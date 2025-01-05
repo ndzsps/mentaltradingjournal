@@ -19,20 +19,20 @@ const mockData = [
 
 export const EmotionalTendencies = () => {
   return (
-    <Card className="p-6 space-y-4">
+    <Card className="p-4 md:p-6 space-y-4">
       <div className="space-y-2">
-        <h3 className="text-2xl font-bold">Emotional Impact on Trading</h3>
-        <p className="text-muted-foreground">
+        <h3 className="text-xl md:text-2xl font-bold">Emotional Impact on Trading</h3>
+        <p className="text-sm text-muted-foreground">
           Track how your emotions correlate with trading performance
         </p>
       </div>
 
-      <div className="h-[300px] w-full">
+      <div className="h-[250px] md:h-[300px] w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={mockData}>
+          <LineChart data={mockData} margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" />
-            <YAxis />
+            <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+            <YAxis tick={{ fontSize: 12 }} />
             <Tooltip />
             <Line
               type="monotone"
@@ -45,9 +45,9 @@ export const EmotionalTendencies = () => {
         </ResponsiveContainer>
       </div>
 
-      <div className="space-y-2 bg-accent/10 p-4 rounded-lg">
-        <h4 className="font-semibold">AI Insight</h4>
-        <p className="text-sm text-muted-foreground">
+      <div className="space-y-2 bg-accent/10 p-3 md:p-4 rounded-lg">
+        <h4 className="font-semibold text-sm md:text-base">AI Insight</h4>
+        <p className="text-xs md:text-sm text-muted-foreground">
           When feeling pressured, your win rate decreases by 18%. Consider taking a
           break before making trades when feeling stressed.
         </p>

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Smile, 
   Meh, 
@@ -11,11 +11,53 @@ import {
   ThumbsDown,
   MinusCircle
 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const emotions = [
-  { icon: Smile, label: "Positive", value: "positive" },
-  { icon: Meh, label: "Neutral", value: "neutral" },
-  { icon: Frown, label: "Negative", value: "negative" },
+  { 
+    icon: Smile, 
+    label: "Positive", 
+    value: "positive",
+    details: [
+      "Confident",
+      "Motivated",
+      "Focused",
+      "Energetic",
+      "Grateful",
+      "Optimistic"
+    ]
+  },
+  { 
+    icon: Meh, 
+    label: "Neutral", 
+    value: "neutral",
+    details: [
+      "Calm",
+      "Reserved",
+      "Observant",
+      "Patient",
+      "Balanced",
+      "Steady"
+    ]
+  },
+  { 
+    icon: Frown, 
+    label: "Negative", 
+    value: "negative",
+    details: [
+      "Losing Streak",
+      "Family pressures",
+      "Career pressure",
+      "Stressed from work",
+      "Conflicted with a loved one or friend",
+      "Hungover"
+    ]
+  },
 ];
 
 const tradingOutcome = [
@@ -26,15 +68,31 @@ const tradingOutcome = [
 
 export const EmotionLogger = () => {
   const [selectedEmotion, setSelectedEmotion] = useState("");
+  const [selectedEmotionDetail, setSelectedEmotionDetail] = useState("");
   const [selectedOutcome, setSelectedOutcome] = useState("");
   const [notes, setNotes] = useState("");
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
   const { toast } = useToast();
 
+  const handleEmotionSelect = (value: string) => {
+    setSelectedEmotion(value);
+    setIsDetailDialogOpen(true);
+  };
+
+  const handleDetailSelect = (detail: string) => {
+    setSelectedEmotionDetail(detail);
+    setIsDetailDialogOpen(false);
+    toast({
+      title: "Emotion Logged",
+      description: `You're feeling ${detail.toLowerCase()}`,
+    });
+  };
+
   const handleSubmit = () => {
-    if (!selectedEmotion || !notes) {
+    if (!selectedEmotion || !selectedEmotionDetail || !notes) {
       toast({
         title: "Missing Information",
-        description: "Please select an emotion and add notes.",
+        description: "Please select an emotion, specify the details, and add notes.",
         variant: "destructive",
       });
       return;
@@ -46,9 +104,12 @@ export const EmotionLogger = () => {
     });
 
     setSelectedEmotion("");
+    setSelectedEmotionDetail("");
     setSelectedOutcome("");
     setNotes("");
   };
+
+  const selectedEmotionConfig = emotions.find(e => e.value === selectedEmotion);
 
   return (
     <Card className="p-8 space-y-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
@@ -67,7 +128,7 @@ export const EmotionLogger = () => {
                   ? "bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20" 
                   : "hover:border-primary/50 hover:bg-primary/5"
               }`}
-              onClick={() => setSelectedEmotion(value)}
+              onClick={() => handleEmotionSelect(value)}
             >
               <div className="flex flex-col items-center gap-3">
                 <Icon className={`w-8 h-8 transition-transform duration-300 group-hover:scale-110 ${
@@ -78,6 +139,30 @@ export const EmotionLogger = () => {
             </Button>
           ))}
         </div>
+
+        <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>How specifically are you feeling?</DialogTitle>
+            </DialogHeader>
+            <div className="grid grid-cols-2 gap-4 py-4">
+              {selectedEmotionConfig?.details.map((detail) => (
+                <Button
+                  key={detail}
+                  variant="outline"
+                  className={`h-20 group transition-all duration-300 ${
+                    selectedEmotionDetail === detail
+                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                      : "hover:border-primary/50 hover:bg-primary/5"
+                  }`}
+                  onClick={() => handleDetailSelect(detail)}
+                >
+                  {detail}
+                </Button>
+              ))}
+            </div>
+          </DialogContent>
+        </Dialog>
 
         <div className="grid grid-cols-3 gap-4">
           {tradingOutcome.map(({ icon: Icon, label, value }) => (

@@ -50,7 +50,9 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
             const emotionStyle = getEmotionStyle(dayDate);
             return (
               <div className="relative w-full h-full">
-                <button {...props} className={`w-full h-full ${props.className}`} />
+                <button {...props} className={`w-full h-full ${props.className || ''}`}>
+                  {dayDate.getDate()}
+                </button>
                 {emotionStyle && (
                   <div 
                     className={`absolute bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full ${emotionStyle.emotion}`}

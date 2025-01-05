@@ -24,8 +24,12 @@ export const EmotionLogger = () => {
     setSelectedEmotionDetail(detail);
     setIsDetailDialogOpen(false);
     toast({
-      title: "Emotion Logged",
-      description: `You're feeling ${detail.toLowerCase()}`,
+      description: (
+        <div className="space-y-1">
+          <p className="font-bold">You're feeling {detail.toLowerCase()}</p>
+          <p className="italic">Remember, tough times are temporary. I'm here for you! 💪</p>
+        </div>
+      ),
     });
   };
 
@@ -46,7 +50,6 @@ export const EmotionLogger = () => {
     }
 
     toast({
-      title: "Entry Logged",
       description: "Your trading journal entry has been saved.",
     });
 

@@ -1,5 +1,6 @@
 import { Calendar } from "@/components/ui/calendar";
 import { Card } from "@/components/ui/card";
+import { DayProps } from "react-day-picker";
 
 interface JournalCalendarProps {
   date: Date | undefined;
@@ -46,7 +47,7 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
           day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
         }}
         components={{
-          Day: ({ date: dayDate, ...props }) => {
+          Day: ({ date: dayDate, ...props }: DayProps) => {
             const emotionStyle = getEmotionStyle(dayDate);
             return (
               <div className="relative w-full h-full">

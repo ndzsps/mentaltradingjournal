@@ -106,12 +106,12 @@ const Journal = () => {
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8">
-          <Card className="p-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
+          <Card className="p-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl flex items-center justify-center">
             <Calendar
               mode="single"
               selected={date}
               onSelect={setDate}
-              className="rounded-md w-full"
+              className="w-full max-w-[400px]"
               modifiers={{
                 hasEntry: (date) => 
                   datesWithMatchingEntries.some(entryDate => 

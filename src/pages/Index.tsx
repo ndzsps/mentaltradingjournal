@@ -13,46 +13,48 @@ const behaviorData = [
   { date: '2024-01-05', emotion: 1, pnl: -2.0, outcome: "loss" },
   { date: '2024-01-06', emotion: 3, pnl: 0, outcome: "no_trades" },
   { date: '2024-01-07', emotion: 4, pnl: 3.5, outcome: "win" },
-  { date: '2024-01-08', emotion: 5, pnl: -3.0, outcome: "loss" }, // Added new data point showing excellent emotion but negative result
+  { date: '2024-01-08', emotion: 5, pnl: -3.0, outcome: "loss" },
 ];
 
 const Index = () => {
   return (
     <AppLayout>
-      <div className="max-w-5xl mx-auto space-y-8 px-4">
-        <div className="space-y-3">
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
+      <div className="w-full max-w-5xl mx-auto space-y-6 px-4 sm:px-6 lg:px-8">
+        <div className="space-y-2 text-center sm:text-left">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
             Welcome back!
           </h1>
-          <p className="text-xl text-muted-foreground">
+          <p className="text-base sm:text-lg lg:text-xl text-muted-foreground">
             Track your trading journey and improve your mindset
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
-          <EmotionLogger />
+        <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
+          <div className="w-full">
+            <EmotionLogger />
+          </div>
           
-          <Card className="p-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent mb-6">
+          <Card className="p-4 sm:p-6 lg:p-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
+            <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent mb-4 sm:mb-6">
               Your Progress
             </h2>
-            <div className="space-y-6">
-              <div className="space-y-3">
-                <div className="flex justify-between text-sm font-medium">
+            <div className="space-y-4 sm:space-y-6">
+              <div className="space-y-2 sm:space-y-3">
+                <div className="flex justify-between text-sm sm:text-base font-medium">
                   <span className="text-muted-foreground">Daily Streak</span>
                   <span className="text-primary-light">3 days</span>
                 </div>
-                <div className="h-3 bg-muted rounded-full overflow-hidden">
+                <div className="h-2 sm:h-3 bg-muted rounded-full overflow-hidden">
                   <div className="h-full w-3/4 bg-gradient-to-r from-primary to-primary-light rounded-full" />
                 </div>
               </div>
               
-              <div className="space-y-3">
-                <div className="flex justify-between text-sm font-medium">
+              <div className="space-y-2 sm:space-y-3">
+                <div className="flex justify-between text-sm sm:text-base font-medium">
                   <span className="text-muted-foreground">Level Progress</span>
                   <span className="text-accent">Level 2</span>
                 </div>
-                <div className="h-3 bg-muted rounded-full overflow-hidden">
+                <div className="h-2 sm:h-3 bg-muted rounded-full overflow-hidden">
                   <div className="h-full w-1/2 bg-gradient-to-r from-accent/70 to-accent rounded-full" />
                 </div>
               </div>
@@ -60,12 +62,11 @@ const Index = () => {
           </Card>
         </div>
 
-        {/* Behavior Pattern Graph Section */}
-        <Card className="p-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent mb-6">
+        <Card className="p-4 sm:p-6 lg:p-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
+          <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent mb-4 sm:mb-6">
             Trading Performance & Emotional States
           </h2>
-          <div className="h-[400px] w-full">
+          <div className="h-[300px] sm:h-[350px] lg:h-[400px] w-full">
             <ChartContainer
               className="h-full"
               config={{
@@ -88,29 +89,37 @@ const Index = () => {
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart 
                   data={behaviorData} 
-                  margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                  margin={{ 
+                    top: 20, 
+                    right: 20, 
+                    left: 0, 
+                    bottom: 20 
+                  }}
                 >
                   <CartesianGrid strokeDasharray="3 3" className="stroke-border/20" />
                   <XAxis
                     dataKey="date"
                     tickFormatter={(value) => new Date(value).toLocaleDateString()}
-                    className="text-muted-foreground text-xs"
+                    className="text-muted-foreground text-xs sm:text-sm"
+                    tick={{ fontSize: 10 }}
                   />
                   <YAxis
                     yAxisId="left"
                     orientation="left"
-                    className="text-muted-foreground text-xs"
+                    className="text-muted-foreground text-xs sm:text-sm"
                     tickFormatter={(value) => `${value}%`}
+                    tick={{ fontSize: 10 }}
                   />
                   <YAxis
                     yAxisId="right"
                     orientation="right"
                     domain={[0, 5]}
-                    className="text-muted-foreground text-xs"
+                    className="text-muted-foreground text-xs sm:text-sm"
                     tickFormatter={(value) => {
                       const emotions = ["Very Bad", "Bad", "Neutral", "Good", "Excellent"];
                       return emotions[value - 1] || value;
                     }}
+                    tick={{ fontSize: 10 }}
                   />
                   <ChartTooltip
                     content={({ active, payload }) => {
@@ -139,7 +148,7 @@ const Index = () => {
                     dataKey="pnl"
                     stroke="var(--color-pnl)"
                     strokeWidth={2}
-                    dot={{ fill: "var(--color-pnl)" }}
+                    dot={{ fill: "var(--color-pnl)", r: 4 }}
                   />
                   <Line
                     yAxisId="right"
@@ -149,7 +158,7 @@ const Index = () => {
                     strokeWidth={2}
                     dot={{ 
                       fill: "var(--color-emotion)",
-                      r: 6
+                      r: 4
                     }}
                   />
                 </LineChart>
@@ -157,10 +166,10 @@ const Index = () => {
             </ChartContainer>
           </div>
           <div className="space-y-2 mt-4">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs sm:text-sm text-muted-foreground">
               This graph shows the relationship between your trading performance (blue line) and emotional states (orange line) over time.
             </p>
-            <ul className="text-xs text-muted-foreground list-disc list-inside space-y-1">
+            <ul className="text-xs sm:text-sm text-muted-foreground list-disc list-inside space-y-1">
               <li>Left axis shows your daily profit/loss as a percentage</li>
               <li>Right axis indicates your emotional state from "Very Bad" to "Excellent"</li>
               <li>Larger dots represent emotional measurements to emphasize your psychological state</li>

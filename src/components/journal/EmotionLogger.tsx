@@ -8,7 +8,8 @@ import {
   Meh, 
   Frown,
   ThumbsUp,
-  ThumbsDown 
+  ThumbsDown,
+  MinusCircle
 } from "lucide-react";
 
 const emotions = [
@@ -18,8 +19,9 @@ const emotions = [
 ];
 
 const tradingOutcome = [
-  { icon: ThumbsUp, label: "Profitable", value: "profitable" },
+  { icon: ThumbsUp, label: "Win", value: "win" },
   { icon: ThumbsDown, label: "Loss", value: "loss" },
+  { icon: MinusCircle, label: "No Trades", value: "no_trades" },
 ];
 
 export const EmotionLogger = () => {
@@ -77,7 +79,7 @@ export const EmotionLogger = () => {
           ))}
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-4">
           {tradingOutcome.map(({ icon: Icon, label, value }) => (
             <Button
               key={value}

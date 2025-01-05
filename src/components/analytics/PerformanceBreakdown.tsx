@@ -1,13 +1,41 @@
 import { Card } from "@/components/ui/card";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
+import { generateAnalytics } from "@/utils/analyticsUtils";
 
-const mockData = [
-  { name: "Wins (Positive)", value: 60, color: "#6E59A5" },
-  { name: "Wins (Neutral)", value: 25, color: "#0EA5E9" },
-  { name: "Losses", value: 15, color: "#FEC6A1" },
+// For demo purposes, using mock data
+const mockJournalEntries = [
+  {
+    emotion: "positive",
+    emotionDetail: "confident",
+    outcome: "win",
+    notes: "Great trade!",
+    sessionType: "post" as const,
+    timestamp: new Date(),
+  },
+  // Add more mock entries as needed
 ];
 
 export const PerformanceBreakdown = () => {
+  const analytics = generateAnalytics(mockJournalEntries);
+  
+  const data = [
+    { 
+      name: "Wins (Positive)", 
+      value: analytics.performanceByEmotion.positive, 
+      color: "#6E59A5" 
+    },
+    { 
+      name: "Wins (Neutral)", 
+      value: analytics.performanceByEmotion.neutral, 
+      color: "#0EA5E9" 
+    },
+    { 
+      name: "Losses", 
+      value: 100 - analytics.performanceByEmotion.positive - analytics.performanceByEmotion.neutral, 
+      color: "#FEC6A1" 
+    },
+  ];
+
   return (
     <Card className="p-4 md:p-6 space-y-4">
       <div className="space-y-2">
@@ -21,7 +49,7 @@ export const PerformanceBreakdown = () => {
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
-              data={mockData}
+              data={data}
               cx="50%"
               cy="50%"
               innerRadius={50}
@@ -29,7 +57,7 @@ export const PerformanceBreakdown = () => {
               paddingAngle={5}
               dataKey="value"
             >
-              {mockData.map((entry, index) => (
+              {data.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
             </Pie>
@@ -46,9 +74,7 @@ export const PerformanceBreakdown = () => {
       <div className="space-y-2 bg-accent/10 p-3 md:p-4 rounded-lg">
         <h4 className="font-semibold text-sm md:text-base">AI Insight</h4>
         <p className="text-xs md:text-sm text-muted-foreground">
-          You win 60% of trades when in a positive emotional state, compared to
-          25% in neutral states. Focus on maintaining a positive mindset for
-          optimal performance.
+          {analytics.mainInsight} {analytics.recommendedAction}
         </p>
       </div>
     </Card>

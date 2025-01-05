@@ -8,16 +8,29 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { generateAnalytics } from "@/utils/analyticsUtils";
 
-const mockData = [
-  { date: "Mon", emotion: "positive", winRate: 65 },
-  { date: "Tue", emotion: "neutral", winRate: 55 },
-  { date: "Wed", emotion: "negative", winRate: 35 },
-  { date: "Thu", emotion: "positive", winRate: 70 },
-  { date: "Fri", emotion: "neutral", winRate: 50 },
+// For demo purposes, using mock data
+const mockJournalEntries = [
+  {
+    emotion: "positive",
+    emotionDetail: "confident",
+    outcome: "win",
+    notes: "Great trade!",
+    sessionType: "post" as const,
+    timestamp: new Date(),
+  },
+  // Add more mock entries as needed
 ];
 
 export const EmotionalTendencies = () => {
+  const analytics = generateAnalytics(mockJournalEntries);
+  
+  const data = analytics.emotionalImpact.dates.map((date, index) => ({
+    date,
+    winRate: analytics.emotionalImpact.winRate[index],
+  }));
+
   return (
     <Card className="p-4 md:p-6 space-y-4">
       <div className="space-y-2">
@@ -29,7 +42,7 @@ export const EmotionalTendencies = () => {
 
       <div className="h-[250px] md:h-[300px] w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={mockData} margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
+          <LineChart data={data} margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="date" tick={{ fontSize: 12 }} />
             <YAxis tick={{ fontSize: 12 }} />
@@ -48,8 +61,7 @@ export const EmotionalTendencies = () => {
       <div className="space-y-2 bg-accent/10 p-3 md:p-4 rounded-lg">
         <h4 className="font-semibold text-sm md:text-base">AI Insight</h4>
         <p className="text-xs md:text-sm text-muted-foreground">
-          When feeling pressured, your win rate decreases by 18%. Consider taking a
-          break before making trades when feeling stressed.
+          {analytics.mainInsight} {analytics.recommendedAction}
         </p>
       </div>
     </Card>

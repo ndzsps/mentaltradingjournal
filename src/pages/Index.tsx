@@ -2,17 +2,17 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { EmotionLogger } from "@/components/journal/EmotionLogger";
 import { Card } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Scatter } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
 
 // Sample data - in a real app this would come from your database
 const behaviorData = [
-  { date: '2024-01-01', emotion: 3, pnl: 250, outcome: "win" },
-  { date: '2024-01-02', emotion: 4, pnl: 450, outcome: "win" },
-  { date: '2024-01-03', emotion: 2, pnl: -300, outcome: "loss" },
-  { date: '2024-01-04', emotion: 5, pnl: 600, outcome: "win" },
-  { date: '2024-01-05', emotion: 1, pnl: -200, outcome: "loss" },
+  { date: '2024-01-01', emotion: 3, pnl: 2.5, outcome: "win" },
+  { date: '2024-01-02', emotion: 4, pnl: 4.5, outcome: "win" },
+  { date: '2024-01-03', emotion: 2, pnl: -3.0, outcome: "loss" },
+  { date: '2024-01-04', emotion: 5, pnl: 6.0, outcome: "win" },
+  { date: '2024-01-05', emotion: 1, pnl: -2.0, outcome: "loss" },
   { date: '2024-01-06', emotion: 3, pnl: 0, outcome: "no_trades" },
-  { date: '2024-01-07', emotion: 4, pnl: 350, outcome: "win" },
+  { date: '2024-01-07', emotion: 4, pnl: 3.5, outcome: "win" },
 ];
 
 const Index = () => {
@@ -69,7 +69,7 @@ const Index = () => {
               className="h-full"
               config={{
                 pnl: {
-                  label: "Profit/Loss ($)",
+                  label: "Profit/Loss (%)",
                   theme: {
                     light: "#0EA5E9",
                     dark: "#38BDF8"
@@ -99,7 +99,7 @@ const Index = () => {
                     yAxisId="left"
                     orientation="left"
                     className="text-muted-foreground text-xs"
-                    tickFormatter={(value) => `$${value}`}
+                    tickFormatter={(value) => `${value}%`}
                   />
                   <YAxis
                     yAxisId="right"
@@ -124,7 +124,7 @@ const Index = () => {
                               return emotions[Number(value) - 1] || value;
                             }
                             if (name === "pnl") {
-                              return `$${value}`;
+                              return `${value}%`;
                             }
                             return value;
                           }}
@@ -160,7 +160,7 @@ const Index = () => {
               This graph shows the relationship between your trading performance (blue line) and emotional states (orange line) over time.
             </p>
             <ul className="text-xs text-muted-foreground list-disc list-inside space-y-1">
-              <li>Left axis shows your daily profit/loss in dollars</li>
+              <li>Left axis shows your daily profit/loss as a percentage</li>
               <li>Right axis indicates your emotional state from "Very Bad" to "Excellent"</li>
               <li>Larger dots represent emotional measurements to emphasize your psychological state</li>
             </ul>

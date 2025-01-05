@@ -111,7 +111,17 @@ const Journal = () => {
               mode="single"
               selected={date}
               onSelect={setDate}
-              className="w-full max-w-[400px]"
+              className="w-full max-w-[600px]"
+              classNames={{
+                months: "w-full",
+                month: "w-full",
+                table: "w-full",
+                head_row: "w-full",
+                row: "w-full",
+                cell: "w-[14.28%] h-14 lg:h-16 p-0",
+                day: "w-full h-full rounded-md",
+                nav: "w-full",
+              }}
               modifiers={{
                 hasEntry: (date) => 
                   datesWithMatchingEntries.some(entryDate => 

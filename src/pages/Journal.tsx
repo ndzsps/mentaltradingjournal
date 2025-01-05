@@ -20,29 +20,29 @@ const sampleEntries = [
   { 
     date: new Date(2024, 2, 15), 
     type: "pre", 
-    emotion: "Focused",
-    detail: "Ready to trade",
+    emotion: "Positive",
+    detail: "Confident",
     notes: "Starting the day with a clear mind"
   },
   { 
     date: new Date(2024, 2, 15), 
     type: "post", 
-    emotion: "Satisfied",
-    detail: "Achieved goals",
+    emotion: "Positive",
+    detail: "Motivated",
     notes: "Made good decisions today"
   },
   { 
     date: new Date(2024, 2, 16), 
     type: "pre", 
-    emotion: "Anxious",
-    detail: "Career pressures",
+    emotion: "Negative",
+    detail: "Career pressure",
     notes: "Feeling pressure from recent losses"
   },
   { 
     date: new Date(2024, 2, 16), 
     type: "post", 
-    emotion: "Calm",
-    detail: "Market understanding",
+    emotion: "Neutral",
+    detail: "Calm",
     notes: "Managed to stay disciplined"
   },
 ];
@@ -52,14 +52,18 @@ const Journal = () => {
   const [emotionFilter, setEmotionFilter] = useState<string | null>(null);
   const [detailFilter, setDetailFilter] = useState<string | null>(null);
   
-  // Get entries for the selected date
-  const selectedDateEntries = sampleEntries
-    .filter(entry => date && entry.date.toDateString() === date.toDateString())
-    .filter(entry => !emotionFilter || entry.emotion === emotionFilter)
-    .filter(entry => !detailFilter || entry.detail === detailFilter);
+  // Filter entries based on emotion and detail
+  const filteredEntries = sampleEntries.filter(entry => {
+    const matchesEmotion = !emotionFilter || entry.emotion === emotionFilter;
+    const matchesDetail = !detailFilter || entry.detail === detailFilter;
+    return matchesEmotion && matchesDetail;
+  });
 
   // Get all unique emotion details for filtering
   const allDetails = Array.from(new Set(sampleEntries.map(entry => entry.detail)));
+
+  // Get dates that have entries matching the current filters
+  const datesWithMatchingEntries = filteredEntries.map(entry => entry.date);
 
   return (
     <AppLayout>
@@ -82,8 +86,8 @@ const Journal = () => {
               className="rounded-md w-full"
               modifiers={{
                 hasEntry: (date) => 
-                  sampleEntries.some(entry => 
-                    entry.date.toDateString() === date.toDateString()
+                  datesWithMatchingEntries.some(entryDate => 
+                    entryDate.toDateString() === date.toDateString()
                   ),
               }}
               modifiersStyles={{
@@ -100,12 +104,7 @@ const Journal = () => {
           <Card className="p-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
-                {date ? date.toLocaleDateString('en-US', { 
-                  weekday: 'long', 
-                  year: 'numeric', 
-                  month: 'long', 
-                  day: 'numeric' 
-                }) : 'Select a date'}
+                Journal Entries
               </h2>
               <div className="flex gap-2">
                 <DropdownMenu>
@@ -156,16 +155,21 @@ const Journal = () => {
               </div>
             </div>
             
-            {selectedDateEntries.length > 0 ? (
+            {filteredEntries.length > 0 ? (
               <div className="space-y-4">
-                {selectedDateEntries.map((entry, index) => (
+                {filteredEntries.map((entry, index) => (
                   <div key={index} className="p-4 rounded-lg bg-background/50 border border-primary/10">
                     <div className="flex items-center justify-between mb-2">
                       <Badge variant={entry.type === 'pre' ? 'default' : 'secondary'}>
                         {entry.type === 'pre' ? 'Pre-Session' : 'Post-Session'}
                       </Badge>
                       <span className="text-sm text-muted-foreground">
-                        {entry.date.toLocaleTimeString()}
+                        {entry.date.toLocaleDateString('en-US', { 
+                          weekday: 'long',
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
                       </span>
                     </div>
                     <p className="font-medium text-foreground mb-1">
@@ -179,7 +183,7 @@ const Journal = () => {
               </div>
             ) : (
               <p className="text-muted-foreground text-center py-8">
-                No entries for this date
+                No entries found matching your filters
               </p>
             )}
           </Card>

@@ -79,50 +79,28 @@ const Journal = () => {
                     color: "var(--primary)",
                     fontWeight: "bold",
                     backgroundColor: "transparent",
-                    position: "relative",
-                    "::after": {
-                      content: '""',
-                      position: "absolute",
-                      width: "24px",
-                      height: "24px",
-                      borderRadius: "50%",
-                      backgroundColor: "var(--primary)",
-                      opacity: "0.2",
-                      zIndex: "-1",
-                    },
+                    position: "relative"
                   },
                   neutral: {
                     color: "var(--accent)",
                     fontWeight: "bold",
                     backgroundColor: "transparent",
-                    position: "relative",
-                    "::after": {
-                      content: '""',
-                      position: "absolute",
-                      width: "24px",
-                      height: "24px",
-                      borderRadius: "50%",
-                      backgroundColor: "var(--accent)",
-                      opacity: "0.2",
-                      zIndex: "-1",
-                    },
+                    position: "relative"
                   },
                   negative: {
                     color: "var(--destructive)",
                     fontWeight: "bold",
                     backgroundColor: "transparent",
-                    position: "relative",
-                    "::after": {
-                      content: '""',
-                      position: "absolute",
-                      width: "24px",
-                      height: "24px",
-                      borderRadius: "50%",
-                      backgroundColor: "var(--destructive)",
-                      opacity: "0.2",
-                      zIndex: "-1",
-                    },
+                    position: "relative"
                   },
+                }}
+                classNames={{
+                  day: "relative before:absolute before:inset-0 before:z-[-1] before:rounded-full hover:before:bg-accent/20",
+                  day_selected: "before:bg-primary before:opacity-20",
+                  day_today: "before:bg-accent before:opacity-20",
+                  day_positive: "before:bg-primary before:opacity-20",
+                  day_neutral: "before:bg-accent before:opacity-20",
+                  day_negative: "before:bg-destructive before:opacity-20",
                 }}
               />
 

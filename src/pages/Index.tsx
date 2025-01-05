@@ -13,6 +13,7 @@ const behaviorData = [
   { date: '2024-01-05', emotion: 1, pnl: -2.0, outcome: "loss" },
   { date: '2024-01-06', emotion: 3, pnl: 0, outcome: "no_trades" },
   { date: '2024-01-07', emotion: 4, pnl: 3.5, outcome: "win" },
+  { date: '2024-01-08', emotion: 5, pnl: -3.0, outcome: "loss" }, // Added new data point showing excellent emotion but negative result
 ];
 
 const Index = () => {

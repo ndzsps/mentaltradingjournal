@@ -106,7 +106,7 @@ const Journal = () => {
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8">
-          <Card className="p-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl flex items-center justify-center">
+          <Card className="p-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
             <Calendar
               mode="single"
               selected={date}

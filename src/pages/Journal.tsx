@@ -1,5 +1,4 @@
 import { AppLayout } from "@/components/layout/AppLayout";
-import { Calendar } from "@/components/ui/calendar";
 import { Card } from "@/components/ui/card";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -16,8 +15,8 @@ import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
 import { emotions } from "@/components/journal/emotionConfig";
 import { subMonths, isWithinInterval, startOfMonth, endOfMonth } from "date-fns";
+import { JournalCalendar } from "@/components/journal/JournalCalendar";
 
-// This would come from your database in a real app
 const sampleEntries = [
   { 
     date: new Date(2024, 2, 15), 
@@ -57,7 +56,6 @@ const Journal = () => {
   const [detailFilter, setDetailFilter] = useState<string | null>(null);
   const [timeFilter, setTimeFilter] = useState<TimeFilter>(null);
   
-  // Filter entries based on emotion, detail, and time period
   const filteredEntries = sampleEntries.filter(entry => {
     const matchesEmotion = !emotionFilter || entry.emotion === emotionFilter;
     const matchesDetail = !detailFilter || entry.detail === detailFilter;
@@ -106,38 +104,11 @@ const Journal = () => {
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8">
-          <Card className="p-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
-            <Calendar
-              mode="single"
-              selected={date}
-              onSelect={setDate}
-              className="w-full max-w-[600px]"
-              classNames={{
-                months: "w-full",
-                month: "w-full",
-                table: "w-full",
-                head_row: "w-full",
-                row: "w-full",
-                cell: "w-[14.28%] h-14 lg:h-16 p-0",
-                day: "w-full h-full rounded-md",
-                nav: "w-full",
-              }}
-              modifiers={{
-                hasEntry: (date) => 
-                  datesWithMatchingEntries.some(entryDate => 
-                    entryDate.toDateString() === date.toDateString()
-                  ),
-              }}
-              modifiersStyles={{
-                hasEntry: {
-                  fontWeight: 'bold',
-                  backgroundColor: 'var(--primary)',
-                  color: 'white',
-                  borderRadius: '0.5rem',
-                }
-              }}
-            />
-          </Card>
+          <JournalCalendar 
+            date={date}
+            onDateSelect={setDate}
+            entries={filteredEntries}
+          />
 
           <Card className="p-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
             <div className="flex items-center justify-between mb-6">

@@ -65,7 +65,7 @@ const Journal = () => {
     let matchesTimeFilter = true;
     if (timeFilter) {
       const now = new Date();
-      const intervals: Record<TimeFilter, { start: Date; end: Date } | null> = {
+      const intervals: Record<Exclude<TimeFilter, null>, { start: Date; end: Date }> = {
         "this-month": {
           start: startOfMonth(now),
           end: endOfMonth(now)
@@ -77,14 +77,11 @@ const Journal = () => {
         "last-three-months": {
           start: startOfMonth(subMonths(now, 3)),
           end: endOfMonth(now)
-        },
-        "null": null
+        }
       };
 
       const interval = intervals[timeFilter];
-      if (interval) {
-        matchesTimeFilter = isWithinInterval(entry.date, interval);
-      }
+      matchesTimeFilter = isWithinInterval(entry.date, interval);
     }
 
     return matchesEmotion && matchesDetail && matchesTimeFilter;

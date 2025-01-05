@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { 
-  Happy, 
+  Smile, 
   Meh, 
   Frown,
   ThumbsUp,
@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 const emotions = [
-  { icon: Happy, label: "Positive", value: "positive" },
+  { icon: Smile, label: "Positive", value: "positive" },
   { icon: Meh, label: "Neutral", value: "neutral" },
   { icon: Frown, label: "Negative", value: "negative" },
 ];

@@ -5,6 +5,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { emotions, tradingOutcome } from "./emotionConfig";
 import { EmotionDetailDialog } from "./EmotionDetailDialog";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 
 export const EmotionLogger = () => {
   const [selectedEmotion, setSelectedEmotion] = useState("");
@@ -13,6 +15,7 @@ export const EmotionLogger = () => {
   const [notes, setNotes] = useState("");
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
   const [customDetails, setCustomDetails] = useState<string[]>([]);
+  const [sessionType, setSessionType] = useState<"pre" | "post">("pre");
   const { toast } = useToast();
 
   const handleEmotionSelect = (value: string) => {
@@ -63,9 +66,27 @@ export const EmotionLogger = () => {
 
   return (
     <Card className="p-8 space-y-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
-      <h2 className="text-3xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
-        How are you feeling?
-      </h2>
+      <div className="space-y-4">
+        <h2 className="text-3xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
+          How are you feeling?
+        </h2>
+        
+        <RadioGroup
+          defaultValue="pre"
+          value={sessionType}
+          onValueChange={(value) => setSessionType(value as "pre" | "post")}
+          className="flex space-x-4"
+        >
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="pre" id="pre" />
+            <Label htmlFor="pre" className="font-medium">Pre-Session</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="post" id="post" />
+            <Label htmlFor="post" className="font-medium">Post-Session</Label>
+          </div>
+        </RadioGroup>
+      </div>
       
       <div className="space-y-6">
         <div className="grid grid-cols-3 gap-4">
@@ -123,7 +144,10 @@ export const EmotionLogger = () => {
         </div>
 
         <Textarea
-          placeholder="What's on your mind? Describe your trading mindset..."
+          placeholder={sessionType === "pre" 
+            ? "How are you feeling before starting your trading session?" 
+            : "Reflect on your trading session. How do you feel about your performance and decisions?"
+          }
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           className="min-h-[120px] bg-card/50 border-primary/10 focus-visible:ring-primary/30 resize-none"
@@ -133,7 +157,7 @@ export const EmotionLogger = () => {
           onClick={handleSubmit}
           className="w-full h-12 text-lg font-medium bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all duration-300"
         >
-          Log Entry
+          Log {sessionType === "pre" ? "Pre" : "Post"}-Session Entry
         </Button>
       </div>
     </Card>

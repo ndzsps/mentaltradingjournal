@@ -3,68 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { 
-  Smile, 
-  Meh, 
-  Frown,
-  ThumbsUp,
-  ThumbsDown,
-  MinusCircle
-} from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-
-const emotions = [
-  { 
-    icon: Smile, 
-    label: "Positive", 
-    value: "positive",
-    details: [
-      "Confident",
-      "Motivated",
-      "Focused",
-      "Energetic",
-      "Grateful",
-      "Optimistic"
-    ]
-  },
-  { 
-    icon: Meh, 
-    label: "Neutral", 
-    value: "neutral",
-    details: [
-      "Calm",
-      "Reserved",
-      "Observant",
-      "Patient",
-      "Balanced",
-      "Steady"
-    ]
-  },
-  { 
-    icon: Frown, 
-    label: "Negative", 
-    value: "negative",
-    details: [
-      "Losing Streak",
-      "Family pressures",
-      "Career pressure",
-      "Stressed from work",
-      "Conflicted with a loved one or friend",
-      "Hungover"
-    ]
-  },
-];
-
-const tradingOutcome = [
-  { icon: ThumbsUp, label: "Win", value: "win" },
-  { icon: ThumbsDown, label: "Loss", value: "loss" },
-  { icon: MinusCircle, label: "No Trades", value: "no_trades" },
-];
+import { emotions, tradingOutcome } from "./emotionConfig";
+import { EmotionDetailDialog } from "./EmotionDetailDialog";
 
 export const EmotionLogger = () => {
   const [selectedEmotion, setSelectedEmotion] = useState("");
@@ -72,6 +12,7 @@ export const EmotionLogger = () => {
   const [selectedOutcome, setSelectedOutcome] = useState("");
   const [notes, setNotes] = useState("");
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
+  const [customDetails, setCustomDetails] = useState<string[]>([]);
   const { toast } = useToast();
 
   const handleEmotionSelect = (value: string) => {
@@ -86,6 +27,12 @@ export const EmotionLogger = () => {
       title: "Emotion Logged",
       description: `You're feeling ${detail.toLowerCase()}`,
     });
+  };
+
+  const handleCustomDetailAdd = (detail: string) => {
+    if (!customDetails.includes(detail)) {
+      setCustomDetails([...customDetails, detail]);
+    }
   };
 
   const handleSubmit = () => {
@@ -140,29 +87,15 @@ export const EmotionLogger = () => {
           ))}
         </div>
 
-        <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>How specifically are you feeling?</DialogTitle>
-            </DialogHeader>
-            <div className="grid grid-cols-2 gap-4 py-4">
-              {selectedEmotionConfig?.details.map((detail) => (
-                <Button
-                  key={detail}
-                  variant="outline"
-                  className={`h-20 group transition-all duration-300 ${
-                    selectedEmotionDetail === detail
-                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                      : "hover:border-primary/50 hover:bg-primary/5"
-                  }`}
-                  onClick={() => handleDetailSelect(detail)}
-                >
-                  {detail}
-                </Button>
-              ))}
-            </div>
-          </DialogContent>
-        </Dialog>
+        <EmotionDetailDialog
+          isOpen={isDetailDialogOpen}
+          onOpenChange={setIsDetailDialogOpen}
+          details={selectedEmotionConfig?.details || []}
+          onDetailSelect={handleDetailSelect}
+          selectedDetail={selectedEmotionDetail}
+          customDetails={customDetails}
+          onCustomDetailAdd={handleCustomDetailAdd}
+        />
 
         <div className="grid grid-cols-3 gap-4">
           {tradingOutcome.map(({ icon: Icon, label, value }) => (

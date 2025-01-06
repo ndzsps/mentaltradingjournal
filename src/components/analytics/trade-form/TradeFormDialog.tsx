@@ -66,14 +66,42 @@ export const TradeFormDialog = ({ open, onOpenChange, onSubmit, editTrade }: Tra
       }
 
       const currentEntry = entries[0];
-      const existingTrades = (currentEntry.trades || []) as Trade[];
+      // Cast the trades array to Trade[] after parsing from JSON
+      const existingTrades = (currentEntry.trades || []).map((trade: any) => ({
+        id: trade.id || crypto.randomUUID(),
+        entryDate: trade.entryDate,
+        instrument: trade.instrument,
+        setup: trade.setup,
+        direction: trade.direction,
+        entryPrice: parseFloat(trade.entryPrice),
+        quantity: parseFloat(trade.quantity),
+        stopLoss: parseFloat(trade.stopLoss),
+        takeProfit: parseFloat(trade.takeProfit),
+        exitDate: trade.exitDate,
+        exitPrice: parseFloat(trade.exitPrice),
+        pnl: parseFloat(trade.pnl),
+        fees: parseFloat(trade.fees),
+      })) as Trade[];
+
       const updatedTrades = editTrade 
         ? existingTrades.map(t => t.id === editTrade.id ? tradeData : t)
         : [...existingTrades, tradeData];
 
+      // Convert Trade[] to Json[] before sending to Supabase
+      const tradesForDb = updatedTrades.map(trade => ({
+        ...trade,
+        entryPrice: trade.entryPrice.toString(),
+        quantity: trade.quantity.toString(),
+        stopLoss: trade.stopLoss.toString(),
+        takeProfit: trade.takeProfit.toString(),
+        exitPrice: trade.exitPrice.toString(),
+        pnl: trade.pnl.toString(),
+        fees: trade.fees.toString(),
+      }));
+
       const { error: updateError } = await supabase
         .from('journal_entries')
-        .update({ trades: updatedTrades })
+        .update({ trades: tradesForDb })
         .eq('id', currentEntry.id);
 
       if (updateError) throw updateError;

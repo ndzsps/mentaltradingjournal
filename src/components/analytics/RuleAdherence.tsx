@@ -13,11 +13,12 @@ import {
 } from "recharts";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { AddTradeDialog } from "./AddTradeDialog";
-import { Plus } from "lucide-react";
+import { Plus, Pencil } from "lucide-react";
 import { toast } from "sonner";
 
 export const RuleAdherence = () => {
   const [showAddTradeDialog, setShowAddTradeDialog] = useState(false);
+  const [selectedTrade, setSelectedTrade] = useState<any>(null);
   const analytics = generateAnalytics([]);
   
   const data = [
@@ -37,6 +38,12 @@ export const RuleAdherence = () => {
     // Here you would typically handle the trade data, e.g., save it to a database
     console.log("Trade submitted:", tradeData);
     toast.success(isEdit ? "Trade updated successfully!" : "Trade added successfully!");
+    setSelectedTrade(null);
+  };
+
+  const handleEditTrade = (trade: any) => {
+    setSelectedTrade(trade);
+    setShowAddTradeDialog(true);
   };
 
   return (
@@ -48,14 +55,30 @@ export const RuleAdherence = () => {
             Compare outcomes when trading rules are followed vs. broken
           </p>
         </div>
-        <Button
-          onClick={() => setShowAddTradeDialog(true)}
-          className="flex items-center gap-2"
-          size="sm"
-        >
-          <Plus className="w-4 h-4" />
-          Add Trade
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => handleEditTrade({
+              id: '1', // Example trade data
+              direction: 'buy',
+              instrument: 'AAPL',
+              entryPrice: '150.00'
+            })}
+            className="flex items-center gap-2"
+            size="sm"
+          >
+            <Pencil className="w-4 h-4" />
+            Edit Last Trade
+          </Button>
+          <Button
+            onClick={() => setShowAddTradeDialog(true)}
+            className="flex items-center gap-2"
+            size="sm"
+          >
+            <Plus className="w-4 h-4" />
+            Add Trade
+          </Button>
+        </div>
       </div>
 
       <div className="h-[250px] md:h-[300px] w-full">
@@ -84,6 +107,7 @@ export const RuleAdherence = () => {
         open={showAddTradeDialog}
         onOpenChange={setShowAddTradeDialog}
         onSubmit={handleTradeSubmit}
+        editTrade={selectedTrade}
       />
     </Card>
   );

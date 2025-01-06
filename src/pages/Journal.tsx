@@ -78,7 +78,8 @@ const Journal = () => {
   const filteredEntries = entries.filter(entry => {
     const entryDate = new Date(entry.created_at);
     const matchesDate = !selectedDate || isSameDay(entryDate, selectedDate);
-    const matchesEmotion = !emotionFilter || entry.emotion === emotionFilter;
+    // Convert both to lowercase for case-insensitive comparison
+    const matchesEmotion = !emotionFilter || entry.emotion.toLowerCase() === emotionFilter.toLowerCase();
     const matchesDetail = !detailFilter || entry.emotion_detail === detailFilter;
     
     let matchesTimeFilter = true;

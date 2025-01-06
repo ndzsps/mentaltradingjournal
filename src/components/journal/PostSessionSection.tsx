@@ -52,27 +52,27 @@ export const PostSessionSection = ({
   const getOutcomeStyles = (value: string) => {
     if (selectedOutcome === value) {
       if (value === "loss") {
-        return "bg-gradient-to-br from-red-500 to-red-400 text-white shadow-lg shadow-red-500/20";
+        return "bg-gradient-to-br from-[#FF6B6B] to-[#FF8787] text-white shadow-lg shadow-red-500/20";
       }
       if (value === "win") {
-        return "bg-gradient-to-br from-green-500 to-green-400 text-white shadow-lg shadow-green-500/20";
+        return "bg-gradient-to-br from-[#40C057] to-[#69DB7C] text-white shadow-lg shadow-green-500/20";
       }
-      return "bg-gradient-to-br from-yellow-500 to-yellow-400 text-white shadow-lg shadow-yellow-500/20";
+      return "bg-gradient-to-br from-[#FAB005] to-[#FFD43B] text-white shadow-lg shadow-yellow-500/20";
     }
     if (value === "loss") {
-      return "hover:bg-gradient-to-br hover:from-red-500/10 hover:to-red-400/5 hover:border-red-500/50 group-hover:text-red-600";
+      return "hover:bg-gradient-to-br hover:from-[#FFF5F5] hover:to-[#FFE3E3] hover:border-[#FF8787]/50 group-hover:text-[#FA5252]";
     }
     if (value === "win") {
-      return "hover:bg-gradient-to-br hover:from-green-500/10 hover:to-green-400/5 hover:border-green-500/50 group-hover:text-green-600";
+      return "hover:bg-gradient-to-br hover:from-[#EBFBEE] hover:to-[#D3F9D8] hover:border-[#69DB7C]/50 group-hover:text-[#37B24D]";
     }
-    return "hover:bg-gradient-to-br hover:from-yellow-500/10 hover:to-yellow-400/5 hover:border-yellow-500/50 group-hover:text-yellow-600";
+    return "hover:bg-gradient-to-br hover:from-[#FFF9DB] hover:to-[#FFE066] hover:border-[#FFD43B]/50 group-hover:text-[#F59F00]";
   };
 
   const getIconColor = (value: string) => {
     if (selectedOutcome === value) return "text-white";
-    if (value === "loss") return "text-red-500 group-hover:text-red-600";
-    if (value === "win") return "text-green-500 group-hover:text-green-600";
-    return "text-yellow-500 group-hover:text-yellow-600";
+    if (value === "loss") return "text-[#FA5252] group-hover:text-[#FA5252]";
+    if (value === "win") return "text-[#37B24D] group-hover:text-[#37B24D]";
+    return "text-[#F59F00] group-hover:text-[#F59F00]";
   };
 
   const marketConditionOptions = [

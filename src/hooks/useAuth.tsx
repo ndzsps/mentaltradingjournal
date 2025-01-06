@@ -14,8 +14,9 @@ export const useAuth = () => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const queryClient = useQueryClient();
 
-  // Check initial session
+  // Check initial session and set up auth state listener
   useEffect(() => {
+    // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         fetchProfile(session.user.id).then(profile => {
@@ -28,35 +29,54 @@ export const useAuth = () => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session?.user) {
+      console.log('Auth state changed:', event, session?.user?.id);
+      
+      if (event === 'SIGNED_IN' && session?.user) {
         const profile = await fetchProfile(session.user.id);
-        if (profile) setUser(profile);
-      } else {
+        if (profile) {
+          console.log('Setting user profile:', profile);
+          setUser(profile);
+        }
+      } else if (event === 'SIGNED_OUT') {
         setUser(null);
+        queryClient.clear();
       }
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [queryClient]);
 
   const fetchProfile = async (userId: string): Promise<UserProfile | null> => {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
+    try {
+      console.log('Fetching profile for user:', userId);
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
 
-    if (error) {
-      console.error('Error fetching profile:', error);
+      if (error) {
+        console.error('Error fetching profile:', error);
+        return null;
+      }
+
+      console.log('Fetched profile:', data);
+      return data;
+    } catch (error) {
+      console.error('Error in fetchProfile:', error);
       return null;
     }
-    return data;
   };
 
   const signUp = async (email: string, password: string, fullName: string) => {
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: {
+          full_name: fullName,
+        },
+      },
     });
 
     if (authError) throw authError;
@@ -85,6 +105,7 @@ export const useAuth = () => {
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
+    setUser(null);
     queryClient.clear();
   };
 

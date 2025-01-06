@@ -61,6 +61,44 @@ export const ProgressStats = ({
   });
   const [previousPreStreak, setPreviousPreStreak] = useState(preSessionStreak);
   const [previousPostStreak, setPreviousPostStreak] = useState(postSessionStreak);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch initial stats when component mounts
+  useEffect(() => {
+    const fetchInitialStats = async () => {
+      if (!user) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('progress_stats')
+          .select('*')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (error) throw error;
+
+        if (data) {
+          const newStats: ProgressStats = {
+            preSessionStreak: data.pre_session_streak,
+            postSessionStreak: data.post_session_streak,
+            dailyStreak: data.daily_streak,
+            level: data.level,
+            levelProgress: data.level_progress,
+          };
+          setStats(newStats);
+          setPreviousPreStreak(data.pre_session_streak);
+          setPreviousPostStreak(data.post_session_streak);
+        }
+      } catch (error) {
+        console.error('Error fetching initial stats:', error);
+        toast.error('Failed to load progress stats');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchInitialStats();
+  }, [user]);
 
   useEffect(() => {
     if (!user) return;
@@ -76,7 +114,6 @@ export const ProgressStats = ({
           filter: `user_id=eq.${user.id}`,
         },
         (payload) => {
-          // Ensure payload.new exists and is of type ProgressStatsRow
           if (payload.new && 'pre_session_streak' in payload.new) {
             const newData = payload.new as ProgressStatsRow;
             const newStats: ProgressStats = {
@@ -115,6 +152,22 @@ export const ProgressStats = ({
       supabase.removeChannel(channel);
     };
   }, [user, previousPreStreak, previousPostStreak]);
+
+  if (isLoading) {
+    return (
+      <Card className="p-6 space-y-6 bg-card/30 backdrop-blur-xl border-primary/10">
+        <div className="animate-pulse space-y-4">
+          <div className="h-6 bg-muted rounded w-1/3"></div>
+          <div className="h-4 bg-muted rounded w-2/3"></div>
+          <div className="space-y-2">
+            <div className="h-12 bg-muted rounded"></div>
+            <div className="h-12 bg-muted rounded"></div>
+            <div className="h-12 bg-muted rounded"></div>
+          </div>
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card className="p-6 space-y-6 bg-card/30 backdrop-blur-xl border-primary/10">

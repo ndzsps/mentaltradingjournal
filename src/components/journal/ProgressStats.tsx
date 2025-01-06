@@ -72,7 +72,7 @@ export const ProgressStats = ({
         (payload: RealtimePostgresChangesPayload<ProgressStatsRow>) => {
           console.log('Progress stats update received:', payload);
           if (payload.new) {
-            const newStats = {
+            const newStats: ProgressStats = {
               preSessionStreak: payload.new.pre_session_streak,
               postSessionStreak: payload.new.post_session_streak,
               dailyStreak: payload.new.daily_streak,

@@ -1,6 +1,6 @@
 import { Progress } from "@/components/ui/progress";
 import { LucideIcon, Check } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface ProgressItemProps {
   icon: LucideIcon;
@@ -44,13 +44,49 @@ export const ProgressItem = ({
       <div className="flex-1">
         <div className="flex justify-between items-center mb-1">
           <span className="text-sm font-medium">{title}</span>
-          <span className={`text-sm ${`text-${color}`}`}>
-            {value === 1 && maxValue === 1 ? (
-              <Check className="w-4 h-4" />
-            ) : (
-              `${value} ${unit}`
-            )}
-          </span>
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={value}
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ 
+                scale: 1, 
+                opacity: 1,
+                transition: {
+                  type: "spring",
+                  stiffness: 500,
+                  damping: 15,
+                }
+              }}
+              exit={{ scale: 0.5, opacity: 0 }}
+              className={`text-sm ${`text-${color}`} ${title.includes('Daily Activity') ? 'font-bold' : ''}`}
+            >
+              {value === 1 && maxValue === 1 ? (
+                <Check className="w-4 h-4" />
+              ) : (
+                <>
+                  {title.includes('Daily Activity') ? (
+                    <motion.span
+                      key={value}
+                      initial={{ scale: 1 }}
+                      animate={{ 
+                        scale: [1, 1.5, 1],
+                        transition: {
+                          duration: 0.5,
+                          times: [0, 0.5, 1],
+                          ease: "easeInOut"
+                        }
+                      }}
+                      className="inline-block"
+                    >
+                      {value}
+                    </motion.span>
+                  ) : (
+                    value
+                  )} {unit}
+                </>
+              )}
+            </motion.span>
+          </AnimatePresence>
         </div>
         <Progress
           value={progressValue}

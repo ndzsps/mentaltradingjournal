@@ -80,5 +80,10 @@ export const useProgressTracking = () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(initialStats));
   };
 
+  // Reset the stats immediately when the hook is initialized
+  useEffect(() => {
+    resetProgress();
+  }, []);
+
   return { stats, updateProgress, resetProgress };
 };

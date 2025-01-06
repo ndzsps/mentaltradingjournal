@@ -91,22 +91,6 @@ export const useJournalFormSubmission = ({
     }
 
     try {
-      // First, get any existing trades for this user from today
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      
-      const { data: existingEntries } = await supabase
-        .from('journal_entries')
-        .select('trades')
-        .eq('user_id', user.id)
-        .gte('created_at', today.toISOString())
-        .lt('created_at', new Date(today.getTime() + 24 * 60 * 60 * 1000).toISOString());
-
-      // Get the most recent trades array
-      const trades = existingEntries && existingEntries.length > 0 
-        ? existingEntries[existingEntries.length - 1].trades || []
-        : [];
-
       const { error } = await supabase.from('journal_entries').insert({
         user_id: user.id,
         session_type: sessionType,
@@ -118,7 +102,7 @@ export const useJournalFormSubmission = ({
         followed_rules: followedRules,
         mistakes: selectedMistakes,
         pre_trading_activities: preTradingActivities,
-        trades: trades,
+        trades: [], // Initialize with an empty array to allow trades to be added later
       });
 
       if (error) throw error;

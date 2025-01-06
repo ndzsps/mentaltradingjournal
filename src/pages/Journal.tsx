@@ -1,6 +1,6 @@
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -16,49 +16,76 @@ import { ChevronDown } from "lucide-react";
 import { emotions } from "@/components/journal/emotionConfig";
 import { subMonths, isWithinInterval, startOfMonth, endOfMonth } from "date-fns";
 import { JournalCalendar } from "@/components/journal/JournalCalendar";
-
-const sampleEntries = [
-  { 
-    date: new Date(2024, 2, 15), 
-    type: "pre", 
-    emotion: "Positive",
-    detail: "Confident",
-    notes: "Starting the day with a clear mind"
-  },
-  { 
-    date: new Date(2024, 2, 15), 
-    type: "post", 
-    emotion: "Positive",
-    detail: "Motivated",
-    notes: "Made good decisions today"
-  },
-  { 
-    date: new Date(2024, 2, 16), 
-    type: "pre", 
-    emotion: "Negative",
-    detail: "Career pressure",
-    notes: "Feeling pressure from recent losses"
-  },
-  { 
-    date: new Date(2024, 2, 16), 
-    type: "post", 
-    emotion: "Neutral",
-    detail: "Calm",
-    notes: "Managed to stay disciplined"
-  },
-];
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 type TimeFilter = "this-month" | "last-month" | "last-three-months" | null;
+
+interface JournalEntry {
+  id: string;
+  created_at: string;
+  session_type: string;
+  emotion: string;
+  emotion_detail: string;
+  notes: string;
+  outcome?: string;
+  market_conditions?: string;
+  followed_rules?: string[];
+  mistakes?: string[];
+  pre_trading_activities?: string[];
+}
 
 const Journal = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [emotionFilter, setEmotionFilter] = useState<string | null>(null);
   const [detailFilter, setDetailFilter] = useState<string | null>(null);
   const [timeFilter, setTimeFilter] = useState<TimeFilter>(null);
+  const [entries, setEntries] = useState<JournalEntry[]>([]);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchEntries = async () => {
+      const { data, error } = await supabase
+        .from('journal_entries')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching journal entries:', error);
+        return;
+      }
+
+      setEntries(data || []);
+    };
+
+    fetchEntries();
+
+    // Subscribe to realtime updates
+    const subscription = supabase
+      .channel('journal_entries_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'journal_entries',
+        },
+        () => {
+          fetchEntries(); // Refetch entries when changes occur
+        }
+      )
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [user]);
   
-  const filteredEntries = sampleEntries.filter(entry => {
+  const filteredEntries = entries.filter(entry => {
     const matchesEmotion = !emotionFilter || entry.emotion === emotionFilter;
-    const matchesDetail = !detailFilter || entry.detail === detailFilter;
+    const matchesDetail = !detailFilter || entry.emotion_detail === detailFilter;
     
     let matchesTimeFilter = true;
     if (timeFilter) {
@@ -78,18 +105,18 @@ const Journal = () => {
         }
       };
 
-      const interval = intervals[timeFilter];
-      matchesTimeFilter = isWithinInterval(entry.date, interval);
+      if (timeFilter) {
+        const interval = intervals[timeFilter];
+        const entryDate = new Date(entry.created_at);
+        matchesTimeFilter = isWithinInterval(entryDate, interval);
+      }
     }
 
     return matchesEmotion && matchesDetail && matchesTimeFilter;
   });
 
   // Get all unique emotion details for filtering
-  const allDetails = Array.from(new Set(sampleEntries.map(entry => entry.detail)));
-
-  // Get dates that have entries matching the current filters
-  const datesWithMatchingEntries = filteredEntries.map(entry => entry.date);
+  const allDetails = Array.from(new Set(entries.map(entry => entry.emotion_detail)));
 
   return (
     <AppLayout>
@@ -107,7 +134,10 @@ const Journal = () => {
           <JournalCalendar 
             date={date}
             onDateSelect={setDate}
-            entries={filteredEntries}
+            entries={filteredEntries.map(entry => ({
+              date: new Date(entry.created_at),
+              emotion: entry.emotion
+            }))}
           />
 
           <Card className="p-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
@@ -191,14 +221,14 @@ const Journal = () => {
             <ScrollArea className="h-[600px] pr-4">
               {filteredEntries.length > 0 ? (
                 <div className="space-y-4">
-                  {filteredEntries.map((entry, index) => (
-                    <div key={index} className="p-4 rounded-lg bg-background/50 border border-primary/10">
+                  {filteredEntries.map((entry) => (
+                    <div key={entry.id} className="p-4 rounded-lg bg-background/50 border border-primary/10">
                       <div className="flex items-center justify-between mb-2">
-                        <Badge variant={entry.type === 'pre' ? 'default' : 'secondary'}>
-                          {entry.type === 'pre' ? 'Pre-Session' : 'Post-Session'}
+                        <Badge variant={entry.session_type === 'pre' ? 'default' : 'secondary'}>
+                          {entry.session_type === 'pre' ? 'Pre-Session' : 'Post-Session'}
                         </Badge>
                         <span className="text-sm text-muted-foreground">
-                          {entry.date.toLocaleDateString('en-US', { 
+                          {new Date(entry.created_at).toLocaleDateString('en-US', { 
                             weekday: 'long',
                             year: 'numeric',
                             month: 'long',
@@ -207,11 +237,21 @@ const Journal = () => {
                         </span>
                       </div>
                       <p className="font-medium text-foreground mb-1">
-                        Feeling: {entry.emotion} - {entry.detail}
+                        Feeling: {entry.emotion} - {entry.emotion_detail}
                       </p>
                       <p className="text-muted-foreground text-sm">
                         {entry.notes}
                       </p>
+                      {entry.outcome && (
+                        <p className="mt-2 text-sm">
+                          <span className="font-medium">Outcome:</span> {entry.outcome}
+                        </p>
+                      )}
+                      {entry.market_conditions && (
+                        <p className="text-sm">
+                          <span className="font-medium">Market Conditions:</span> {entry.market_conditions}
+                        </p>
+                      )}
                     </div>
                   ))}
                 </div>

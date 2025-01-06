@@ -109,12 +109,13 @@ export const useProgressTracking = () => {
         return;
       }
 
+      // Always update last_activity and increment level_progress
       const updates: any = {
         last_activity: new Date().toISOString(),
         level_progress: Math.min(currentStats.level_progress + 10, 100),
       };
 
-      // Update session-specific streak
+      // Update session-specific streak (no daily limit on submissions)
       if (sessionType === 'pre') {
         updates.pre_session_streak = Math.min(currentStats.pre_session_streak + 1, 30);
       } else {

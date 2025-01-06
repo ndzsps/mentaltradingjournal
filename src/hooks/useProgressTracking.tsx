@@ -50,9 +50,9 @@ export const useProgressTracking = () => {
         }
 
         setStats({
-          preSessionStreak: Math.min(data.pre_session_streak, 30),
-          postSessionStreak: Math.min(data.post_session_streak, 30),
-          dailyStreak: Math.min(data.daily_streak, 30),
+          preSessionStreak: data.pre_session_streak,
+          postSessionStreak: data.post_session_streak,
+          dailyStreak: data.daily_streak,
           level: data.level,
           levelProgress: data.level_progress,
         });
@@ -109,28 +109,30 @@ export const useProgressTracking = () => {
         return;
       }
 
-      // Always update last_activity and increment level_progress
+      // Always update last_activity
       const updates: any = {
         last_activity: new Date().toISOString(),
-        level_progress: Math.min(currentStats.level_progress + 10, 100),
       };
 
       // Update session-specific streak
       if (sessionType === 'pre') {
-        updates.pre_session_streak = Math.min(currentStats.pre_session_streak + 1, 30);
+        updates.pre_session_streak = 1;
       } else {
-        updates.post_session_streak = Math.min(currentStats.post_session_streak + 1, 30);
+        updates.post_session_streak = 1;
       }
 
-      // Only update daily streak if both pre and post sessions are completed
-      const hasPreSession = sessionType === 'pre' ? true : currentStats.pre_session_streak > 0;
-      const hasPostSession = sessionType === 'post' ? true : currentStats.post_session_streak > 0;
-      
+      // Check if both sessions are completed for the day
+      const hasPreSession = sessionType === 'pre' || currentStats.pre_session_streak > 0;
+      const hasPostSession = sessionType === 'post' || currentStats.post_session_streak > 0;
+
       if (hasPreSession && hasPostSession) {
-        updates.daily_streak = Math.min(currentStats.daily_streak + 1, 30);
+        // Increment daily streak by 1 when both sessions are completed
+        updates.daily_streak = currentStats.daily_streak + 1;
         // Reset session streaks after completing both
         updates.pre_session_streak = 0;
         updates.post_session_streak = 0;
+        // Update level progress
+        updates.level_progress = Math.min(currentStats.level_progress + 10, 100);
       }
 
       // Level up if progress reaches 100%
@@ -154,7 +156,7 @@ export const useProgressTracking = () => {
         postSessionStreak: updates.post_session_streak ?? prev.postSessionStreak,
         dailyStreak: updates.daily_streak ?? prev.dailyStreak,
         level: updates.level ?? prev.level,
-        levelProgress: updates.level_progress,
+        levelProgress: updates.level_progress ?? prev.levelProgress,
       }));
 
     } catch (error) {

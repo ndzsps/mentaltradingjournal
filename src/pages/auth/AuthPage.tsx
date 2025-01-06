@@ -76,13 +76,7 @@ const AuthPage = () => {
               }
             }
           }}
-          additionalSignUpFields={{
-            full_name: {
-              required: true,
-              label: 'Full Name',
-              placeholder: 'Enter your full name'
-            }
-          }}
+          view="sign_up"
         />
       </Card>
     </div>

@@ -34,18 +34,15 @@ export const useProgressTracking = () => {
     setStats(prevStats => {
       const newStats = { ...prevStats };
 
-      // Simply increment the respective streak without any conditions
       if (sessionType === 'pre') {
-        newStats.preSessionStreak += 1;
+        newStats.preSessionStreak = prevStats.preSessionStreak + 1;
+        newStats.levelProgress += 10;
         console.log('[Progress Tracking] Incremented pre-session streak:', newStats.preSessionStreak);
       } else {
-        newStats.postSessionStreak += 1;
+        newStats.postSessionStreak = prevStats.postSessionStreak + 1;
         console.log('[Progress Tracking] Incremented post-session streak:', newStats.postSessionStreak);
       }
 
-      // Update level progress
-      newStats.levelProgress += 10;
-      
       // Level up if progress reaches 100%
       if (newStats.levelProgress >= 100) {
         newStats.level += 1;
@@ -53,10 +50,10 @@ export const useProgressTracking = () => {
         console.log('[Progress Tracking] Level up! New level:', newStats.level);
       }
 
-      // Only update daily streak if both sessions are completed
+      // Update daily streak if both sessions are completed
       if (newStats.preSessionStreak > 0 && newStats.postSessionStreak > 0) {
         newStats.dailyStreak += 1;
-        // Reset streaks only after updating daily streak
+        // Reset session streaks after updating daily streak
         newStats.preSessionStreak = 0;
         newStats.postSessionStreak = 0;
         console.log('[Progress Tracking] Daily streak increased:', newStats.dailyStreak);
@@ -79,11 +76,6 @@ export const useProgressTracking = () => {
     setStats(initialStats);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(initialStats));
   };
-
-  // Reset the stats immediately when the hook is initialized
-  useEffect(() => {
-    resetProgress();
-  }, []);
 
   return { stats, updateProgress, resetProgress };
 };

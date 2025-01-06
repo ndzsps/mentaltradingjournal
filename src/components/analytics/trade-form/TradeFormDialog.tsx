@@ -131,13 +131,21 @@ export const TradeFormDialog = ({ open, onOpenChange, onSubmit, editTrade }: Tra
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogTitle>{editTrade ? 'Edit Trade' : 'Add Trade'}</DialogTitle>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <GeneralSection direction={direction} setDirection={setDirection} />
-          <TradeEntrySection />
-          <TradeExitSection />
-          <Button type="submit">{editTrade ? 'Update' : 'Submit'}</Button>
+      <DialogContent className="max-h-[90vh] flex flex-col p-0">
+        <div className="p-6 pb-0">
+          <DialogTitle>{editTrade ? 'Edit Trade' : 'Add Trade'}</DialogTitle>
+        </div>
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1">
+          <div className="flex-1 overflow-y-auto p-6 space-y-4">
+            <GeneralSection direction={direction} setDirection={setDirection} />
+            <TradeEntrySection />
+            <TradeExitSection />
+          </div>
+          <div className="p-6 pt-0 border-t">
+            <Button type="submit" className="w-full">
+              {editTrade ? 'Update' : 'Submit'}
+            </Button>
+          </div>
         </form>
       </DialogContent>
     </Dialog>

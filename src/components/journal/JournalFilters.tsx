@@ -10,13 +10,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { emotions } from "./emotionConfig";
 
+type TimeFilter = "this-month" | "last-month" | "last-three-months" | null;
+
 interface JournalFiltersProps {
   emotionFilter: string | null;
   setEmotionFilter: (value: string | null) => void;
   detailFilter: string | null;
   setDetailFilter: (value: string | null) => void;
-  timeFilter: string | null;
-  setTimeFilter: (value: string | null) => void;
+  timeFilter: TimeFilter;
+  setTimeFilter: (value: TimeFilter) => void;
   allDetails: string[];
 }
 

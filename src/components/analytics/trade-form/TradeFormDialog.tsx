@@ -45,6 +45,8 @@ export const TradeFormDialog = ({ open, onOpenChange, onSubmit, editTrade }: Tra
       fees: parseFloat(formData.get('fees') as string),
     };
 
+    console.log('Trade form submitted with data:', tradeData);
+
     try {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -58,6 +60,8 @@ export const TradeFormDialog = ({ open, onOpenChange, onSubmit, editTrade }: Tra
         .order('created_at', { ascending: false })
         .limit(1);
 
+      console.log('Fetched journal entries:', entries);
+
       if (fetchError) throw fetchError;
 
       if (!entries || entries.length === 0) {
@@ -66,6 +70,8 @@ export const TradeFormDialog = ({ open, onOpenChange, onSubmit, editTrade }: Tra
       }
 
       const currentEntry = entries[0];
+      console.log('Current entry before update:', currentEntry);
+      
       // Cast the trades array to Trade[] after parsing from JSON
       const existingTrades = (currentEntry.trades || []).map((trade: any) => ({
         id: trade.id || crypto.randomUUID(),
@@ -83,9 +89,13 @@ export const TradeFormDialog = ({ open, onOpenChange, onSubmit, editTrade }: Tra
         fees: parseFloat(trade.fees),
       })) as Trade[];
 
+      console.log('Existing trades:', existingTrades);
+
       const updatedTrades = editTrade 
         ? existingTrades.map(t => t.id === editTrade.id ? tradeData : t)
         : [...existingTrades, tradeData];
+
+      console.log('Updated trades array:', updatedTrades);
 
       // Convert Trade[] to Json[] before sending to Supabase
       const tradesForDb = updatedTrades.map(trade => ({
@@ -104,8 +114,12 @@ export const TradeFormDialog = ({ open, onOpenChange, onSubmit, editTrade }: Tra
         .update({ trades: tradesForDb })
         .eq('id', currentEntry.id);
 
-      if (updateError) throw updateError;
+      if (updateError) {
+        console.error('Error updating trades:', updateError);
+        throw updateError;
+      }
 
+      console.log('Successfully updated trades in database');
       onSubmit(tradeData, !!editTrade);
       onOpenChange(false);
       toast.success(editTrade ? "Trade updated successfully!" : "Trade added successfully!");

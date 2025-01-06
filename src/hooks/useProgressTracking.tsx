@@ -122,11 +122,12 @@ export const useProgressTracking = () => {
       }
 
       // Check if both sessions are completed for the day
-      const hasPreSession = sessionType === 'pre' || currentStats.pre_session_streak > 0;
-      const hasPostSession = sessionType === 'post' || currentStats.post_session_streak > 0;
+      // Changed to use AND instead of OR for proper streak calculation
+      const hasPreSession = sessionType === 'pre' || currentStats.pre_session_streak === 1;
+      const hasPostSession = sessionType === 'post' || currentStats.post_session_streak === 1;
 
       if (hasPreSession && hasPostSession) {
-        // Increment daily streak by 1 when both sessions are completed
+        // Only increment daily streak when both sessions are completed
         updates.daily_streak = currentStats.daily_streak + 1;
         // Reset session streaks after completing both
         updates.pre_session_streak = 0;

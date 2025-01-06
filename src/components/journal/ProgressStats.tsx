@@ -3,7 +3,6 @@ import { Trophy, Flame, Star } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import { toast } from "sonner";
 import { ProgressItem } from "./progress/ProgressItem";
 import { LevelProgress } from "./progress/LevelProgress";
@@ -76,17 +75,19 @@ export const ProgressStats = ({
           table: 'progress_stats',
           filter: `user_id=eq.${user.id}`,
         },
-        (payload: RealtimePostgresChangesPayload<ProgressStatsRow>) => {
-          if (payload.new) {
+        (payload) => {
+          // Ensure payload.new exists and is of type ProgressStatsRow
+          if (payload.new && 'pre_session_streak' in payload.new) {
+            const newData = payload.new as ProgressStatsRow;
             const newStats: ProgressStats = {
-              preSessionStreak: payload.new.pre_session_streak,
-              postSessionStreak: payload.new.post_session_streak,
-              dailyStreak: payload.new.daily_streak,
-              level: payload.new.level,
-              levelProgress: payload.new.level_progress,
+              preSessionStreak: newData.pre_session_streak,
+              postSessionStreak: newData.post_session_streak,
+              dailyStreak: newData.daily_streak,
+              level: newData.level,
+              levelProgress: newData.level_progress,
             };
 
-            if (payload.new.pre_session_streak > previousPreStreak) {
+            if (newData.pre_session_streak > previousPreStreak) {
               const randomMessage = inspirationalMessages[Math.floor(Math.random() * inspirationalMessages.length)];
               toast.success(randomMessage, {
                 duration: 5000,
@@ -94,7 +95,7 @@ export const ProgressStats = ({
               });
             }
 
-            if (payload.new.post_session_streak > previousPostStreak) {
+            if (newData.post_session_streak > previousPostStreak) {
               const randomMessage = inspirationalMessages[Math.floor(Math.random() * inspirationalMessages.length)];
               toast.success(randomMessage, {
                 duration: 5000,
@@ -102,8 +103,8 @@ export const ProgressStats = ({
               });
             }
 
-            setPreviousPreStreak(payload.new.pre_session_streak);
-            setPreviousPostStreak(payload.new.post_session_streak);
+            setPreviousPreStreak(newData.pre_session_streak);
+            setPreviousPostStreak(newData.post_session_streak);
             setStats(newStats);
           }
         }

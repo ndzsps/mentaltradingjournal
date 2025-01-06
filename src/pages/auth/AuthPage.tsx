@@ -76,13 +76,11 @@ const AuthPage = () => {
               }
             }
           }}
-          options={{
-            additionalSignUpFields: {
-              full_name: {
-                required: true,
-                label: 'Full Name',
-                placeholder: 'Enter your full name'
-              }
+          additionalSignUpFields={{
+            full_name: {
+              required: true,
+              label: 'Full Name',
+              placeholder: 'Enter your full name'
             }
           }}
         />

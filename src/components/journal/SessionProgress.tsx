@@ -2,7 +2,7 @@ import { Progress } from "@/components/ui/progress";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { Trophy, Flame, Star } from "lucide-react";
+import { Trophy } from "lucide-react";
 
 interface SessionProgressProps {
   emotionSelected: boolean;
@@ -48,6 +48,11 @@ export const SessionProgress = ({
     return (completedSteps / steps.length) * 100;
   };
 
+  // Reset celebration when switching between pre and post session
+  useEffect(() => {
+    setShowCelebration(false);
+  }, [isPostSession]);
+
   useEffect(() => {
     const newProgress = calculateProgress();
     setProgress(newProgress);
@@ -58,6 +63,7 @@ export const SessionProgress = ({
         `${isPostSession ? "Post" : "Pre"}-Session Review Completed! 🎉`,
         {
           description: "Great job maintaining your trading discipline!",
+          duration: 5000,
         }
       );
     }
@@ -83,7 +89,7 @@ export const SessionProgress = ({
         <span className="text-sm font-medium">{Math.round(progress)}%</span>
       </div>
       <Progress value={progress} className="h-2" />
-      {showCelebration && (
+      {showCelebration && !isPostSession && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

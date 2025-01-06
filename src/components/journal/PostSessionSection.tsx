@@ -52,20 +52,27 @@ export const PostSessionSection = ({
   const getOutcomeStyles = (value: string) => {
     if (selectedOutcome === value) {
       if (value === "loss") {
-        return "bg-red-500 text-white hover:bg-red-600 shadow-lg shadow-red-500/20";
+        return "bg-gradient-to-br from-red-500 to-red-400 text-white shadow-lg shadow-red-500/20";
       }
       if (value === "win") {
-        return "bg-green-500 text-white hover:bg-green-600 shadow-lg shadow-green-500/20";
+        return "bg-gradient-to-br from-green-500 to-green-400 text-white shadow-lg shadow-green-500/20";
       }
-      return "bg-yellow-500 text-white hover:bg-yellow-600 shadow-lg shadow-yellow-500/20";
+      return "bg-gradient-to-br from-yellow-500 to-yellow-400 text-white shadow-lg shadow-yellow-500/20";
     }
     if (value === "loss") {
-      return "hover:border-red-500/50 hover:bg-red-500/5";
+      return "hover:bg-gradient-to-br hover:from-red-500/10 hover:to-red-400/5 hover:border-red-500/50 group-hover:text-red-600";
     }
     if (value === "win") {
-      return "hover:border-green-500/50 hover:bg-green-500/5";
+      return "hover:bg-gradient-to-br hover:from-green-500/10 hover:to-green-400/5 hover:border-green-500/50 group-hover:text-green-600";
     }
-    return "hover:border-yellow-500/50 hover:bg-yellow-500/5";
+    return "hover:bg-gradient-to-br hover:from-yellow-500/10 hover:to-yellow-400/5 hover:border-yellow-500/50 group-hover:text-yellow-600";
+  };
+
+  const getIconColor = (value: string) => {
+    if (selectedOutcome === value) return "text-white";
+    if (value === "loss") return "text-red-500 group-hover:text-red-600";
+    if (value === "win") return "text-green-500 group-hover:text-green-600";
+    return "text-yellow-500 group-hover:text-yellow-600";
   };
 
   const marketConditionOptions = [
@@ -88,13 +95,10 @@ export const PostSessionSection = ({
             onClick={() => setSelectedOutcome(value)}
           >
             <div className="flex items-center gap-3">
-              <Icon className={`w-6 h-6 transition-transform duration-300 group-hover:scale-110 ${
-                selectedOutcome === value ? "" : 
-                value === "loss" ? "text-red-500" : 
-                value === "win" ? "text-green-500" : 
-                "text-yellow-500"
-              }`} />
-              <span className="font-medium">{capitalizeWords(label)}</span>
+              <Icon className={`w-6 h-6 transition-transform duration-300 group-hover:scale-110 ${getIconColor(value)}`} />
+              <span className={`font-medium ${selectedOutcome === value ? "text-white" : getIconColor(value)}`}>
+                {capitalizeWords(label)}
+              </span>
             </div>
           </Button>
         ))}

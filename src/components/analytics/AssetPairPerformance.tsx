@@ -78,27 +78,27 @@ const data = [
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-background border border-border/50 rounded-lg p-2 shadow-lg">
-        <p className="font-medium">{label}</p>
+      <div className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border border-border/50 rounded-lg p-3 shadow-xl">
+        <p className="font-semibold mb-1">{label}</p>
         {payload.map((entry: any, index: number) => (
           <p
             key={index}
             className={`text-sm ${
               entry.dataKey === "profit"
-                ? "text-emerald-500"
+                ? "text-emerald-400"
                 : entry.dataKey === "loss"
-                ? "text-red-500"
+                ? "text-red-400"
                 : ""
             }`}
           >
             {entry.dataKey.charAt(0).toUpperCase() + entry.dataKey.slice(1)}:{" "}
             {entry.dataKey === "loss"
-              ? Math.abs(entry.value)
-              : entry.value.toFixed(2)}
+              ? `$${Math.abs(entry.value).toLocaleString()}`
+              : `$${entry.value.toLocaleString()}`}
           </p>
         ))}
-        <p className="text-sm font-medium border-t border-border/50 mt-1 pt-1">
-          Net: {payload[0].payload.net}
+        <p className="text-sm font-medium border-t border-border/50 mt-2 pt-2">
+          Net: ${payload[0].payload.net.toLocaleString()}
         </p>
       </div>
     );
@@ -123,8 +123,14 @@ export const AssetPairPerformance = () => {
           <BarChart
             data={data}
             margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+            barSize={32}
           >
-            <CartesianGrid strokeDasharray="3 3" />
+            <CartesianGrid
+              strokeDasharray="3 3"
+              vertical={false}
+              stroke="hsl(var(--border))"
+              opacity={0.4}
+            />
             <XAxis
               dataKey="pair"
               tick={{ fontSize: 12 }}
@@ -132,12 +138,33 @@ export const AssetPairPerformance = () => {
               angle={-45}
               textAnchor="end"
               height={60}
+              stroke="hsl(var(--foreground))"
+              tickLine={false}
             />
-            <YAxis tick={{ fontSize: 12 }} />
-            <Tooltip content={<CustomTooltip />} />
-            <ReferenceLine y={0} stroke="#666" />
-            <Bar dataKey="profit" stackId="a" fill="#10B981" />
-            <Bar dataKey="loss" stackId="a" fill="#EF4444" />
+            <YAxis
+              tick={{ fontSize: 12 }}
+              stroke="hsl(var(--foreground))"
+              tickLine={false}
+              axisLine={false}
+              tickFormatter={(value) => `$${value}`}
+            />
+            <Tooltip
+              content={<CustomTooltip />}
+              cursor={{ fill: "hsl(var(--muted))", opacity: 0.1 }}
+            />
+            <ReferenceLine y={0} stroke="hsl(var(--border))" />
+            <Bar
+              dataKey="profit"
+              stackId="a"
+              fill="hsl(142.1 76.2% 36.3%)"
+              radius={[4, 4, 0, 0]}
+            />
+            <Bar
+              dataKey="loss"
+              stackId="a"
+              fill="hsl(346.8 77.2% 49.8%)"
+              radius={[0, 0, 4, 4]}
+            />
           </BarChart>
         </ResponsiveContainer>
       </div>

@@ -83,7 +83,7 @@ export const ProgressStats = ({
           </div>
           <div className="flex-1">
             <div className="flex justify-between items-center mb-1">
-              <span className="text-sm font-medium">Pre-Session Entries</span>
+              <span className="text-sm font-medium">Pre-Session Streak</span>
               <span className="text-sm text-primary">{stats.preSessionStreak} entries</span>
             </div>
             <Progress value={(stats.preSessionStreak / 30) * 100} className="h-1" />

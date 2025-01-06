@@ -9,14 +9,14 @@ interface Trade {
   instrument: string;
   setup: string;
   direction: 'buy' | 'sell';
-  entryPrice: number;
-  quantity: number;
-  stopLoss: number;
-  takeProfit: number;
+  entryPrice: number | string;
+  quantity: number | string;
+  stopLoss: number | string;
+  takeProfit: number | string;
   exitDate: string;
-  exitPrice: number;
-  pnl: number;
-  fees: number;
+  exitPrice: number | string;
+  pnl: number | string;
+  fees: number | string;
 }
 
 interface JournalEntry {

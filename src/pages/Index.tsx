@@ -3,7 +3,6 @@ import { EmotionLogger } from "@/components/journal/EmotionLogger";
 import { Card } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
-import { ProgressStats } from "@/components/journal/ProgressStats";
 
 // Sample data - in a real app this would come from your database
 const behaviorData = [
@@ -17,19 +16,10 @@ const behaviorData = [
   { date: '2024-01-08', emotion: 5, pnl: -3.0, outcome: "loss" },
 ];
 
-// Mock data for progress stats - in a real app, this would come from your backend
-const progressStats = {
-  preSessionStreak: 5,
-  postSessionStreak: 3,
-  dailyStreak: 3,
-  level: 2,
-  levelProgress: 45,
-};
-
 const Index = () => {
   return (
     <AppLayout>
-      <div className="w-full max-w-5xl mx-auto space-y-6 px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-7xl mx-auto space-y-6 px-4 sm:px-6 lg:px-8">
         <div className="space-y-2 text-center sm:text-left">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
             Welcome back!
@@ -39,13 +29,7 @@ const Index = () => {
           </p>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
-          <div className="w-full">
-            <EmotionLogger />
-          </div>
-          
-          <ProgressStats {...progressStats} />
-        </div>
+        <EmotionLogger />
 
         <Card className="p-4 sm:p-6 lg:p-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
           <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent mb-4 sm:mb-6">

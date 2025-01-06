@@ -128,17 +128,19 @@ export const ProgressStats = ({
         <ProgressItem
           icon={Trophy}
           title="Pre-Session Daily Goal"
-          value={stats.preSessionStreak}
-          maxValue={30}
+          value={stats.preSessionStreak > 0 ? 1 : 0}
+          maxValue={1}
           color="primary"
+          unit="completed"
         />
 
         <ProgressItem
           icon={Star}
           title="Post-Session Daily Goal"
-          value={stats.postSessionStreak}
-          maxValue={30}
+          value={stats.postSessionStreak > 0 ? 1 : 0}
+          maxValue={1}
           color="secondary"
+          unit="completed"
         />
 
         <ProgressItem

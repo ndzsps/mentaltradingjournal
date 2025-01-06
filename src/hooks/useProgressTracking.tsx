@@ -81,28 +81,31 @@ export const useProgressTracking = () => {
       newStats.postSessionStreak = 0;
     }
 
-    // Update the stats in Supabase
-    const { error } = await supabase
-      .from('progress_stats')
-      .upsert({
-        user_id: user.id,
-        pre_session_streak: newStats.preSessionStreak,
-        post_session_streak: newStats.postSessionStreak,
-        daily_streak: newStats.dailyStreak,
-        level: newStats.level,
-        level_progress: newStats.levelProgress,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('user_id', user.id);
+    try {
+      const { error } = await supabase
+        .from('progress_stats')
+        .update({
+          pre_session_streak: newStats.preSessionStreak,
+          post_session_streak: newStats.postSessionStreak,
+          daily_streak: newStats.dailyStreak,
+          level: newStats.level,
+          level_progress: newStats.levelProgress,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('user_id', user.id);
 
-    if (error) {
-      console.error('Error updating progress stats:', error);
+      if (error) {
+        console.error('Error updating progress stats:', error);
+        toast.error('Failed to update progress');
+        return;
+      }
+
+      console.log('[Progress Tracking] Updated stats:', newStats);
+      setStats(newStats);
+    } catch (error) {
+      console.error('Error updating progress:', error);
       toast.error('Failed to update progress');
-      return;
     }
-
-    console.log('[Progress Tracking] Updated stats:', newStats);
-    setStats(newStats);
   };
 
   const resetProgress = async () => {

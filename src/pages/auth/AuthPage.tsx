@@ -68,23 +68,14 @@ const AuthPage = () => {
           }}
           providers={[]}
           redirectTo={window.location.origin}
-          localization={{
-            variables: {
-              sign_in: {
-                email_label: 'Email',
-                password_label: 'Password',
-              },
-              sign_up: {
-                email_label: 'Email',
-                password_label: 'Password',
+          options={{
+            emailRedirectTo: window.location.origin,
+            additionalSignUpFields: {
+              username: {
+                required: true,
+                placeholder: 'Choose a username'
               }
             }
-          }}
-          view="sign_up"
-          magicLink={false}
-          showLinks={true}
-          queryParams={{
-            full_name: ''
           }}
         />
       </Card>

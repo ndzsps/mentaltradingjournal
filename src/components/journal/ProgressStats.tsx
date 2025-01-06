@@ -58,13 +58,12 @@ export const ProgressStats = ({
       levelProgress,
     });
 
-    // Enable full replica identity for real-time
     const channel = supabase
       .channel('progress_stats_changes')
       .on(
         'postgres_changes',
         {
-          event: '*', // Listen to all events
+          event: '*',
           schema: 'public',
           table: 'progress_stats',
           filter: `user_id=eq.${user.id}`,

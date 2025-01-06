@@ -8,18 +8,39 @@ interface GeneralSectionProps {
 }
 
 export const GeneralSection = ({ direction, setDirection }: GeneralSectionProps) => {
+  const setTodayDate = (inputId: string) => {
+    const now = new Date();
+    const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+      .toISOString()
+      .slice(0, 16);
+    const input = document.getElementById(inputId) as HTMLInputElement;
+    if (input) {
+      input.value = localDateTime;
+    }
+  };
+
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold mb-3">General</h3>
       <div className="space-y-3">
         <div className="grid w-full items-center gap-1.5">
           <Label htmlFor="entryDate">Entry Date</Label>
-          <Input
-            type="datetime-local"
-            id="entryDate"
-            name="entryDate"
-            className="w-full"
-          />
+          <div className="flex gap-2">
+            <Input
+              type="datetime-local"
+              id="entryDate"
+              name="entryDate"
+              className="w-full"
+            />
+            <Button 
+              type="button" 
+              variant="outline" 
+              size="sm"
+              onClick={() => setTodayDate('entryDate')}
+            >
+              Today
+            </Button>
+          </div>
         </div>
         <div className="grid w-full items-center gap-1.5">
           <Label htmlFor="instrument">Instrument *</Label>

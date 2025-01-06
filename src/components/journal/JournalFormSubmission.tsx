@@ -53,6 +53,10 @@ export const useJournalFormSubmission = ({
   const { user } = useAuth();
 
   const validateOutcome = (outcome?: string): ValidOutcome => {
+    // For pre-session entries, always return null
+    if (sessionType === "pre") return null;
+    
+    // For post-session entries, validate the outcome
     if (!outcome) return null;
     if (['win', 'loss', 'breakeven'].includes(outcome.toLowerCase())) {
       return outcome.toLowerCase() as ValidOutcome;
@@ -90,7 +94,7 @@ export const useJournalFormSubmission = ({
     }
 
     if (sessionType === "post") {
-      if (!selectedOutcome || !marketConditions || followedRules?.length === 0) {
+      if (!marketConditions || followedRules?.length === 0) {
         toast.error("Missing Information", {
           description: "Please fill in all required fields for post-session.",
           duration: 5000,

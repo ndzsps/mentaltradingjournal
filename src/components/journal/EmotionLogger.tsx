@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { SessionProgress } from "./SessionProgress";
 import { PostSessionSection } from "./PostSessionSection";
 import { ProgressStats } from "./ProgressStats";
+import { useProgressTracking } from "@/hooks/useProgressTracking";
 
 export const EmotionLogger = () => {
   const [selectedEmotion, setSelectedEmotion] = useState("");
@@ -25,15 +26,7 @@ export const EmotionLogger = () => {
   const [followedRules, setFollowedRules] = useState<string[]>([]);
   const [preTradingActivities, setPreTradingActivities] = useState<string[]>([]);
   const { toast } = useToast();
-
-  // Mock data for progress stats - in a real app, this would come from your backend
-  const progressStats = {
-    preSessionStreak: 5,
-    postSessionStreak: 3,
-    dailyStreak: 3,
-    level: 2,
-    levelProgress: 45,
-  };
+  const { stats, updateProgress } = useProgressTracking();
 
   const handleEmotionSelect = (value: string) => {
     setSelectedEmotion(value);
@@ -83,6 +76,9 @@ export const EmotionLogger = () => {
     };
 
     console.log("Journal Entry:", journalEntry);
+    
+    // Update progress tracking
+    updateProgress(sessionType);
 
     toast({
       description: "Your trading journal entry has been saved.",
@@ -228,7 +224,7 @@ export const EmotionLogger = () => {
         </div>
       </Card>
 
-      <ProgressStats {...progressStats} />
+      <ProgressStats {...stats} />
     </div>
   );
 };

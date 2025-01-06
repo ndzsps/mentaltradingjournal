@@ -2,7 +2,7 @@ import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -11,11 +11,19 @@ interface AddTradeDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (tradeData: any, isEdit: boolean) => void;
+  editTrade?: any;  // Added this prop
 }
 
-export const AddTradeDialog = ({ open, onOpenChange, onSubmit }: AddTradeDialogProps) => {
+export const AddTradeDialog = ({ open, onOpenChange, onSubmit, editTrade }: AddTradeDialogProps) => {
   const { user } = useAuth();
   const [direction, setDirection] = useState<'buy' | 'sell' | null>(null);
+
+  // Add effect to populate form when editing
+  useEffect(() => {
+    if (editTrade) {
+      setDirection(editTrade.direction);
+    }
+  }, [editTrade]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -67,9 +75,9 @@ export const AddTradeDialog = ({ open, onOpenChange, onSubmit }: AddTradeDialogP
 
       if (updateError) throw updateError;
 
-      onSubmit(tradeData, false);
+      onSubmit(tradeData, !!editTrade);
       onOpenChange(false);
-      toast.success("Trade added successfully!");
+      toast.success(editTrade ? "Trade updated successfully!" : "Trade added successfully!");
     } catch (error) {
       console.error('Error adding trade:', error);
       toast.error("Failed to add trade");
@@ -82,60 +90,131 @@ export const AddTradeDialog = ({ open, onOpenChange, onSubmit }: AddTradeDialogP
         <Button variant="outline">Add Trade</Button>
       </DialogTrigger>
       <DialogContent>
-        <DialogTitle>Add Trade</DialogTitle>
+        <DialogTitle>{editTrade ? 'Edit Trade' : 'Add Trade'}</DialogTitle>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="entryDate">Entry Date</Label>
-            <Input type="datetime-local" id="entryDate" name="entryDate" required />
+            <Input 
+              type="datetime-local" 
+              id="entryDate" 
+              name="entryDate" 
+              defaultValue={editTrade?.entryDate}
+              required 
+            />
           </div>
           <div>
             <Label htmlFor="instrument">Instrument</Label>
-            <Input type="text" id="instrument" name="instrument" required />
+            <Input 
+              type="text" 
+              id="instrument" 
+              name="instrument" 
+              defaultValue={editTrade?.instrument}
+              required 
+            />
           </div>
           <div>
             <Label htmlFor="setup">Setup</Label>
-            <Input type="text" id="setup" name="setup" />
+            <Input 
+              type="text" 
+              id="setup" 
+              name="setup"
+              defaultValue={editTrade?.setup}
+            />
           </div>
           <div>
             <Label htmlFor="direction">Direction</Label>
             <div className="flex gap-2">
-              <Button type="button" variant={direction === 'buy' ? 'default' : 'outline'} onClick={() => setDirection('buy')}>Buy</Button>
-              <Button type="button" variant={direction === 'sell' ? 'default' : 'outline'} onClick={() => setDirection('sell')}>Sell</Button>
+              <Button 
+                type="button" 
+                variant={direction === 'buy' ? 'default' : 'outline'} 
+                onClick={() => setDirection('buy')}
+              >
+                Buy
+              </Button>
+              <Button 
+                type="button" 
+                variant={direction === 'sell' ? 'default' : 'outline'} 
+                onClick={() => setDirection('sell')}
+              >
+                Sell
+              </Button>
             </div>
           </div>
           <div>
             <Label htmlFor="entryPrice">Entry Price</Label>
-            <Input type="number" id="entryPrice" name="entryPrice" required />
+            <Input 
+              type="number" 
+              id="entryPrice" 
+              name="entryPrice" 
+              defaultValue={editTrade?.entryPrice}
+              required 
+            />
           </div>
           <div>
             <Label htmlFor="quantity">Quantity</Label>
-            <Input type="number" id="quantity" name="quantity" required />
+            <Input 
+              type="number" 
+              id="quantity" 
+              name="quantity" 
+              defaultValue={editTrade?.quantity}
+              required 
+            />
           </div>
           <div>
             <Label htmlFor="stopLoss">Stop Loss</Label>
-            <Input type="number" id="stopLoss" name="stopLoss" />
+            <Input 
+              type="number" 
+              id="stopLoss" 
+              name="stopLoss"
+              defaultValue={editTrade?.stopLoss}
+            />
           </div>
           <div>
             <Label htmlFor="takeProfit">Take Profit</Label>
-            <Input type="number" id="takeProfit" name="takeProfit" />
+            <Input 
+              type="number" 
+              id="takeProfit" 
+              name="takeProfit"
+              defaultValue={editTrade?.takeProfit}
+            />
           </div>
           <div>
             <Label htmlFor="exitDate">Exit Date</Label>
-            <Input type="datetime-local" id="exitDate" name="exitDate" />
+            <Input 
+              type="datetime-local" 
+              id="exitDate" 
+              name="exitDate"
+              defaultValue={editTrade?.exitDate}
+            />
           </div>
           <div>
             <Label htmlFor="exitPrice">Exit Price</Label>
-            <Input type="number" id="exitPrice" name="exitPrice" />
+            <Input 
+              type="number" 
+              id="exitPrice" 
+              name="exitPrice"
+              defaultValue={editTrade?.exitPrice}
+            />
           </div>
           <div>
             <Label htmlFor="pnl">PnL</Label>
-            <Input type="number" id="pnl" name="pnl" />
+            <Input 
+              type="number" 
+              id="pnl" 
+              name="pnl"
+              defaultValue={editTrade?.pnl}
+            />
           </div>
           <div>
             <Label htmlFor="fees">Fees</Label>
-            <Input type="number" id="fees" name="fees" />
+            <Input 
+              type="number" 
+              id="fees" 
+              name="fees"
+              defaultValue={editTrade?.fees}
+            />
           </div>
-          <Button type="submit">Submit</Button>
+          <Button type="submit">{editTrade ? 'Update' : 'Submit'}</Button>
         </form>
       </DialogContent>
     </Dialog>

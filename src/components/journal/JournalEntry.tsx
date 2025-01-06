@@ -108,11 +108,12 @@ export const JournalEntry = ({ entry }: JournalEntryProps) => {
         </div>
       )}
 
+      {/* Display Trades */}
       {Array.isArray(entry.trades) && entry.trades.length > 0 && (
         <>
           <Separator className="my-4" />
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold">Trades</h3>
+            <h4 className="text-sm font-medium text-muted-foreground">Trades</h4>
             <Accordion type="single" collapsible className="w-full">
               {entry.trades.map((trade, index) => (
                 <AccordionItem key={trade.id || index} value={`trade-${index}`}>

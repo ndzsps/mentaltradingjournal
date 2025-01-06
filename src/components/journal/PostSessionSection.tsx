@@ -6,6 +6,7 @@ import { Plus } from "lucide-react";
 import { useState } from "react";
 import { AddTradeDialog } from "../analytics/AddTradeDialog";
 import { TradingOutcome, MistakeCategory, TradingRule } from "./types";
+import { toast } from "sonner";
 
 interface PostSessionSectionProps {
   selectedOutcome: string;
@@ -35,6 +36,12 @@ export const PostSessionSection = ({
   tradingRules,
 }: PostSessionSectionProps) => {
   const [showAddTradeDialog, setShowAddTradeDialog] = useState(false);
+
+  const handleTradeSubmit = (tradeData: any, isEdit: boolean) => {
+    // Here you would typically handle the trade data, e.g., save it to a database
+    console.log("Trade submitted:", tradeData);
+    toast.success(isEdit ? "Trade updated successfully!" : "Trade added successfully!");
+  };
 
   return (
     <>
@@ -137,6 +144,7 @@ export const PostSessionSection = ({
       <AddTradeDialog
         open={showAddTradeDialog}
         onOpenChange={setShowAddTradeDialog}
+        onSubmit={handleTradeSubmit}
       />
     </>
   );

@@ -14,6 +14,7 @@ import {
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { AddTradeDialog } from "./AddTradeDialog";
 import { Plus } from "lucide-react";
+import { toast } from "sonner";
 
 export const RuleAdherence = () => {
   const [showAddTradeDialog, setShowAddTradeDialog] = useState(false);
@@ -31,6 +32,12 @@ export const RuleAdherence = () => {
       losses: 80,
     },
   ];
+
+  const handleTradeSubmit = (tradeData: any, isEdit: boolean) => {
+    // Here you would typically handle the trade data, e.g., save it to a database
+    console.log("Trade submitted:", tradeData);
+    toast.success(isEdit ? "Trade updated successfully!" : "Trade added successfully!");
+  };
 
   return (
     <Card className="p-4 md:p-6 space-y-4">
@@ -76,6 +83,7 @@ export const RuleAdherence = () => {
       <AddTradeDialog
         open={showAddTradeDialog}
         onOpenChange={setShowAddTradeDialog}
+        onSubmit={handleTradeSubmit}
       />
     </Card>
   );

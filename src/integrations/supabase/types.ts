@@ -41,6 +41,7 @@ export type Database = {
           created_at: string
           daily_streak: number
           id: string
+          last_activity: string | null
           level: number
           level_progress: number
           post_session_streak: number
@@ -52,6 +53,7 @@ export type Database = {
           created_at?: string
           daily_streak?: number
           id?: string
+          last_activity?: string | null
           level?: number
           level_progress?: number
           post_session_streak?: number
@@ -63,6 +65,7 @@ export type Database = {
           created_at?: string
           daily_streak?: number
           id?: string
+          last_activity?: string | null
           level?: number
           level_progress?: number
           post_session_streak?: number

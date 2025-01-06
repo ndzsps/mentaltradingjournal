@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { differenceInDays } from 'date-fns';
 
 interface ProgressStats {
   preSessionStreak: number;
@@ -38,10 +39,20 @@ export const useProgressTracking = () => {
       }
 
       if (data) {
+        // Check if user has missed a day
+        const lastActivity = new Date(data.last_activity);
+        const daysSinceLastActivity = differenceInDays(new Date(), lastActivity);
+
+        if (daysSinceLastActivity > 1) {
+          // Reset streaks if user missed a day
+          await resetStreaks();
+          return;
+        }
+
         setStats({
-          preSessionStreak: data.pre_session_streak,
-          postSessionStreak: data.post_session_streak,
-          dailyStreak: data.daily_streak,
+          preSessionStreak: Math.min(data.pre_session_streak, 30),
+          postSessionStreak: Math.min(data.post_session_streak, 30),
+          dailyStreak: Math.min(data.daily_streak, 30),
           level: data.level,
           levelProgress: data.level_progress,
         });
@@ -51,100 +62,99 @@ export const useProgressTracking = () => {
     fetchStats();
   }, [user]);
 
-  const updateProgress = async (sessionType: 'pre' | 'post') => {
+  const resetStreaks = async () => {
     if (!user) return;
-
-    console.log(`[Progress Tracking] Updating progress for ${sessionType} session`);
-    console.log('[Progress Tracking] Previous stats:', stats);
-
-    const newStats = { ...stats };
-
-    // Update streaks based on session type
-    if (sessionType === 'pre') {
-      newStats.preSessionStreak += 1;
-      newStats.levelProgress += 10;
-    } else {
-      newStats.postSessionStreak += 1;
-      newStats.levelProgress += 10;
-    }
-
-    // Level up if progress reaches 100%
-    if (newStats.levelProgress >= 100) {
-      newStats.level += 1;
-      newStats.levelProgress = 0;
-    }
-
-    // Check if both sessions are completed for the day
-    const bothSessionsCompleted = 
-      (sessionType === 'pre' && newStats.postSessionStreak > 0) || 
-      (sessionType === 'post' && newStats.preSessionStreak > 0);
-
-    // Update daily streak if both sessions are completed
-    if (bothSessionsCompleted) {
-      newStats.dailyStreak += 1;
-      // We'll reset the session streaks at the start of the next day
-      // This allows users to see their current progress
-    }
 
     try {
       const { error } = await supabase
         .from('progress_stats')
         .update({
-          pre_session_streak: newStats.preSessionStreak,
-          post_session_streak: newStats.postSessionStreak,
-          daily_streak: newStats.dailyStreak,
-          level: newStats.level,
-          level_progress: newStats.levelProgress,
-          updated_at: new Date().toISOString(),
+          pre_session_streak: 0,
+          post_session_streak: 0,
+          daily_streak: 0,
+          last_activity: new Date().toISOString(),
         })
         .eq('user_id', user.id);
 
-      if (error) {
-        console.error('Error updating progress stats:', error);
-        toast.error('Failed to update progress');
+      if (error) throw error;
+
+      setStats(prev => ({
+        ...prev,
+        preSessionStreak: 0,
+        postSessionStreak: 0,
+        dailyStreak: 0,
+      }));
+
+      console.log('Streaks reset due to inactivity');
+    } catch (error) {
+      console.error('Error resetting streaks:', error);
+      toast.error('Failed to reset streaks');
+    }
+  };
+
+  const updateProgress = async (sessionType: 'pre' | 'post') => {
+    if (!user) return;
+
+    console.log(`[Progress Tracking] Updating progress for ${sessionType} session`);
+    
+    try {
+      const { data: currentStats } = await supabase
+        .from('progress_stats')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (!currentStats) {
+        console.error('No progress stats found for user');
         return;
       }
 
-      console.log('[Progress Tracking] Updated stats:', newStats);
-      setStats(newStats);
+      const updates: any = {
+        last_activity: new Date().toISOString(),
+        level_progress: Math.min(currentStats.level_progress + 10, 100),
+      };
+
+      // Update session-specific streak
+      if (sessionType === 'pre') {
+        updates.pre_session_streak = Math.min(currentStats.pre_session_streak + 1, 30);
+      } else {
+        updates.post_session_streak = Math.min(currentStats.post_session_streak + 1, 30);
+      }
+
+      // Update daily streak if both sessions are completed
+      if ((sessionType === 'pre' && currentStats.post_session_streak > 0) ||
+          (sessionType === 'post' && currentStats.pre_session_streak > 0)) {
+        updates.daily_streak = Math.min(currentStats.daily_streak + 1, 30);
+      }
+
+      // Level up if progress reaches 100%
+      if (updates.level_progress >= 100) {
+        updates.level = currentStats.level + 1;
+        updates.level_progress = 0;
+      }
+
+      const { error } = await supabase
+        .from('progress_stats')
+        .update(updates)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      setStats(prev => ({
+        ...prev,
+        preSessionStreak: sessionType === 'pre' ? Math.min(prev.preSessionStreak + 1, 30) : prev.preSessionStreak,
+        postSessionStreak: sessionType === 'post' ? Math.min(prev.postSessionStreak + 1, 30) : prev.postSessionStreak,
+        dailyStreak: updates.daily_streak || prev.dailyStreak,
+        level: updates.level || prev.level,
+        levelProgress: updates.level_progress,
+      }));
+
+      console.log('[Progress Tracking] Progress updated successfully:', updates);
     } catch (error) {
       console.error('Error updating progress:', error);
       toast.error('Failed to update progress');
     }
   };
 
-  const resetProgress = async () => {
-    if (!user) return;
-
-    console.log('[Progress Tracking] Resetting all progress');
-    const initialStats = {
-      preSessionStreak: 0,
-      postSessionStreak: 0,
-      dailyStreak: 0,
-      level: 1,
-      levelProgress: 0,
-    };
-
-    const { error } = await supabase
-      .from('progress_stats')
-      .update({
-        pre_session_streak: 0,
-        post_session_streak: 0,
-        daily_streak: 0,
-        level: 1,
-        level_progress: 0,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('user_id', user.id);
-
-    if (error) {
-      console.error('Error resetting progress:', error);
-      toast.error('Failed to reset progress');
-      return;
-    }
-
-    setStats(initialStats);
-  };
-
-  return { stats, updateProgress, resetProgress };
+  return { stats, updateProgress, resetStreaks };
 };

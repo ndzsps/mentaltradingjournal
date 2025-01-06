@@ -9,12 +9,12 @@ interface LevelProgressProps {
 
 export const LevelProgress = ({ level, levelProgress }: LevelProgressProps) => {
   const getLevelColor = (level: number) => {
-    if (level === 1) return "bg-accent/10";
+    if (level === 1) return "bg-[#E5DEFF]/10";
     return "bg-primary/10";
   };
 
   const getLevelTextColor = (level: number) => {
-    if (level === 1) return "text-accent";
+    if (level === 1) return "text-[#E5DEFF]";
     return "text-primary";
   };
 
@@ -35,7 +35,7 @@ export const LevelProgress = ({ level, levelProgress }: LevelProgressProps) => {
         </div>
         <Progress 
           value={levelProgress} 
-          className={`h-1 ${level === 1 ? "[--progress:theme(colors.accent.DEFAULT)]" : ""}`} 
+          className={`h-1 ${level === 1 ? "[--progress:theme(colors.primary.DEFAULT)]" : ""}`} 
         />
       </div>
     </motion.div>

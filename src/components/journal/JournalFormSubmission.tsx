@@ -1,6 +1,8 @@
 import { useJournalToast } from "@/hooks/useJournalToast";
 import { useProgressTracking } from "@/hooks/useProgressTracking";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface JournalFormSubmissionProps {
   sessionType: "pre" | "post";
@@ -31,8 +33,17 @@ export const useJournalFormSubmission = ({
 }: JournalFormSubmissionProps) => {
   const { showSuccessToast } = useJournalToast();
   const { updateProgress } = useProgressTracking();
+  const { user } = useAuth();
 
   const handleSubmit = async () => {
+    if (!user) {
+      toast.error("Authentication Error", {
+        description: "You must be logged in to submit journal entries.",
+        duration: 5000,
+      });
+      return;
+    }
+
     console.log('Submitting journal entry:', {
       sessionType,
       selectedEmotion,
@@ -64,22 +75,22 @@ export const useJournalFormSubmission = ({
       }
     }
 
-    const journalEntry = {
-      emotion: selectedEmotion,
-      emotionDetail: selectedEmotionDetail,
-      outcome: selectedOutcome,
-      notes,
-      sessionType,
-      timestamp: new Date(),
-      marketConditions,
-      followedRules,
-      mistakes: selectedMistakes,
-      preTradingActivities,
-    };
-
-    console.log("Journal Entry:", journalEntry);
-    
     try {
+      const { error } = await supabase.from('journal_entries').insert({
+        user_id: user.id,
+        session_type: sessionType,
+        emotion: selectedEmotion,
+        emotion_detail: selectedEmotionDetail,
+        notes,
+        outcome: selectedOutcome,
+        market_conditions: marketConditions,
+        followed_rules: followedRules,
+        mistakes: selectedMistakes,
+        pre_trading_activities: preTradingActivities,
+      });
+
+      if (error) throw error;
+
       // Update progress tracking and show success message
       await updateProgress(sessionType);
       console.log(`Progress updated for ${sessionType} session`);
@@ -87,9 +98,9 @@ export const useJournalFormSubmission = ({
       resetForm();
       onSubmitSuccess?.();
     } catch (error) {
-      console.error('Error updating progress:', error);
+      console.error('Error submitting journal entry:', error);
       toast.error("Error", {
-        description: "Failed to update progress. Please try again.",
+        description: "Failed to submit journal entry. Please try again.",
         duration: 5000,
       });
     }

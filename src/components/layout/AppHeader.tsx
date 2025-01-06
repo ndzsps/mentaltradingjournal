@@ -1,4 +1,4 @@
-import { Home, BookOpen, BarChart2, Menu, LogOut, User, Edit2 } from "lucide-react";
+import { Home, BookOpen, BarChart2, Menu, LogOut, User } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -15,25 +15,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 
 export function AppHeader() {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
-  const [isEditingUsername, setIsEditingUsername] = useState(false);
-  const [newUsername, setNewUsername] = useState("");
   const { user, signOut } = useAuth();
   
   const navigationItems = [
@@ -48,26 +36,7 @@ export function AppHeader() {
         .map((n) => n[0])
         .join("")
         .toUpperCase()
-    : user?.email?.[0].toUpperCase() || "U";
-
-  const handleUpdateUsername = async () => {
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ full_name: newUsername })
-        .eq('id', user?.id);
-
-      if (error) throw error;
-
-      toast.success("Username updated successfully!");
-      setIsEditingUsername(false);
-      // Force reload the page to update the user data
-      window.location.reload();
-    } catch (error) {
-      console.error('Error updating username:', error);
-      toast.error("Failed to update username");
-    }
-  };
+    : "U";
 
   return (
     <header className="border-b border-border/40 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -97,59 +66,31 @@ export function AppHeader() {
             </Button>
           ))}
 
-          <Dialog open={isEditingUsername} onOpenChange={setIsEditingUsername}>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={user?.avatar_url || ""} alt={user?.full_name || user?.email || ""} />
-                    <AvatarFallback>{userInitials}</AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none flex items-center gap-2">
-                      {user?.full_name || user?.email}
-                      <DialogTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-4 w-4 p-0">
-                          <Edit2 className="h-3 w-3" />
-                        </Button>
-                      </DialogTrigger>
-                    </p>
-                    <p className="text-xs leading-none text-muted-foreground">
-                      {user?.email}
-                    </p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={signOut}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Edit Display Name</DialogTitle>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid gap-2">
-                  <Input
-                    id="name"
-                    placeholder="Enter your display name"
-                    value={newUsername}
-                    onChange={(e) => setNewUsername(e.target.value)}
-                  />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={user?.avatar_url || ""} alt={user?.full_name || ""} />
+                  <AvatarFallback>{userInitials}</AvatarFallback>
+                </Avatar>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56" align="end" forceMount>
+              <DropdownMenuLabel className="font-normal">
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm font-medium leading-none">{user?.full_name}</p>
+                  <p className="text-xs leading-none text-muted-foreground">
+                    {user?.email}
+                  </p>
                 </div>
-                <Button onClick={handleUpdateUsername} disabled={!newUsername.trim()}>
-                  Save Changes
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={signOut}>
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Log out</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </nav>
 
         {/* Mobile Navigation */}

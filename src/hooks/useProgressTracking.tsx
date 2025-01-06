@@ -22,10 +22,9 @@ export const useProgressTracking = () => {
     };
   });
 
-  // Ensure stats are saved whenever they change
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(stats));
-    console.log('Progress stats updated:', stats); // Debug log
+    console.log('Progress stats updated:', stats);
   }, [stats]);
 
   const updateProgress = (sessionType: 'pre' | 'post') => {
@@ -35,10 +34,10 @@ export const useProgressTracking = () => {
       // Update session-specific streaks
       if (sessionType === 'pre') {
         newStats.preSessionStreak += 1;
-        console.log('Updated pre-session streak:', newStats.preSessionStreak); // Debug log
+        console.log('Updated pre-session streak:', newStats.preSessionStreak);
       } else {
         newStats.postSessionStreak += 1;
-        console.log('Updated post-session streak:', newStats.postSessionStreak); // Debug log
+        console.log('Updated post-session streak:', newStats.postSessionStreak);
       }
 
       // Update level progress for any session completion
@@ -50,10 +49,10 @@ export const useProgressTracking = () => {
         newStats.levelProgress = 0;
       }
 
-      // Check if both sessions are completed to update daily streak
+      // Only update daily streak when both sessions are completed
       if (newStats.preSessionStreak > 0 && newStats.postSessionStreak > 0) {
         newStats.dailyStreak += 1;
-        // Reset session streaks after completing both
+        // Reset only after incrementing daily streak
         newStats.preSessionStreak = 0;
         newStats.postSessionStreak = 0;
       }

@@ -27,16 +27,26 @@ export const ProfitLossDistribution = () => {
       </Card>
     );
   }
-  
-  const data = [
-    { range: "-$1000+", count: 5 },
-    { range: "-$500 to -$1000", count: 8 },
-    { range: "-$100 to -$500", count: 15 },
-    { range: "-$100 to $100", count: 25 },
-    { range: "$100 to $500", count: 20 },
-    { range: "$500 to $1000", count: 12 },
-    { range: "$1000+", count: 7 },
+
+  // Process trades from journal entries to create P/L distribution
+  const allTrades = analytics.journalEntries.flatMap(entry => entry.trades || []);
+  const ranges = [
+    { min: -Infinity, max: -1000, label: "-$1000+" },
+    { min: -1000, max: -500, label: "-$500 to -$1000" },
+    { min: -500, max: -100, label: "-$100 to -$500" },
+    { min: -100, max: 100, label: "-$100 to $100" },
+    { min: 100, max: 500, label: "$100 to $500" },
+    { min: 500, max: 1000, label: "$500 to $1000" },
+    { min: 1000, max: Infinity, label: "$1000+" },
   ];
+
+  const data = ranges.map(range => ({
+    range: range.label,
+    count: allTrades.filter(trade => {
+      const pnl = Number(trade.pnl);
+      return pnl > range.min && pnl <= range.max;
+    }).length,
+  }));
 
   return (
     <Card className="p-4 md:p-6 space-y-4">
@@ -62,7 +72,10 @@ export const ProfitLossDistribution = () => {
       <div className="space-y-2 bg-accent/10 p-3 md:p-4 rounded-lg">
         <h4 className="font-semibold text-sm md:text-base">AI Insight</h4>
         <p className="text-xs md:text-sm text-muted-foreground">
-          Most of your trades fall within the -$100 to $100 range, suggesting consistent but conservative position sizing.
+          {data.find(d => d.range === "-$100 to $100")?.count > 
+           Math.max(...data.map(d => d.count)) / 2
+            ? "Most of your trades fall within the -$100 to $100 range, suggesting consistent but conservative position sizing."
+            : "Your trade outcomes show varied distribution. Consider reviewing position sizing strategy for more consistent results."}
         </p>
       </div>
     </Card>

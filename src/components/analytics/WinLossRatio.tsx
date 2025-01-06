@@ -26,10 +26,18 @@ export const WinLossRatio = () => {
       </Card>
     );
   }
+
+  // Process trades to calculate win/loss ratio
+  const allTrades = analytics.journalEntries.flatMap(entry => entry.trades || []);
+  const winningTrades = allTrades.filter(trade => Number(trade.pnl) > 0).length;
+  const totalTrades = allTrades.length;
   
+  const winRate = totalTrades ? (winningTrades / totalTrades) * 100 : 0;
+  const lossRate = totalTrades ? ((totalTrades - winningTrades) / totalTrades) * 100 : 0;
+
   const data = [
-    { name: "Winning Trades", value: 65 },
-    { name: "Losing Trades", value: 35 },
+    { name: "Winning Trades", value: winRate },
+    { name: "Losing Trades", value: lossRate },
   ];
 
   const COLORS = ['#6E59A5', '#FEC6A1'];
@@ -68,7 +76,9 @@ export const WinLossRatio = () => {
       <div className="space-y-2 bg-accent/10 p-3 md:p-4 rounded-lg">
         <h4 className="font-semibold text-sm md:text-base">AI Insight</h4>
         <p className="text-xs md:text-sm text-muted-foreground">
-          Your current win rate is 65%, which is above the recommended minimum of 50% for consistent profitability.
+          {winRate >= 50
+            ? `Your current win rate is ${winRate.toFixed(1)}%, which is above the recommended minimum of 50% for consistent profitability.`
+            : `Your current win rate is ${winRate.toFixed(1)}%. Consider reviewing your trading strategy to improve win rate above 50%.`}
         </p>
       </div>
     </Card>

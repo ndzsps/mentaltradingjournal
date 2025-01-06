@@ -27,15 +27,30 @@ export const TradeFrequency = () => {
       </Card>
     );
   }
-  
-  const data = Array.from({ length: 7 }, (_, i) => {
+
+  // Process journal entries to get trade frequency by day
+  const last7Days = Array.from({ length: 7 }, (_, i) => {
     const date = new Date();
     date.setDate(date.getDate() - i);
-    return {
-      date: date.toLocaleDateString('en-US', { weekday: 'short' }),
-      trades: Math.floor(Math.random() * 10) + 1,
-    };
+    return date.toISOString().split('T')[0];
   }).reverse();
+
+  const data = last7Days.map(date => {
+    const entriesForDay = analytics.journalEntries.filter(entry => 
+      entry.created_at.split('T')[0] === date
+    );
+    
+    const tradesCount = entriesForDay.reduce((sum, entry) => 
+      sum + (entry.trades?.length || 0), 0
+    );
+
+    return {
+      date: new Date(date).toLocaleDateString('en-US', { weekday: 'short' }),
+      trades: tradesCount,
+    };
+  });
+
+  const averageTrades = data.reduce((sum, day) => sum + day.trades, 0) / data.length;
 
   return (
     <Card className="p-4 md:p-6 space-y-4">
@@ -61,7 +76,8 @@ export const TradeFrequency = () => {
       <div className="space-y-2 bg-accent/10 p-3 md:p-4 rounded-lg">
         <h4 className="font-semibold text-sm md:text-base">AI Insight</h4>
         <p className="text-xs md:text-sm text-muted-foreground">
-          Your trading frequency peaks mid-week, with an average of 5 trades per day.
+          Your trading frequency averages {averageTrades.toFixed(1)} trades per day, with peak activity 
+          {data.reduce((max, day) => day.trades > max.trades ? day : max).date}.
         </p>
       </div>
     </Card>

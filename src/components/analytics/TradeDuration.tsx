@@ -27,13 +27,42 @@ export const TradeDuration = () => {
       </Card>
     );
   }
+
+  // Process trades to calculate durations and win rates
+  const allTrades = analytics.journalEntries.flatMap(entry => entry.trades || []);
   
-  const data = [
-    { duration: "< 10 min", winRate: 65, volume: 40 },
-    { duration: "10-30 min", winRate: 45, volume: 30 },
-    { duration: "30-60 min", winRate: 30, volume: 20 },
-    { duration: "> 1 hour", winRate: 20, volume: 10 },
+  const calculateDuration = (trade: any) => {
+    const entryTime = new Date(trade.entryDate).getTime();
+    const exitTime = new Date(trade.exitDate).getTime();
+    return (exitTime - entryTime) / (1000 * 60); // Duration in minutes
+  };
+
+  const durationRanges = [
+    { max: 10, label: "< 10 min" },
+    { max: 30, label: "10-30 min" },
+    { max: 60, label: "30-60 min" },
+    { max: Infinity, label: "> 1 hour" },
   ];
+
+  const data = durationRanges.map(range => {
+    const tradesInRange = allTrades.filter(trade => {
+      const duration = calculateDuration(trade);
+      return duration <= range.max;
+    });
+
+    const totalTrades = tradesInRange.length;
+    const winningTrades = tradesInRange.filter(trade => Number(trade.pnl) > 0).length;
+
+    return {
+      duration: range.label,
+      winRate: totalTrades ? (winningTrades / totalTrades) * 100 : 0,
+      volume: totalTrades ? (totalTrades / allTrades.length) * 100 : 0,
+    };
+  });
+
+  const bestDuration = data.reduce((prev, current) => 
+    current.winRate > prev.winRate ? current : prev
+  );
 
   return (
     <Card className="p-4 md:p-6 space-y-4">
@@ -60,8 +89,8 @@ export const TradeDuration = () => {
       <div className="space-y-2 bg-accent/10 p-3 md:p-4 rounded-lg">
         <h4 className="font-semibold text-sm md:text-base">AI Insight</h4>
         <div className="space-y-2 text-xs md:text-sm text-muted-foreground">
-          <p>Your short trades (&lt;10 minutes) have a 65% win rate, while longer trades (&gt;1 hour) lead to 80% losses.</p>
-          <p>Reducing trade duration by 20% could improve consistency.</p>
+          <p>Your {bestDuration.duration} trades have a {bestDuration.winRate.toFixed(1)}% win rate.</p>
+          <p>Consider focusing more on trades within this duration range for optimal results.</p>
         </div>
       </div>
     </Card>

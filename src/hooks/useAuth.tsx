@@ -14,49 +14,6 @@ export const useAuth = () => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const queryClient = useQueryClient();
 
-  useEffect(() => {
-    const initializeAuth = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        console.log('Initial session check:', session?.user?.id);
-        
-        if (session?.user) {
-          const profile = await fetchProfile(session.user.id);
-          if (profile) {
-            console.log('Setting initial user profile:', profile);
-            setUser(profile);
-          }
-        }
-
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-          console.log('Auth state changed:', event, session?.user?.id);
-          
-          if (session?.user) {
-            const profile = await fetchProfile(session.user.id);
-            if (profile) {
-              console.log('Setting user profile after auth change:', profile);
-              setUser(profile);
-              queryClient.invalidateQueries({ queryKey: ['profile'] });
-            }
-          } else {
-            console.log('No session, clearing user state');
-            setUser(null);
-            queryClient.clear();
-          }
-        });
-
-        return () => {
-          subscription.unsubscribe();
-        };
-      } catch (error) {
-        console.error('Error initializing auth:', error);
-        toast.error('Error initializing authentication');
-      }
-    };
-
-    initializeAuth();
-  }, [queryClient]);
-
   const fetchProfile = async (userId: string): Promise<UserProfile | null> => {
     try {
       console.log('Fetching profile for user:', userId);
@@ -78,6 +35,63 @@ export const useAuth = () => {
       return null;
     }
   };
+
+  useEffect(() => {
+    let mounted = true;
+
+    const initializeAuth = async () => {
+      try {
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          throw sessionError;
+        }
+
+        console.log('Initial session check:', session?.user?.id);
+        
+        if (session?.user && mounted) {
+          const profile = await fetchProfile(session.user.id);
+          if (profile && mounted) {
+            console.log('Setting initial user profile:', profile);
+            setUser(profile);
+          }
+        }
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+          console.log('Auth state changed:', event, session?.user?.id);
+          
+          if (session?.user && mounted) {
+            const profile = await fetchProfile(session.user.id);
+            if (profile && mounted) {
+              console.log('Setting user profile after auth change:', profile);
+              setUser(profile);
+              queryClient.invalidateQueries({ queryKey: ['profile'] });
+            }
+          } else {
+            console.log('No session or signed out, clearing user state');
+            if (mounted) {
+              setUser(null);
+              queryClient.clear();
+            }
+          }
+        });
+
+        return () => {
+          mounted = false;
+          subscription.unsubscribe();
+        };
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+        toast.error('Error initializing authentication');
+      }
+    };
+
+    initializeAuth();
+
+    return () => {
+      mounted = false;
+    };
+  }, [queryClient]);
 
   const signUp = async (email: string, password: string, fullName: string) => {
     const { data: authData, error: authError } = await supabase.auth.signUp({

@@ -1,6 +1,5 @@
 import { Progress } from "@/components/ui/progress";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { Trophy } from "lucide-react";
 
@@ -81,10 +80,10 @@ export const SessionProgress = ({
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-2 p-3 bg-accent/20 rounded-lg"
+          className="flex items-center gap-3 p-4 bg-[#2A2A2A] rounded-lg"
         >
-          <Trophy className="w-5 h-5 text-accent" />
-          <span className="text-sm font-medium">
+          <Trophy className="w-5 h-5 text-[#FFB156]" />
+          <span className="text-sm font-medium text-white">
             Session completed! Keep up the great work!
           </span>
         </motion.div>

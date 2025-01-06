@@ -29,6 +29,7 @@ interface JournalEntry {
   outcome?: string;
   market_conditions?: string;
   trades?: Trade[];
+  followed_rules?: string[];
 }
 
 interface JournalEntryProps {
@@ -49,9 +50,6 @@ export const JournalEntry = ({ entry }: JournalEntryProps) => {
     month: 'long',
     day: 'numeric'
   });
-
-  console.log('Full entry:', entry); // Debug log
-  console.log('Entry trades:', entry.trades); // Debug log
 
   return (
     <Card className="p-4 rounded-lg bg-background/50 border border-primary/10">
@@ -91,6 +89,24 @@ export const JournalEntry = ({ entry }: JournalEntryProps) => {
       <p className="mt-2 text-sm text-foreground/90">
         {entry.notes}
       </p>
+
+      {/* Display Trading Rules Followed */}
+      {Array.isArray(entry.followed_rules) && entry.followed_rules.length > 0 && (
+        <div className="mt-4">
+          <h4 className="text-sm font-medium text-muted-foreground mb-2">Trading Rules Followed:</h4>
+          <div className="flex flex-wrap gap-2">
+            {entry.followed_rules.map((rule, index) => (
+              <Badge 
+                key={index}
+                variant="outline"
+                className="bg-accent/10 hover:bg-accent/20 transition-colors"
+              >
+                {capitalizeWords(rule)}
+              </Badge>
+            ))}
+          </div>
+        </div>
+      )}
 
       {Array.isArray(entry.trades) && entry.trades.length > 0 && (
         <>

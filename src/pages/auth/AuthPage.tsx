@@ -53,39 +53,17 @@ const AuthPage = () => {
                 colors: {
                   brand: 'hsl(var(--primary))',
                   brandAccent: 'hsl(var(--primary-light))',
-                  inputText: 'white',
-                  inputBackground: 'hsl(var(--background))',
-                  inputPlaceholder: 'hsl(var(--muted-foreground))',
                 }
               }
             },
             className: {
               container: 'space-y-4',
               button: 'bg-primary hover:bg-primary/90',
-              input: 'bg-background text-foreground',
-              label: 'text-foreground',
+              input: 'bg-background',
             }
           }}
           providers={[]}
           redirectTo={window.location.origin}
-          localization={{
-            variables: {
-              sign_in: {
-                email_label: 'Email',
-                password_label: 'Password',
-              },
-              sign_up: {
-                email_label: 'Email',
-                password_label: 'Password',
-              }
-            }
-          }}
-          view="sign_up"
-          magicLink={false}
-          showLinks={true}
-          queryParams={{
-            full_name: ''
-          }}
         />
       </Card>
     </div>

@@ -81,6 +81,7 @@ export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
     "Keep up the good work with emotional management.";
 
   return {
+    journalEntries,
     performanceByEmotion,
     emotionalImpact: {
       winRate: winRates,

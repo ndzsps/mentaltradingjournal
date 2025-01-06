@@ -13,6 +13,7 @@ export interface JournalEntry {
 }
 
 export interface AnalyticsInsight {
+  journalEntries: JournalEntry[];
   performanceByEmotion: {
     positive: number;
     neutral: number;

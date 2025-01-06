@@ -17,9 +17,10 @@ interface AddTradeDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   editTrade?: any;
+  onSubmit: (tradeData: any, isEdit: boolean) => void;
 }
 
-export const AddTradeDialog = ({ open, onOpenChange, editTrade }: AddTradeDialogProps) => {
+export const AddTradeDialog = ({ open, onOpenChange, editTrade, onSubmit }: AddTradeDialogProps) => {
   const [direction, setDirection] = useState<'buy' | 'sell' | null>(null);
   const [formProgress, setFormProgress] = useState(0);
 
@@ -36,6 +37,16 @@ export const AddTradeDialog = ({ open, onOpenChange, editTrade }: AddTradeDialog
       });
     }
   }, [editTrade]);
+
+  // Reset form when dialog closes
+  useEffect(() => {
+    if (!open) {
+      setDirection(null);
+      setFormProgress(0);
+      const form = document.querySelector('form');
+      if (form) form.reset();
+    }
+  }, [open]);
 
   // Calculate form progress
   useEffect(() => {
@@ -91,6 +102,7 @@ export const AddTradeDialog = ({ open, onOpenChange, editTrade }: AddTradeDialog
     
     const formData = new FormData(e.currentTarget);
     const tradeData = {
+      id: editTrade?.id, // Preserve the ID if editing
       entryDate: formData.get('entryDate'),
       instrument: formData.get('instrument'),
       setup: formData.get('setup'),
@@ -115,7 +127,7 @@ export const AddTradeDialog = ({ open, onOpenChange, editTrade }: AddTradeDialog
       return;
     }
 
-    console.log("Trade submitted:", tradeData);
+    onSubmit(tradeData, !!editTrade);
     toast.success(editTrade ? "Trade updated successfully!" : "Trade added successfully!");
     onOpenChange(false);
   };

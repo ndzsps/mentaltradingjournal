@@ -1,5 +1,5 @@
 import { Smile, Meh, Frown, ThumbsUp, ThumbsDown, MinusCircle } from "lucide-react";
-import { Emotion, TradingOutcome } from "./types";
+import { Emotion, TradingOutcome, MistakeCategory, TradingRule } from "./types";
 
 export const emotions: Emotion[] = [
   { 
@@ -50,4 +50,24 @@ export const tradingOutcome: TradingOutcome[] = [
   { icon: ThumbsUp, label: "Win", value: "win" },
   { icon: ThumbsDown, label: "Loss", value: "loss" },
   { icon: MinusCircle, label: "No Trades", value: "no_trades" },
+];
+
+export const mistakeCategories: MistakeCategory[] = [
+  { label: "Revenge Trading", value: "revenge_trading" },
+  { label: "Moving Stop-Loss", value: "moving_stop_loss" },
+  { label: "FOMO Trade", value: "fomo_trade" },
+  { label: "Over-leveraging", value: "over_leveraging" },
+  { label: "Breaking Trading Plan", value: "breaking_plan" },
+  { label: "Poor Position Sizing", value: "poor_sizing" },
+  { label: "Emotional Trading", value: "emotional_trading" },
+  { label: "Poor Time Management", value: "poor_timing" },
+];
+
+export const tradingRules: TradingRule[] = [
+  { label: "Proper Position Sizing", value: "position_sizing" },
+  { label: "Stop Loss Placement", value: "stop_loss" },
+  { label: "Risk/Reward Ratio", value: "risk_reward" },
+  { label: "Trading Hours", value: "trading_hours" },
+  { label: "Entry Criteria", value: "entry_criteria" },
+  { label: "Exit Strategy", value: "exit_strategy" },
 ];

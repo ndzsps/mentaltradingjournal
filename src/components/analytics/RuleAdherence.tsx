@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   BarChart,
   Bar,
@@ -10,8 +12,11 @@ import {
   Legend,
 } from "recharts";
 import { generateAnalytics } from "@/utils/analyticsUtils";
+import { AddTradeDialog } from "./AddTradeDialog";
+import { Plus } from "lucide-react";
 
 export const RuleAdherence = () => {
+  const [showAddTradeDialog, setShowAddTradeDialog] = useState(false);
   const analytics = generateAnalytics([]);
   
   const data = [
@@ -29,11 +34,21 @@ export const RuleAdherence = () => {
 
   return (
     <Card className="p-4 md:p-6 space-y-4">
-      <div className="space-y-2">
-        <h3 className="text-xl md:text-2xl font-bold">Rule Adherence vs. Performance</h3>
-        <p className="text-sm text-muted-foreground">
-          Compare outcomes when trading rules are followed vs. broken
-        </p>
+      <div className="flex justify-between items-start">
+        <div className="space-y-2">
+          <h3 className="text-xl md:text-2xl font-bold">Rule Adherence vs. Performance</h3>
+          <p className="text-sm text-muted-foreground">
+            Compare outcomes when trading rules are followed vs. broken
+          </p>
+        </div>
+        <Button
+          onClick={() => setShowAddTradeDialog(true)}
+          className="flex items-center gap-2"
+          size="sm"
+        >
+          <Plus className="w-4 h-4" />
+          Add Trade
+        </Button>
       </div>
 
       <div className="h-[250px] md:h-[300px] w-full">
@@ -57,6 +72,11 @@ export const RuleAdherence = () => {
           <p>Skipping your stop-loss rules led to average losses of 3x larger than planned.</p>
         </div>
       </div>
+
+      <AddTradeDialog
+        open={showAddTradeDialog}
+        onOpenChange={setShowAddTradeDialog}
+      />
     </Card>
   );
 };

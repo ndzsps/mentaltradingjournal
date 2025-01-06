@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
-type AuthMode = "signin" | "signup";
+type AuthMode = "signin" | "signup" | "forgot-password";
 
 export function AuthDialog({
   isOpen,
@@ -20,7 +20,7 @@ export function AuthDialog({
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
-  const { signIn, signUp } = useAuth();
+  const { signIn, signUp, resetPassword } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,9 +30,13 @@ export function AuthDialog({
       if (mode === "signup") {
         await signUp(email, password, fullName);
         toast.success("Account created successfully!");
-      } else {
+      } else if (mode === "signin") {
         await signIn(email, password);
         toast.success("Signed in successfully!");
+      } else if (mode === "forgot-password") {
+        await resetPassword(email);
+        toast.success("Password reset email sent! Check your inbox.");
+        setMode("signin");
       }
       onClose();
     } catch (error) {
@@ -47,7 +51,11 @@ export function AuthDialog({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>
-            {mode === "signin" ? "Sign In" : "Create Account"}
+            {mode === "signin" 
+              ? "Sign In" 
+              : mode === "signup" 
+              ? "Create Account" 
+              : "Reset Password"}
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -72,20 +80,35 @@ export function AuthDialog({
               required
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
+          {mode !== "forgot-password" && (
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+          )}
           <div className="flex flex-col gap-2">
             <Button type="submit" disabled={loading}>
-              {mode === "signin" ? "Sign In" : "Sign Up"}
+              {mode === "signin" 
+                ? "Sign In" 
+                : mode === "signup" 
+                ? "Sign Up" 
+                : "Send Reset Link"}
             </Button>
+            {mode === "signin" && (
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setMode("forgot-password")}
+              >
+                Forgot your password?
+              </Button>
+            )}
             <Button
               type="button"
               variant="ghost"
@@ -95,7 +118,9 @@ export function AuthDialog({
             >
               {mode === "signin"
                 ? "Don't have an account? Sign Up"
-                : "Already have an account? Sign In"}
+                : mode === "signup"
+                ? "Already have an account? Sign In"
+                : "Back to Sign In"}
             </Button>
           </div>
         </form>

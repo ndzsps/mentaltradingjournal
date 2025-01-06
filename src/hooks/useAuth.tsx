@@ -88,6 +88,13 @@ export const useAuth = () => {
     queryClient.clear();
   };
 
+  const resetPassword = async (email: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    if (error) throw error;
+  };
+
   const updateProfile = async (updates: Partial<UserProfile>) => {
     if (!user?.id) throw new Error('No user logged in');
 
@@ -126,6 +133,7 @@ export const useAuth = () => {
     signUp,
     signIn,
     signOut,
+    resetPassword,
     updateProfile,
     uploadAvatar,
   };

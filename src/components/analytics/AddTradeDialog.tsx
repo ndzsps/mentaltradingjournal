@@ -16,7 +16,7 @@ import { TradeExitSection } from "./trade-form/TradeExitSection";
 interface AddTradeDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  editTrade?: any; // Type this properly based on your trade data structure
+  editTrade?: any;
 }
 
 export const AddTradeDialog = ({ open, onOpenChange, editTrade }: AddTradeDialogProps) => {
@@ -27,7 +27,6 @@ export const AddTradeDialog = ({ open, onOpenChange, editTrade }: AddTradeDialog
   useEffect(() => {
     if (editTrade) {
       setDirection(editTrade.direction);
-      // Populate form fields
       const fields = ['entryDate', 'instrument', 'setup', 'entryPrice', 'quantity', 'stopLoss', 'takeProfit', 'exitDate', 'exitPrice', 'pnl', 'fees'];
       fields.forEach(field => {
         const input = document.getElementById(field) as HTMLInputElement;
@@ -41,42 +40,41 @@ export const AddTradeDialog = ({ open, onOpenChange, editTrade }: AddTradeDialog
   // Calculate form progress
   useEffect(() => {
     const calculateProgress = () => {
-      const requiredFields = [
-        'instrument',
-        'entryPrice',
-        direction,
-      ];
-
-      const optionalFields = [
-        'entryDate',
-        'setup',
-        'quantity',
-        'stopLoss',
-        'takeProfit',
-        'exitDate',
-        'exitPrice',
-        'pnl',
-        'fees',
+      const categories = [
+        {
+          name: 'General',
+          fields: ['instrument', 'entryDate'],
+          directionCheck: direction !== null
+        },
+        {
+          name: 'Entry',
+          fields: ['entryPrice', 'quantity', 'stopLoss', 'takeProfit']
+        },
+        {
+          name: 'Exit',
+          fields: ['exitDate', 'exitPrice', 'pnl', 'fees']
+        }
       ];
 
       const form = document.querySelector('form');
       if (!form) return 0;
 
       const formData = new FormData(form);
-      const filledRequiredFields = requiredFields.filter(field => {
-        if (typeof field === 'string') {
-          return formData.get(field);
+      let completedCategories = 0;
+
+      categories.forEach(category => {
+        const hasAllRequiredFields = category.fields.every(field => {
+          const value = formData.get(field);
+          return value && value.toString().trim() !== '';
+        });
+
+        if (hasAllRequiredFields && (!category.directionCheck || category.directionCheck)) {
+          completedCategories++;
         }
-        return field !== null;
       });
 
-      const filledOptionalFields = optionalFields.filter(field => formData.get(field));
-
-      // Required fields contribute to 60% of progress, optional fields to 40%
-      const requiredProgress = (filledRequiredFields.length / requiredFields.length) * 60;
-      const optionalProgress = (filledOptionalFields.length / optionalFields.length) * 40;
-
-      return Math.round(requiredProgress + optionalProgress);
+      // Each category represents 33.33% of the total progress (100% / 3 categories)
+      return Math.round((completedCategories / categories.length) * 100);
     };
 
     const progressInterval = setInterval(() => {
@@ -110,6 +108,11 @@ export const AddTradeDialog = ({ open, onOpenChange, editTrade }: AddTradeDialog
       return;
     }
 
+    if (formProgress < 100) {
+      toast.error("Please complete all sections before submitting");
+      return;
+    }
+
     console.log("Trade submitted:", tradeData);
     toast.success(editTrade ? "Trade updated successfully!" : "Trade added successfully!");
     onOpenChange(false);
@@ -122,6 +125,7 @@ export const AddTradeDialog = ({ open, onOpenChange, editTrade }: AddTradeDialog
           <DialogTitle>{editTrade ? 'Edit Trade' : 'Add New Trade'}</DialogTitle>
           <DialogDescription>
             Fill in the details of your trade. Required fields are marked with an asterisk (*).
+            All sections must be completed before submission.
           </DialogDescription>
         </DialogHeader>
 

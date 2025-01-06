@@ -3,6 +3,7 @@ import { EmotionLogger } from "@/components/journal/EmotionLogger";
 import { Card } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
+import { ProgressStats } from "@/components/journal/ProgressStats";
 
 // Sample data - in a real app this would come from your database
 const behaviorData = [
@@ -15,6 +16,15 @@ const behaviorData = [
   { date: '2024-01-07', emotion: 4, pnl: 3.5, outcome: "win" },
   { date: '2024-01-08', emotion: 5, pnl: -3.0, outcome: "loss" },
 ];
+
+// Mock data for progress stats - in a real app, this would come from your backend
+const progressStats = {
+  preSessionStreak: 5,
+  postSessionStreak: 3,
+  dailyStreak: 3,
+  level: 2,
+  levelProgress: 45,
+};
 
 const Index = () => {
   return (
@@ -34,32 +44,7 @@ const Index = () => {
             <EmotionLogger />
           </div>
           
-          <Card className="p-4 sm:p-6 lg:p-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
-            <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent mb-4 sm:mb-6">
-              Your Progress
-            </h2>
-            <div className="space-y-4 sm:space-y-6">
-              <div className="space-y-2 sm:space-y-3">
-                <div className="flex justify-between text-sm sm:text-base font-medium">
-                  <span className="text-muted-foreground">Daily Streak</span>
-                  <span className="text-primary-light">3 days</span>
-                </div>
-                <div className="h-2 sm:h-3 bg-muted rounded-full overflow-hidden">
-                  <div className="h-full w-3/4 bg-gradient-to-r from-primary to-primary-light rounded-full" />
-                </div>
-              </div>
-              
-              <div className="space-y-2 sm:space-y-3">
-                <div className="flex justify-between text-sm sm:text-base font-medium">
-                  <span className="text-muted-foreground">Level Progress</span>
-                  <span className="text-accent">Level 2</span>
-                </div>
-                <div className="h-2 sm:h-3 bg-muted rounded-full overflow-hidden">
-                  <div className="h-full w-1/2 bg-gradient-to-r from-accent/70 to-accent rounded-full" />
-                </div>
-              </div>
-            </div>
-          </Card>
+          <ProgressStats {...progressStats} />
         </div>
 
         <Card className="p-4 sm:p-6 lg:p-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">

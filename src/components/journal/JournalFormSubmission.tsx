@@ -32,7 +32,19 @@ export const useJournalFormSubmission = ({
   const { showSuccessToast } = useJournalToast();
   const { updateProgress } = useProgressTracking();
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    console.log('Submitting journal entry:', {
+      sessionType,
+      selectedEmotion,
+      selectedEmotionDetail,
+      notes,
+      selectedOutcome,
+      marketConditions,
+      followedRules,
+      selectedMistakes,
+      preTradingActivities,
+    });
+
     if (!selectedEmotion || !selectedEmotionDetail || !notes) {
       toast.error("Missing Information", {
         description: "Please fill in all required fields.",
@@ -67,11 +79,20 @@ export const useJournalFormSubmission = ({
 
     console.log("Journal Entry:", journalEntry);
     
-    // Update progress tracking and show success message
-    updateProgress(sessionType);
-    showSuccessToast(sessionType);
-    resetForm();
-    onSubmitSuccess?.();
+    try {
+      // Update progress tracking and show success message
+      await updateProgress(sessionType);
+      console.log(`Progress updated for ${sessionType} session`);
+      showSuccessToast(sessionType);
+      resetForm();
+      onSubmitSuccess?.();
+    } catch (error) {
+      console.error('Error updating progress:', error);
+      toast.error("Error", {
+        description: "Failed to update progress. Please try again.",
+        duration: 5000,
+      });
+    }
   };
 
   return { handleSubmit };

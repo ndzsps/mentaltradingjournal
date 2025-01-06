@@ -33,34 +33,49 @@ export const ProgressStats = ({
   useEffect(() => {
     if (!user) return;
 
-    // Subscribe to realtime changes for the user's progress stats
+    console.log('Initial stats:', {
+      preSessionStreak,
+      postSessionStreak,
+      dailyStreak,
+      level,
+      levelProgress,
+    });
+
+    // Enable full replica identity for real-time
     const channel = supabase
       .channel('progress_stats_changes')
       .on(
         'postgres_changes',
         {
-          event: 'UPDATE',
+          event: '*', // Listen to all events
           schema: 'public',
           table: 'progress_stats',
           filter: `user_id=eq.${user.id}`,
         },
         (payload) => {
-          console.log('Progress stats updated:', payload.new);
-          setStats({
-            preSessionStreak: payload.new.pre_session_streak,
-            postSessionStreak: payload.new.post_session_streak,
-            dailyStreak: payload.new.daily_streak,
-            level: payload.new.level,
-            levelProgress: payload.new.level_progress,
-          });
+          console.log('Progress stats update received:', payload);
+          if (payload.new) {
+            const newStats = {
+              preSessionStreak: payload.new.pre_session_streak,
+              postSessionStreak: payload.new.post_session_streak,
+              dailyStreak: payload.new.daily_streak,
+              level: payload.new.level,
+              levelProgress: payload.new.level_progress,
+            };
+            console.log('Updating stats to:', newStats);
+            setStats(newStats);
+          }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Subscription status:', status);
+      });
 
     return () => {
+      console.log('Cleaning up subscription');
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user, preSessionStreak, postSessionStreak, dailyStreak, level, levelProgress]);
 
   return (
     <Card className="p-6 space-y-6 bg-card/30 backdrop-blur-xl border-primary/10">
@@ -83,7 +98,7 @@ export const ProgressStats = ({
           </div>
           <div className="flex-1">
             <div className="flex justify-between items-center mb-1">
-              <span className="text-sm font-medium">Pre-Session Streak</span>
+              <span className="text-sm font-medium">Pre-Session Streaks</span>
               <span className="text-sm text-primary">{stats.preSessionStreak} entries</span>
             </div>
             <Progress value={(stats.preSessionStreak / 30) * 100} className="h-1" />

@@ -73,6 +73,7 @@ const AuthPage = () => {
               sign_up: {
                 email_label: 'Email',
                 password_label: 'Password',
+                full_name_label: 'Full Name'
               }
             }
           }}
@@ -80,11 +81,7 @@ const AuthPage = () => {
           magicLink={false}
           showLinks={true}
           queryParams={{
-            defaultOptions: {
-              data: {
-                full_name: ''
-              }
-            }
+            full_name: ''
           }}
         />
       </Card>

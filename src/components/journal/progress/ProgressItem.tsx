@@ -1,5 +1,5 @@
 import { Progress } from "@/components/ui/progress";
-import { LucideIcon } from "lucide-react";
+import { LucideIcon, Check } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface ProgressItemProps {
@@ -45,7 +45,11 @@ export const ProgressItem = ({
         <div className="flex justify-between items-center mb-1">
           <span className="text-sm font-medium">{title}</span>
           <span className={`text-sm ${`text-${color}`}`}>
-            {value} {unit}
+            {value === 1 && maxValue === 1 ? (
+              <Check className="w-4 h-4" />
+            ) : (
+              `${value} ${unit}`
+            )}
           </span>
         </div>
         <Progress

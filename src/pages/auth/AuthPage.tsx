@@ -53,13 +53,17 @@ const AuthPage = () => {
                 colors: {
                   brand: 'hsl(var(--primary))',
                   brandAccent: 'hsl(var(--primary-light))',
+                  inputText: 'white',
+                  inputBackground: 'hsl(var(--background))',
+                  inputPlaceholder: 'hsl(var(--muted-foreground))',
                 }
               }
             },
             className: {
               container: 'space-y-4',
               button: 'bg-primary hover:bg-primary/90',
-              input: 'bg-background',
+              input: 'bg-background text-foreground',
+              label: 'text-foreground',
             }
           }}
           providers={[]}

@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
+import { toast } from "sonner";
 
 interface ProgressStats {
   preSessionStreak: number;
@@ -22,6 +23,19 @@ interface ProgressStatsRow {
   level: number;
   level_progress: number;
 }
+
+const inspirationalMessages = [
+  "Great job! Every step you take brings you closer to your goals.",
+  "You've just made progress! Small habits lead to big changes.",
+  "Well done! Reflecting like this is a powerful way to grow.",
+  "You're building consistency—keep up the momentum!",
+  "Another win for today! Your dedication is inspiring.",
+  "Awesome! Every entry is a step toward self-awareness.",
+  "You're on a roll! Keep tracking, and great insights will follow.",
+  "Nice work! This entry is one more piece of your success story.",
+  "Way to go! Your discipline is paving the way for better results.",
+  "Fantastic effort! Reflecting on your journey is how you master it."
+];
 
 interface ProgressStatsProps {
   preSessionStreak: number;
@@ -46,6 +60,8 @@ export const ProgressStats = ({
     level,
     levelProgress,
   });
+  const [previousPreStreak, setPreviousPreStreak] = useState(preSessionStreak);
+  const [previousPostStreak, setPreviousPostStreak] = useState(postSessionStreak);
 
   useEffect(() => {
     if (!user) return;
@@ -78,6 +94,28 @@ export const ProgressStats = ({
               level: payload.new.level,
               levelProgress: payload.new.level_progress,
             };
+
+            // Check if pre-session streak increased
+            if (payload.new.pre_session_streak > previousPreStreak) {
+              const randomMessage = inspirationalMessages[Math.floor(Math.random() * inspirationalMessages.length)];
+              toast.success(randomMessage, {
+                duration: 5000,
+                className: "bg-primary text-white",
+              });
+            }
+
+            // Check if post-session streak increased
+            if (payload.new.post_session_streak > previousPostStreak) {
+              const randomMessage = inspirationalMessages[Math.floor(Math.random() * inspirationalMessages.length)];
+              toast.success(randomMessage, {
+                duration: 5000,
+                className: "bg-primary text-white",
+              });
+            }
+
+            setPreviousPreStreak(payload.new.pre_session_streak);
+            setPreviousPostStreak(payload.new.post_session_streak);
+            
             console.log('Updating stats to:', newStats);
             setStats(newStats);
           }
@@ -91,7 +129,7 @@ export const ProgressStats = ({
       console.log('Cleaning up subscription');
       supabase.removeChannel(channel);
     };
-  }, [user, preSessionStreak, postSessionStreak, dailyStreak, level, levelProgress]);
+  }, [user, preSessionStreak, postSessionStreak, dailyStreak, level, levelProgress, previousPreStreak, previousPostStreak]);
 
   return (
     <Card className="p-6 space-y-6 bg-card/30 backdrop-blur-xl border-primary/10">
@@ -114,7 +152,7 @@ export const ProgressStats = ({
           </div>
           <div className="flex-1">
             <div className="flex justify-between items-center mb-1">
-              <span className="text-sm font-medium">Pre-Session Streaks</span>
+              <span className="text-sm font-medium">Pre-Session Daily Goal</span>
               <span className="text-sm text-primary">{stats.preSessionStreak} entries</span>
             </div>
             <Progress value={(stats.preSessionStreak / 30) * 100} className="h-1" />
@@ -132,7 +170,7 @@ export const ProgressStats = ({
           </div>
           <div className="flex-1">
             <div className="flex justify-between items-center mb-1">
-              <span className="text-sm font-medium">Post-Session Entries</span>
+              <span className="text-sm font-medium">Post-Session Daily Goal</span>
               <span className="text-sm text-secondary">
                 {stats.postSessionStreak} entries
               </span>

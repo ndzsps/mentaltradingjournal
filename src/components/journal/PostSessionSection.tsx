@@ -54,12 +54,18 @@ export const PostSessionSection = ({
       if (value === "loss") {
         return "bg-red-500 text-white hover:bg-red-600 shadow-lg shadow-red-500/20";
       }
-      return "bg-accent text-accent-foreground hover:bg-accent/90 shadow-lg shadow-accent/20";
+      if (value === "win") {
+        return "bg-green-500 text-white hover:bg-green-600 shadow-lg shadow-green-500/20";
+      }
+      return "bg-yellow-500 text-white hover:bg-yellow-600 shadow-lg shadow-yellow-500/20";
     }
     if (value === "loss") {
       return "hover:border-red-500/50 hover:bg-red-500/5";
     }
-    return "hover:border-accent/50 hover:bg-accent/5";
+    if (value === "win") {
+      return "hover:border-green-500/50 hover:bg-green-500/5";
+    }
+    return "hover:border-yellow-500/50 hover:bg-yellow-500/5";
   };
 
   const marketConditionOptions = [
@@ -83,7 +89,10 @@ export const PostSessionSection = ({
           >
             <div className="flex items-center gap-3">
               <Icon className={`w-6 h-6 transition-transform duration-300 group-hover:scale-110 ${
-                selectedOutcome === value ? "" : value === "loss" ? "text-red-500" : "text-accent-foreground/70"
+                selectedOutcome === value ? "" : 
+                value === "loss" ? "text-red-500" : 
+                value === "win" ? "text-green-500" : 
+                "text-yellow-500"
               }`} />
               <span className="font-medium">{capitalizeWords(label)}</span>
             </div>

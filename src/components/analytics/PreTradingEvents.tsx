@@ -19,7 +19,10 @@ export const PreTradingEvents = () => {
     { event: "Exercise", impact: 30 },
     { event: "News Reading", impact: -20 },
     { event: "Planning Session", impact: 50 },
-  ];
+  ].map(item => ({
+    ...item,
+    fill: item.impact > 0 ? "#6E59A5" : "#FEC6A1"
+  }));
 
   return (
     <Card className="p-4 md:p-6 space-y-4">
@@ -38,8 +41,10 @@ export const PreTradingEvents = () => {
             <YAxis tick={{ fontSize: 12 }} />
             <Tooltip />
             <Bar 
-              dataKey="impact" 
-              fill={(entry) => entry.impact > 0 ? "#6E59A5" : "#FEC6A1"}
+              dataKey="impact"
+              fill="#6E59A5"
+              fillOpacity={1}
+              stroke="none"
             />
           </BarChart>
         </ResponsiveContainer>

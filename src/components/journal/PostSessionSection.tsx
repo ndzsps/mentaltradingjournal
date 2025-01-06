@@ -38,9 +38,21 @@ export const PostSessionSection = ({
   const [showAddTradeDialog, setShowAddTradeDialog] = useState(false);
 
   const handleTradeSubmit = (tradeData: any, isEdit: boolean) => {
-    // Here you would typically handle the trade data, e.g., save it to a database
     console.log("Trade submitted:", tradeData);
     toast.success(isEdit ? "Trade updated successfully!" : "Trade added successfully!");
+  };
+
+  const getOutcomeStyles = (value: string) => {
+    if (selectedOutcome === value) {
+      if (value === "loss") {
+        return "bg-red-500 text-white hover:bg-red-600 shadow-lg shadow-red-500/20";
+      }
+      return "bg-accent text-accent-foreground hover:bg-accent/90 shadow-lg shadow-accent/20";
+    }
+    if (value === "loss") {
+      return "hover:border-red-500/50 hover:bg-red-500/5";
+    }
+    return "hover:border-accent/50 hover:bg-accent/5";
   };
 
   return (
@@ -50,16 +62,12 @@ export const PostSessionSection = ({
           <Button
             key={value}
             variant={selectedOutcome === value ? "default" : "outline"}
-            className={`h-20 group transition-all duration-300 ${
-              selectedOutcome === value 
-                ? "bg-accent text-accent-foreground hover:bg-accent/90 shadow-lg shadow-accent/20" 
-                : "hover:border-accent/50 hover:bg-accent/5"
-            }`}
+            className={`h-20 group transition-all duration-300 ${getOutcomeStyles(value)}`}
             onClick={() => setSelectedOutcome(value)}
           >
             <div className="flex items-center gap-3">
               <Icon className={`w-6 h-6 transition-transform duration-300 group-hover:scale-110 ${
-                selectedOutcome === value ? "" : "text-accent-foreground/70"
+                selectedOutcome === value ? "" : value === "loss" ? "text-red-500" : "text-accent-foreground/70"
               }`} />
               <span className="font-medium">{label}</span>
             </div>

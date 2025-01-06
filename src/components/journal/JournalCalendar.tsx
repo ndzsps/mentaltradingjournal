@@ -45,7 +45,7 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
           head_row: "w-full",
           row: "w-full",
           cell: "w-[14.28%] h-14 lg:h-16 p-0 relative",
-          day: "w-full h-full rounded-md hover:bg-primary/20",
+          day: "w-full h-full rounded-md hover:bg-primary/20 cursor-pointer", // Added cursor-pointer
           day_today: "bg-accent text-accent-foreground",
           day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
         }}

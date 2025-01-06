@@ -29,21 +29,21 @@ export default {
           light: "#9b87f5",
           dark: "#4A3B80",
           foreground: "#ffffff",
-          hover: "#F1F0FB", // Added lighter hover color
+          hover: "#F5F3FF", // Lighter purple for hover state
         },
         secondary: {
           DEFAULT: "#0EA5E9",
           light: "#38BDF8",
           dark: "#0284C7",
           foreground: "#ffffff",
-          hover: "#F1F9FE", // Added lighter hover color
+          hover: "#F1F9FE",
         },
         accent: {
           DEFAULT: "#FEC6A1",
           light: "#FFDCC0",
           dark: "#FBA36F",
           foreground: "#1A1F2C",
-          hover: "#FFF5EE", // Added lighter hover color
+          hover: "#FFF5EE",
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
@@ -52,7 +52,7 @@ export default {
         muted: {
           DEFAULT: "hsl(var(--muted))",
           foreground: "hsl(var(--muted-foreground))",
-          hover: "#F1F1F1", // Added lighter hover color
+          hover: "#F1F1F1",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",

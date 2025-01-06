@@ -14,36 +14,49 @@ export const useAuth = () => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const queryClient = useQueryClient();
 
-  // Check initial session and set up auth state listener
+  // Initialize auth state and set up listener
   useEffect(() => {
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        fetchProfile(session.user.id).then(profile => {
-          if (profile) setUser(profile);
-        });
-      }
-    });
-
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state changed:', event, session?.user?.id);
-      
-      if (event === 'SIGNED_IN' && session?.user) {
-        const profile = await fetchProfile(session.user.id);
-        if (profile) {
-          console.log('Setting user profile:', profile);
-          setUser(profile);
+    const initializeAuth = async () => {
+      try {
+        // First check for an existing session
+        const { data: { session } } = await supabase.auth.getSession();
+        console.log('Initial session check:', session?.user?.id);
+        
+        if (session?.user) {
+          const profile = await fetchProfile(session.user.id);
+          if (profile) {
+            console.log('Setting initial user profile:', profile);
+            setUser(profile);
+          }
         }
-      } else if (event === 'SIGNED_OUT') {
-        setUser(null);
-        queryClient.clear();
-      }
-    });
 
-    return () => subscription.unsubscribe();
+        // Then set up the auth state listener
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+          console.log('Auth state changed:', event, session?.user?.id);
+          
+          if (event === 'SIGNED_IN' && session?.user) {
+            const profile = await fetchProfile(session.user.id);
+            if (profile) {
+              console.log('Setting user profile after sign in:', profile);
+              setUser(profile);
+            }
+          } else if (event === 'SIGNED_OUT') {
+            console.log('User signed out, clearing state');
+            setUser(null);
+            queryClient.clear();
+          }
+        });
+
+        return () => {
+          subscription.unsubscribe();
+        };
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+      }
+    };
+
+    initializeAuth();
   }, [queryClient]);
 
   const fetchProfile = async (userId: string): Promise<UserProfile | null> => {

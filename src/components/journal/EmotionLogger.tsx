@@ -52,11 +52,9 @@ export const EmotionLogger = () => {
     preTradingActivities,
     resetForm,
     onSubmitSuccess: () => {
-      if (sessionType === "pre") {
-        setShowCelebration(true);
-        // Hide celebration message after 5 seconds
-        setTimeout(() => setShowCelebration(false), 5000);
-      }
+      setShowCelebration(true);
+      // Hide celebration message after 5 seconds
+      setTimeout(() => setShowCelebration(false), 5000);
     },
   });
 

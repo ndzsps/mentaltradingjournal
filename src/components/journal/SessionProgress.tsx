@@ -72,7 +72,7 @@ export const SessionProgress = ({
         <span className="text-sm font-medium">{Math.round(progress)}%</span>
       </div>
       <Progress value={progress} className="h-2" />
-      {showCelebration && !isPostSession && (
+      {showCelebration && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -80,7 +80,7 @@ export const SessionProgress = ({
         >
           <Trophy className="w-5 h-5 text-[#FFB156]" />
           <span className="text-sm font-medium text-white">
-            Session completed! Keep up the great work!
+            {isPostSession ? "Post-session completed!" : "Pre-session completed!"} Keep up the great work!
           </span>
         </motion.div>
       )}

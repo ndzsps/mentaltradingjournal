@@ -7,9 +7,28 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  Legend,
 } from "recharts";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
+
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-background border border-border/50 rounded-lg p-3 shadow-lg">
+        <p className="text-sm font-medium">{label}</p>
+        <p className="text-sm text-muted-foreground">
+          Emotional Score: {payload[0].value}
+          <span className="text-xs ml-1">(0-100)</span>
+        </p>
+        <p className="text-sm text-muted-foreground">
+          P&L: ${payload[1].value.toFixed(2)}
+        </p>
+      </div>
+    );
+  }
+  return null;
+};
 
 export const EmotionalTendencies = () => {
   const { data: analytics, isLoading } = useQuery({
@@ -41,12 +60,35 @@ export const EmotionalTendencies = () => {
 
       <div className="h-[250px] md:h-[300px] w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data} margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
+          <LineChart data={data} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="date" tick={{ fontSize: 12 }} />
-            <YAxis tick={{ fontSize: 12 }} />
-            <Tooltip />
+            <YAxis 
+              yAxisId="emotion"
+              domain={[0, 100]}
+              tick={{ fontSize: 12 }}
+              label={{ 
+                value: 'Emotional Score', 
+                angle: -90, 
+                position: 'insideLeft',
+                style: { fontSize: '12px' }
+              }}
+            />
+            <YAxis
+              yAxisId="pnl"
+              orientation="right"
+              tick={{ fontSize: 12 }}
+              label={{ 
+                value: 'P&L ($)', 
+                angle: 90, 
+                position: 'insideRight',
+                style: { fontSize: '12px' }
+              }}
+            />
+            <Tooltip content={<CustomTooltip />} />
+            <Legend />
             <Line
+              yAxisId="emotion"
               type="monotone"
               dataKey="emotionalScore"
               stroke="#6E59A5"
@@ -55,12 +97,13 @@ export const EmotionalTendencies = () => {
               name="Emotional Score"
             />
             <Line
+              yAxisId="pnl"
               type="monotone"
               dataKey="tradingResult"
               stroke="#0EA5E9"
               strokeWidth={2}
               dot={{ fill: "#0EA5E9" }}
-              name="Trading Result"
+              name="P&L"
             />
           </LineChart>
         </ResponsiveContainer>

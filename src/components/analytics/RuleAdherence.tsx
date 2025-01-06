@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import {
   BarChart,
   Bar,
@@ -13,14 +12,8 @@ import {
 } from "recharts";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
-import { AddTradeDialog } from "./AddTradeDialog";
-import { Plus, Pencil } from "lucide-react";
-import { toast } from "sonner";
 
 export const RuleAdherence = () => {
-  const [showAddTradeDialog, setShowAddTradeDialog] = useState(false);
-  const [selectedTrade, setSelectedTrade] = useState<any>(null);
-  
   const { data: analytics, isLoading } = useQuery({
     queryKey: ['analytics'],
     queryFn: generateAnalytics,
@@ -50,51 +43,13 @@ export const RuleAdherence = () => {
     },
   ];
 
-  const handleTradeSubmit = (tradeData: any, isEdit: boolean) => {
-    // Here you would typically handle the trade data, e.g., save it to a database
-    console.log("Trade submitted:", tradeData);
-    toast.success(isEdit ? "Trade updated successfully!" : "Trade added successfully!");
-    setSelectedTrade(null);
-  };
-
-  const handleEditTrade = (trade: any) => {
-    setSelectedTrade(trade);
-    setShowAddTradeDialog(true);
-  };
-
   return (
     <Card className="p-4 md:p-6 space-y-4">
-      <div className="flex justify-between items-start">
-        <div className="space-y-2">
-          <h3 className="text-xl md:text-2xl font-bold">Rule Adherence vs. Performance</h3>
-          <p className="text-sm text-muted-foreground">
-            Compare outcomes when trading rules are followed vs. broken
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={() => handleEditTrade({
-              id: '1', // Example trade data
-              direction: 'buy',
-              instrument: 'AAPL',
-              entryPrice: '150.00'
-            })}
-            className="flex items-center gap-2"
-            size="sm"
-          >
-            <Pencil className="w-4 h-4" />
-            Edit Last Trade
-          </Button>
-          <Button
-            onClick={() => setShowAddTradeDialog(true)}
-            className="flex items-center gap-2"
-            size="sm"
-          >
-            <Plus className="w-4 h-4" />
-            Add Trade
-          </Button>
-        </div>
+      <div className="space-y-2">
+        <h3 className="text-xl md:text-2xl font-bold">Rule Adherence vs. Performance</h3>
+        <p className="text-sm text-muted-foreground">
+          Compare outcomes when trading rules are followed vs. broken
+        </p>
       </div>
 
       <div className="h-[250px] md:h-[300px] w-full">
@@ -118,13 +73,6 @@ export const RuleAdherence = () => {
           <p>Skipping your stop-loss rules led to average losses of 3x larger than planned.</p>
         </div>
       </div>
-
-      <AddTradeDialog
-        open={showAddTradeDialog}
-        onOpenChange={setShowAddTradeDialog}
-        onSubmit={handleTradeSubmit}
-        editTrade={selectedTrade}
-      />
     </Card>
   );
 };

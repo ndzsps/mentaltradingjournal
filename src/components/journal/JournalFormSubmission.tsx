@@ -4,6 +4,21 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
+interface Trade {
+  entryDate: string;
+  instrument: string;
+  setup: string;
+  direction: 'buy' | 'sell';
+  entryPrice: number;
+  quantity: number;
+  stopLoss: number;
+  takeProfit: number;
+  exitDate: string;
+  exitPrice: number;
+  pnl: number;
+  fees: number;
+}
+
 interface JournalFormSubmissionProps {
   sessionType: "pre" | "post";
   selectedEmotion: string;
@@ -76,6 +91,22 @@ export const useJournalFormSubmission = ({
     }
 
     try {
+      // First, get any existing trades for this user from today
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const { data: existingEntries } = await supabase
+        .from('journal_entries')
+        .select('trades')
+        .eq('user_id', user.id)
+        .gte('created_at', today.toISOString())
+        .lt('created_at', new Date(today.getTime() + 24 * 60 * 60 * 1000).toISOString());
+
+      // Get the most recent trades array
+      const trades = existingEntries && existingEntries.length > 0 
+        ? existingEntries[existingEntries.length - 1].trades || []
+        : [];
+
       const { error } = await supabase.from('journal_entries').insert({
         user_id: user.id,
         session_type: sessionType,
@@ -87,6 +118,7 @@ export const useJournalFormSubmission = ({
         followed_rules: followedRules,
         mistakes: selectedMistakes,
         pre_trading_activities: preTradingActivities,
+        trades: trades,
       });
 
       if (error) throw error;

@@ -90,20 +90,10 @@
   /* Improve hover states for better text visibility */
   button:hover, 
   a:hover {
-    @apply transition-colors duration-300;
+    @apply transition-colors duration-200;
   }
 
-  /* Ensure text remains visible during hover states */
-  button:hover span,
-  a:hover span,
   .hover-text-visible:hover {
-    @apply text-foreground;
-  }
-
-  /* Maintain text visibility in dark mode hover states */
-  .dark button:hover span,
-  .dark a:hover span,
-  .dark .hover-text-visible:hover {
-    @apply text-foreground;
+    @apply text-foreground/90;
   }
 }

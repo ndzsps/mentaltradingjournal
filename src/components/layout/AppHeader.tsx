@@ -8,10 +8,15 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { AuthDialog } from "@/components/auth/AuthDialog";
+import { UserMenu } from "@/components/auth/UserMenu";
 
 export function AppHeader() {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
+  const { user } = useAuth();
   
   const navigationItems = [
     { icon: Home, label: "Home", path: "/" },
@@ -48,38 +53,54 @@ export function AppHeader() {
           ))}
         </nav>
 
-        {/* Mobile Navigation */}
-        <Sheet open={isOpen} onOpenChange={setIsOpen}>
-          <SheetTrigger asChild className="md:hidden">
-            <Button variant="ghost" size="icon">
-              <Menu className="h-5 w-5" />
+        {/* Auth Section */}
+        <div className="flex items-center gap-4">
+          {user ? (
+            <UserMenu />
+          ) : (
+            <Button onClick={() => setShowAuthDialog(true)}>
+              Sign In
             </Button>
-          </SheetTrigger>
-          <SheetContent side="right" className="w-[240px] sm:w-[280px]">
-            <nav className="flex flex-col gap-4 mt-6">
-              {navigationItems.map((item) => (
-                <Button
-                  key={item.path}
-                  variant="ghost"
-                  asChild
-                  className={cn(
-                    "justify-start",
-                    location.pathname === item.path
-                      ? "text-foreground"
-                      : "text-foreground/60"
-                  )}
-                  onClick={() => setIsOpen(false)}
-                >
-                  <Link to={item.path} className="flex items-center gap-2">
-                    <item.icon className="h-4 w-4" />
-                    <span>{item.label}</span>
-                  </Link>
-                </Button>
-              ))}
-            </nav>
-          </SheetContent>
-        </Sheet>
+          )}
+
+          {/* Mobile Navigation */}
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetTrigger asChild className="md:hidden">
+              <Button variant="ghost" size="icon">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[240px] sm:w-[280px]">
+              <nav className="flex flex-col gap-4 mt-6">
+                {navigationItems.map((item) => (
+                  <Button
+                    key={item.path}
+                    variant="ghost"
+                    asChild
+                    className={cn(
+                      "justify-start",
+                      location.pathname === item.path
+                        ? "text-foreground"
+                        : "text-foreground/60"
+                    )}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <Link to={item.path} className="flex items-center gap-2">
+                      <item.icon className="h-4 w-4" />
+                      <span>{item.label}</span>
+                    </Link>
+                  </Button>
+                ))}
+              </nav>
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
+
+      <AuthDialog
+        isOpen={showAuthDialog}
+        onClose={() => setShowAuthDialog(false)}
+      />
     </header>
   );
 }

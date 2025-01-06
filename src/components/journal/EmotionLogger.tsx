@@ -25,9 +25,9 @@ export const EmotionLogger = () => {
   const [marketConditions, setMarketConditions] = useState("");
   const [followedRules, setFollowedRules] = useState<string[]>([]);
   const [preTradingActivities, setPreTradingActivities] = useState<string[]>([]);
+  const [showCelebration, setShowCelebration] = useState(false);
   
   const { stats } = useProgressTracking();
-  const [showCelebration, setShowCelebration] = useState(false);
 
   const resetForm = () => {
     setSelectedEmotion("");
@@ -38,7 +38,6 @@ export const EmotionLogger = () => {
     setMarketConditions("");
     setFollowedRules([]);
     setPreTradingActivities([]);
-    setShowCelebration(false);
   };
 
   const { handleSubmit } = useJournalFormSubmission({
@@ -55,6 +54,8 @@ export const EmotionLogger = () => {
     onSubmitSuccess: () => {
       if (sessionType === "pre") {
         setShowCelebration(true);
+        // Hide celebration message after 5 seconds
+        setTimeout(() => setShowCelebration(false), 5000);
       }
     },
   });
@@ -75,6 +76,12 @@ export const EmotionLogger = () => {
     }
   };
 
+  // Hide celebration when switching to post-session
+  const handleSessionTypeChange = (value: "pre" | "post") => {
+    setSessionType(value);
+    setShowCelebration(false);
+  };
+
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr,300px]">
       <Card className="p-8 space-y-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
@@ -86,7 +93,7 @@ export const EmotionLogger = () => {
           <RadioGroup
             defaultValue="pre"
             value={sessionType}
-            onValueChange={(value) => setSessionType(value as "pre" | "post")}
+            onValueChange={handleSessionTypeChange}
             className="flex space-x-4"
           >
             <div className="flex items-center space-x-2">
@@ -109,6 +116,7 @@ export const EmotionLogger = () => {
             rulesSelected={followedRules.length > 0}
             mistakesReviewed={selectedMistakes.length > 0 || selectedOutcome !== "loss"}
             isPostSession={sessionType === "post"}
+            showCelebration={showCelebration}
           />
         </div>
 

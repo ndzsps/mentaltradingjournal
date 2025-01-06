@@ -11,6 +11,7 @@ import { SessionProgress } from "./SessionProgress";
 import { PostSessionSection } from "./PostSessionSection";
 import { ProgressStats } from "./ProgressStats";
 import { useJournalFormSubmission } from "./JournalFormSubmission";
+import { useProgressTracking } from "@/hooks/useProgressTracking";
 
 export const EmotionLogger = () => {
   const [selectedEmotion, setSelectedEmotion] = useState("");
@@ -24,6 +25,8 @@ export const EmotionLogger = () => {
   const [marketConditions, setMarketConditions] = useState("");
   const [followedRules, setFollowedRules] = useState<string[]>([]);
   const [preTradingActivities, setPreTradingActivities] = useState<string[]>([]);
+  
+  const { stats } = useProgressTracking();
 
   const resetForm = () => {
     setSelectedEmotion("");
@@ -194,7 +197,13 @@ export const EmotionLogger = () => {
         </div>
       </Card>
 
-      <ProgressStats />
+      <ProgressStats 
+        preSessionStreak={stats.preSessionStreak}
+        postSessionStreak={stats.postSessionStreak}
+        dailyStreak={stats.dailyStreak}
+        level={stats.level}
+        levelProgress={stats.levelProgress}
+      />
     </div>
   );
 };

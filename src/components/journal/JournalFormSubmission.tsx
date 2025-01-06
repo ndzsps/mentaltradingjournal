@@ -1,5 +1,6 @@
 import { useJournalToast } from "@/hooks/useJournalToast";
 import { useProgressTracking } from "@/hooks/useProgressTracking";
+import { toast } from "sonner";
 
 interface JournalFormSubmissionProps {
   sessionType: "pre" | "post";

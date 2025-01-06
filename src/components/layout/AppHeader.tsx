@@ -2,6 +2,7 @@ import { Home, BookOpen, BarChart2, Menu, User } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import {
   Sheet,
   SheetContent,
@@ -78,6 +79,8 @@ export function AppHeader() {
             </Button>
           ))}
 
+          <ThemeToggle />
+
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="ghost" className="gap-2">
@@ -150,6 +153,7 @@ export function AppHeader() {
                   </Link>
                 </Button>
               ))}
+              <ThemeToggle />
               <div className="space-y-2">
                 {isEditing ? (
                   <div className="space-y-2">

@@ -11,6 +11,7 @@ import { useProgressTracking } from "@/hooks/useProgressTracking";
 import { SessionTypeSelector } from "./SessionTypeSelector";
 import { PreTradingActivities } from "./PreTradingActivities";
 import { EmotionSelector } from "./EmotionSelector";
+import { emotions, tradingOutcome, mistakeCategories, tradingRules } from "./emotionConfig";
 
 const PRE_TRADING_ACTIVITIES = [
   "Meditation",

@@ -50,6 +50,8 @@ export const JournalEntry = ({ entry }: JournalEntryProps) => {
     day: 'numeric'
   });
 
+  console.log('Entry trades:', entry.trades); // Debug log
+
   return (
     <Card className="p-4 rounded-lg bg-background/50 border border-primary/10">
       <div className="flex items-center justify-between mb-2">

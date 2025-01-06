@@ -79,7 +79,6 @@ export const useJournalFormSubmission = ({
       return;
     }
 
-    // Validate post-session specific fields
     if (sessionType === "post") {
       if (!selectedOutcome || !marketConditions || followedRules?.length === 0) {
         toast.error("Missing Information", {
@@ -102,12 +101,11 @@ export const useJournalFormSubmission = ({
         followed_rules: followedRules,
         mistakes: selectedMistakes,
         pre_trading_activities: preTradingActivities,
-        trades: [], // Initialize with an empty array to allow trades to be added later
+        trades: [], // Initialize with an empty array
       });
 
       if (error) throw error;
 
-      // Update progress tracking and show success message
       await updateProgress(sessionType);
       console.log(`Progress updated for ${sessionType} session`);
       showSuccessToast(sessionType);

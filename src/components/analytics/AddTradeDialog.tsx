@@ -1,166 +1,141 @@
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Progress } from "@/components/ui/progress";
-import { useState, useEffect } from "react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useState } from "react";
 import { toast } from "sonner";
-import { GeneralSection } from "./trade-form/GeneralSection";
-import { TradeEntrySection } from "./trade-form/TradeEntrySection";
-import { TradeExitSection } from "./trade-form/TradeExitSection";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface AddTradeDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  editTrade?: any;
   onSubmit: (tradeData: any, isEdit: boolean) => void;
 }
 
-export const AddTradeDialog = ({ open, onOpenChange, editTrade, onSubmit }: AddTradeDialogProps) => {
+export const AddTradeDialog = ({ open, onOpenChange, onSubmit }: AddTradeDialogProps) => {
+  const { user } = useAuth();
   const [direction, setDirection] = useState<'buy' | 'sell' | null>(null);
-  const [formProgress, setFormProgress] = useState(0);
 
-  // Initialize form with edit data if provided
-  useEffect(() => {
-    if (editTrade) {
-      setDirection(editTrade.direction);
-      const fields = ['entryDate', 'instrument', 'setup', 'entryPrice', 'quantity', 'stopLoss', 'takeProfit', 'exitDate', 'exitPrice', 'pnl', 'fees'];
-      fields.forEach(field => {
-        const input = document.getElementById(field) as HTMLInputElement;
-        if (input && editTrade[field]) {
-          input.value = editTrade[field];
-        }
-      });
-    }
-  }, [editTrade]);
-
-  // Reset form when dialog closes
-  useEffect(() => {
-    if (!open) {
-      setDirection(null);
-      setFormProgress(0);
-      const form = document.querySelector('form');
-      if (form) form.reset();
-    }
-  }, [open]);
-
-  // Calculate form progress
-  useEffect(() => {
-    const calculateProgress = () => {
-      const categories = [
-        {
-          name: 'General',
-          fields: ['instrument', 'entryDate'],
-          directionCheck: direction !== null
-        },
-        {
-          name: 'Entry',
-          fields: ['entryPrice', 'quantity', 'stopLoss', 'takeProfit']
-        },
-        {
-          name: 'Exit',
-          fields: ['exitDate', 'exitPrice', 'pnl', 'fees']
-        }
-      ];
-
-      const form = document.querySelector('form');
-      if (!form) return 0;
-
-      const formData = new FormData(form);
-      let completedCategories = 0;
-
-      categories.forEach(category => {
-        const hasAllRequiredFields = category.fields.every(field => {
-          const value = formData.get(field)?.toString().trim();
-          // Check if the value exists and is not empty
-          return value && value !== '';
-        });
-
-        // Only count category as complete if all fields are filled and direction is selected (if required)
-        if (hasAllRequiredFields && (!category.directionCheck || category.directionCheck)) {
-          completedCategories++;
-        }
-      });
-
-      // Each category represents 33.33% of the total progress (100% / 3 categories)
-      return Math.round((completedCategories / categories.length) * 100);
-    };
-
-    const progressInterval = setInterval(() => {
-      setFormProgress(calculateProgress());
-    }, 500);
-
-    return () => clearInterval(progressInterval);
-  }, [direction]);
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
     const formData = new FormData(e.currentTarget);
     const tradeData = {
-      id: editTrade?.id, // Preserve the ID if editing
-      entryDate: formData.get('entryDate'),
-      instrument: formData.get('instrument'),
-      setup: formData.get('setup'),
-      direction: direction,
-      entryPrice: formData.get('entryPrice'),
-      quantity: formData.get('quantity'),
-      stopLoss: formData.get('stopLoss'),
-      takeProfit: formData.get('takeProfit'),
-      exitDate: formData.get('exitDate'),
-      exitPrice: formData.get('exitPrice'),
-      pnl: formData.get('pnl'),
-      fees: formData.get('fees'),
+      entryDate: formData.get('entryDate') as string,
+      instrument: formData.get('instrument') as string,
+      setup: formData.get('setup') as string,
+      direction,
+      entryPrice: parseFloat(formData.get('entryPrice') as string),
+      quantity: parseFloat(formData.get('quantity') as string),
+      stopLoss: parseFloat(formData.get('stopLoss') as string),
+      takeProfit: parseFloat(formData.get('takeProfit') as string),
+      exitDate: formData.get('exitDate') as string,
+      exitPrice: parseFloat(formData.get('exitPrice') as string),
+      pnl: parseFloat(formData.get('pnl') as string),
+      fees: parseFloat(formData.get('fees') as string),
     };
 
-    if (!tradeData.instrument || !tradeData.direction || !tradeData.entryPrice) {
-      toast.error("Please fill in all required fields");
-      return;
-    }
+    try {
+      // Get the most recent journal entry for today
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const { data: entries, error: fetchError } = await supabase
+        .from('journal_entries')
+        .select('*')
+        .eq('user_id', user?.id)
+        .gte('created_at', today.toISOString())
+        .lt('created_at', new Date(today.getTime() + 24 * 60 * 60 * 1000).toISOString())
+        .order('created_at', { ascending: false })
+        .limit(1);
 
-    if (formProgress < 100) {
-      toast.error("Please complete all sections before submitting");
-      return;
-    }
+      if (fetchError) throw fetchError;
 
-    onSubmit(tradeData, !!editTrade);
-    toast.success(editTrade ? "Trade updated successfully!" : "Trade added successfully!");
-    onOpenChange(false);
+      if (!entries || entries.length === 0) {
+        toast.error("No journal entry found for today");
+        return;
+      }
+
+      const currentEntry = entries[0];
+      const updatedTrades = [...(currentEntry.trades || []), tradeData];
+
+      // Update the journal entry with the new trade
+      const { error: updateError } = await supabase
+        .from('journal_entries')
+        .update({ trades: updatedTrades })
+        .eq('id', currentEntry.id);
+
+      if (updateError) throw updateError;
+
+      onSubmit(tradeData, false);
+      onOpenChange(false);
+      toast.success("Trade added successfully!");
+    } catch (error) {
+      console.error('Error adding trade:', error);
+      toast.error("Failed to add trade");
+    }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[900px]">
-        <DialogHeader>
-          <DialogTitle>{editTrade ? 'Edit Trade' : 'Add New Trade'}</DialogTitle>
-          <DialogDescription>
-            Fill in the details of your trade. Required fields are marked with an asterisk (*).
-            All sections must be completed before submission.
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="space-y-2 mb-4">
-          <div className="flex justify-between text-sm text-muted-foreground">
-            <span>Form Progress</span>
-            <span>{formProgress}%</span>
+      <DialogTrigger asChild>
+        <Button variant="outline">Add Trade</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogTitle>Add Trade</DialogTitle>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <Label htmlFor="entryDate">Entry Date</Label>
+            <Input type="datetime-local" id="entryDate" name="entryDate" required />
           </div>
-          <Progress value={formProgress} className="h-2" />
-        </div>
-
-        <form onSubmit={handleSubmit} className="grid grid-cols-3 gap-6">
-          <GeneralSection direction={direction} setDirection={setDirection} />
-          <TradeEntrySection />
-          <TradeExitSection />
-          
-          <div className="col-span-3">
-            <Button type="submit" className="w-full">
-              {editTrade ? 'Update Trade' : 'Add Trade'}
-            </Button>
+          <div>
+            <Label htmlFor="instrument">Instrument</Label>
+            <Input type="text" id="instrument" name="instrument" required />
           </div>
+          <div>
+            <Label htmlFor="setup">Setup</Label>
+            <Input type="text" id="setup" name="setup" />
+          </div>
+          <div>
+            <Label htmlFor="direction">Direction</Label>
+            <div className="flex gap-2">
+              <Button type="button" variant={direction === 'buy' ? 'default' : 'outline'} onClick={() => setDirection('buy')}>Buy</Button>
+              <Button type="button" variant={direction === 'sell' ? 'default' : 'outline'} onClick={() => setDirection('sell')}>Sell</Button>
+            </div>
+          </div>
+          <div>
+            <Label htmlFor="entryPrice">Entry Price</Label>
+            <Input type="number" id="entryPrice" name="entryPrice" required />
+          </div>
+          <div>
+            <Label htmlFor="quantity">Quantity</Label>
+            <Input type="number" id="quantity" name="quantity" required />
+          </div>
+          <div>
+            <Label htmlFor="stopLoss">Stop Loss</Label>
+            <Input type="number" id="stopLoss" name="stopLoss" />
+          </div>
+          <div>
+            <Label htmlFor="takeProfit">Take Profit</Label>
+            <Input type="number" id="takeProfit" name="takeProfit" />
+          </div>
+          <div>
+            <Label htmlFor="exitDate">Exit Date</Label>
+            <Input type="datetime-local" id="exitDate" name="exitDate" />
+          </div>
+          <div>
+            <Label htmlFor="exitPrice">Exit Price</Label>
+            <Input type="number" id="exitPrice" name="exitPrice" />
+          </div>
+          <div>
+            <Label htmlFor="pnl">PnL</Label>
+            <Input type="number" id="pnl" name="pnl" />
+          </div>
+          <div>
+            <Label htmlFor="fees">Fees</Label>
+            <Input type="number" id="fees" name="fees" />
+          </div>
+          <Button type="submit">Submit</Button>
         </form>
       </DialogContent>
     </Dialog>

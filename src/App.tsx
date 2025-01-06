@@ -9,30 +9,19 @@ import Analytics from "./pages/Analytics";
 import AuthPage from "./pages/auth/AuthPage";
 import { useAuth } from "./hooks/useAuth";
 
-// Configure QueryClient with shorter timeouts
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      staleTime: 5 * 1000, // 5 seconds
-    },
-  },
-});
+const queryClient = new QueryClient();
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
 
-  // Show a simple loading indicator
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <div className="min-h-screen flex items-center justify-center">
+      Loading...
+    </div>;
   }
 
   if (!user) {
-    return <Navigate to="/auth" replace />;
+    return <Navigate to="/auth" />;
   }
 
   return <>{children}</>;

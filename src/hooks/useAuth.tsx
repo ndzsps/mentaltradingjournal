@@ -38,11 +38,7 @@ export const useAuth = () => {
 
         if (error) {
           console.error("Error fetching profile:", error);
-          if (mounted) {
-            setUser(null);
-            setLoading(false);
-          }
-          return;
+          throw error;
         }
 
         if (mounted) {
@@ -58,10 +54,8 @@ export const useAuth = () => {
       }
     };
 
-    // Initial profile fetch
     getProfile();
 
-    // Set up auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (event === "SIGNED_IN") {
@@ -69,14 +63,12 @@ export const useAuth = () => {
         } else if (event === "SIGNED_OUT") {
           if (mounted) {
             setUser(null);
-            setLoading(false);
             navigate("/auth");
           }
         }
       }
     );
 
-    // Cleanup function
     return () => {
       mounted = false;
       subscription.unsubscribe();

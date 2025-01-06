@@ -40,6 +40,7 @@ export const useProgressTracking = () => {
         console.log('[Progress Tracking] Incremented pre-session streak:', newStats.preSessionStreak);
       } else {
         newStats.postSessionStreak = prevStats.postSessionStreak + 1;
+        newStats.levelProgress += 10;
         console.log('[Progress Tracking] Incremented post-session streak:', newStats.postSessionStreak);
       }
 

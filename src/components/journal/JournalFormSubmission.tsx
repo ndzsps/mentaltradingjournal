@@ -53,10 +53,6 @@ export const useJournalFormSubmission = ({
   const { user } = useAuth();
 
   const validateOutcome = (outcome?: string): ValidOutcome => {
-    // For pre-session entries, always return null
-    if (sessionType === "pre") return null;
-    
-    // For post-session entries, validate the outcome
     if (!outcome) return null;
     if (['win', 'loss', 'breakeven'].includes(outcome.toLowerCase())) {
       return outcome.toLowerCase() as ValidOutcome;
@@ -85,16 +81,20 @@ export const useJournalFormSubmission = ({
       preTradingActivities,
     });
 
-    if (!selectedEmotion || !selectedEmotionDetail || !notes) {
-      toast.error("Missing Information", {
-        description: "Please fill in all required fields.",
-        duration: 5000,
-      });
-      return;
+    // Validate pre-session requirements
+    if (sessionType === "pre") {
+      if (!selectedEmotion || !selectedEmotionDetail || !notes || preTradingActivities.length === 0) {
+        toast.error("Missing Information", {
+          description: "Please fill in all required fields: emotion, details, activities, and notes.",
+          duration: 5000,
+        });
+        return;
+      }
     }
 
+    // Validate post-session requirements
     if (sessionType === "post") {
-      if (!marketConditions || followedRules?.length === 0) {
+      if (!selectedEmotion || !selectedEmotionDetail || !notes || !marketConditions || followedRules?.length === 0) {
         toast.error("Missing Information", {
           description: "Please fill in all required fields for post-session.",
           duration: 5000,
@@ -104,16 +104,13 @@ export const useJournalFormSubmission = ({
     }
 
     try {
-      // Validate outcome before submission
-      const validatedOutcome = validateOutcome(selectedOutcome);
-
       const { error } = await supabase.from('journal_entries').insert({
         user_id: user.id,
         session_type: sessionType,
         emotion: selectedEmotion,
         emotion_detail: selectedEmotionDetail,
         notes,
-        outcome: validatedOutcome,
+        outcome: sessionType === "pre" ? null : validateOutcome(selectedOutcome),
         market_conditions: marketConditions,
         followed_rules: followedRules,
         mistakes: selectedMistakes,

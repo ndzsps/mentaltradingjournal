@@ -50,6 +50,7 @@ export const JournalEntry = ({ entry }: JournalEntryProps) => {
     day: 'numeric'
   });
 
+  console.log('Full entry:', entry); // Debug log
   console.log('Entry trades:', entry.trades); // Debug log
 
   return (
@@ -91,7 +92,7 @@ export const JournalEntry = ({ entry }: JournalEntryProps) => {
         {entry.notes}
       </p>
 
-      {entry.trades && entry.trades.length > 0 && (
+      {Array.isArray(entry.trades) && entry.trades.length > 0 && (
         <>
           <Separator className="my-4" />
           <div className="space-y-3">

@@ -67,6 +67,7 @@ export const useJournalFormSubmission = ({
 
     console.log("Journal Entry:", journalEntry);
     
+    // Update the progress tracking with the session type
     updateProgress(sessionType);
     showSuccessToast(sessionType);
     resetForm();

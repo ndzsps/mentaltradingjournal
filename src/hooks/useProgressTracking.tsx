@@ -32,9 +32,9 @@ export const useProgressTracking = () => {
 
       // Update session-specific streaks
       if (sessionType === 'pre') {
-        newStats.preSessionStreak = 1;
+        newStats.preSessionStreak += 1;
       } else {
-        newStats.postSessionStreak = 1;
+        newStats.postSessionStreak += 1;
       }
 
       // Update level progress for any session completion

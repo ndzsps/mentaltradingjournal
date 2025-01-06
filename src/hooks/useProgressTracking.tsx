@@ -115,17 +115,22 @@ export const useProgressTracking = () => {
         level_progress: Math.min(currentStats.level_progress + 10, 100),
       };
 
-      // Update session-specific streak (no daily limit on submissions)
+      // Update session-specific streak
       if (sessionType === 'pre') {
         updates.pre_session_streak = Math.min(currentStats.pre_session_streak + 1, 30);
       } else {
         updates.post_session_streak = Math.min(currentStats.post_session_streak + 1, 30);
       }
 
-      // Update daily streak if both sessions are completed
-      if ((sessionType === 'pre' && currentStats.post_session_streak > 0) ||
-          (sessionType === 'post' && currentStats.pre_session_streak > 0)) {
+      // Only update daily streak if both pre and post sessions are completed
+      const hasPreSession = sessionType === 'pre' ? true : currentStats.pre_session_streak > 0;
+      const hasPostSession = sessionType === 'post' ? true : currentStats.post_session_streak > 0;
+      
+      if (hasPreSession && hasPostSession) {
         updates.daily_streak = Math.min(currentStats.daily_streak + 1, 30);
+        // Reset session streaks after completing both
+        updates.pre_session_streak = 0;
+        updates.post_session_streak = 0;
       }
 
       // Level up if progress reaches 100%
@@ -141,16 +146,17 @@ export const useProgressTracking = () => {
 
       if (error) throw error;
 
+      console.log('[Progress Tracking] Progress updated successfully:', updates);
+
       setStats(prev => ({
         ...prev,
-        preSessionStreak: sessionType === 'pre' ? Math.min(prev.preSessionStreak + 1, 30) : prev.preSessionStreak,
-        postSessionStreak: sessionType === 'post' ? Math.min(prev.postSessionStreak + 1, 30) : prev.postSessionStreak,
-        dailyStreak: updates.daily_streak || prev.dailyStreak,
-        level: updates.level || prev.level,
+        preSessionStreak: updates.pre_session_streak ?? prev.preSessionStreak,
+        postSessionStreak: updates.post_session_streak ?? prev.postSessionStreak,
+        dailyStreak: updates.daily_streak ?? prev.dailyStreak,
+        level: updates.level ?? prev.level,
         levelProgress: updates.level_progress,
       }));
 
-      console.log('[Progress Tracking] Progress updated successfully:', updates);
     } catch (error) {
       console.error('Error updating progress:', error);
       toast.error('Failed to update progress');

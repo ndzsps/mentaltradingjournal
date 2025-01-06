@@ -22,7 +22,7 @@ export const PreSessionProgress = ({
   return (
     <div className="space-y-2">
       <div className="flex justify-between text-sm text-muted-foreground">
-        <span>Your Progress</span>
+        <span>Progress Bar</span>
         <span>{Math.round(calculateProgress())}%</span>
       </div>
       <Progress value={calculateProgress()} className="h-2" />

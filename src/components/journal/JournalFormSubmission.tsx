@@ -19,6 +19,8 @@ interface Trade {
   fees: number;
 }
 
+type ValidOutcome = 'win' | 'loss' | 'breakeven' | null;
+
 interface JournalFormSubmissionProps {
   sessionType: "pre" | "post";
   selectedEmotion: string;
@@ -49,6 +51,14 @@ export const useJournalFormSubmission = ({
   const { showSuccessToast } = useJournalToast();
   const { updateProgress } = useProgressTracking();
   const { user } = useAuth();
+
+  const validateOutcome = (outcome?: string): ValidOutcome => {
+    if (!outcome) return null;
+    if (['win', 'loss', 'breakeven'].includes(outcome.toLowerCase())) {
+      return outcome.toLowerCase() as ValidOutcome;
+    }
+    throw new Error('Invalid outcome value. Must be "win", "loss", or "breakeven".');
+  };
 
   const handleSubmit = async () => {
     if (!user) {
@@ -90,13 +100,16 @@ export const useJournalFormSubmission = ({
     }
 
     try {
+      // Validate outcome before submission
+      const validatedOutcome = validateOutcome(selectedOutcome);
+
       const { error } = await supabase.from('journal_entries').insert({
         user_id: user.id,
         session_type: sessionType,
         emotion: selectedEmotion,
         emotion_detail: selectedEmotionDetail,
         notes,
-        outcome: selectedOutcome,
+        outcome: validatedOutcome,
         market_conditions: marketConditions,
         followed_rules: followedRules,
         mistakes: selectedMistakes,
@@ -114,7 +127,7 @@ export const useJournalFormSubmission = ({
     } catch (error) {
       console.error('Error submitting journal entry:', error);
       toast.error("Error", {
-        description: "Failed to submit journal entry. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to submit journal entry. Please try again.",
         duration: 5000,
       });
     }

@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 interface Trade {
   id: string;
@@ -93,39 +94,60 @@ export const JournalEntry = ({ entry }: JournalEntryProps) => {
           <Separator className="my-4" />
           <div className="space-y-3">
             <h3 className="text-sm font-semibold">Trades</h3>
-            {entry.trades.map((trade, index) => (
-              <div key={trade.id || index} className="bg-card/50 p-3 rounded-md space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="font-medium">{trade.instrument}</span>
-                  <Badge 
-                    variant={trade.direction === 'buy' ? 'default' : 'destructive'}
-                    className="capitalize"
-                  >
-                    {trade.direction}
-                  </Badge>
-                </div>
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div>
-                    <p className="text-muted-foreground">Entry</p>
-                    <p>{new Date(trade.entryDate).toLocaleString()}</p>
-                    <p>Price: {trade.entryPrice}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">Exit</p>
-                    <p>{new Date(trade.exitDate).toLocaleString()}</p>
-                    <p>Price: {trade.exitPrice}</p>
-                  </div>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span>Quantity: {trade.quantity}</span>
-                  <span className={`font-medium ${
-                    Number(trade.pnl) >= 0 ? 'text-green-500' : 'text-red-500'
-                  }`}>
-                    P&L: {Number(trade.pnl) >= 0 ? '+' : ''}{trade.pnl}
-                  </span>
-                </div>
-              </div>
-            ))}
+            <Accordion type="single" collapsible className="w-full">
+              {entry.trades.map((trade, index) => (
+                <AccordionItem key={trade.id || index} value={`trade-${index}`}>
+                  <AccordionTrigger className="hover:no-underline">
+                    <div className="flex items-center justify-between w-full pr-4">
+                      <span className="font-medium">{trade.instrument}</span>
+                      <div className="flex items-center gap-2">
+                        <Badge 
+                          variant={trade.direction === 'buy' ? 'default' : 'destructive'}
+                          className="capitalize"
+                        >
+                          {trade.direction}
+                        </Badge>
+                        <span className={`font-medium ${
+                          Number(trade.pnl) >= 0 ? 'text-green-500' : 'text-red-500'
+                        }`}>
+                          {Number(trade.pnl) >= 0 ? '+' : ''}{trade.pnl}
+                        </span>
+                      </div>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="space-y-4 pt-2">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <h4 className="text-sm font-medium text-muted-foreground">Entry Details</h4>
+                          <div className="space-y-1">
+                            <p className="text-sm">Date: {new Date(trade.entryDate).toLocaleString()}</p>
+                            <p className="text-sm">Price: {trade.entryPrice}</p>
+                            <p className="text-sm">Stop Loss: {trade.stopLoss}</p>
+                            <p className="text-sm">Take Profit: {trade.takeProfit}</p>
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <h4 className="text-sm font-medium text-muted-foreground">Exit Details</h4>
+                          <div className="space-y-1">
+                            <p className="text-sm">Date: {new Date(trade.exitDate).toLocaleString()}</p>
+                            <p className="text-sm">Price: {trade.exitPrice}</p>
+                            <p className="text-sm">Quantity: {trade.quantity}</p>
+                            <p className="text-sm">Fees: {trade.fees}</p>
+                          </div>
+                        </div>
+                      </div>
+                      {trade.setup && (
+                        <div className="space-y-1">
+                          <h4 className="text-sm font-medium text-muted-foreground">Setup</h4>
+                          <p className="text-sm">{trade.setup}</p>
+                        </div>
+                      )}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
           </div>
         </>
       )}

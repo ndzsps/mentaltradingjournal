@@ -70,10 +70,13 @@ const AuthPage = () => {
           redirectTo={window.location.origin}
           localization={{
             variables: {
+              sign_in: {
+                email_label: 'Email',
+                password_label: 'Password',
+              },
               sign_up: {
                 email_label: 'Email',
                 password_label: 'Password',
-                full_name_label: 'Full Name'
               }
             }
           }}

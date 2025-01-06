@@ -2,6 +2,9 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Trophy, Flame, Star, TrendingUp } from "lucide-react";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface ProgressStatsProps {
   preSessionStreak: number;
@@ -18,6 +21,47 @@ export const ProgressStats = ({
   level,
   levelProgress,
 }: ProgressStatsProps) => {
+  const { user } = useAuth();
+  const [stats, setStats] = useState({
+    preSessionStreak,
+    postSessionStreak,
+    dailyStreak,
+    level,
+    levelProgress,
+  });
+
+  useEffect(() => {
+    if (!user) return;
+
+    // Subscribe to realtime changes for the user's progress stats
+    const channel = supabase
+      .channel('progress_stats_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'progress_stats',
+          filter: `user_id=eq.${user.id}`,
+        },
+        (payload) => {
+          console.log('Progress stats updated:', payload.new);
+          setStats({
+            preSessionStreak: payload.new.pre_session_streak,
+            postSessionStreak: payload.new.post_session_streak,
+            dailyStreak: payload.new.daily_streak,
+            level: payload.new.level,
+            levelProgress: payload.new.level_progress,
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
+
   return (
     <Card className="p-6 space-y-6 bg-card/30 backdrop-blur-xl border-primary/10">
       <div className="space-y-2">
@@ -40,9 +84,9 @@ export const ProgressStats = ({
           <div className="flex-1">
             <div className="flex justify-between items-center mb-1">
               <span className="text-sm font-medium">Pre-Session Streak</span>
-              <span className="text-sm text-primary">{preSessionStreak} days</span>
+              <span className="text-sm text-primary">{stats.preSessionStreak} days</span>
             </div>
-            <Progress value={(preSessionStreak / 30) * 100} className="h-1" />
+            <Progress value={(stats.preSessionStreak / 30) * 100} className="h-1" />
           </div>
         </motion.div>
 
@@ -59,11 +103,11 @@ export const ProgressStats = ({
             <div className="flex justify-between items-center mb-1">
               <span className="text-sm font-medium">Post-Session Streak</span>
               <span className="text-sm text-secondary">
-                {postSessionStreak} days
+                {stats.postSessionStreak} days
               </span>
             </div>
             <Progress
-              value={(postSessionStreak / 30) * 100}
+              value={(stats.postSessionStreak / 30) * 100}
               className="h-1 bg-secondary/20 [&>div]:bg-secondary"
             />
           </div>
@@ -82,11 +126,11 @@ export const ProgressStats = ({
             <div className="flex justify-between items-center mb-1">
               <span className="text-sm font-medium">Daily Streak</span>
               <span className="text-sm text-accent-foreground">
-                {dailyStreak} days
+                {stats.dailyStreak} days
               </span>
             </div>
             <Progress
-              value={(dailyStreak / 30) * 100}
+              value={(stats.dailyStreak / 30) * 100}
               className="h-1 bg-accent/20 [&>div]:bg-accent"
             />
           </div>
@@ -103,10 +147,10 @@ export const ProgressStats = ({
           </div>
           <div className="flex-1">
             <div className="flex justify-between items-center mb-1">
-              <span className="text-sm font-medium">Level {level}</span>
-              <span className="text-sm text-primary">{levelProgress}%</span>
+              <span className="text-sm font-medium">Level {stats.level}</span>
+              <span className="text-sm text-primary">{stats.levelProgress}%</span>
             </div>
-            <Progress value={levelProgress} className="h-1" />
+            <Progress value={stats.levelProgress} className="h-1" />
           </div>
         </motion.div>
       </div>

@@ -68,6 +68,20 @@ const AuthPage = () => {
           }}
           providers={[]}
           redirectTo={window.location.origin}
+          localization={{
+            variables: {
+              sign_up: {
+                full_name_label: 'Full Name',
+                full_name_placeholder: 'Enter your full name',
+                email_label: 'Email',
+                password_label: 'Password',
+              }
+            }
+          }}
+          view="sign_up"
+          additionalData={{
+            full_name: undefined
+          }}
         />
       </Card>
     </div>

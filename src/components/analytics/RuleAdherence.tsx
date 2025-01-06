@@ -12,6 +12,7 @@ import {
   Legend,
 } from "recharts";
 import { generateAnalytics } from "@/utils/analyticsUtils";
+import { useQuery } from "@tanstack/react-query";
 import { AddTradeDialog } from "./AddTradeDialog";
 import { Plus, Pencil } from "lucide-react";
 import { toast } from "sonner";
@@ -19,7 +20,22 @@ import { toast } from "sonner";
 export const RuleAdherence = () => {
   const [showAddTradeDialog, setShowAddTradeDialog] = useState(false);
   const [selectedTrade, setSelectedTrade] = useState<any>(null);
-  const analytics = generateAnalytics([]);
+  
+  const { data: analytics, isLoading } = useQuery({
+    queryKey: ['analytics'],
+    queryFn: generateAnalytics,
+  });
+  
+  if (isLoading || !analytics) {
+    return (
+      <Card className="p-4 md:p-6 space-y-4">
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 bg-accent/10 rounded w-3/4"></div>
+          <div className="h-[250px] md:h-[300px] bg-accent/10 rounded"></div>
+        </div>
+      </Card>
+    );
+  }
   
   const data = [
     {

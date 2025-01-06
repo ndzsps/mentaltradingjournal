@@ -15,6 +15,7 @@ import { ProfitLossDistribution } from "./ProfitLossDistribution";
 import { TradeFrequency } from "./TradeFrequency";
 import { RiskRewardAnalysis } from "./RiskRewardAnalysis";
 import { WinLossRatio } from "./WinLossRatio";
+import { AssetPairPerformance } from "./AssetPairPerformance";
 
 export const AnalyticsDashboard = () => {
   const [activeView, setActiveView] = useState<'all' | 'psychological' | 'trading'>('all');
@@ -28,6 +29,7 @@ export const AnalyticsDashboard = () => {
   ];
 
   const tradingComponents = [
+    AssetPairPerformance,
     PerformanceBreakdown,
     RuleAdherence,
     MarketVolatility,

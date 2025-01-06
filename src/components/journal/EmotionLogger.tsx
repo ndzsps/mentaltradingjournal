@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
 import { emotions, tradingOutcome, mistakeCategories, tradingRules } from "./emotionConfig";
 import { EmotionDetailDialog } from "./EmotionDetailDialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -11,7 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { SessionProgress } from "./SessionProgress";
 import { PostSessionSection } from "./PostSessionSection";
 import { ProgressStats } from "./ProgressStats";
-import { useProgressTracking } from "@/hooks/useProgressTracking";
+import { useJournalFormSubmission } from "./JournalFormSubmission";
 
 export const EmotionLogger = () => {
   const [selectedEmotion, setSelectedEmotion] = useState("");
@@ -25,8 +24,30 @@ export const EmotionLogger = () => {
   const [marketConditions, setMarketConditions] = useState("");
   const [followedRules, setFollowedRules] = useState<string[]>([]);
   const [preTradingActivities, setPreTradingActivities] = useState<string[]>([]);
-  const { toast } = useToast();
-  const { stats, updateProgress } = useProgressTracking();
+
+  const resetForm = () => {
+    setSelectedEmotion("");
+    setSelectedEmotionDetail("");
+    setSelectedOutcome("");
+    setNotes("");
+    setSelectedMistakes([]);
+    setMarketConditions("");
+    setFollowedRules([]);
+    setPreTradingActivities([]);
+  };
+
+  const { handleSubmit } = useJournalFormSubmission({
+    sessionType,
+    selectedEmotion,
+    selectedEmotionDetail,
+    notes,
+    selectedOutcome,
+    marketConditions,
+    followedRules,
+    selectedMistakes,
+    preTradingActivities,
+    resetForm,
+  });
 
   const handleEmotionSelect = (value: string) => {
     setSelectedEmotion(value);
@@ -36,63 +57,12 @@ export const EmotionLogger = () => {
   const handleDetailSelect = (detail: string) => {
     setSelectedEmotionDetail(detail);
     setIsDetailDialogOpen(false);
-    toast({
-      description: (
-        <div className="space-y-1">
-          <p className="font-bold">You're feeling {detail.toLowerCase()}</p>
-          <p className="italic">Remember, tough times are temporary. I'm here for you! 💪</p>
-        </div>
-      ),
-    });
   };
 
   const handleCustomDetailAdd = (detail: string) => {
     if (!customDetails.includes(detail)) {
       setCustomDetails([...customDetails, detail]);
     }
-  };
-
-  const handleSubmit = () => {
-    if (!selectedEmotion || !selectedEmotionDetail || !notes) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in all required fields.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const journalEntry = {
-      emotion: selectedEmotion,
-      emotionDetail: selectedEmotionDetail,
-      outcome: selectedOutcome,
-      notes,
-      sessionType,
-      timestamp: new Date(),
-      marketConditions,
-      followedRules,
-      mistakes: selectedMistakes,
-      preTradingActivities,
-    };
-
-    console.log("Journal Entry:", journalEntry);
-    
-    // Update progress tracking
-    updateProgress(sessionType);
-
-    toast({
-      description: "Your trading journal entry has been saved.",
-    });
-
-    // Reset form
-    setSelectedEmotion("");
-    setSelectedEmotionDetail("");
-    setSelectedOutcome("");
-    setNotes("");
-    setSelectedMistakes([]);
-    setMarketConditions("");
-    setFollowedRules([]);
-    setPreTradingActivities([]);
   };
 
   return (
@@ -224,7 +194,7 @@ export const EmotionLogger = () => {
         </div>
       </Card>
 
-      <ProgressStats {...stats} />
+      <ProgressStats />
     </div>
   );
 };

@@ -22,6 +22,13 @@ interface PostSessionSectionProps {
   tradingRules: TradingRule[];
 }
 
+const capitalizeWords = (str: string) => {
+  return str
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+};
+
 export const PostSessionSection = ({
   selectedOutcome,
   setSelectedOutcome,
@@ -55,6 +62,15 @@ export const PostSessionSection = ({
     return "hover:border-accent/50 hover:bg-accent/5";
   };
 
+  const marketConditionOptions = [
+    { value: "low_volatility", label: "Low Volatility" },
+    { value: "medium_volatility", label: "Medium Volatility" },
+    { value: "high_volatility", label: "High Volatility" },
+    { value: "trending", label: "Trending" },
+    { value: "ranging", label: "Ranging" },
+    { value: "news_driven", label: "News Driven" },
+  ];
+
   return (
     <>
       <div className="grid grid-cols-3 gap-4">
@@ -69,7 +85,7 @@ export const PostSessionSection = ({
               <Icon className={`w-6 h-6 transition-transform duration-300 group-hover:scale-110 ${
                 selectedOutcome === value ? "" : value === "loss" ? "text-red-500" : "text-accent-foreground/70"
               }`} />
-              <span className="font-medium">{label}</span>
+              <span className="font-medium">{capitalizeWords(label)}</span>
             </div>
           </Button>
         ))}
@@ -82,12 +98,11 @@ export const PostSessionSection = ({
             <SelectValue placeholder="Select market conditions" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="low_volatility">Low Volatility</SelectItem>
-            <SelectItem value="medium_volatility">Medium Volatility</SelectItem>
-            <SelectItem value="high_volatility">High Volatility</SelectItem>
-            <SelectItem value="trending">Trending</SelectItem>
-            <SelectItem value="ranging">Ranging</SelectItem>
-            <SelectItem value="news_driven">News Driven</SelectItem>
+            {marketConditionOptions.map(option => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
@@ -118,7 +133,7 @@ export const PostSessionSection = ({
                     }
                   }}
                 />
-                <Label htmlFor={rule.value}>{rule.label}</Label>
+                <Label htmlFor={rule.value}>{capitalizeWords(rule.label)}</Label>
               </div>
             ))}
           </div>
@@ -142,7 +157,7 @@ export const PostSessionSection = ({
                     }
                   }}
                 />
-                <Label htmlFor={mistake.value}>{mistake.label}</Label>
+                <Label htmlFor={mistake.value}>{capitalizeWords(mistake.label)}</Label>
               </div>
             ))}
           </div>

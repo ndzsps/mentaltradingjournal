@@ -16,6 +16,13 @@ interface JournalEntryProps {
   entry: JournalEntry;
 }
 
+const capitalizeWords = (str: string) => {
+  return str
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+};
+
 export const JournalEntry = ({ entry }: JournalEntryProps) => {
   const formattedDate = new Date(entry.created_at).toLocaleDateString('en-US', { 
     weekday: 'long',
@@ -43,7 +50,7 @@ export const JournalEntry = ({ entry }: JournalEntryProps) => {
                   : 'border-accent/50 text-accent-foreground'
               }`}
             >
-              {entry.outcome}
+              {capitalizeWords(entry.outcome)}
             </Badge>
           )}
         </div>
@@ -52,11 +59,11 @@ export const JournalEntry = ({ entry }: JournalEntryProps) => {
         </span>
       </div>
       <p className="font-medium text-foreground mb-1">
-        Feeling: {entry.emotion} - {entry.emotion_detail}
+        Feeling: {capitalizeWords(entry.emotion)} - {capitalizeWords(entry.emotion_detail)}
       </p>
       {entry.market_conditions && (
         <p className="text-sm text-muted-foreground">
-          Market Conditions: {entry.market_conditions.replace('_', ' ')}
+          Market Conditions: {capitalizeWords(entry.market_conditions)}
         </p>
       )}
       <p className="mt-2 text-sm text-foreground/90">

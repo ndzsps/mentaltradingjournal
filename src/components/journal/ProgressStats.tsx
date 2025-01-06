@@ -1,12 +1,12 @@
 import { Card } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Trophy, Flame, Star, TrendingUp } from "lucide-react";
-import { motion } from "framer-motion";
+import { Trophy, Flame, Star } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import { toast } from "sonner";
+import { ProgressItem } from "./progress/ProgressItem";
+import { LevelProgress } from "./progress/LevelProgress";
 
 interface ProgressStats {
   preSessionStreak: number;
@@ -66,14 +66,6 @@ export const ProgressStats = ({
   useEffect(() => {
     if (!user) return;
 
-    console.log('Initial stats:', {
-      preSessionStreak,
-      postSessionStreak,
-      dailyStreak,
-      level,
-      levelProgress,
-    });
-
     const channel = supabase
       .channel('progress_stats_changes')
       .on(
@@ -85,7 +77,6 @@ export const ProgressStats = ({
           filter: `user_id=eq.${user.id}`,
         },
         (payload: RealtimePostgresChangesPayload<ProgressStatsRow>) => {
-          console.log('Progress stats update received:', payload);
           if (payload.new) {
             const newStats: ProgressStats = {
               preSessionStreak: payload.new.pre_session_streak,
@@ -95,7 +86,6 @@ export const ProgressStats = ({
               levelProgress: payload.new.level_progress,
             };
 
-            // Check if pre-session streak increased
             if (payload.new.pre_session_streak > previousPreStreak) {
               const randomMessage = inspirationalMessages[Math.floor(Math.random() * inspirationalMessages.length)];
               toast.success(randomMessage, {
@@ -104,7 +94,6 @@ export const ProgressStats = ({
               });
             }
 
-            // Check if post-session streak increased
             if (payload.new.post_session_streak > previousPostStreak) {
               const randomMessage = inspirationalMessages[Math.floor(Math.random() * inspirationalMessages.length)];
               toast.success(randomMessage, {
@@ -115,21 +104,16 @@ export const ProgressStats = ({
 
             setPreviousPreStreak(payload.new.pre_session_streak);
             setPreviousPostStreak(payload.new.post_session_streak);
-            
-            console.log('Updating stats to:', newStats);
             setStats(newStats);
           }
         }
       )
-      .subscribe((status) => {
-        console.log('Subscription status:', status);
-      });
+      .subscribe();
 
     return () => {
-      console.log('Cleaning up subscription');
       supabase.removeChannel(channel);
     };
-  }, [user, preSessionStreak, postSessionStreak, dailyStreak, level, levelProgress, previousPreStreak, previousPostStreak]);
+  }, [user, previousPreStreak, previousPostStreak]);
 
   return (
     <Card className="p-6 space-y-6 bg-card/30 backdrop-blur-xl border-primary/10">
@@ -141,87 +125,35 @@ export const ProgressStats = ({
       </div>
 
       <div className="grid gap-4">
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.1 }}
-          className="flex items-center gap-4"
-        >
-          <div className="p-2 rounded-full bg-primary/10">
-            <Trophy className="w-5 h-5 text-primary" />
-          </div>
-          <div className="flex-1">
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-sm font-medium">Pre-Session Daily Goal</span>
-              <span className="text-sm text-primary">{stats.preSessionStreak} entries</span>
-            </div>
-            <Progress value={(stats.preSessionStreak / 30) * 100} className="h-1" />
-          </div>
-        </motion.div>
+        <ProgressItem
+          icon={Trophy}
+          title="Pre-Session Daily Goal"
+          value={stats.preSessionStreak}
+          maxValue={30}
+          color="primary"
+        />
 
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.2 }}
-          className="flex items-center gap-4"
-        >
-          <div className="p-2 rounded-full bg-secondary/10">
-            <Star className="w-5 h-5 text-secondary" />
-          </div>
-          <div className="flex-1">
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-sm font-medium">Post-Session Daily Goal</span>
-              <span className="text-sm text-secondary">
-                {stats.postSessionStreak} entries
-              </span>
-            </div>
-            <Progress
-              value={(stats.postSessionStreak / 30) * 100}
-              className="h-1 bg-secondary/20 [&>div]:bg-secondary"
-            />
-          </div>
-        </motion.div>
+        <ProgressItem
+          icon={Star}
+          title="Post-Session Daily Goal"
+          value={stats.postSessionStreak}
+          maxValue={30}
+          color="secondary"
+        />
 
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.3 }}
-          className="flex items-center gap-4"
-        >
-          <div className="p-2 rounded-full bg-accent/10">
-            <Flame className="w-5 h-5 text-accent" />
-          </div>
-          <div className="flex-1">
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-sm font-medium">Daily Activity Streak</span>
-              <span className="text-sm text-accent-foreground">
-                {stats.dailyStreak} days
-              </span>
-            </div>
-            <Progress
-              value={(stats.dailyStreak / 30) * 100}
-              className="h-1 bg-accent/20 [&>div]:bg-accent"
-            />
-          </div>
-        </motion.div>
+        <ProgressItem
+          icon={Flame}
+          title="Daily Activity Streak"
+          value={stats.dailyStreak}
+          maxValue={30}
+          color="accent"
+          unit="days"
+        />
 
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.4 }}
-          className="flex items-center gap-4"
-        >
-          <div className="p-2 rounded-full bg-primary/10">
-            <TrendingUp className="w-5 h-5 text-primary" />
-          </div>
-          <div className="flex-1">
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-sm font-medium">Level {stats.level}</span>
-              <span className="text-sm text-primary">{stats.levelProgress}%</span>
-            </div>
-            <Progress value={stats.levelProgress} className="h-1" />
-          </div>
-        </motion.div>
+        <LevelProgress
+          level={stats.level}
+          levelProgress={stats.levelProgress}
+        />
       </div>
     </Card>
   );

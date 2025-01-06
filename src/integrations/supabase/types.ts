@@ -80,7 +80,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      calculate_level_from_streak: {
+        Args: {
+          daily_streak: number
+        }
+        Returns: number
+      }
     }
     Enums: {
       [_ in never]: never

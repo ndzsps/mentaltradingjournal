@@ -9,27 +9,26 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { generateAnalytics } from "@/utils/analyticsUtils";
-
-// For demo purposes, using mock data
-const mockJournalEntries = [
-  {
-    emotion: "positive",
-    emotionDetail: "confident",
-    outcome: "win",
-    notes: "Great trade!",
-    sessionType: "post" as const,
-    timestamp: new Date(),
-  },
-  // Add more mock entries as needed
-];
+import { useQuery } from "@tanstack/react-query";
 
 export const EmotionalTendencies = () => {
-  const analytics = generateAnalytics(mockJournalEntries);
+  const { data: analytics, isLoading } = useQuery({
+    queryKey: ['analytics'],
+    queryFn: generateAnalytics,
+  });
   
-  const data = analytics.emotionalImpact.dates.map((date, index) => ({
-    date,
-    winRate: analytics.emotionalImpact.winRate[index],
-  }));
+  if (isLoading || !analytics) {
+    return (
+      <Card className="p-4 md:p-6 space-y-4">
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 bg-accent/10 rounded w-3/4"></div>
+          <div className="h-[250px] md:h-[300px] bg-accent/10 rounded"></div>
+        </div>
+      </Card>
+    );
+  }
+
+  const data = analytics.emotionTrend;
 
   return (
     <Card className="p-4 md:p-6 space-y-4">
@@ -49,10 +48,19 @@ export const EmotionalTendencies = () => {
             <Tooltip />
             <Line
               type="monotone"
-              dataKey="winRate"
+              dataKey="emotionalScore"
               stroke="#6E59A5"
               strokeWidth={2}
               dot={{ fill: "#6E59A5" }}
+              name="Emotional Score"
+            />
+            <Line
+              type="monotone"
+              dataKey="tradingResult"
+              stroke="#0EA5E9"
+              strokeWidth={2}
+              dot={{ fill: "#0EA5E9" }}
+              name="Trading Result"
             />
           </LineChart>
         </ResponsiveContainer>

@@ -1,10 +1,16 @@
+import { supabase } from "@/integrations/supabase/client";
+
 interface JournalEntry {
   emotion: string;
-  emotionDetail: string;
+  emotion_detail: string;
   outcome: string;
   notes: string;
-  sessionType: 'pre' | 'post';
-  timestamp: Date;
+  session_type: 'pre' | 'post';
+  trades: any[];
+  market_conditions: string | null;
+  followed_rules: string[] | null;
+  mistakes: string[] | null;
+  created_at: string;
 }
 
 interface AnalyticsInsight {
@@ -30,117 +36,120 @@ interface AnalyticsInsight {
   recommendedAction: string;
 }
 
-export const generateAnalytics = (journalEntries: JournalEntry[]): AnalyticsInsight => {
+export const fetchJournalEntries = async () => {
+  const { data: entries, error } = await supabase
+    .from('journal_entries')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching journal entries:', error);
+    return [];
+  }
+
+  return entries as JournalEntry[];
+};
+
+export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
+  const journalEntries = await fetchJournalEntries();
+
   if (!journalEntries.length) {
     return {
-      performanceByEmotion: { positive: 60, neutral: 25, negative: 15 },
+      performanceByEmotion: { positive: 0, neutral: 0, negative: 0 },
       emotionalImpact: {
-        winRate: [65, 55, 35, 70, 50],
-        dates: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+        winRate: [],
+        dates: [],
       },
-      emotionTrend: Array.from({ length: 30 }, (_, i) => ({
-        date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        emotionalScore: Math.random() * 100,
-        tradingResult: (Math.random() - 0.3) * 100,
-      })).reverse(),
+      emotionTrend: [],
       emotionTrendInsights: {
-        improvement: "Your emotional resilience has improved by 20% over the last month.",
-        impact: "When emotional dips occurred more than 3 times a week, your performance dropped by 40%.",
+        improvement: "Start logging trades to see emotional impact analysis.",
+        impact: "No data available yet.",
       },
       mainInsight: "Not enough data to generate insights. Keep logging your trades!",
       recommendedAction: "Try to log at least 5 trades to get personalized insights.",
     };
   }
 
-  // Calculate win rates by emotional state
-  const emotionalOutcomes: Record<string, { wins: number; total: number }> = {
-    positive: { wins: 0, total: 0 },
-    neutral: { wins: 0, total: 0 },
-    negative: { wins: 0, total: 0 },
+  // Calculate performance by emotion
+  const emotionCounts = {
+    positive: 0,
+    neutral: 0,
+    negative: 0,
+    total: 0,
   };
 
   journalEntries.forEach(entry => {
-    const emotionType = entry.emotion;
-    const isWin = entry.outcome === 'win';
-    
-    if (emotionalOutcomes[emotionType]) {
-      emotionalOutcomes[emotionType].total++;
-      if (isWin) emotionalOutcomes[emotionType].wins++;
-    }
+    const emotion = entry.emotion.toLowerCase();
+    if (emotion.includes('positive')) emotionCounts.positive++;
+    else if (emotion.includes('neutral')) emotionCounts.neutral++;
+    else if (emotion.includes('negative')) emotionCounts.negative++;
+    emotionCounts.total++;
   });
 
   const performanceByEmotion = {
-    positive: (emotionalOutcomes.positive.wins / emotionalOutcomes.positive.total) * 100 || 0,
-    neutral: (emotionalOutcomes.neutral.wins / emotionalOutcomes.neutral.total) * 100 || 0,
-    negative: (emotionalOutcomes.negative.wins / emotionalOutcomes.negative.total) * 100 || 0,
+    positive: (emotionCounts.positive / emotionCounts.total) * 100 || 0,
+    neutral: (emotionCounts.neutral / emotionCounts.total) * 100 || 0,
+    negative: (emotionCounts.negative / emotionCounts.total) * 100 || 0,
   };
 
-  // Calculate daily win rates
+  // Calculate win rates by date
   const last5Days = [...new Set(
     journalEntries
-      .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
       .slice(0, 5)
-      .map(entry => new Date(entry.timestamp).toLocaleDateString('en-US', { weekday: 'short' }))
+      .map(entry => new Date(entry.created_at).toLocaleDateString('en-US', { weekday: 'short' }))
   )];
 
   const winRates = last5Days.map(date => {
     const dayEntries = journalEntries.filter(
-      entry => new Date(entry.timestamp).toLocaleDateString('en-US', { weekday: 'short' }) === date
+      entry => new Date(entry.created_at).toLocaleDateString('en-US', { weekday: 'short' }) === date
     );
     const wins = dayEntries.filter(entry => entry.outcome === 'win').length;
     return (wins / dayEntries.length) * 100 || 0;
   });
 
-  // Generate insights based on the data
-  let mainInsight = '';
-  let recommendedAction = '';
-
-  const bestPerformance = Math.max(
-    performanceByEmotion.positive,
-    performanceByEmotion.neutral,
-    performanceByEmotion.negative
-  );
-
-  if (bestPerformance === performanceByEmotion.positive) {
-    mainInsight = `You win ${performanceByEmotion.positive.toFixed(1)}% of trades when in a positive emotional state, compared to ${performanceByEmotion.neutral.toFixed(1)}% in neutral states.`;
-    recommendedAction = "Focus on maintaining a positive mindset for optimal performance.";
-  } else if (bestPerformance === performanceByEmotion.neutral) {
-    mainInsight = `Your highest win rate of ${performanceByEmotion.neutral.toFixed(1)}% occurs in neutral emotional states.`;
-    recommendedAction = "Consider implementing a more systematic trading approach that relies less on emotions.";
-  } else {
-    mainInsight = `Your trading performance seems to be impacted by emotional states.`;
-    recommendedAction = "Consider taking breaks when experiencing strong emotions before making trades.";
-  }
-
   // Generate emotion trend data
-  const emotionTrend = Array.from({ length: 30 }, (_, i) => {
-    const date = new Date();
-    date.setDate(date.getDate() - i);
+  const emotionTrend = journalEntries.slice(0, 30).map(entry => {
+    const emotionalScore = entry.emotion.toLowerCase().includes('positive') ? 75 :
+      entry.emotion.toLowerCase().includes('neutral') ? 50 : 25;
+    
+    const tradingResult = entry.trades.reduce((acc, trade) => {
+      return acc + (trade.pnl || 0);
+    }, 0);
+
     return {
-      date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-      emotionalScore: Math.random() * 100,
-      tradingResult: (Math.random() - 0.3) * 100,
+      date: new Date(entry.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      emotionalScore,
+      tradingResult,
     };
   }).reverse();
 
-  const emotionTrendInsights = {
-    improvement: "Your emotional resilience has improved by 20% over the last month, and your trading consistency has increased by 15%.",
-    impact: "When emotional dips occurred more than 3 times a week, your performance dropped by 40%.",
-  };
+  // Generate insights
+  const mainInsight = `Your trading performance shows strong correlation with emotional states. ${
+    performanceByEmotion.positive > 50 ? 
+    'Positive emotions lead to better outcomes.' : 
+    'Consider working on emotional management.'
+  }`;
+
+  const recommendedAction = emotionCounts.negative > emotionCounts.positive ?
+    "Focus on maintaining a positive mindset before trading." :
+    "Keep up the good work with emotional management.";
 
   return {
-    performanceByEmotion: {
-      positive: 60,
-      neutral: 25,
-      negative: 15,
-    },
+    performanceByEmotion,
     emotionalImpact: {
-      winRate: [65, 55, 35, 70, 50],
-      dates: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+      winRate: winRates,
+      dates: last5Days,
     },
     emotionTrend,
-    emotionTrendInsights,
-    mainInsight: "Your trading performance shows strong correlation with emotional states.",
-    recommendedAction: "Consider implementing emotional awareness exercises before trading.",
+    emotionTrendInsights: {
+      improvement: `Your emotional resilience has ${
+        performanceByEmotion.positive > 50 ? 'improved' : 'decreased'
+      } over the last month.`,
+      impact: `When emotional dips occurred, your win rate dropped by approximately ${
+        Math.round((performanceByEmotion.positive - performanceByEmotion.negative) * 100) / 100
+      }%.`,
+    },
+    mainInsight,
+    recommendedAction,
   };
 };

@@ -64,10 +64,12 @@ export const AddTradeDialog = ({ open, onOpenChange, editTrade }: AddTradeDialog
 
       categories.forEach(category => {
         const hasAllRequiredFields = category.fields.every(field => {
-          const value = formData.get(field);
-          return value && value.toString().trim() !== '';
+          const value = formData.get(field)?.toString().trim();
+          // Check if the value exists and is not empty
+          return value && value !== '';
         });
 
+        // Only count category as complete if all fields are filled and direction is selected (if required)
         if (hasAllRequiredFields && (!category.directionCheck || category.directionCheck)) {
           completedCategories++;
         }

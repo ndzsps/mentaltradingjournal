@@ -77,6 +77,15 @@ const AuthPage = () => {
             }
           }}
           view="sign_up"
+          magicLink={false}
+          showLinks={true}
+          queryParams={{
+            defaultOptions: {
+              data: {
+                full_name: ''
+              }
+            }
+          }}
         />
       </Card>
     </div>

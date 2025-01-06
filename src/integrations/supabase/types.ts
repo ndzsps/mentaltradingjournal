@@ -36,6 +36,42 @@ export type Database = {
         }
         Relationships: []
       }
+      progress_stats: {
+        Row: {
+          created_at: string
+          daily_streak: number
+          id: string
+          level: number
+          level_progress: number
+          post_session_streak: number
+          pre_session_streak: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          daily_streak?: number
+          id?: string
+          level?: number
+          level_progress?: number
+          post_session_streak?: number
+          pre_session_streak?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          daily_streak?: number
+          id?: string
+          level?: number
+          level_progress?: number
+          post_session_streak?: number
+          pre_session_streak?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

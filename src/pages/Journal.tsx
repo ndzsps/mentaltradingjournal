@@ -23,6 +23,7 @@ interface JournalEntryType {
   followed_rules?: string[];
   mistakes?: string[];
   pre_trading_activities?: string[];
+  trades?: any[];
 }
 
 const Journal = () => {
@@ -47,6 +48,13 @@ const Journal = () => {
         return;
       }
 
+      console.log('Fetched entries:', data);
+      if (data) {
+        data.forEach((entry, index) => {
+          console.log(`Entry ${index + 1} trades:`, entry.trades);
+        });
+      }
+
       setEntries(data || []);
     };
 
@@ -61,7 +69,8 @@ const Journal = () => {
           schema: 'public',
           table: 'journal_entries',
         },
-        () => {
+        (payload) => {
+          console.log('Realtime update received:', payload);
           fetchEntries();
         }
       )
@@ -104,7 +113,7 @@ const Journal = () => {
     return matchesEmotion && matchesDetail && matchesTimeFilter;
   });
 
-  const allDetails = Array.from(new Set(entries.map(entry => entry.emotion_detail)));
+  console.log('Filtered entries:', filteredEntries);
 
   return (
     <AppLayout>
@@ -140,7 +149,7 @@ const Journal = () => {
                 setDetailFilter={setDetailFilter}
                 timeFilter={timeFilter}
                 setTimeFilter={setTimeFilter}
-                allDetails={allDetails}
+                allDetails={Array.from(new Set(entries.map(entry => entry.emotion_detail)))}
               />
             </div>
             

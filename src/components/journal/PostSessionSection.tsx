@@ -61,18 +61,35 @@ export const PostSessionSection = ({
       </div>
 
       <div className="space-y-4">
+        <Label className="text-lg font-medium">Market Conditions</Label>
+        <Select value={marketConditions} onValueChange={setMarketConditions}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select market conditions" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="low_volatility">Low Volatility</SelectItem>
+            <SelectItem value="medium_volatility">Medium Volatility</SelectItem>
+            <SelectItem value="high_volatility">High Volatility</SelectItem>
+            <SelectItem value="trending">Trending</SelectItem>
+            <SelectItem value="ranging">Ranging</SelectItem>
+            <SelectItem value="news_driven">News Driven</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-4">
         <div className="flex justify-between items-center">
-          <Label className="text-lg font-medium">Trading Rules Followed</Label>
           <Button
             onClick={() => setShowAddTradeDialog(true)}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 bg-[#0EA5E9] hover:bg-[#0EA5E9]/90 text-white shadow-lg shadow-[#0EA5E9]/20"
             size="sm"
-            variant="outline"
           >
             <Plus className="w-4 h-4" />
             Add Trade
           </Button>
         </div>
+
+        <Label className="text-lg font-medium">Trading Rules Followed</Label>
         <div className="grid grid-cols-2 gap-4">
           {tradingRules.map((rule) => (
             <div key={rule.value} className="flex items-center space-x-2">
@@ -91,23 +108,6 @@ export const PostSessionSection = ({
             </div>
           ))}
         </div>
-      </div>
-
-      <div className="space-y-4">
-        <Label className="text-lg font-medium">Market Conditions</Label>
-        <Select value={marketConditions} onValueChange={setMarketConditions}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select market conditions" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="low_volatility">Low Volatility</SelectItem>
-            <SelectItem value="medium_volatility">Medium Volatility</SelectItem>
-            <SelectItem value="high_volatility">High Volatility</SelectItem>
-            <SelectItem value="trending">Trending</SelectItem>
-            <SelectItem value="ranging">Ranging</SelectItem>
-            <SelectItem value="news_driven">News Driven</SelectItem>
-          </SelectContent>
-        </Select>
       </div>
 
       {selectedOutcome === "loss" && (

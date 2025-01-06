@@ -8,6 +8,7 @@ import { EmotionDetailDialog } from "./EmotionDetailDialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { PreSessionProgress } from "./PreSessionProgress";
 import {
   Select,
   SelectContent,
@@ -117,6 +118,15 @@ export const EmotionLogger = () => {
             <Label htmlFor="post" className="font-medium">Post-Session</Label>
           </div>
         </RadioGroup>
+
+        {sessionType === "pre" && (
+          <PreSessionProgress 
+            emotionSelected={!!selectedEmotion}
+            emotionDetailSelected={!!selectedEmotionDetail}
+            activitiesSelected={preTradingActivities.length > 0}
+            notesEntered={notes.length > 0}
+          />
+        )}
       </div>
 
       {sessionType === "pre" && (

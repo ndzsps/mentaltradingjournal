@@ -77,36 +77,36 @@ export const PostSessionSection = ({
         </Select>
       </div>
 
-      <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <Button
-            onClick={() => setShowAddTradeDialog(true)}
-            className="flex items-center gap-2 bg-[#0EA5E9] hover:bg-[#0EA5E9]/90 text-white shadow-lg shadow-[#0EA5E9]/20"
-            size="sm"
-          >
-            <Plus className="w-4 h-4" />
-            Add Trade
-          </Button>
-        </div>
+      <div className="space-y-6">
+        <Button
+          onClick={() => setShowAddTradeDialog(true)}
+          className="flex items-center gap-2 bg-[#0EA5E9] hover:bg-[#0EA5E9]/90 text-white shadow-lg shadow-[#0EA5E9]/20"
+          size="sm"
+        >
+          <Plus className="w-4 h-4" />
+          Add Trade
+        </Button>
 
-        <Label className="text-lg font-medium">Trading Rules Followed</Label>
-        <div className="grid grid-cols-2 gap-4">
-          {tradingRules.map((rule) => (
-            <div key={rule.value} className="flex items-center space-x-2">
-              <Checkbox
-                id={rule.value}
-                checked={followedRules.includes(rule.value)}
-                onCheckedChange={(checked) => {
-                  if (checked) {
-                    setFollowedRules([...followedRules, rule.value]);
-                  } else {
-                    setFollowedRules(followedRules.filter(r => r !== rule.value));
-                  }
-                }}
-              />
-              <Label htmlFor={rule.value}>{rule.label}</Label>
-            </div>
-          ))}
+        <div className="space-y-4">
+          <Label className="text-lg font-medium">Trading Rules Followed</Label>
+          <div className="grid grid-cols-2 gap-4">
+            {tradingRules.map((rule) => (
+              <div key={rule.value} className="flex items-center space-x-2">
+                <Checkbox
+                  id={rule.value}
+                  checked={followedRules.includes(rule.value)}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      setFollowedRules([...followedRules, rule.value]);
+                    } else {
+                      setFollowedRules(followedRules.filter(r => r !== rule.value));
+                    }
+                  }}
+                />
+                <Label htmlFor={rule.value}>{rule.label}</Label>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 

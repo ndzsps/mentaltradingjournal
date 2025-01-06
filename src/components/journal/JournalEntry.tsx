@@ -51,8 +51,10 @@ export const JournalEntry = ({ entry }: JournalEntryProps) => {
     day: 'numeric'
   });
 
+  console.log('Trades in entry:', entry.trades); // Debug log
+
   return (
-    <Card className="p-6 rounded-lg bg-background/50 border border-primary/10 min-h-[300px]">
+    <Card className="p-6 rounded-lg bg-background/50 border border-primary/10 min-h-[400px]">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Badge 

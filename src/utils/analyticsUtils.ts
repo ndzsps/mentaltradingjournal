@@ -13,7 +13,7 @@ interface JournalEntry {
   created_at: string;
 }
 
-interface AnalyticsInsight {
+export interface AnalyticsInsight {
   performanceByEmotion: {
     positive: number;
     neutral: number;
@@ -36,7 +36,7 @@ interface AnalyticsInsight {
   recommendedAction: string;
 }
 
-export const fetchJournalEntries = async () => {
+export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
   const { data: entries, error } = await supabase
     .from('journal_entries')
     .select('*')
@@ -44,14 +44,10 @@ export const fetchJournalEntries = async () => {
 
   if (error) {
     console.error('Error fetching journal entries:', error);
-    return [];
+    throw error;
   }
 
-  return entries as JournalEntry[];
-};
-
-export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
-  const journalEntries = await fetchJournalEntries();
+  const journalEntries = entries as JournalEntry[];
 
   if (!journalEntries.length) {
     return {
@@ -112,9 +108,9 @@ export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
     const emotionalScore = entry.emotion.toLowerCase().includes('positive') ? 75 :
       entry.emotion.toLowerCase().includes('neutral') ? 50 : 25;
     
-    const tradingResult = entry.trades.reduce((acc, trade) => {
+    const tradingResult = entry.trades?.reduce((acc, trade) => {
       return acc + (trade.pnl || 0);
-    }, 0);
+    }, 0) || 0;
 
     return {
       date: new Date(entry.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),

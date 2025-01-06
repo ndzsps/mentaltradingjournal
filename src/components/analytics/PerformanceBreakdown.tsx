@@ -1,23 +1,25 @@
 import { Card } from "@/components/ui/card";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
 import { generateAnalytics } from "@/utils/analyticsUtils";
-
-// For demo purposes, using mock data
-const mockJournalEntries = [
-  {
-    emotion: "positive",
-    emotionDetail: "confident",
-    outcome: "win",
-    notes: "Great trade!",
-    sessionType: "post" as const,
-    timestamp: new Date(),
-  },
-  // Add more mock entries as needed
-];
+import { useQuery } from "@tanstack/react-query";
 
 export const PerformanceBreakdown = () => {
-  const analytics = generateAnalytics(mockJournalEntries);
+  const { data: analytics, isLoading } = useQuery({
+    queryKey: ['analytics'],
+    queryFn: generateAnalytics,
+  });
   
+  if (isLoading || !analytics) {
+    return (
+      <Card className="p-4 md:p-6 space-y-4">
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 bg-accent/10 rounded w-3/4"></div>
+          <div className="h-[250px] md:h-[300px] bg-accent/10 rounded"></div>
+        </div>
+      </Card>
+    );
+  }
+
   const data = [
     { 
       name: "Wins (Positive)", 
@@ -31,7 +33,7 @@ export const PerformanceBreakdown = () => {
     },
     { 
       name: "Losses", 
-      value: 100 - analytics.performanceByEmotion.positive - analytics.performanceByEmotion.neutral, 
+      value: analytics.performanceByEmotion.negative, 
       color: "#FEC6A1" 
     },
   ];

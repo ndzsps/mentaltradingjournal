@@ -10,15 +10,26 @@ import {
   Legend,
 } from "recharts";
 import { generateAnalytics } from "@/utils/analyticsUtils";
+import { useQuery } from "@tanstack/react-query";
 
 export const EmotionTrend = () => {
-  const analytics = generateAnalytics([]);
+  const { data: analytics, isLoading } = useQuery({
+    queryKey: ['analytics'],
+    queryFn: generateAnalytics,
+  });
   
-  const data = analytics.emotionTrend.map((entry) => ({
-    date: entry.date,
-    emotionalScore: entry.emotionalScore,
-    tradingResult: entry.tradingResult,
-  }));
+  if (isLoading || !analytics) {
+    return (
+      <Card className="p-4 md:p-6 space-y-4">
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 bg-accent/10 rounded w-3/4"></div>
+          <div className="h-[250px] md:h-[300px] bg-accent/10 rounded"></div>
+        </div>
+      </Card>
+    );
+  }
+
+  const data = analytics.emotionTrend;
 
   return (
     <Card className="p-4 md:p-6 space-y-4">

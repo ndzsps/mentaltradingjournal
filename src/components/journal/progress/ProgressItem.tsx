@@ -1,6 +1,8 @@
 import { Progress } from "@/components/ui/progress";
 import { LucideIcon, Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import ReactConfetti from "react-confetti";
+import { useEffect, useState } from "react";
 
 interface ProgressItemProps {
   icon: LucideIcon;
@@ -19,6 +21,18 @@ export const ProgressItem = ({
   color,
   unit = "entries",
 }: ProgressItemProps) => {
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [prevValue, setPrevValue] = useState(value);
+
+  useEffect(() => {
+    if (title.includes('Daily Activity') && value > prevValue) {
+      setShowConfetti(true);
+      const timer = setTimeout(() => setShowConfetti(false), 3000);
+      return () => clearTimeout(timer);
+    }
+    setPrevValue(value);
+  }, [value, title, prevValue]);
+
   const progressValue = (value / maxValue) * 100;
   const colorClasses = {
     primary: "text-primary bg-primary/10",
@@ -36,8 +50,25 @@ export const ProgressItem = ({
     <motion.div
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
-      className="flex items-center gap-4"
+      className="flex items-center gap-4 relative"
     >
+      {showConfetti && (
+        <ReactConfetti
+          width={window.innerWidth}
+          height={window.innerHeight}
+          recycle={false}
+          numberOfPieces={200}
+          gravity={0.3}
+          initialVelocityY={20}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            zIndex: 50,
+            pointerEvents: 'none'
+          }}
+        />
+      )}
       <div className={`p-2 rounded-full ${colorClasses[color]}`}>
         <Icon className="w-5 h-5" />
       </div>

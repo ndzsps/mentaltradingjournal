@@ -59,6 +59,7 @@ export const useProgressTracking = () => {
 
     const newStats = { ...stats };
 
+    // Update streaks based on session type
     if (sessionType === 'pre') {
       newStats.preSessionStreak += 1;
       newStats.levelProgress += 10;
@@ -73,12 +74,16 @@ export const useProgressTracking = () => {
       newStats.levelProgress = 0;
     }
 
+    // Check if both sessions are completed for the day
+    const bothSessionsCompleted = 
+      (sessionType === 'pre' && newStats.postSessionStreak > 0) || 
+      (sessionType === 'post' && newStats.preSessionStreak > 0);
+
     // Update daily streak if both sessions are completed
-    if (newStats.preSessionStreak > 0 && newStats.postSessionStreak > 0) {
+    if (bothSessionsCompleted) {
       newStats.dailyStreak += 1;
-      // Reset session streaks after completing both sessions
-      newStats.preSessionStreak = 0;
-      newStats.postSessionStreak = 0;
+      // We'll reset the session streaks at the start of the next day
+      // This allows users to see their current progress
     }
 
     try {

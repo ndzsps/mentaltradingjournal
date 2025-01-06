@@ -8,6 +8,7 @@ import Journal from "./pages/Journal";
 import Analytics from "./pages/Analytics";
 import AuthPage from "./pages/auth/AuthPage";
 import { useAuth } from "./hooks/useAuth";
+import React from 'react';
 
 const queryClient = new QueryClient();
 
@@ -60,15 +61,17 @@ const AppRoutes = () => {
 };
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
+  <React.StrictMode>
+    <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <AppRoutes />
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <AppRoutes />
+        </TooltipProvider>
       </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+    </QueryClientProvider>
+  </React.StrictMode>
 );
 
 export default App;

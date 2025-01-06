@@ -41,6 +41,17 @@ export const useJournalFormSubmission = ({
       return;
     }
 
+    // Validate post-session specific fields
+    if (sessionType === "post") {
+      if (!selectedOutcome || !marketConditions || followedRules?.length === 0) {
+        toast.error("Missing Information", {
+          description: "Please fill in all required fields for post-session.",
+          duration: 5000,
+        });
+        return;
+      }
+    }
+
     const journalEntry = {
       emotion: selectedEmotion,
       emotionDetail: selectedEmotionDetail,

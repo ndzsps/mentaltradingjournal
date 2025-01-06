@@ -13,6 +13,7 @@ interface SessionProgressProps {
   rulesSelected?: boolean;
   mistakesReviewed?: boolean;
   isPostSession?: boolean;
+  showCelebration?: boolean;
 }
 
 export const SessionProgress = ({
@@ -25,9 +26,9 @@ export const SessionProgress = ({
   rulesSelected = false,
   mistakesReviewed = false,
   isPostSession = false,
+  showCelebration = false,
 }: SessionProgressProps) => {
   const [progress, setProgress] = useState(0);
-  const [showCelebration, setShowCelebration] = useState(false);
 
   const calculateProgress = () => {
     const steps = isPostSession
@@ -46,11 +47,6 @@ export const SessionProgress = ({
     const completedSteps = steps.filter(Boolean).length;
     return (completedSteps / steps.length) * 100;
   };
-
-  // Reset celebration when switching between pre and post session
-  useEffect(() => {
-    setShowCelebration(false);
-  }, [isPostSession]);
 
   useEffect(() => {
     const newProgress = calculateProgress();

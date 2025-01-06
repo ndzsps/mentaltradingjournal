@@ -5,6 +5,23 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
+
+interface ProgressStats {
+  preSessionStreak: number;
+  postSessionStreak: number;
+  dailyStreak: number;
+  level: number;
+  levelProgress: number;
+}
+
+interface ProgressStatsRow {
+  pre_session_streak: number;
+  post_session_streak: number;
+  daily_streak: number;
+  level: number;
+  level_progress: number;
+}
 
 interface ProgressStatsProps {
   preSessionStreak: number;
@@ -22,7 +39,7 @@ export const ProgressStats = ({
   levelProgress,
 }: ProgressStatsProps) => {
   const { user } = useAuth();
-  const [stats, setStats] = useState({
+  const [stats, setStats] = useState<ProgressStats>({
     preSessionStreak,
     postSessionStreak,
     dailyStreak,
@@ -52,7 +69,7 @@ export const ProgressStats = ({
           table: 'progress_stats',
           filter: `user_id=eq.${user.id}`,
         },
-        (payload) => {
+        (payload: RealtimePostgresChangesPayload<ProgressStatsRow>) => {
           console.log('Progress stats update received:', payload);
           if (payload.new) {
             const newStats = {

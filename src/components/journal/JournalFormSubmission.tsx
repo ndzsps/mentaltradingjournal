@@ -13,6 +13,7 @@ interface JournalFormSubmissionProps {
   selectedMistakes?: string[];
   preTradingActivities: string[];
   resetForm: () => void;
+  onSubmitSuccess?: () => void;
 }
 
 export const useJournalFormSubmission = ({
@@ -26,6 +27,7 @@ export const useJournalFormSubmission = ({
   selectedMistakes,
   preTradingActivities,
   resetForm,
+  onSubmitSuccess,
 }: JournalFormSubmissionProps) => {
   const { showSuccessToast } = useJournalToast();
   const { updateProgress } = useProgressTracking();
@@ -57,6 +59,7 @@ export const useJournalFormSubmission = ({
     updateProgress(sessionType);
     showSuccessToast(sessionType);
     resetForm();
+    onSubmitSuccess?.();
   };
 
   return { handleSubmit };

@@ -27,6 +27,7 @@ export const EmotionLogger = () => {
   const [preTradingActivities, setPreTradingActivities] = useState<string[]>([]);
   
   const { stats } = useProgressTracking();
+  const [showCelebration, setShowCelebration] = useState(false);
 
   const resetForm = () => {
     setSelectedEmotion("");
@@ -37,6 +38,7 @@ export const EmotionLogger = () => {
     setMarketConditions("");
     setFollowedRules([]);
     setPreTradingActivities([]);
+    setShowCelebration(false);
   };
 
   const { handleSubmit } = useJournalFormSubmission({
@@ -50,6 +52,11 @@ export const EmotionLogger = () => {
     selectedMistakes,
     preTradingActivities,
     resetForm,
+    onSubmitSuccess: () => {
+      if (sessionType === "pre") {
+        setShowCelebration(true);
+      }
+    },
   });
 
   const handleEmotionSelect = (value: string) => {

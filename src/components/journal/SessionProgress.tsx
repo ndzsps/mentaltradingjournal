@@ -56,17 +56,6 @@ export const SessionProgress = ({
   useEffect(() => {
     const newProgress = calculateProgress();
     setProgress(newProgress);
-
-    if (newProgress === 100 && !showCelebration) {
-      setShowCelebration(true);
-      toast.success(
-        `${isPostSession ? "Post" : "Pre"}-Session Review Completed! 🎉`,
-        {
-          description: "Great job maintaining your trading discipline!",
-          duration: 5000,
-        }
-      );
-    }
   }, [
     emotionSelected,
     emotionDetailSelected,
@@ -77,7 +66,6 @@ export const SessionProgress = ({
     rulesSelected,
     mistakesReviewed,
     isPostSession,
-    showCelebration,
   ]);
 
   return (

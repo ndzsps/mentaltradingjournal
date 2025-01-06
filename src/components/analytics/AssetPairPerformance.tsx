@@ -11,69 +11,7 @@ import {
   Label,
 } from "recharts";
 import { generateAnalytics } from "@/utils/analyticsUtils";
-
-const data = [
-  {
-    pair: "EUR/USD",
-    profit: 500,
-    loss: -200,
-    net: 300,
-  },
-  {
-    pair: "GBP/USD",
-    profit: 300,
-    loss: -100,
-    net: 200,
-  },
-  {
-    pair: "USD/JPY",
-    profit: 0,
-    loss: -150,
-    net: -150,
-  },
-  {
-    pair: "AUD/USD",
-    profit: 250,
-    loss: -180,
-    net: 70,
-  },
-  {
-    pair: "USD/CAD",
-    profit: 420,
-    loss: -320,
-    net: 100,
-  },
-  {
-    pair: "USD/CHF",
-    profit: 180,
-    loss: -90,
-    net: 90,
-  },
-  {
-    pair: "NZD/USD",
-    profit: 150,
-    loss: -200,
-    net: -50,
-  },
-  {
-    pair: "EUR/GBP",
-    profit: 280,
-    loss: -130,
-    net: 150,
-  },
-  {
-    pair: "EUR/JPY",
-    profit: 340,
-    loss: -290,
-    net: 50,
-  },
-  {
-    pair: "GBP/JPY",
-    profit: 190,
-    loss: -240,
-    net: -50,
-  },
-];
+import { useQuery } from "@tanstack/react-query";
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
@@ -107,7 +45,84 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export const AssetPairPerformance = () => {
-  const analytics = generateAnalytics([]);
+  const { data: analytics, isLoading } = useQuery({
+    queryKey: ['analytics'],
+    queryFn: generateAnalytics,
+  });
+  
+  if (isLoading || !analytics) {
+    return (
+      <Card className="p-4 md:p-6 space-y-4">
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 bg-accent/10 rounded w-3/4"></div>
+          <div className="h-[350px] md:h-[400px] bg-accent/10 rounded"></div>
+        </div>
+      </Card>
+    );
+  }
+
+  const data = [
+    {
+      pair: "EUR/USD",
+      profit: 500,
+      loss: -200,
+      net: 300,
+    },
+    {
+      pair: "GBP/USD",
+      profit: 300,
+      loss: -100,
+      net: 200,
+    },
+    {
+      pair: "USD/JPY",
+      profit: 0,
+      loss: -150,
+      net: -150,
+    },
+    {
+      pair: "AUD/USD",
+      profit: 250,
+      loss: -180,
+      net: 70,
+    },
+    {
+      pair: "USD/CAD",
+      profit: 420,
+      loss: -320,
+      net: 100,
+    },
+    {
+      pair: "USD/CHF",
+      profit: 180,
+      loss: -90,
+      net: 90,
+    },
+    {
+      pair: "NZD/USD",
+      profit: 150,
+      loss: -200,
+      net: -50,
+    },
+    {
+      pair: "EUR/GBP",
+      profit: 280,
+      loss: -130,
+      net: 150,
+    },
+    {
+      pair: "EUR/JPY",
+      profit: 340,
+      loss: -290,
+      net: 50,
+    },
+    {
+      pair: "GBP/JPY",
+      profit: 190,
+      loss: -240,
+      net: -50,
+    },
+  ];
 
   return (
     <Card className="p-4 md:p-6 space-y-4">

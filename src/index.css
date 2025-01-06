@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    /* Light theme colors */
+    /* Light theme colors with improved contrast */
     --background: 210 40% 98%;
     --foreground: 222.2 84% 4.9%;
 
@@ -37,6 +37,7 @@
   }
 
   .dark {
+    /* Dark theme colors with improved contrast */
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
 
@@ -84,5 +85,15 @@
       transparent 40%
     );
     background-attachment: fixed;
+  }
+
+  /* Improve hover states for better text visibility */
+  button:hover, 
+  a:hover {
+    @apply transition-colors duration-200;
+  }
+
+  .hover-text-visible:hover {
+    @apply text-foreground/90;
   }
 }

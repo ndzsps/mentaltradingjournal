@@ -1,4 +1,3 @@
-import { Card } from "@/components/ui/card";
 import {
   LineChart,
   Line,
@@ -11,18 +10,32 @@ import {
 } from "recharts";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
+import { Card } from "@/components/ui/card";
 
-const CustomTooltip = ({ active, payload, label }: any) => {
-  if (active && payload && payload.length) {
+interface TooltipProps {
+  active?: boolean;
+  payload?: Array<{
+    value: number;
+    dataKey: string;
+    name: string;
+  }>;
+  label?: string;
+}
+
+const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
+  if (active && payload && payload.length >= 2) {
+    const emotionalScore = payload[0]?.value;
+    const pnlValue = payload[1]?.value;
+
     return (
       <div className="bg-background border border-border/50 rounded-lg p-3 shadow-lg">
         <p className="text-sm font-medium">{label}</p>
         <p className="text-sm text-muted-foreground">
-          Emotional Score: {payload[0].value}
+          Emotional Score: {typeof emotionalScore === 'number' ? emotionalScore : 'N/A'}
           <span className="text-xs ml-1">(0-100)</span>
         </p>
         <p className="text-sm text-muted-foreground">
-          P&L: ${payload[1].value.toFixed(2)}
+          P&L: ${typeof pnlValue === 'number' ? pnlValue.toFixed(2) : 'N/A'}
         </p>
       </div>
     );

@@ -11,6 +11,7 @@ import {
 } from "recharts";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
+import { AlertCircle } from "lucide-react";
 
 export const RiskRewardAnalysis = () => {
   const { data: analytics, isLoading } = useQuery({
@@ -24,6 +25,36 @@ export const RiskRewardAnalysis = () => {
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-accent/10 rounded w-3/4"></div>
           <div className="h-[250px] md:h-[300px] bg-accent/10 rounded"></div>
+        </div>
+      </Card>
+    );
+  }
+
+  const requirements = analytics.dataRequirements.riskRewardAnalysis;
+  
+  if (!requirements.hasEnoughData) {
+    return (
+      <Card className="p-4 md:p-6 space-y-4">
+        <div className="space-y-2">
+          <h3 className="text-xl md:text-2xl font-bold">Risk/Reward Analysis</h3>
+          <p className="text-sm text-muted-foreground">
+            Visualization of risk vs reward ratios in your trades
+          </p>
+        </div>
+
+        <div className="h-[250px] md:h-[300px] w-full flex items-center justify-center">
+          <div className="text-center space-y-4">
+            <AlertCircle className="w-12 h-12 text-muted-foreground mx-auto" />
+            <div className="space-y-2">
+              <p className="text-sm font-medium">Not enough data available</p>
+              <p className="text-sm text-muted-foreground max-w-[240px]">
+                {requirements.description}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Required fields: {requirements.requiredFields.join(', ')}
+              </p>
+            </div>
+          </div>
         </div>
       </Card>
     );

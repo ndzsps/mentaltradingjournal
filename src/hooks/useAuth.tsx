@@ -14,12 +14,9 @@ export const useAuth = () => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const queryClient = useQueryClient();
 
-  // Initialize auth state and set up listener
   useEffect(() => {
-    // Get initial session
     const initializeAuth = async () => {
       try {
-        // First check for an existing session
         const { data: { session } } = await supabase.auth.getSession();
         console.log('Initial session check:', session?.user?.id);
         
@@ -31,18 +28,18 @@ export const useAuth = () => {
           }
         }
 
-        // Then set up the auth state listener
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
           console.log('Auth state changed:', event, session?.user?.id);
           
-          if (event === 'SIGNED_IN' && session?.user) {
+          if (session?.user) {
             const profile = await fetchProfile(session.user.id);
             if (profile) {
-              console.log('Setting user profile after sign in:', profile);
+              console.log('Setting user profile after auth change:', profile);
               setUser(profile);
+              queryClient.invalidateQueries({ queryKey: ['profile'] });
             }
-          } else if (event === 'SIGNED_OUT') {
-            console.log('User signed out, clearing state');
+          } else {
+            console.log('No session, clearing user state');
             setUser(null);
             queryClient.clear();
           }
@@ -53,6 +50,7 @@ export const useAuth = () => {
         };
       } catch (error) {
         console.error('Error initializing auth:', error);
+        toast.error('Error initializing authentication');
       }
     };
 
@@ -139,7 +137,6 @@ export const useAuth = () => {
 
     if (error) throw error;
     
-    // Update local user state
     setUser(prev => prev ? { ...prev, ...updates } : null);
   };
 

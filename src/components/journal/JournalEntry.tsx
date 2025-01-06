@@ -52,8 +52,8 @@ export const JournalEntry = ({ entry }: JournalEntryProps) => {
   });
 
   return (
-    <Card className="p-4 rounded-lg bg-background/50 border border-primary/10">
-      <div className="flex items-center justify-between mb-2">
+    <Card className="p-6 rounded-lg bg-background/50 border border-primary/10 min-h-[300px]">
+      <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Badge 
             variant={entry.session_type === 'pre' ? 'default' : 'secondary'}
@@ -78,21 +78,21 @@ export const JournalEntry = ({ entry }: JournalEntryProps) => {
           {formattedDate}
         </span>
       </div>
-      <p className="font-medium text-foreground mb-1">
+      <p className="font-medium text-foreground mb-2">
         Feeling: {capitalizeWords(entry.emotion)} - {capitalizeWords(entry.emotion_detail)}
       </p>
       {entry.market_conditions && (
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-muted-foreground mb-3">
           Market Conditions: {capitalizeWords(entry.market_conditions)}
         </p>
       )}
-      <p className="mt-2 text-sm text-foreground/90">
+      <p className="mt-2 text-sm text-foreground/90 mb-4">
         {entry.notes}
       </p>
 
       {/* Display Trading Rules Followed */}
       {Array.isArray(entry.followed_rules) && entry.followed_rules.length > 0 && (
-        <div className="mt-4">
+        <div className="mt-4 mb-6">
           <h4 className="text-sm font-medium text-muted-foreground mb-2">Trading Rules Followed:</h4>
           <div className="flex flex-wrap gap-2">
             {entry.followed_rules.map((rule, index) => (
@@ -112,15 +112,15 @@ export const JournalEntry = ({ entry }: JournalEntryProps) => {
       {Array.isArray(entry.trades) && entry.trades.length > 0 && (
         <>
           <Separator className="my-4" />
-          <div className="space-y-3">
+          <div className="space-y-4">
             <h4 className="text-sm font-medium text-muted-foreground">Trades</h4>
-            <Accordion type="single" collapsible className="w-full">
+            <Accordion type="single" collapsible className="w-full space-y-2">
               {entry.trades.map((trade, index) => (
-                <AccordionItem key={trade.id || index} value={`trade-${index}`}>
-                  <AccordionTrigger className="hover:no-underline">
+                <AccordionItem key={trade.id || index} value={`trade-${index}`} className="border rounded-lg px-4">
+                  <AccordionTrigger className="hover:no-underline py-3">
                     <div className="flex items-center justify-between w-full pr-4">
                       <span className="font-medium">{trade.instrument}</span>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-3">
                         <Badge 
                           variant={trade.direction === 'buy' ? 'default' : 'destructive'}
                           className="capitalize"
@@ -135,21 +135,21 @@ export const JournalEntry = ({ entry }: JournalEntryProps) => {
                       </div>
                     </div>
                   </AccordionTrigger>
-                  <AccordionContent>
-                    <div className="space-y-4 pt-2">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
+                  <AccordionContent className="pb-4">
+                    <div className="space-y-6 pt-2">
+                      <div className="grid grid-cols-2 gap-6">
+                        <div className="space-y-3">
                           <h4 className="text-sm font-medium text-muted-foreground">Entry Details</h4>
-                          <div className="space-y-1">
+                          <div className="space-y-2">
                             <p className="text-sm">Date: {new Date(trade.entryDate).toLocaleString()}</p>
                             <p className="text-sm">Price: {trade.entryPrice}</p>
                             <p className="text-sm">Stop Loss: {trade.stopLoss}</p>
                             <p className="text-sm">Take Profit: {trade.takeProfit}</p>
                           </div>
                         </div>
-                        <div className="space-y-2">
+                        <div className="space-y-3">
                           <h4 className="text-sm font-medium text-muted-foreground">Exit Details</h4>
-                          <div className="space-y-1">
+                          <div className="space-y-2">
                             <p className="text-sm">Date: {new Date(trade.exitDate).toLocaleString()}</p>
                             <p className="text-sm">Price: {trade.exitPrice}</p>
                             <p className="text-sm">Quantity: {trade.quantity}</p>
@@ -158,7 +158,7 @@ export const JournalEntry = ({ entry }: JournalEntryProps) => {
                         </div>
                       </div>
                       {trade.setup && (
-                        <div className="space-y-1">
+                        <div className="space-y-2">
                           <h4 className="text-sm font-medium text-muted-foreground">Setup</h4>
                           <p className="text-sm">{trade.setup}</p>
                         </div>

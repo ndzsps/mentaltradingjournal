@@ -37,45 +37,15 @@ export const useProgressTracking = () => {
         return;
       }
 
-      // If no stats exist, create default stats for the user
-      if (!data) {
-        const { error: insertError } = await supabase
-          .from('progress_stats')
-          .insert([
-            {
-              user_id: user.id,
-              pre_session_streak: 0,
-              post_session_streak: 0,
-              daily_streak: 0,
-              level: 1,
-              level_progress: 0,
-            }
-          ]);
-
-        if (insertError) {
-          console.error('Error creating initial progress stats:', insertError);
-          toast.error('Failed to initialize progress stats');
-          return;
-        }
-
-        // Use default stats
+      if (data) {
         setStats({
-          preSessionStreak: 0,
-          postSessionStreak: 0,
-          dailyStreak: 0,
-          level: 1,
-          levelProgress: 0,
+          preSessionStreak: data.pre_session_streak,
+          postSessionStreak: data.post_session_streak,
+          dailyStreak: data.daily_streak,
+          level: data.level,
+          levelProgress: data.level_progress,
         });
-        return;
       }
-
-      setStats({
-        preSessionStreak: data.pre_session_streak,
-        postSessionStreak: data.post_session_streak,
-        dailyStreak: data.daily_streak,
-        level: data.level,
-        levelProgress: data.level_progress,
-      });
     };
 
     fetchStats();
@@ -114,12 +84,14 @@ export const useProgressTracking = () => {
     // Update the stats in Supabase
     const { error } = await supabase
       .from('progress_stats')
-      .update({
+      .upsert({
+        user_id: user.id,
         pre_session_streak: newStats.preSessionStreak,
         post_session_streak: newStats.postSessionStreak,
         daily_streak: newStats.dailyStreak,
         level: newStats.level,
         level_progress: newStats.levelProgress,
+        updated_at: new Date().toISOString(),
       })
       .eq('user_id', user.id);
 
@@ -153,6 +125,7 @@ export const useProgressTracking = () => {
         daily_streak: 0,
         level: 1,
         level_progress: 0,
+        updated_at: new Date().toISOString(),
       })
       .eq('user_id', user.id);
 

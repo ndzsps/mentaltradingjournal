@@ -2,16 +2,23 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { emotions, tradingOutcome, mistakeCategories, tradingRules } from "./emotionConfig";
 import { EmotionDetailDialog } from "./EmotionDetailDialog";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { SessionProgress } from "./SessionProgress";
 import { PostSessionSection } from "./PostSessionSection";
 import { ProgressStats } from "./ProgressStats";
 import { useJournalFormSubmission } from "./JournalFormSubmission";
 import { useProgressTracking } from "@/hooks/useProgressTracking";
+import { SessionTypeSelector } from "./SessionTypeSelector";
+import { PreTradingActivities } from "./PreTradingActivities";
+import { EmotionSelector } from "./EmotionSelector";
+
+const PRE_TRADING_ACTIVITIES = [
+  "Meditation",
+  "Exercise",
+  "News Reading",
+  "Market Analysis",
+  "Trading Plan Review"
+];
 
 export const EmotionLogger = () => {
   const [selectedEmotion, setSelectedEmotion] = useState("");
@@ -53,7 +60,6 @@ export const EmotionLogger = () => {
     resetForm,
     onSubmitSuccess: () => {
       setShowCelebration(true);
-      // Hide celebration message after 5 seconds
       setTimeout(() => setShowCelebration(false), 5000);
     },
   });
@@ -74,7 +80,6 @@ export const EmotionLogger = () => {
     }
   };
 
-  // Hide celebration when switching to post-session
   const handleSessionTypeChange = (value: "pre" | "post") => {
     setSessionType(value);
     setShowCelebration(false);
@@ -88,21 +93,10 @@ export const EmotionLogger = () => {
             {sessionType === "pre" ? "Pre-Session Check-in" : "Post-Session Review"}
           </h2>
           
-          <RadioGroup
-            defaultValue="pre"
-            value={sessionType}
-            onValueChange={handleSessionTypeChange}
-            className="flex space-x-4"
-          >
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="pre" id="pre" />
-              <Label htmlFor="pre" className="font-medium">Pre-Session</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="post" id="post" />
-              <Label htmlFor="post" className="font-medium">Post-Session</Label>
-            </div>
-          </RadioGroup>
+          <SessionTypeSelector
+            sessionType={sessionType}
+            onSessionTypeChange={handleSessionTypeChange}
+          />
 
           <SessionProgress 
             emotionSelected={!!selectedEmotion}
@@ -119,51 +113,18 @@ export const EmotionLogger = () => {
         </div>
 
         {sessionType === "pre" && (
-          <div className="space-y-4">
-            <Label className="text-lg font-medium">Pre-Trading Activities</Label>
-            <div className="grid grid-cols-2 gap-4">
-              {["Meditation", "Exercise", "News Reading", "Market Analysis", "Trading Plan Review"].map((activity) => (
-                <div key={activity} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={activity}
-                    checked={preTradingActivities.includes(activity)}
-                    onCheckedChange={(checked) => {
-                      if (checked) {
-                        setPreTradingActivities([...preTradingActivities, activity]);
-                      } else {
-                        setPreTradingActivities(preTradingActivities.filter(a => a !== activity));
-                      }
-                    }}
-                  />
-                  <Label htmlFor={activity}>{activity}</Label>
-                </div>
-              ))}
-            </div>
-          </div>
+          <PreTradingActivities
+            activities={PRE_TRADING_ACTIVITIES}
+            selectedActivities={preTradingActivities}
+            onActivityChange={setPreTradingActivities}
+          />
         )}
         
         <div className="space-y-6">
-          <div className="grid grid-cols-3 gap-4">
-            {emotions.map(({ icon: Icon, label, value }) => (
-              <Button
-                key={value}
-                variant={selectedEmotion === value ? "default" : "outline"}
-                className={`h-24 group transition-all duration-300 ${
-                  selectedEmotion === value 
-                    ? "bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20" 
-                    : "hover:border-primary/50 hover:bg-primary/5"
-                }`}
-                onClick={() => handleEmotionSelect(value)}
-              >
-                <div className="flex flex-col items-center gap-3">
-                  <Icon className={`w-8 h-8 transition-transform duration-300 group-hover:scale-110 ${
-                    selectedEmotion === value ? "" : "text-primary"
-                  }`} />
-                  <span className="font-medium">{label}</span>
-                </div>
-              </Button>
-            ))}
-          </div>
+          <EmotionSelector
+            selectedEmotion={selectedEmotion}
+            onEmotionSelect={handleEmotionSelect}
+          />
 
           <EmotionDetailDialog
             isOpen={isDetailDialogOpen}

@@ -22,8 +22,10 @@ export const useProgressTracking = () => {
     };
   });
 
+  // Ensure stats are saved whenever they change
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(stats));
+    console.log('Progress stats updated:', stats); // Debug log
   }, [stats]);
 
   const updateProgress = (sessionType: 'pre' | 'post') => {
@@ -33,22 +35,14 @@ export const useProgressTracking = () => {
       // Update session-specific streaks
       if (sessionType === 'pre') {
         newStats.preSessionStreak += 1;
+        console.log('Updated pre-session streak:', newStats.preSessionStreak); // Debug log
       } else {
         newStats.postSessionStreak += 1;
+        console.log('Updated post-session streak:', newStats.postSessionStreak); // Debug log
       }
 
       // Update level progress for any session completion
       newStats.levelProgress += 10;
-
-      // Check if both sessions are completed to update daily streak
-      if (newStats.preSessionStreak > 0 && newStats.postSessionStreak > 0) {
-        newStats.dailyStreak += 1;
-        // Reset session streaks after completing both
-        newStats.preSessionStreak = 0;
-        newStats.postSessionStreak = 0;
-        // Additional progress for completing both sessions
-        newStats.levelProgress += 10;
-      }
 
       // Level up if progress reaches 100%
       if (newStats.levelProgress >= 100) {
@@ -56,9 +50,29 @@ export const useProgressTracking = () => {
         newStats.levelProgress = 0;
       }
 
+      // Check if both sessions are completed to update daily streak
+      if (newStats.preSessionStreak > 0 && newStats.postSessionStreak > 0) {
+        newStats.dailyStreak += 1;
+        // Reset session streaks after completing both
+        newStats.preSessionStreak = 0;
+        newStats.postSessionStreak = 0;
+      }
+
       return newStats;
     });
   };
 
-  return { stats, updateProgress };
+  const resetProgress = () => {
+    const initialStats = {
+      preSessionStreak: 0,
+      postSessionStreak: 0,
+      dailyStreak: 0,
+      level: 1,
+      levelProgress: 0,
+    };
+    setStats(initialStats);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(initialStats));
+  };
+
+  return { stats, updateProgress, resetProgress };
 };

@@ -38,6 +38,15 @@ export const generateAnalytics = (journalEntries: JournalEntry[]): AnalyticsInsi
         winRate: [65, 55, 35, 70, 50],
         dates: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
       },
+      emotionTrend: Array.from({ length: 30 }, (_, i) => ({
+        date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        emotionalScore: Math.random() * 100,
+        tradingResult: (Math.random() - 0.3) * 100,
+      })).reverse(),
+      emotionTrendInsights: {
+        improvement: "Your emotional resilience has improved by 20% over the last month.",
+        impact: "When emotional dips occurred more than 3 times a week, your performance dropped by 40%.",
+      },
       mainInsight: "Not enough data to generate insights. Keep logging your trades!",
       recommendedAction: "Try to log at least 5 trades to get personalized insights.",
     };

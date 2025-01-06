@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { JournalEntry } from "@/components/journal/JournalEntry";
 import { JournalFilters } from "@/components/journal/JournalFilters";
-import { subMonths, isWithinInterval, startOfMonth, endOfMonth } from "date-fns";
+import { subMonths, isWithinInterval, startOfMonth, endOfMonth, isSameDay } from "date-fns";
 
 type TimeFilter = "this-month" | "last-month" | "last-three-months" | null;
 
@@ -27,7 +27,7 @@ interface JournalEntryType {
 }
 
 const Journal = () => {
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [emotionFilter, setEmotionFilter] = useState<string | null>(null);
   const [detailFilter, setDetailFilter] = useState<string | null>(null);
   const [timeFilter, setTimeFilter] = useState<TimeFilter>(null);
@@ -49,12 +49,6 @@ const Journal = () => {
       }
 
       console.log('Fetched entries:', data);
-      if (data) {
-        data.forEach((entry, index) => {
-          console.log(`Entry ${index + 1} trades:`, entry.trades);
-        });
-      }
-
       setEntries(data || []);
     };
 
@@ -82,6 +76,8 @@ const Journal = () => {
   }, [user]);
   
   const filteredEntries = entries.filter(entry => {
+    const entryDate = new Date(entry.created_at);
+    const matchesDate = !selectedDate || isSameDay(entryDate, selectedDate);
     const matchesEmotion = !emotionFilter || entry.emotion === emotionFilter;
     const matchesDetail = !detailFilter || entry.emotion_detail === detailFilter;
     
@@ -105,14 +101,14 @@ const Journal = () => {
 
       if (timeFilter) {
         const interval = intervals[timeFilter];
-        const entryDate = new Date(entry.created_at);
         matchesTimeFilter = isWithinInterval(entryDate, interval);
       }
     }
 
-    return matchesEmotion && matchesDetail && matchesTimeFilter;
+    return matchesDate && matchesEmotion && matchesDetail && matchesTimeFilter;
   });
 
+  console.log('Selected date:', selectedDate);
   console.log('Filtered entries:', filteredEntries);
 
   return (
@@ -129,9 +125,9 @@ const Journal = () => {
 
         <div className="grid lg:grid-cols-2 gap-8">
           <JournalCalendar 
-            date={date}
-            onDateSelect={setDate}
-            entries={filteredEntries.map(entry => ({
+            date={selectedDate}
+            onDateSelect={setSelectedDate}
+            entries={entries.map(entry => ({
               date: new Date(entry.created_at),
               emotion: entry.emotion
             }))}
@@ -162,7 +158,7 @@ const Journal = () => {
                 </div>
               ) : (
                 <p className="text-muted-foreground text-center py-8">
-                  No entries found matching your filters
+                  No entries found for the selected date
                 </p>
               )}
             </ScrollArea>

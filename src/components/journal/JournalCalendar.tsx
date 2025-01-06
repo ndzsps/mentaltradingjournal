@@ -31,12 +31,17 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
     };
   };
 
+  const handleDateSelect = (newDate: Date | undefined) => {
+    console.log("Selected date:", newDate); // Debug log
+    onDateSelect(newDate);
+  };
+
   return (
     <Card className="p-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
       <Calendar
         mode="single"
         selected={date}
-        onSelect={onDateSelect}
+        onSelect={handleDateSelect}
         className="w-full"
         classNames={{
           months: "w-full",
@@ -45,7 +50,7 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
           head_row: "w-full",
           row: "w-full",
           cell: "w-[14.28%] h-14 lg:h-16 p-0 relative",
-          day: "w-full h-full rounded-md hover:bg-primary/20 cursor-pointer", // Added cursor-pointer
+          day: "w-full h-full rounded-md hover:bg-primary/20 cursor-pointer",
           day_today: "bg-accent text-accent-foreground",
           day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
         }}

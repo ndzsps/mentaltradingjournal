@@ -68,6 +68,15 @@ const AuthPage = () => {
           }}
           providers={[]}
           redirectTo={window.location.origin}
+          options={{
+            emailRedirectTo: window.location.origin,
+            additionalSignUpFields: {
+              username: {
+                required: true,
+                placeholder: 'Choose a username'
+              }
+            }
+          }}
         />
       </Card>
     </div>

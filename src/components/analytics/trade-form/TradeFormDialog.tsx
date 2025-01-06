@@ -7,12 +7,13 @@ import { useAuth } from "@/contexts/AuthContext";
 import { GeneralSection } from "./GeneralSection";
 import { TradeEntrySection } from "./TradeEntrySection";
 import { TradeExitSection } from "./TradeExitSection";
+import { Trade } from "@/types/trade";
 
 interface TradeFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (tradeData: any, isEdit: boolean) => void;
-  editTrade?: any;
+  onSubmit: (tradeData: Trade, isEdit: boolean) => void;
+  editTrade?: Trade;
 }
 
 export const TradeFormDialog = ({ open, onOpenChange, onSubmit, editTrade }: TradeFormDialogProps) => {
@@ -28,11 +29,12 @@ export const TradeFormDialog = ({ open, onOpenChange, onSubmit, editTrade }: Tra
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const tradeData = {
+    const tradeData: Trade = {
+      id: editTrade?.id || crypto.randomUUID(),
       entryDate: formData.get('entryDate') as string,
       instrument: formData.get('instrument') as string,
       setup: formData.get('setup') as string,
-      direction,
+      direction: direction as 'buy' | 'sell',
       entryPrice: parseFloat(formData.get('entryPrice') as string),
       quantity: parseFloat(formData.get('quantity') as string),
       stopLoss: parseFloat(formData.get('stopLoss') as string),
@@ -64,10 +66,10 @@ export const TradeFormDialog = ({ open, onOpenChange, onSubmit, editTrade }: Tra
       }
 
       const currentEntry = entries[0];
-      const existingTrades = currentEntry.trades || [];
+      const existingTrades = (currentEntry.trades || []) as Trade[];
       const updatedTrades = editTrade 
-        ? existingTrades.map(t => t.id === editTrade.id ? { ...tradeData, id: t.id } : t)
-        : [...existingTrades, { ...tradeData, id: crypto.randomUUID() }];
+        ? existingTrades.map(t => t.id === editTrade.id ? tradeData : t)
+        : [...existingTrades, tradeData];
 
       const { error: updateError } = await supabase
         .from('journal_entries')

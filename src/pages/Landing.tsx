@@ -19,7 +19,7 @@ const Landing = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-12 md:py-16">
+      <section className="container mx-auto px-4 py-8 md:py-12">
         <div className="text-center space-y-6">
           <h1 className="text-4xl md:text-6xl font-bold tracking-tighter">
             Master Your Trading Psychology
@@ -40,18 +40,18 @@ const Landing = () => {
       </section>
 
       {/* Data-Driven Reports Section */}
-      <section className="container mx-auto px-4 py-12 bg-accent/10">
-        <div className="text-center mb-12">
+      <section className="container mx-auto px-4 py-8 pb-16 bg-accent/10">
+        <div className="text-center mb-8">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Data-Driven Reports
           </h2>
-          <p className="text-xl text-muted-foreground mb-8">
+          <p className="text-xl text-muted-foreground">
             Gain Key Insights Into Your Trading Psychology
           </p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
-          <Card className="relative overflow-hidden">
+          <Card className="relative overflow-hidden h-full">
             <CardHeader className="space-y-4">
               <Brain className="h-12 w-12 text-primary" />
               <div>
@@ -62,13 +62,13 @@ const Landing = () => {
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="h-[400px] p-4">
+              <div className="h-[450px] p-4">
                 <EmotionalTendencies />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="relative overflow-hidden">
+          <Card className="relative overflow-hidden h-full">
             <CardHeader className="space-y-4">
               <BarChart2 className="h-12 w-12 text-primary" />
               <div>
@@ -79,13 +79,13 @@ const Landing = () => {
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="h-[400px] p-4">
+              <div className="h-[450px] p-4">
                 <AssetPairPerformance />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="relative overflow-hidden">
+          <Card className="relative overflow-hidden h-full">
             <CardHeader className="space-y-4">
               <Target className="h-12 w-12 text-primary" />
               <div>
@@ -96,7 +96,7 @@ const Landing = () => {
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="h-[400px] p-4">
+              <div className="h-[450px] p-4">
                 <MistakeAnalysis />
               </div>
             </CardContent>

@@ -3,6 +3,7 @@ import { startOfWeek, endOfWeek, format, addWeeks, isWithinInterval } from "date
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { Trade } from "@/types/trade";
 
 interface WeekSummary {
   weekNumber: number;
@@ -49,7 +50,8 @@ export const WeeklyPerformance = () => {
           
           if (isWithinInterval(entryDate, { start: weekStart, end: weekEnd })) {
             // Calculate total P&L from trades
-            const dailyPnL = entry.trades?.reduce((sum: number, trade: any) => 
+            const trades = entry.trades as Trade[];
+            const dailyPnL = trades?.reduce((sum, trade) => 
               sum + (Number(trade.pnl) || 0), 0) || 0;
             
             weeks[i].totalPnL += dailyPnL;
@@ -63,7 +65,8 @@ export const WeeklyPerformance = () => {
         }
       });
 
-      return weeks;
+      // Sort weeks in ascending order by weekNumber
+      return weeks.sort((a, b) => a.weekNumber - b.weekNumber);
     },
   });
 

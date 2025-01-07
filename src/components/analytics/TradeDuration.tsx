@@ -11,6 +11,31 @@ import {
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
 
+// Custom tooltip component
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (!active || !payload || !payload.length) return null;
+
+  return (
+    <div className="bg-white/95 backdrop-blur-sm border border-border rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95">
+      <p className="font-medium text-sm text-foreground mb-2">{label}</p>
+      {payload.map((item: any, index: number) => (
+        <div key={index} className="flex items-center gap-2 text-sm">
+          <div
+            className="w-2 h-2 rounded-full"
+            style={{ backgroundColor: item.fill }}
+          />
+          <span className="text-muted-foreground">
+            {item.name}:
+          </span>
+          <span className="font-medium">
+            {item.value.toFixed(1)}%
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 export const TradeDuration = () => {
   const { data: analytics, isLoading } = useQuery({
     queryKey: ['analytics'],
@@ -79,9 +104,22 @@ export const TradeDuration = () => {
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="duration" tick={{ fontSize: 12 }} />
             <YAxis tick={{ fontSize: 12 }} />
-            <Tooltip />
-            <Bar dataKey="winRate" fill="#6E59A5" name="Win Rate %" />
-            <Bar dataKey="volume" fill="#0EA5E9" name="Volume %" />
+            <Tooltip 
+              content={<CustomTooltip />}
+              cursor={{ fill: 'transparent' }}
+            />
+            <Bar 
+              dataKey="winRate" 
+              fill="#6E59A5" 
+              name="Win Rate" 
+              radius={[4, 4, 0, 0]}
+            />
+            <Bar 
+              dataKey="volume" 
+              fill="#0EA5E9" 
+              name="Volume" 
+              radius={[4, 4, 0, 0]}
+            />
           </BarChart>
         </ResponsiveContainer>
       </div>

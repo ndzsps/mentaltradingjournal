@@ -6,8 +6,6 @@ import { Trade } from "@/types/trade";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
 
 interface TradeFormContentProps {
   direction: 'buy' | 'sell' | null;
@@ -121,13 +119,7 @@ export const TradeFormContent = ({
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col flex-1">
-      <Alert variant="destructive" className="mb-4 mx-6 mt-6">
-        <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          Remember to create a post-session entry before adding trades
-        </AlertDescription>
-      </Alert>
-      <div className="flex-1 p-6 pt-0 space-y-4 md:space-y-0 md:space-x-4 md:flex">
+      <div className="flex-1 p-6 space-y-4 md:space-y-0 md:space-x-4 md:flex">
         <div className="flex-1 p-4 border rounded-lg bg-background/50">
           <GeneralSection direction={direction} setDirection={setDirection} />
         </div>

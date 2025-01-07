@@ -50,7 +50,7 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
           head_row: "w-full",
           row: "w-full",
           cell: "w-[14.28%] h-14 lg:h-16 p-0 relative",
-          day: "relative w-full h-full rounded-md transition-all duration-200 hover:bg-primary/10 active:scale-95 cursor-pointer group",
+          day: "relative w-full h-full rounded-md transition-all duration-200 cursor-pointer group",
           day_today: "bg-accent/40 text-accent-foreground hover:bg-accent/60",
           day_selected: "!bg-primary text-primary-foreground hover:bg-primary/90",
         }}
@@ -63,8 +63,9 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
                   {...props} 
                   className={`
                     ${props.className || ''} 
-                    after:absolute after:inset-1 after:rounded-md after:transition-colors after:duration-200
-                    hover:after:bg-primary/5 dark:hover:after:bg-primary/10
+                    flex items-center justify-center w-full h-full
+                    after:absolute after:inset-[15%] after:rounded-md after:transition-colors after:duration-200
+                    hover:after:bg-primary/10 dark:hover:after:bg-primary/20
                     group-hover:font-medium
                   `}
                 >

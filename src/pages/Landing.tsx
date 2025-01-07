@@ -9,9 +9,12 @@ const Landing = () => {
 
   return (
     <div className="min-h-screen relative bg-background overflow-hidden">
-      {/* Gradient Background with enhanced blur and depth */}
-      <div className="fixed inset-0 bg-gradient-to-br from-primary/20 via-background to-accent/20 backdrop-blur-2xl" />
-      <div className="fixed inset-0 bg-gradient-radial from-primary/10 via-transparent to-transparent" />
+      {/* Enhanced Gradient Background */}
+      <div className="fixed inset-0">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-background to-accent/20" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent" />
+        <div className="absolute inset-0 backdrop-blur-[100px]" />
+      </div>
       
       {/* Content */}
       <div className="relative z-10">
@@ -74,6 +77,65 @@ const Landing = () => {
               
               {/* Enhanced glow effect */}
               <div className="absolute -inset-4 bg-gradient-to-r from-primary/30 to-accent/30 blur-3xl -z-10" />
+            </div>
+          </div>
+        </section>
+
+        {/* Psychology Focus Section */}
+        <section className="relative min-h-screen flex items-center py-24">
+          <div className="container mx-auto px-4 md:px-6">
+            <div className="flex flex-col-reverse md:flex-row items-center gap-12">
+              {/* Left Side - App Preview */}
+              <div className="flex-1 relative w-full max-w-2xl">
+                <div className="relative aspect-[4/3] rounded-2xl overflow-hidden backdrop-blur-xl bg-gradient-to-br from-primary/10 to-accent/10 border border-white/10">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20" />
+                  <div className="p-6 relative z-10">
+                    {/* Mock Trading Journal Interface */}
+                    <div className="space-y-6">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-xl font-semibold text-white/90">Emotional State Tracker</h3>
+                        <span className="px-3 py-1 rounded-full bg-primary/20 text-primary-light text-sm">Active</span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        {['Calm', 'Focused', 'Patient', 'Disciplined'].map((emotion) => (
+                          <div key={emotion} className="p-4 rounded-lg bg-white/5 hover:bg-white/10 transition-colors cursor-pointer border border-white/10">
+                            <p className="text-white/80">{emotion}</p>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="h-32 rounded-lg bg-white/5 border border-white/10 p-4">
+                        <div className="w-full h-full bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 rounded animate-pulse" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {/* Enhanced glow effect */}
+                <div className="absolute -inset-4 bg-gradient-to-r from-primary/30 to-accent/30 blur-3xl -z-10" />
+              </div>
+
+              {/* Right Side - Content */}
+              <div className="flex-1 space-y-8 md:pl-8">
+                <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
+                  You've been focused on the
+                  <span className="bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent"> wrong thing </span>
+                  all this time.
+                </h2>
+                <div className="space-y-6">
+                  <p className="text-lg md:text-xl text-gray-300 leading-relaxed">
+                    Our platform is built to help you trade better by focusing on what really matters—your emotions and decision-making process—while steering you away from distractions like obsessing over P&L results. Our tools are designed to blend seamlessly into your workflow, helping you stay emotionally grounded and consistent.
+                  </p>
+                  <p className="text-lg md:text-xl text-gray-300 leading-relaxed">
+                    Other trading journals focus heavily on numbers and results, which can harm your performance, even if you don't realize it. They fuel emotional reactions, cloud your judgment, and reinforce bad habits. Our platform is built from the ground up to shift the focus to what truly drives success—mastering your emotions and optimizing your trading psychology.
+                  </p>
+                </div>
+                <Button
+                  size="lg"
+                  className="text-lg px-8 py-6 bg-white/10 hover:bg-white/20 backdrop-blur-lg border border-white/10 transition-all duration-300"
+                  onClick={() => navigate("/login")}
+                >
+                  Focus on what matters →
+                </Button>
+              </div>
             </div>
           </div>
         </section>

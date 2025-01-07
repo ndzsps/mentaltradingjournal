@@ -8,7 +8,7 @@ const Landing = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-[#1A1F2C] text-white overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 text-white overflow-hidden">
       {/* Hero Section */}
       <section className="relative min-h-[90vh] flex items-center">
         <div className="container mx-auto px-4 md:px-6 flex flex-col md:flex-row items-center gap-12">
@@ -70,9 +70,6 @@ const Landing = () => {
             <div className="absolute -inset-4 bg-gradient-to-r from-primary/30 to-accent/30 blur-3xl -z-10"></div>
           </div>
         </div>
-
-        {/* Background Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5 -z-20"></div>
       </section>
 
       <AnalyticsSection />

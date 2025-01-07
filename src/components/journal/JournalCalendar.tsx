@@ -95,12 +95,12 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
         components={{
           IconLeft: () => (
             <div className="bg-gradient-to-r from-primary-light to-accent bg-clip-text">
-              <ChevronLeft className="h-6 w-6 text-transparent fill-current" />
+              <ChevronLeft className="h-6 w-6 stroke-primary-light dark:stroke-primary-light" />
             </div>
           ),
           IconRight: () => (
             <div className="bg-gradient-to-r from-primary-light to-accent bg-clip-text">
-              <ChevronRight className="h-6 w-6 text-transparent fill-current" />
+              <ChevronRight className="h-6 w-6 stroke-primary-light dark:stroke-primary-light" />
             </div>
           ),
           Day: ({ date: dayDate, ...props }: DayProps & { className?: string }) => {

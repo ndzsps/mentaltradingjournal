@@ -4,44 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useProgressTracking } from "@/hooks/useProgressTracking";
 
-const EmotionGauge = ({ score }: { score: number }) => {
-  // Calculate the rotation angle based on the score (0-100)
-  // -90 to start at the left, then rotate based on score percentage
-  const rotation = -90 + (score / 100) * 180;
-  
-  return (
-    <div className="relative w-16 h-8 mx-auto mb-1">
-      {/* Background arc */}
-      <div 
-        className="absolute w-full h-full rounded-t-full overflow-hidden"
-        style={{
-          background: `conic-gradient(
-            from 180deg at 50% 100%,
-            #ef4444 0deg,
-            #fbbf24 90deg,
-            #22c55e 180deg
-          )`,
-          clipPath: 'polygon(0 50%, 100% 50%, 100% 0, 0 0)'
-        }}
-      />
-      {/* Indicator needle */}
-      <div 
-        className="absolute bottom-0 left-1/2 w-1 h-6 bg-foreground origin-bottom transition-transform duration-700"
-        style={{
-          transform: `translateX(-50%) rotate(${rotation}deg)`
-        }}
-      />
-      {/* Center point */}
-      <div 
-        className="absolute bottom-0 left-1/2 w-2 h-2 bg-foreground rounded-full"
-        style={{
-          transform: 'translate(-50%, 50%)'
-        }}
-      />
-    </div>
-  );
-};
-
 export const StatsHeader = () => {
   const { data: analytics, isLoading: isAnalyticsLoading } = useQuery({
     queryKey: ['analytics'],
@@ -126,11 +88,10 @@ export const StatsHeader = () => {
           <span className="text-sm font-medium text-muted-foreground">Emotion Meter</span>
           <Smile className="h-4 w-4 text-accent-dark" />
         </div>
-        <EmotionGauge score={emotionScore} />
-        <div className="text-2xl font-bold text-foreground text-center">
+        <div className="text-2xl font-bold text-foreground">
           {emotionScore.toFixed(0)}%
         </div>
-        <div className="text-sm text-muted-foreground text-center">
+        <div className="text-sm text-muted-foreground">
           Positive Emotions
         </div>
       </Card>

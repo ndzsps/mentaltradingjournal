@@ -97,6 +97,7 @@ export const MistakeAnalysis = () => {
               outerRadius={80}
               paddingAngle={5}
               dataKey="value"
+              stroke="transparent"
             >
               {data.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

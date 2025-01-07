@@ -122,10 +122,10 @@ const Landing = () => {
                 </h2>
                 <div className="space-y-6">
                   <p className="text-lg md:text-xl text-gray-300 leading-relaxed">
-                    Our platform is built to help you trade better by focusing on what really matters—your emotions and decision-making process—while steering you away from distractions like obsessing over P&L results. Our tools are designed to blend seamlessly into your workflow, helping you stay emotionally grounded and consistent.
+                    Our platform helps you trade smarter by focusing on your emotions and decision-making process, not just P&L results. It's designed to seamlessly fit your workflow, keeping you grounded and consistent.
                   </p>
                   <p className="text-lg md:text-xl text-gray-300 leading-relaxed">
-                    Other trading journals focus heavily on numbers and results, which can harm your performance, even if you don't realize it. They fuel emotional reactions, cloud your judgment, and reinforce bad habits. Our platform is built from the ground up to shift the focus to what truly drives success—mastering your emotions and optimizing your trading psychology.
+                    Most trading journals fixate on numbers and results, which can hurt your performance without you realizing it. We shift the focus to mastering your emotions—the key to lasting success.
                   </p>
                 </div>
                 <Button

@@ -82,7 +82,7 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
           head_row: "w-full",
           row: "w-full",
           cell: "w-[14.28%] h-24 lg:h-28 p-0 relative",
-          day: "h-full w-full rounded-lg transition-all duration-200 hover:scale-105 cursor-pointer group border border-transparent",
+          day: "h-full w-full rounded-lg transition-all duration-200 hover:scale-105 cursor-pointer group border border-border/20",
           day_today: "!border-primary",
           day_selected: "!border-primary border-2",
         }}
@@ -103,6 +103,7 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
                     ${style?.border || ''}
                     relative flex flex-col items-stretch justify-start p-1
                     hover:shadow-lg transition-all duration-200
+                    border border-border/10
                   `}
                 >
                   <span className="text-sm text-muted-foreground absolute top-1 right-1">

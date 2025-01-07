@@ -1,24 +1,24 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card } from '@/components/ui/card';
+import { useToast } from '@/hooks/use-toast';
 
 const Login = () => {
   const [isSignUp, setIsSignUp] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Add useEffect to check authentication state and redirect
+  // Redirect authenticated users to dashboard
   useEffect(() => {
     if (user) {
-      navigate("/dashboard");
+      navigate('/dashboard');
     }
   }, [user, navigate]);
 
@@ -30,18 +30,18 @@ const Login = () => {
       if (isSignUp) {
         await signUp(email, password);
         toast({
-          title: "Account created successfully",
-          description: "Please check your email to verify your account.",
+          title: 'Account created successfully',
+          description: 'Please check your email to verify your account.',
         });
       } else {
         await signIn(email, password);
-        navigate("/dashboard");
+        navigate('/dashboard');
       }
     } catch (error) {
       toast({
-        variant: "destructive",
-        title: "Error",
-        description: error instanceof Error ? error.message : "An error occurred",
+        variant: 'destructive',
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'An error occurred',
       });
     } finally {
       setLoading(false);
@@ -54,7 +54,7 @@ const Login = () => {
         <div className="space-y-2 text-center">
           <h1 className="text-3xl font-bold">Welcome to TradingMind</h1>
           <p className="text-muted-foreground">
-            {isSignUp ? "Create an account" : "Sign in to your account"}
+            {isSignUp ? 'Create an account' : 'Sign in to your account'}
           </p>
         </div>
 
@@ -81,9 +81,9 @@ const Login = () => {
             {loading ? (
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
             ) : isSignUp ? (
-              "Sign Up"
+              'Sign Up'
             ) : (
-              "Sign In"
+              'Sign In'
             )}
           </Button>
         </form>
@@ -95,7 +95,7 @@ const Login = () => {
             className="text-sm"
           >
             {isSignUp
-              ? "Already have an account? Sign In"
+              ? 'Already have an account? Sign In'
               : "Don't have an account? Sign Up"}
           </Button>
         </div>

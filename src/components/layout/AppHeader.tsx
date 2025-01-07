@@ -22,7 +22,7 @@ export function AppHeader() {
           asChild
           className="gap-2"
         >
-          <Link to={user ? "/dashboard" : "/login"}>
+          <Link to="/login">
             <User className="h-4 w-4" />
             <span>Log In</span>
           </Link>

@@ -16,7 +16,57 @@ import { useQuery } from "@tanstack/react-query";
 export const RuleAdherence = () => {
   const { data: analytics, isLoading } = useQuery({
     queryKey: ['analytics'],
-    queryFn: generateAnalytics,
+    queryFn: async () => {
+      const { data: entries, error } = await supabase
+        .from('journal_entries')
+        .select('*')
+        .eq('session_type', 'post')
+        .not('outcome', 'eq', 'no_trades');
+
+      if (error) throw error;
+
+      const rulesFollowedStats = {
+        wins: 0,
+        losses: 0,
+        total: 0,
+      };
+
+      const rulesNotFollowedStats = {
+        wins: 0,
+        losses: 0,
+        total: 0,
+      };
+
+      entries?.forEach(entry => {
+        const hasFollowedRules = entry.followed_rules && entry.followed_rules.length > 0;
+        
+        if (hasFollowedRules) {
+          rulesFollowedStats.total++;
+          if (entry.outcome === 'win') rulesFollowedStats.wins++;
+          if (entry.outcome === 'loss') rulesFollowedStats.losses++;
+        } else {
+          rulesNotFollowedStats.total++;
+          if (entry.outcome === 'win') rulesNotFollowedStats.wins++;
+          if (entry.outcome === 'loss') rulesNotFollowedStats.losses++;
+        }
+      });
+
+      const calculatePercentage = (value: number, total: number) => 
+        total > 0 ? Math.round((value / total) * 100) : 0;
+
+      return [
+        {
+          name: "Rules Followed",
+          wins: calculatePercentage(rulesFollowedStats.wins, rulesFollowedStats.total),
+          losses: calculatePercentage(rulesFollowedStats.losses, rulesFollowedStats.total),
+        },
+        {
+          name: "Rules Not Followed",
+          wins: calculatePercentage(rulesNotFollowedStats.wins, rulesNotFollowedStats.total),
+          losses: calculatePercentage(rulesNotFollowedStats.losses, rulesNotFollowedStats.total),
+        },
+      ];
+    },
   });
   
   if (isLoading || !analytics) {
@@ -29,32 +79,26 @@ export const RuleAdherence = () => {
       </Card>
     );
   }
-  
-  const data = [
-    {
-      name: "Rules Followed",
-      wins: 80,
-      losses: 20,
-    },
-    {
-      name: "Rules Broken",
-      wins: 20,
-      losses: 80,
-    },
-  ];
+
+  // Calculate insights
+  const rulesFollowed = analytics[0];
+  const rulesNotFollowed = analytics[1];
+  const winRateDifference = rulesFollowed.wins - rulesNotFollowed.wins;
+  const hasEnoughData = rulesFollowed.wins + rulesFollowed.losses > 0 && 
+                       rulesNotFollowed.wins + rulesNotFollowed.losses > 0;
 
   return (
     <Card className="p-4 md:p-6 space-y-4">
       <div className="space-y-2">
         <h3 className="text-xl md:text-2xl font-bold">Rule Adherence vs. Performance</h3>
         <p className="text-sm text-muted-foreground">
-          Compare outcomes when trading rules are followed vs. broken
+          Compare outcomes when trading rules are followed vs. not followed
         </p>
       </div>
 
       <div className="h-[250px] md:h-[300px] w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
+          <BarChart data={analytics} margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="name" tick={{ fontSize: 12 }} />
             <YAxis tick={{ fontSize: 12 }} />
@@ -69,8 +113,22 @@ export const RuleAdherence = () => {
       <div className="space-y-2 bg-accent/10 p-3 md:p-4 rounded-lg">
         <h4 className="font-semibold text-sm md:text-base">AI Insight</h4>
         <div className="space-y-2 text-xs md:text-sm text-muted-foreground">
-          <p>Following your trading rules resulted in an 80% win rate, compared to 20% when rules were not followed.</p>
-          <p>Skipping your stop-loss rules led to average losses of 3x larger than planned.</p>
+          {hasEnoughData ? (
+            <>
+              <p>
+                {winRateDifference > 0
+                  ? `Following your trading rules resulted in a ${winRateDifference}% higher win rate.`
+                  : `Your win rate was ${Math.abs(winRateDifference)}% lower when following rules - review your rule set.`}
+              </p>
+              <p>
+                {rulesFollowed.wins > 50
+                  ? "Your trading rules are effective when followed consistently."
+                  : "Consider reviewing and adjusting your trading rules for better performance."}
+              </p>
+            </>
+          ) : (
+            <p>Add more trading sessions to generate insights about your rule adherence.</p>
+          )}
         </div>
       </div>
     </Card>

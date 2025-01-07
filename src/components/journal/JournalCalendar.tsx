@@ -4,6 +4,7 @@ import { DayProps } from "react-day-picker";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface JournalCalendarProps {
   date: Date | undefined;
@@ -67,7 +68,7 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
   };
 
   return (
-    <Card className="p-8 bg-white border-gray-100 shadow-xl rounded-2xl">
+    <Card className="p-8 bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800 shadow-xl rounded-2xl">
       <Calendar
         mode="single"
         selected={date}
@@ -87,11 +88,21 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
           caption: "flex justify-center pt-1 relative items-center",
           caption_label: "text-2xl font-semibold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent",
           nav: "space-x-1 flex items-center",
-          nav_button: "h-9 w-9 bg-transparent p-0 opacity-50 hover:opacity-100 hover:bg-primary hover:bg-opacity-10 rounded-full flex items-center justify-center transition-all duration-200",
+          nav_button: "h-9 w-9 bg-transparent p-0 hover:opacity-100 hover:bg-primary hover:bg-opacity-10 rounded-full flex items-center justify-center transition-all duration-200",
           nav_button_previous: "absolute left-1",
           nav_button_next: "absolute right-1",
         }}
         components={{
+          IconLeft: () => (
+            <div className="bg-gradient-to-r from-primary-light to-accent bg-clip-text">
+              <ChevronLeft className="h-6 w-6 text-transparent fill-current" />
+            </div>
+          ),
+          IconRight: () => (
+            <div className="bg-gradient-to-r from-primary-light to-accent bg-clip-text">
+              <ChevronRight className="h-6 w-6 text-transparent fill-current" />
+            </div>
+          ),
           Day: ({ date: dayDate, ...props }: DayProps & { className?: string }) => {
             const entry = entries.find(e => e.date.toDateString() === dayDate.toDateString());
             const stats = entry ? calculateDayStats(entry) : null;
@@ -104,38 +115,36 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
                   {...props} 
                   className={`
                     ${props.className || ''} 
-                    ${style?.bg || 'hover:bg-gray-50'}
+                    ${style?.bg || 'hover:bg-gray-50 dark:hover:bg-gray-800'}
                     ${style?.border || ''}
                     ${style?.shadow || ''}
                     relative flex flex-col h-full w-full
-                    border-2 border-gray-200 rounded-lg
+                    border-2 border-gray-200 dark:border-gray-700 rounded-lg
                     hover:border-primary hover:shadow-lg
                     transition-all duration-200 ease-in-out
                     overflow-hidden
                     ${isToday ? 'border-primary-light' : ''}
                   `}
                 >
-                  {/* Date number in top-right corner with gradient for today */}
                   <div className="absolute top-2 right-2">
                     <span className={`
                       text-sm font-medium
-                      ${isToday ? 'bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent' : 'text-gray-500'}
+                      ${isToday ? 'bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent' : 'text-gray-500 dark:text-gray-400'}
                     `}>
                       {dayDate.getDate()}
                     </span>
                   </div>
                   
-                  {/* Stats container with gradient overlay */}
                   {stats && (
-                    <div className="absolute inset-0 flex flex-col justify-end p-2 bg-gradient-to-t from-white/90 to-transparent">
+                    <div className="absolute inset-0 flex flex-col justify-end p-2 bg-gradient-to-t from-white/90 to-transparent dark:from-gray-900/90">
                       <div className="space-y-1 text-center w-full">
-                        <p className={`text-lg font-semibold ${stats.totalPL >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                        <p className={`text-lg font-semibold ${stats.totalPL >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}`}>
                           {formatCurrency(stats.totalPL)}
                         </p>
-                        <p className="text-xs text-gray-600">
+                        <p className="text-xs text-gray-600 dark:text-gray-300">
                           {stats.numTrades} trade{stats.numTrades !== 1 ? 's' : ''}
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
                           {stats.avgRR}R • {stats.winRate.toFixed(0)}%
                         </p>
                       </div>

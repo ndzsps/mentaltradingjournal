@@ -78,11 +78,11 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
           month: "w-full space-y-4",
           table: "w-full border-collapse",
           head_row: "flex w-full mb-4",
-          head_cell: "text-sm font-medium text-gray-600 w-[14.28%] text-center",
+          head_cell: "text-sm font-medium bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent w-[14.28%] text-center",
           row: "flex w-full mt-4",
           cell: "w-[14.28%] h-32 lg:h-36 p-1 relative [&:has([aria-selected])]:bg-accent/50",
           day: "h-full w-full transition-all duration-200 cursor-pointer group",
-          day_today: "!border-primary-light !border-2",
+          day_today: "relative before:absolute before:inset-0 before:rounded-lg before:bg-gradient-to-br before:from-primary-light before:to-accent before:opacity-10 before:transition-opacity hover:before:opacity-20",
           day_selected: "!border-primary !border-2 !shadow-lg shadow-primary/20",
         }}
         components={{
@@ -90,6 +90,7 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
             const entry = entries.find(e => e.date.toDateString() === dayDate.toDateString());
             const stats = entry ? calculateDayStats(entry) : null;
             const style = getEmotionStyle(dayDate);
+            const isToday = dayDate.toDateString() === new Date().toDateString();
             
             return (
               <div className="w-full h-full p-0.5">
@@ -105,11 +106,15 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
                     hover:border-primary hover:shadow-lg
                     transition-all duration-200 ease-in-out
                     overflow-hidden
+                    ${isToday ? 'border-primary-light' : ''}
                   `}
                 >
-                  {/* Date number in top-right corner */}
+                  {/* Date number in top-right corner with gradient for today */}
                   <div className="absolute top-2 right-2">
-                    <span className="text-sm font-medium text-gray-500">
+                    <span className={`
+                      text-sm font-medium
+                      ${isToday ? 'bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent' : 'text-gray-500'}
+                    `}>
                       {dayDate.getDate()}
                     </span>
                   </div>

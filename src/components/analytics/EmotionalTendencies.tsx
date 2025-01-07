@@ -28,15 +28,24 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
     const pnlValue = payload[1]?.value;
 
     return (
-      <div className="bg-background border border-border/50 rounded-lg p-3 shadow-lg">
-        <p className="text-sm font-medium">{label}</p>
-        <p className="text-sm text-muted-foreground">
-          Emotional Score: {typeof emotionalScore === 'number' ? emotionalScore : 'N/A'}
-          <span className="text-xs ml-1">(0-100)</span>
-        </p>
-        <p className="text-sm text-muted-foreground">
-          P&L: ${typeof pnlValue === 'number' ? pnlValue.toFixed(2) : 'N/A'}
-        </p>
+      <div className="bg-background border border-border rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95">
+        <p className="font-medium text-sm text-foreground mb-2">{label}</p>
+        {payload.map((item, index) => (
+          <div key={index} className="flex items-center gap-2 text-sm">
+            <div
+              className="w-2 h-2 rounded-full"
+              style={{ backgroundColor: item.color }}
+            />
+            <span className="text-muted-foreground">
+              {item.name}:
+            </span>
+            <span className="font-medium text-foreground">
+              {item.name === "Emotional Score" 
+                ? `${typeof item.value === 'number' ? item.value : 'N/A'}`
+                : `$${typeof item.value === 'number' ? item.value.toFixed(2) : 'N/A'}`}
+            </span>
+          </div>
+        ))}
       </div>
     );
   }

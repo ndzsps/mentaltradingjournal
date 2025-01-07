@@ -13,6 +13,31 @@ import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
 import { AlertCircle } from "lucide-react";
 
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-background border border-border rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95">
+        <p className="font-medium text-sm text-foreground mb-2">Trade Details</p>
+        {payload.map((entry: any, index: number) => (
+          <div key={index} className="flex items-center gap-2 text-sm">
+            <div
+              className="w-2 h-2 rounded-full"
+              style={{ backgroundColor: entry.color }}
+            />
+            <span className="text-muted-foreground">
+              {entry.name}:
+            </span>
+            <span className="font-medium text-foreground">
+              ${entry.value.toFixed(2)}
+            </span>
+          </div>
+        ))}
+      </div>
+    );
+  }
+  return null;
+};
+
 export const RiskRewardAnalysis = () => {
   const { data: analytics, isLoading } = useQuery({
     queryKey: ['analytics'],
@@ -30,36 +55,6 @@ export const RiskRewardAnalysis = () => {
     );
   }
 
-  const requirements = analytics.dataRequirements.riskRewardAnalysis;
-  
-  if (!requirements.hasEnoughData) {
-    return (
-      <Card className="p-4 md:p-6 space-y-4">
-        <div className="space-y-2">
-          <h3 className="text-xl md:text-2xl font-bold">Risk/Reward Analysis</h3>
-          <p className="text-sm text-muted-foreground">
-            Visualization of risk vs reward ratios in your trades
-          </p>
-        </div>
-
-        <div className="h-[250px] md:h-[300px] w-full flex items-center justify-center">
-          <div className="text-center space-y-4">
-            <AlertCircle className="w-12 h-12 text-muted-foreground mx-auto" />
-            <div className="space-y-2">
-              <p className="text-sm font-medium">Not enough data available</p>
-              <p className="text-sm text-muted-foreground max-w-[240px]">
-                {requirements.description}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Required fields: {requirements.requiredFields.join(', ')}
-              </p>
-            </div>
-          </div>
-        </div>
-      </Card>
-    );
-  }
-  
   const data = Array.from({ length: 20 }, () => ({
     risk: Math.random() * 500,
     reward: Math.random() * 1000,

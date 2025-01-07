@@ -35,6 +35,25 @@ export const EmotionRecovery = () => {
     { days: "> 3 days", frequency: 10 },
   ];
 
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-background border border-border rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95">
+          <p className="font-medium text-sm text-foreground mb-2">{label}</p>
+          <div className="flex items-center gap-2 text-sm">
+            <div
+              className="w-2 h-2 rounded-full"
+              style={{ backgroundColor: payload[0].color }}
+            />
+            <span className="text-muted-foreground">Frequency:</span>
+            <span className="font-medium text-foreground">{payload[0].value}%</span>
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <Card className="p-4 md:p-6 space-y-4">
       <div className="space-y-2">
@@ -50,7 +69,7 @@ export const EmotionRecovery = () => {
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="days" tick={{ fontSize: 12 }} />
             <YAxis tick={{ fontSize: 12 }} />
-            <Tooltip />
+            <Tooltip content={<CustomTooltip />} />
             <Bar dataKey="frequency" fill="#6E59A5" name="Frequency" />
           </BarChart>
         </ResponsiveContainer>

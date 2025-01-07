@@ -12,6 +12,33 @@ import {
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
 
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-background border border-border rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95">
+        <p className="font-medium text-sm text-foreground mb-2">{label}</p>
+        {payload.map((entry: any, index: number) => (
+          <div key={index} className="flex items-center gap-2 text-sm">
+            <div
+              className="w-2 h-2 rounded-full"
+              style={{ backgroundColor: entry.color }}
+            />
+            <span className="text-muted-foreground">
+              {entry.name}:
+            </span>
+            <span className="font-medium text-foreground">
+              {entry.name === "Emotional Score" 
+                ? entry.value 
+                : `$${entry.value.toLocaleString()}`}
+            </span>
+          </div>
+        ))}
+      </div>
+    );
+  }
+  return null;
+};
+
 export const CumulativeImpact = () => {
   const { data: analytics, isLoading } = useQuery({
     queryKey: ['analytics'],
@@ -51,7 +78,7 @@ export const CumulativeImpact = () => {
             <XAxis dataKey="day" tick={{ fontSize: 12 }} />
             <YAxis yAxisId="left" tick={{ fontSize: 12 }} />
             <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 12 }} />
-            <Tooltip />
+            <Tooltip content={<CustomTooltip />} />
             <Legend />
             <Line
               yAxisId="left"

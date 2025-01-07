@@ -16,12 +16,12 @@ import { useQuery } from "@tanstack/react-query";
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border border-border/50 rounded-lg p-3 shadow-xl">
-        <p className="font-semibold mb-1">{label}</p>
+      <div className="bg-background border border-border rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95">
+        <p className="font-medium text-sm text-foreground mb-2">{label}</p>
         {payload.map((entry: any, index: number) => (
           <p
             key={index}
-            className={`text-sm ${
+            className={`text-sm flex items-center gap-2 ${
               entry.dataKey === "profit"
                 ? "text-emerald-400"
                 : entry.dataKey === "loss"
@@ -29,14 +29,23 @@ const CustomTooltip = ({ active, payload, label }: any) => {
                 : ""
             }`}
           >
-            {entry.dataKey.charAt(0).toUpperCase() + entry.dataKey.slice(1)}:{" "}
-            {entry.dataKey === "loss"
-              ? `$${Math.abs(entry.value).toLocaleString()}`
-              : `$${entry.value.toLocaleString()}`}
+            <div
+              className="w-2 h-2 rounded-full"
+              style={{ backgroundColor: entry.color }}
+            />
+            <span className="text-muted-foreground">
+              {entry.dataKey.charAt(0).toUpperCase() + entry.dataKey.slice(1)}:
+            </span>
+            <span className="font-medium text-foreground">
+              {entry.dataKey === "loss"
+                ? `$${Math.abs(entry.value).toLocaleString()}`
+                : `$${entry.value.toLocaleString()}`}
+            </span>
           </p>
         ))}
-        <p className="text-sm font-medium border-t border-border/50 mt-2 pt-2">
-          Net: ${payload[0].payload.net.toLocaleString()}
+        <p className="text-sm font-medium border-t border-border mt-2 pt-2 flex items-center gap-2">
+          <span className="text-muted-foreground">Net:</span>
+          <span className="text-foreground">${payload[0].payload.net.toLocaleString()}</span>
         </p>
       </div>
     );

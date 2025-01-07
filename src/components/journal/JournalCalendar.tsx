@@ -66,14 +66,15 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
                   className={`
                     ${props.className || ''} 
                     flex items-center justify-center w-full h-full
-                    after:absolute after:inset-[15%] after:rounded-md after:transition-colors after:duration-200
-                    hover:after:bg-primary/10 dark:hover:after:bg-primary/20
+                    group-hover:after:absolute group-hover:after:inset-[15%] 
+                    group-hover:after:bg-primary/10 group-hover:after:rounded-full
+                    dark:group-hover:after:bg-primary/20
                     group-hover:font-medium
                   `}
                 >
                   <span className={`
-                    relative z-10
-                    ${isToday ? 'bg-primary text-primary-foreground px-2 py-1 rounded-full' : ''}
+                    relative z-10 px-2 py-1 rounded-full
+                    ${isToday ? 'bg-primary text-primary-foreground' : 'group-hover:text-foreground'}
                   `}>
                     {dayDate.getDate()}
                   </span>

@@ -1,7 +1,8 @@
-import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { SessionHeader } from "./SessionHeader";
 
 interface Trade {
   id: string;
@@ -51,63 +52,15 @@ export const JournalEntry = ({ entry }: JournalEntryProps) => {
     day: 'numeric'
   });
 
-  const isPreSession = entry.session_type === 'pre';
-
   return (
     <Card className="p-6 rounded-lg bg-background/50 border border-primary/10 min-h-[400px]">
-      {isPreSession ? (
-        <>
-          <div className="text-sm text-muted-foreground mb-4">
-            {formattedDate}
-          </div>
-          <div className="flex items-center flex-wrap gap-3">
-            <Badge 
-              variant="default"
-              className="capitalize px-4 py-1.5 rounded-full text-sm font-medium"
-            >
-              Pre-Session
-            </Badge>
-            <Badge 
-              variant="outline" 
-              className="bg-background/80 hover:bg-accent/5 transition-colors px-4 py-1.5 rounded-full text-sm font-medium border-none"
-            >
-              {capitalizeWords(entry.emotion)} - {capitalizeWords(entry.emotion_detail)}
-            </Badge>
-          </div>
-        </>
-      ) : (
-        <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <Badge 
-              variant="secondary"
-              className="capitalize px-4 py-1.5 rounded-full text-sm font-medium"
-            >
-              Post-Session
-            </Badge>
-            <Badge 
-              variant="outline" 
-              className="bg-background/80 hover:bg-accent/5 transition-colors px-4 py-1.5 rounded-full text-sm font-medium border-none"
-            >
-              {capitalizeWords(entry.emotion)} - {capitalizeWords(entry.emotion_detail)}
-            </Badge>
-            {entry.outcome && (
-              <Badge 
-                variant="outline" 
-                className={`capitalize px-4 py-1.5 rounded-full text-sm font-medium ${
-                  entry.outcome === 'loss' 
-                    ? 'border-red-500/50 text-red-500 bg-red-500/5 hover:bg-red-500/10' 
-                    : 'border-green-500/50 text-green-500 bg-green-500/5 hover:bg-green-500/10'
-                }`}
-              >
-                {capitalizeWords(entry.outcome)}
-              </Badge>
-            )}
-          </div>
-          <span className="text-sm text-muted-foreground whitespace-nowrap">
-            {formattedDate}
-          </span>
-        </div>
-      )}
+      <SessionHeader
+        date={formattedDate}
+        sessionType={entry.session_type}
+        emotion={entry.emotion}
+        emotionDetail={entry.emotion_detail}
+        outcome={entry.outcome}
+      />
 
       {entry.market_conditions && (
         <p className="text-sm text-muted-foreground mb-3 mt-4">

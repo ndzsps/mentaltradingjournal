@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 interface AuthContextType {
   user: User | null;
@@ -18,22 +19,43 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Check for existing session on mount
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    // Check active session and refresh if needed
+    const checkSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error("Session error:", error);
+          setUser(null);
+          navigate("/login");
+          return;
+        }
+        setUser(session?.user ?? null);
+      } catch (error) {
+        console.error("Session check error:", error);
+        setUser(null);
+        navigate("/login");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkSession();
 
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth state change:", event);
+      
       if (event === 'TOKEN_REFRESHED') {
         setUser(session?.user ?? null);
       } else if (event === 'SIGNED_OUT') {
         setUser(null);
+        navigate("/login");
       } else if (event === 'SIGNED_IN') {
         setUser(session?.user ?? null);
+        navigate("/");
       } else if (event === 'USER_UPDATED') {
         setUser(session?.user ?? null);
       }
@@ -44,7 +66,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [navigate]);
 
   const signIn = async (email: string, password: string) => {
     try {
@@ -65,7 +87,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUp = async (email: string, password: string) => {
     try {
-      const { error, data } = await supabase.auth.signUp({ 
+      const { error } = await supabase.auth.signUp({ 
         email, 
         password,
         options: {
@@ -99,6 +121,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         });
         throw error;
       }
+      navigate("/login");
     } catch (error) {
       console.error("Sign out error:", error);
       throw error;

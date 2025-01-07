@@ -81,12 +81,15 @@ export const RuleAdherence = () => {
     );
   }
 
-  // Calculate insights
-  const rulesFollowed = analytics[0];
-  const rulesNotFollowed = analytics[1];
-  const winRateDifference = rulesFollowed.wins - rulesNotFollowed.wins;
-  const hasEnoughData = rulesFollowed.wins + rulesFollowed.losses > 0 && 
-                       rulesNotFollowed.wins + rulesNotFollowed.losses > 0;
+  // Default values if analytics data is incomplete
+  const defaultStats = { wins: 0, losses: 0 };
+  const rulesFollowed = analytics[0] || { name: "Rules Followed", ...defaultStats };
+  const rulesNotFollowed = analytics[1] || { name: "Rules Not Followed", ...defaultStats };
+  
+  // Calculate insights only if we have valid data
+  const winRateDifference = (rulesFollowed.wins || 0) - (rulesNotFollowed.wins || 0);
+  const hasEnoughData = (rulesFollowed.wins + rulesFollowed.losses > 0) && 
+                       (rulesNotFollowed.wins + rulesNotFollowed.losses > 0);
 
   return (
     <Card className="p-4 md:p-6 space-y-4">

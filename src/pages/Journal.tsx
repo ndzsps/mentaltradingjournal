@@ -33,6 +33,7 @@ const Journal = () => {
     if (!user) return;
 
     const fetchEntries = async () => {
+      console.log('Fetching entries for user:', user.id);
       const { data, error } = await supabase
         .from('journal_entries')
         .select('*')
@@ -42,6 +43,11 @@ const Journal = () => {
         console.error('Error fetching journal entries:', error);
         return;
       }
+
+      console.log('Fetched entries:', data);
+      console.log('Entries for January 7th:', data?.filter(entry => 
+        new Date(entry.created_at).toDateString() === new Date('2024-01-07').toDateString()
+      ));
 
       setEntries(data || []);
     };
@@ -57,7 +63,8 @@ const Journal = () => {
           schema: 'public',
           table: 'journal_entries',
         },
-        () => {
+        (payload) => {
+          console.log('Realtime update received:', payload);
           fetchEntries();
         }
       )

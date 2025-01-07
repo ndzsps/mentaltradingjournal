@@ -74,20 +74,20 @@
   }
   body {
     @apply bg-background text-foreground;
-    background-image: radial-gradient(
-      circle at top right,
-      hsl(var(--primary) / 0.1),
-      transparent 40%
-    ),
-    radial-gradient(
-      circle at bottom left,
-      hsl(var(--accent) / 0.1),
-      transparent 40%
-    );
+    background-image: 
+      radial-gradient(
+        circle at 80% 20%,
+        hsl(var(--primary) / 0.15),
+        transparent 40%
+      ),
+      radial-gradient(
+        circle at 20% 80%,
+        hsl(var(--accent) / 0.15),
+        transparent 40%
+      );
     background-attachment: fixed;
   }
 
-  /* Improve hover states for better text visibility */
   button:hover, 
   a:hover {
     @apply transition-colors duration-200;

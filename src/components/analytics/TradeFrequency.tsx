@@ -28,7 +28,6 @@ export const TradeFrequency = () => {
     );
   }
 
-  // Process journal entries to get trade frequency by day
   const last7Days = Array.from({ length: 7 }, (_, i) => {
     const date = new Date();
     date.setDate(date.getDate() - i);
@@ -50,6 +49,13 @@ export const TradeFrequency = () => {
     };
   });
 
+  const formatYAxisTick = (value: number) => {
+    if (value >= 1000) {
+      return `${(value / 1000).toFixed(1)}K`;
+    }
+    return value;
+  };
+
   const averageTrades = data.reduce((sum, day) => sum + day.trades, 0) / data.length;
 
   return (
@@ -66,9 +72,32 @@ export const TradeFrequency = () => {
           <AreaChart data={data} margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="date" tick={{ fontSize: 12 }} />
-            <YAxis tick={{ fontSize: 12 }} />
-            <Tooltip />
-            <Area type="monotone" dataKey="trades" fill="#6E59A5" stroke="#6E59A5" />
+            <YAxis 
+              tick={{ fontSize: 12 }} 
+              tickFormatter={formatYAxisTick}
+              label={{ 
+                value: 'Number of Trades', 
+                angle: -90, 
+                position: 'insideLeft',
+                style: { fontSize: '12px' }
+              }}
+            />
+            <Tooltip 
+              formatter={(value: number) => [formatYAxisTick(value), 'Trades']}
+              labelStyle={{ color: 'var(--foreground)' }}
+              contentStyle={{ 
+                backgroundColor: 'var(--background)',
+                border: '1px solid var(--border)',
+                borderRadius: '6px'
+              }}
+            />
+            <Area 
+              type="monotone" 
+              dataKey="trades" 
+              fill="#6E59A5" 
+              stroke="#6E59A5" 
+              fillOpacity={0.2}
+            />
           </AreaChart>
         </ResponsiveContainer>
       </div>
@@ -76,8 +105,7 @@ export const TradeFrequency = () => {
       <div className="space-y-2 bg-accent/10 p-3 md:p-4 rounded-lg">
         <h4 className="font-semibold text-sm md:text-base">AI Insight</h4>
         <p className="text-xs md:text-sm text-muted-foreground">
-          Your trading frequency averages {averageTrades.toFixed(1)} trades per day, with peak activity 
-          {data.reduce((max, day) => day.trades > max.trades ? day : max).date}.
+          Your trading frequency averages {averageTrades.toFixed(1)} trades per day, with peak activity on {data.reduce((max, day) => day.trades > max.trades ? day : max).date}.
         </p>
       </div>
     </Card>

@@ -47,7 +47,7 @@ export const PerformanceBreakdown = () => {
 
   // Calculate rounded max value for better axis intervals
   const maxAbsValue = Math.max(...data.map(d => Math.abs(d.averagePnL)));
-  const roundedMax = Math.ceil(maxAbsValue / 100) * 100; // Round to nearest hundred
+  const roundedMax = Math.ceil(maxAbsValue / 100) * 100;
   const domain = [-roundedMax, roundedMax];
 
   // Generate tick values in intervals of 100 or 200 depending on the range
@@ -63,6 +63,14 @@ export const PerformanceBreakdown = () => {
       return `$${(value / 1000).toFixed(1)}K`;
     }
     return `$${value}`;
+  };
+
+  // Custom bar color based on value
+  const getBarColor = (value: number) => {
+    if (value > 500) return "hsl(142.1 76.2% 36.3%)"; // Strong positive (green)
+    if (value > 0) return "hsl(142.1 76.2% 46.3%)"; // Positive (lighter green)
+    if (value > -500) return "hsl(346.8 77.2% 49.8%)"; // Negative (light red)
+    return "hsl(346.8 77.2% 39.8%)"; // Strong negative (darker red)
   };
 
   return (
@@ -88,14 +96,14 @@ export const PerformanceBreakdown = () => {
               tick={{ fontSize: 12 }}
               tickFormatter={formatYAxisTick}
               label={{ 
-                value: 'Average P&L per Trade ($)', 
+                value: 'Average P&L per Trade', 
                 angle: -90, 
                 position: 'insideLeft',
                 style: { fontSize: '12px' }
               }}
             />
             <Tooltip 
-              formatter={(value: number) => [`$${value.toFixed(2)}`, 'Average P&L']}
+              formatter={(value: number) => [formatYAxisTick(value), 'Average P&L']}
               labelStyle={{ color: 'var(--foreground)' }}
               contentStyle={{ 
                 backgroundColor: 'var(--background)',
@@ -107,6 +115,7 @@ export const PerformanceBreakdown = () => {
               dataKey="averagePnL" 
               fill="var(--primary)"
               radius={[4, 4, 0, 0]}
+              fill={(entry) => getBarColor(entry.averagePnL)}
             />
           </BarChart>
         </ResponsiveContainer>

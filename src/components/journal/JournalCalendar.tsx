@@ -11,6 +11,11 @@ interface JournalCalendarProps {
   entries: Array<{
     date: Date;
     emotion: string;
+    trades?: Array<{
+      profit_loss: number;
+      risk_reward?: number;
+      win?: boolean;
+    }>;
   }>;
 }
 
@@ -18,7 +23,30 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
   // Get dates that have entries matching the current filters
   const datesWithMatchingEntries = entries.map(entry => entry.date);
 
-  // Create a modifier styles object for different emotion states
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      signDisplay: 'always',
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
+  const calculateDayStats = (entry: typeof entries[0]) => {
+    if (!entry.trades || entry.trades.length === 0) return null;
+
+    const totalPL = entry.trades.reduce((sum, trade) => sum + (trade.profit_loss || 0), 0);
+    const winRate = entry.trades.filter(t => t.win).length / entry.trades.length * 100;
+    const avgRR = entry.trades.reduce((sum, trade) => sum + (trade.risk_reward || 0), 0) / entry.trades.length;
+
+    return {
+      totalPL,
+      numTrades: entry.trades.length,
+      winRate,
+      avgRR: avgRR.toFixed(2),
+    };
+  };
+
   const getEmotionStyle = (date: Date) => {
     const entry = entries.find(e => 
       e.date.toDateString() === date.toDateString()
@@ -26,13 +54,17 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
     
     if (!entry) return null;
 
+    const stats = calculateDayStats(entry);
+    if (!stats) return null;
+
     return {
-      emotion: entry.emotion === "Positive" ? "bg-[#F2FCE2]" : "bg-[#FEF7CD]"
+      bg: stats.totalPL >= 0 ? "bg-emerald-500/10" : "bg-red-500/10",
+      border: stats.totalPL >= 0 ? "border-emerald-500/20" : "border-red-500/20",
     };
   };
 
   const handleDateSelect = (newDate: Date | undefined) => {
-    console.log("Selected date:", newDate); // Debug log
+    console.log("Selected date:", newDate);
     onDateSelect(newDate);
   };
 
@@ -49,39 +81,48 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
           table: "w-full",
           head_row: "w-full",
           row: "w-full",
-          cell: "w-[14.28%] h-14 lg:h-16 p-0 relative",
-          day: "relative w-full h-full rounded-md transition-all duration-200 cursor-pointer group",
-          day_today: "text-primary-foreground",
-          day_selected: "!bg-primary text-primary-foreground hover:bg-primary/90",
+          cell: "w-[14.28%] h-24 lg:h-28 p-0 relative",
+          day: "h-full w-full rounded-lg transition-all duration-200 hover:scale-105 cursor-pointer group border border-transparent",
+          day_today: "!border-primary",
+          day_selected: "!border-primary border-2",
         }}
         components={{
           Day: ({ date: dayDate, ...props }: DayProps & { className?: string }) => {
-            const emotionStyle = getEmotionStyle(dayDate);
+            const entry = entries.find(e => e.date.toDateString() === dayDate.toDateString());
+            const stats = entry ? calculateDayStats(entry) : null;
+            const style = getEmotionStyle(dayDate);
             const isToday = dayDate.toDateString() === new Date().toDateString();
             
             return (
-              <div className="relative w-full h-full">
+              <div className="w-full h-full p-0.5">
                 <button 
                   {...props} 
                   className={`
                     ${props.className || ''} 
-                    flex items-center justify-center w-full h-full
+                    ${style?.bg || ''}
+                    ${style?.border || ''}
+                    relative flex flex-col items-stretch justify-start p-1
+                    hover:shadow-lg transition-all duration-200
                   `}
                 >
-                  <span className={`
-                    relative z-10 flex items-center justify-center w-9 h-9 rounded-full
-                    transition-colors duration-200
-                    hover:bg-primary/10 dark:hover:bg-primary/20
-                    ${isToday ? 'bg-primary text-primary-foreground' : ''}
-                  `}>
+                  <span className="text-sm text-muted-foreground absolute top-1 right-1">
                     {dayDate.getDate()}
                   </span>
+                  
+                  {stats && (
+                    <div className="mt-4 space-y-0.5 text-left">
+                      <p className="text-base font-medium">
+                        {formatCurrency(stats.totalPL)}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {stats.numTrades} trade{stats.numTrades !== 1 ? 's' : ''}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {stats.avgRR}R, {stats.winRate.toFixed(1)}%
+                      </p>
+                    </div>
+                  )}
                 </button>
-                {emotionStyle && (
-                  <div 
-                    className={`absolute bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full transition-transform duration-200 group-hover:scale-125 ${emotionStyle.emotion}`}
-                  />
-                )}
               </div>
             );
           }

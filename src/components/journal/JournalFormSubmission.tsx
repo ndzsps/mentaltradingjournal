@@ -20,6 +20,8 @@ interface JournalFormSubmissionProps {
   onSubmitSuccess?: () => void;
 }
 
+const VALID_OUTCOMES = ['win', 'loss', 'no_trades'] as const;
+
 export const useJournalFormSubmission = ({
   sessionType,
   selectedEmotion,
@@ -63,6 +65,15 @@ export const useJournalFormSubmission = ({
       if (!selectedEmotion || !selectedEmotionDetail || !notes || !marketConditions || followedRules?.length === 0) {
         toast.error("Missing Information", {
           description: "Please fill in all required fields for post-session.",
+          duration: 5000,
+        });
+        return;
+      }
+
+      // Validate outcome value
+      if (selectedOutcome && !VALID_OUTCOMES.includes(selectedOutcome as typeof VALID_OUTCOMES[number])) {
+        toast.error("Invalid Outcome", {
+          description: "The selected outcome is not valid. Please select a valid outcome.",
           duration: 5000,
         });
         return;

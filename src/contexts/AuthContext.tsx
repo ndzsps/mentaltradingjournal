@@ -22,42 +22,54 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check active session and refresh if needed
-    const checkSession = async () => {
+    const initializeAuth = async () => {
       try {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        if (error) {
-          console.error("Session error:", error);
+        // Get the initial session
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error("Session error:", sessionError);
           setUser(null);
-          navigate("/login");
           return;
         }
-        setUser(session?.user ?? null);
+
+        if (session?.user) {
+          setUser(session.user);
+          navigate("/");
+        } else {
+          setUser(null);
+          navigate("/login");
+        }
       } catch (error) {
-        console.error("Session check error:", error);
+        console.error("Auth initialization error:", error);
         setUser(null);
-        navigate("/login");
       } finally {
         setLoading(false);
       }
     };
 
-    checkSession();
+    initializeAuth();
 
-    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state change:", event);
       
-      if (event === 'TOKEN_REFRESHED') {
-        setUser(session?.user ?? null);
-      } else if (event === 'SIGNED_OUT') {
-        setUser(null);
-        navigate("/login");
-      } else if (event === 'SIGNED_IN') {
-        setUser(session?.user ?? null);
-        navigate("/");
-      } else if (event === 'USER_UPDATED') {
-        setUser(session?.user ?? null);
+      switch (event) {
+        case 'SIGNED_IN':
+          setUser(session?.user ?? null);
+          navigate("/");
+          break;
+        case 'SIGNED_OUT':
+          setUser(null);
+          navigate("/login");
+          break;
+        case 'TOKEN_REFRESHED':
+        case 'USER_UPDATED':
+          setUser(session?.user ?? null);
+          break;
+        case 'USER_DELETED':
+          setUser(null);
+          navigate("/login");
+          break;
       }
       
       setLoading(false);
@@ -121,7 +133,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         });
         throw error;
       }
-      navigate("/login");
     } catch (error) {
       console.error("Sign out error:", error);
       throw error;

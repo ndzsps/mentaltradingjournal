@@ -31,7 +31,15 @@ export const PerformanceChart = ({ data, domain, ticks }: PerformanceChartProps)
   return (
     <div className="h-[250px] md:h-[300px] w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+        <BarChart 
+          data={data} 
+          margin={{ 
+            top: 20, 
+            right: 30, 
+            left: 60, // Increased left margin to accommodate the label
+            bottom: 5 
+          }}
+        >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis 
             dataKey="emotion" 
@@ -46,7 +54,13 @@ export const PerformanceChart = ({ data, domain, ticks }: PerformanceChartProps)
               value: 'Average P&L per Trade', 
               angle: -90, 
               position: 'insideLeft',
-              style: { fontSize: '12px' }
+              style: { 
+                fontSize: '12px',
+                textAnchor: 'middle',
+                fill: 'currentColor',
+                paddingLeft: '20px'
+              },
+              dx: -45 // Adjust the label position horizontally
             }}
           />
           <Tooltip 
@@ -71,7 +85,6 @@ export const PerformanceChart = ({ data, domain, ticks }: PerformanceChartProps)
           <Bar 
             dataKey="averagePnL" 
             radius={[4, 4, 0, 0]}
-            fill="hsl(142.1 76.2% 46.3%)"
           >
             {data.map((entry, index) => (
               <Cell

@@ -24,7 +24,7 @@ export function AppHeader() {
         >
           <Link to={user ? "/dashboard" : "/login"}>
             <User className="h-4 w-4" />
-            <span>{user ? "Dashboard" : "Login"}</span>
+            <span>Log In</span>
           </Link>
         </Button>
       </div>

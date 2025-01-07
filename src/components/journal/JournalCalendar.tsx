@@ -50,21 +50,24 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
           head_row: "w-full",
           row: "w-full",
           cell: "w-[14.28%] h-14 lg:h-16 p-0 relative",
-          day: "w-full h-full rounded-md hover:bg-primary/20 cursor-pointer",
-          day_today: "bg-accent text-accent-foreground",
-          day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+          day: "w-full h-full rounded-md transition-all duration-200 hover:bg-primary/20 hover:scale-110 active:scale-95 cursor-pointer",
+          day_today: "bg-accent text-accent-foreground hover:bg-accent/80",
+          day_selected: "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
         }}
         components={{
           Day: ({ date: dayDate, ...props }: DayProps & { className?: string }) => {
             const emotionStyle = getEmotionStyle(dayDate);
             return (
-              <div className="relative w-full h-full">
-                <button {...props} className={`w-full h-full ${props.className || ''}`}>
+              <div className="relative w-full h-full group">
+                <button 
+                  {...props} 
+                  className={`w-full h-full transition-all duration-200 ${props.className || ''}`}
+                >
                   {dayDate.getDate()}
                 </button>
                 {emotionStyle && (
                   <div 
-                    className={`absolute bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full ${emotionStyle.emotion}`}
+                    className={`absolute bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full transition-transform duration-200 group-hover:scale-125 ${emotionStyle.emotion}`}
                   />
                 )}
               </div>

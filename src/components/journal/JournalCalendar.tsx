@@ -51,7 +51,7 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
           row: "w-full",
           cell: "w-[14.28%] h-14 lg:h-16 p-0 relative",
           day: "relative w-full h-full rounded-md transition-all duration-200 cursor-pointer group",
-          day_today: "bg-[#F1F0FB] hover:bg-[#E5E4F6]",
+          day_today: "after:absolute after:inset-[15%] after:rounded-md after:bg-primary/5",
           day_selected: "!bg-primary text-primary-foreground hover:bg-primary/90",
         }}
         components={{
@@ -69,7 +69,6 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
                     after:absolute after:inset-[15%] after:rounded-md after:transition-colors after:duration-200
                     hover:after:bg-primary/10 dark:hover:after:bg-primary/20
                     group-hover:font-medium
-                    ${isToday ? 'ring-1 ring-primary/20' : ''}
                   `}
                 >
                   <span className="relative z-10">

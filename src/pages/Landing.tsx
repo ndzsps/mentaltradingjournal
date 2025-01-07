@@ -50,14 +50,16 @@ const Landing = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
-          <Card>
-            <CardHeader>
-              <Brain className="h-12 w-12 mb-4 text-primary" />
-              <CardTitle>Emotional Impact Analysis</CardTitle>
-              <CardDescription>
-                Track how your emotions influence your trading decisions and performance
-              </CardDescription>
+        <div className="grid md:grid-cols-3 gap-8">
+          <Card className="relative overflow-hidden">
+            <CardHeader className="space-y-4 pb-8">
+              <Brain className="h-12 w-12 text-primary" />
+              <div>
+                <CardTitle className="text-xl">Emotional Intelligence</CardTitle>
+                <CardDescription className="mt-2">
+                  Develop awareness of your emotional patterns and their impact on trading
+                </CardDescription>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="h-[300px]">
@@ -66,13 +68,15 @@ const Landing = () => {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <BarChart2 className="h-12 w-12 mb-4 text-primary" />
-              <CardTitle>Performance Breakdown</CardTitle>
-              <CardDescription>
-                Analyze your performance across different currency pairs
-              </CardDescription>
+          <Card className="relative overflow-hidden">
+            <CardHeader className="space-y-4 pb-8">
+              <BarChart2 className="h-12 w-12 text-primary" />
+              <div>
+                <CardTitle className="text-xl">Data Analytics</CardTitle>
+                <CardDescription className="mt-2">
+                  Make informed decisions based on comprehensive performance data
+                </CardDescription>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="h-[300px]">
@@ -81,13 +85,15 @@ const Landing = () => {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <Target className="h-12 w-12 mb-4 text-primary" />
-              <CardTitle>Pattern Recognition</CardTitle>
-              <CardDescription>
-                Identify and learn from recurring trading patterns
-              </CardDescription>
+          <Card className="relative overflow-hidden">
+            <CardHeader className="space-y-4 pb-8">
+              <Target className="h-12 w-12 text-primary" />
+              <div>
+                <CardTitle className="text-xl">Continuous Improvement</CardTitle>
+                <CardDescription className="mt-2">
+                  Track your progress and develop better trading habits over time
+                </CardDescription>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="h-[300px]">

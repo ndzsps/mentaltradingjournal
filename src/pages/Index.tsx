@@ -1,9 +1,6 @@
 import { AppLayout } from "@/components/layout/AppLayout";
 import { EmotionLogger } from "@/components/journal/EmotionLogger";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-import { User, ArrowRight } from "lucide-react";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
 
@@ -21,33 +18,8 @@ const behaviorData = [
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Header */}
-      <header className="border-b border-border/40 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 max-w-screen-2xl items-center justify-between">
-          <Link to="/" className="flex items-center space-x-2">
-            <span className="font-bold text-xl">TradingMind</span>
-          </Link>
-
-          <div className="flex items-center space-x-4">
-            <Button variant="ghost" asChild>
-              <Link to="/login" className="flex items-center gap-2">
-                <User className="h-4 w-4" />
-                <span>Log In</span>
-              </Link>
-            </Button>
-            <Button asChild>
-              <Link to="/login" className="flex items-center gap-2">
-                <span>Get Started</span>
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <div className="w-full max-w-7xl mx-auto space-y-6 px-4 sm:px-6 lg:px-8 py-6">
+    <AppLayout>
+      <div className="w-full max-w-7xl mx-auto space-y-6 px-4 sm:px-6 lg:px-8">
         <div className="space-y-2 text-center sm:text-left">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
             Welcome back!
@@ -174,7 +146,7 @@ const Index = () => {
           </div>
         </Card>
       </div>
-    </div>
+    </AppLayout>
   );
 };
 

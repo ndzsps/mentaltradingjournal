@@ -10,10 +10,6 @@ interface WeekSummary {
   tradingDays: number;
 }
 
-interface Trade {
-  pnl: string | number;
-}
-
 export const WeeklyPerformance = () => {
   const { user } = useAuth();
   const currentDate = new Date();
@@ -53,11 +49,8 @@ export const WeeklyPerformance = () => {
           
           if (isWithinInterval(entryDate, { start: weekStart, end: weekEnd })) {
             // Calculate total P&L from trades
-            const dailyPnL = entry.trades?.reduce((sum: number, trade: Trade) => {
-              // Convert trade.pnl to number, defaulting to 0 if invalid
-              const pnlValue = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : Number(trade.pnl);
-              return sum + (isNaN(pnlValue) ? 0 : pnlValue);
-            }, 0) || 0;
+            const dailyPnL = entry.trades?.reduce((sum: number, trade: any) => 
+              sum + (Number(trade.pnl) || 0), 0) || 0;
             
             weeks[i].totalPnL += dailyPnL;
             

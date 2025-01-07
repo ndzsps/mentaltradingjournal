@@ -12,6 +12,7 @@ import { SessionTypeSelector } from "./SessionTypeSelector";
 import { PreTradingActivities } from "./PreTradingActivities";
 import { EmotionSelector } from "./EmotionSelector";
 import { emotions, tradingOutcome, mistakeCategories, tradingRules } from "./emotionConfig";
+import { format } from "date-fns";
 
 const PRE_TRADING_ACTIVITIES = [
   "Meditation",
@@ -21,7 +22,11 @@ const PRE_TRADING_ACTIVITIES = [
   "Trading Plan Review"
 ];
 
-export const EmotionLogger = () => {
+interface EmotionLoggerProps {
+  selectedDate: Date;
+}
+
+export const EmotionLogger = ({ selectedDate }: EmotionLoggerProps) => {
   const [selectedEmotion, setSelectedEmotion] = useState("");
   const [selectedEmotionDetail, setSelectedEmotionDetail] = useState("");
   const [selectedOutcome, setSelectedOutcome] = useState("");
@@ -59,6 +64,7 @@ export const EmotionLogger = () => {
     selectedMistakes,
     preTradingActivities,
     resetForm,
+    selectedDate,
     onSubmitSuccess: () => {
       setShowCelebration(true);
       setTimeout(() => setShowCelebration(false), 5000);
@@ -86,13 +92,22 @@ export const EmotionLogger = () => {
     setShowCelebration(false);
   };
 
+  const isHistoricalEntry = selectedDate.toDateString() !== new Date().toDateString();
+
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr,300px]">
       <Card className="p-8 space-y-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
         <div className="space-y-4">
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
-            {sessionType === "pre" ? "Pre-Session Check-in" : "Post-Session Review"}
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
+              {sessionType === "pre" ? "Pre-Session Check-in" : "Post-Session Review"}
+            </h2>
+            {isHistoricalEntry && (
+              <span className="text-sm text-muted-foreground">
+                Logging for: {format(selectedDate, 'MMM dd, yyyy')}
+              </span>
+            )}
+          </div>
           
           <SessionTypeSelector
             sessionType={sessionType}
@@ -163,13 +178,13 @@ export const EmotionLogger = () => {
             className="min-h-[120px] bg-card/50 border-primary/10 focus-visible:ring-primary/30 resize-none"
           />
 
-          <Button 
-            onClick={handleSubmit}
-            className="w-full h-12 text-lg font-medium bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all duration-300"
-          >
-            Log {sessionType === "pre" ? "Pre" : "Post"}-Session Entry
-          </Button>
-        </div>
+        <Button 
+          onClick={handleSubmit}
+          className="w-full h-12 text-lg font-medium bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all duration-300"
+        >
+          Log {sessionType === "pre" ? "Pre" : "Post"}-Session Entry
+          {isHistoricalEntry && " for Selected Date"}
+        </Button>
       </Card>
 
       <ProgressStats 

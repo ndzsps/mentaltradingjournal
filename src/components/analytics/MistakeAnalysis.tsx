@@ -19,10 +19,11 @@ interface TooltipData {
 
 const CustomTooltip = ({ active, payload }: { 
   active?: boolean; 
-  payload?: TooltipData[]; 
+  payload?: any[]; 
 }) => {
   if (!active || !payload || !payload.length) return null;
 
+  // For PieChart, the payload structure is different
   const data = payload[0];
   return (
     <div className="bg-background border border-border rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95">
@@ -35,14 +36,14 @@ const CustomTooltip = ({ active, payload }: {
           />
           <span className="text-muted-foreground">Frequency:</span>
           <span className="font-medium text-foreground">
-            {data.value.toFixed(1)}%
+            {data.payload.value.toFixed(1)}%
           </span>
         </div>
         <div className="flex items-center gap-2 text-sm">
           <div className="w-2 h-2 rounded-full bg-red-400" />
           <span className="text-muted-foreground">Loss Impact:</span>
           <span className="font-medium text-foreground">
-            ${data.loss.toLocaleString()}
+            ${data.payload.loss.toLocaleString()}
           </span>
         </div>
       </div>

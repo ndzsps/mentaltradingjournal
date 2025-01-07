@@ -70,16 +70,6 @@ export const TradeFormContent = ({
         return;
       }
 
-      // Check if the post-session entry has "no_trades" outcome
-      if (postSessionEntry.outcome === "no_trades") {
-        toast.error("Cannot add trades to a no-trade session", {
-          description: "You've marked this session as having no trades. Please change the session outcome if you want to add trades.",
-          duration: 5000,
-        });
-        onOpenChange(false);
-        return;
-      }
-
       // Get existing trades for this session
       const existingTrades = (postSessionEntry.trades || []).map((trade: any) => ({
         id: trade.id || crypto.randomUUID(),

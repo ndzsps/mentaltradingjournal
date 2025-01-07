@@ -77,13 +77,13 @@
     background-image: 
       radial-gradient(
         circle at 80% 20%,
-        hsl(var(--primary) / 0.15),
-        transparent 40%
+        hsl(var(--primary) / 0.25),
+        transparent 45%
       ),
       radial-gradient(
         circle at 20% 80%,
-        hsl(var(--accent) / 0.15),
-        transparent 40%
+        hsl(var(--accent) / 0.25),
+        transparent 45%
       );
     background-attachment: fixed;
   }
@@ -95,5 +95,19 @@
 
   .hover-text-visible:hover {
     @apply text-foreground/90;
+  }
+
+  .glow-effect {
+    @apply relative;
+  }
+
+  .glow-effect::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-lg blur-xl opacity-75 transition-opacity duration-500;
+    z-index: -1;
+  }
+
+  .glow-effect:hover::before {
+    @apply opacity-100;
   }
 }

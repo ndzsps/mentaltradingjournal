@@ -74,7 +74,7 @@ export const WinLossRatio = () => {
     { name: "Losing Trades", value: lossRate },
   ];
 
-  const COLORS = ['#6E59A5', '#FEC6A1'];
+  const COLORS = ['#22c55e', '#ef4444']; // Green for winning, Red for losing
 
   return (
     <Card className="p-4 md:p-6 space-y-4">

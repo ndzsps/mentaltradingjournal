@@ -68,6 +68,17 @@ const Landing = () => {
             </Button>
           </div>
 
+          {/* Feature Image Section */}
+          <div className="mt-24 mb-32">
+            <div className="feature-image glow-effect">
+              <img
+                src="/lovable-uploads/ee4d3ca1-5b77-4b9f-bdda-ae22c52f9854.png"
+                alt="Trading Psychology Dashboard"
+                className="w-full rounded-[24px] shadow-2xl"
+              />
+            </div>
+          </div>
+
           <div className="mt-20">
             <p className="text-sm text-muted-foreground mb-4">FEATURED IN</p>
             <div className="flex flex-wrap gap-8 items-center opacity-50">

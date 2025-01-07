@@ -10,50 +10,59 @@ export const EmotionGauge = ({ score }: EmotionGaugeProps) => {
   
   return (
     <div className="flex items-center gap-6">
-      <div className="relative w-40 h-20">
-        {/* Main semicircle background */}
+      <div className="relative w-32 h-16">
+        {/* Outer ring */}
+        <div className="absolute inset-0 rounded-t-full border-4 border-border/20" />
+        
+        {/* Background gradient */}
         <div 
           className="absolute inset-0 rounded-t-full overflow-hidden"
           style={{
             background: `conic-gradient(
               from 180deg at 50% 100%,
-              #FF0000 0deg,     /* Poor - Red */
-              #FF0000 36deg,    
-              #FF8C00 36deg,    /* Bad - Orange */
-              #FF8C00 72deg,
-              #FFD700 72deg,    /* Fair - Yellow */
-              #FFD700 108deg,
-              #90EE90 108deg,   /* Normal - Light green */
-              #90EE90 144deg,
-              #008000 144deg,   /* Good - Dark green */
-              #008000 180deg
+              #dc2626 0deg,      /* Deep red */
+              #dc2626 45deg,     /* Red section */
+              #f59e0b 45deg,     /* Orange/yellow transition */
+              #fbbf24 90deg,     /* Yellow section */
+              #fbbf24 120deg,    /* Hold yellow */
+              #16a34a 120deg,    /* Transition to green */
+              #15803d 180deg     /* Deep green */
             )`,
             clipPath: 'polygon(0 50%, 100% 50%, 100% 0, 0 0)',
+            opacity: 0.9
           }}
         />
 
-        {/* Labels */}
+        {/* Tick marks */}
         <div className="absolute inset-0">
-          <span className="absolute text-[10px] font-medium text-white" style={{ left: '10%', top: '40%' }}>POOR</span>
-          <span className="absolute text-[10px] font-medium text-white" style={{ left: '30%', top: '25%' }}>BAD</span>
-          <span className="absolute text-[10px] font-medium text-white" style={{ left: '50%', top: '15%', transform: 'translateX(-50%)' }}>FAIR</span>
-          <span className="absolute text-[10px] font-medium text-white" style={{ right: '30%', top: '25%' }}>NORMAL</span>
-          <span className="absolute text-[10px] font-medium text-white" style={{ right: '10%', top: '40%' }}>GOOD</span>
+          {[0, 45, 90, 135, 180].map((deg) => (
+            <div
+              key={deg}
+              className="absolute bottom-0 left-1/2 w-0.5 h-2 bg-border/60"
+              style={{
+                transform: `translateX(-50%) rotate(${deg - 90}deg)`,
+                transformOrigin: 'bottom'
+              }}
+            />
+          ))}
         </div>
 
-        {/* Black base/housing */}
+        {/* Indicator needle with shadow */}
         <div 
-          className="absolute bottom-0 left-1/2 w-8 h-4 bg-black rounded-t-full"
+          className="absolute bottom-0 left-1/2 w-1 h-11 origin-bottom transition-transform duration-700 shadow-lg"
           style={{
-            transform: 'translateX(-50%)',
+            transform: `translateX(-50%) rotate(${rotation}deg)`,
+            background: 'linear-gradient(to bottom, #1a1a1a, #000000)',
           }}
         />
 
-        {/* Needle */}
+        {/* Center point with metallic effect */}
         <div 
-          className="absolute bottom-0 left-1/2 w-1 h-16 bg-black origin-bottom transition-transform duration-700"
+          className="absolute bottom-0 left-1/2 w-4 h-4 rounded-full shadow-lg"
           style={{
-            transform: `translateX(-50%) rotate(${rotation}deg)`,
+            transform: 'translate(-50%, 50%)',
+            background: 'radial-gradient(circle at 30% 30%, #ffffff, #d1d5db)',
+            border: '2px solid #1a1a1a'
           }}
         />
       </div>

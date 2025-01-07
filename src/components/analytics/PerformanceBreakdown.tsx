@@ -45,8 +45,17 @@ export const PerformanceBreakdown = () => {
     averagePnL: stats.count > 0 ? stats.totalPnL / stats.count : 0,
   })).sort((a, b) => b.averagePnL - a.averagePnL);
 
-  const maxValue = Math.max(...data.map(d => Math.abs(d.averagePnL)));
-  const domain = [-maxValue, maxValue];
+  // Calculate rounded max value for better axis intervals
+  const maxAbsValue = Math.max(...data.map(d => Math.abs(d.averagePnL)));
+  const roundedMax = Math.ceil(maxAbsValue / 100) * 100; // Round to nearest hundred
+  const domain = [-roundedMax, roundedMax];
+
+  // Generate tick values in intervals of 100 or 200 depending on the range
+  const interval = roundedMax > 1000 ? 200 : 100;
+  const ticks = Array.from(
+    { length: Math.floor((2 * roundedMax) / interval) + 1 },
+    (_, i) => -roundedMax + (i * interval)
+  );
 
   return (
     <Card className="p-4 md:p-6 space-y-4">
@@ -67,8 +76,9 @@ export const PerformanceBreakdown = () => {
             />
             <YAxis 
               domain={domain}
+              ticks={ticks}
               tick={{ fontSize: 12 }}
-              tickFormatter={(value) => `$${value.toFixed(0)}`}
+              tickFormatter={(value) => `$${value}`}
               label={{ 
                 value: 'Average P&L per Trade ($)', 
                 angle: -90, 

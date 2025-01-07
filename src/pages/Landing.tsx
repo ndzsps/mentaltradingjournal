@@ -103,33 +103,6 @@ const Landing = () => {
           </Card>
         </div>
       </section>
-
-      {/* Value Propositions */}
-      <section className="container mx-auto px-4 py-16">
-        <div className="grid md:grid-cols-3 gap-8">
-          <div className="text-center space-y-4">
-            <Brain className="h-12 w-12 mx-auto text-primary" />
-            <h3 className="text-xl font-semibold">Emotional Intelligence</h3>
-            <p className="text-muted-foreground">
-              Develop awareness of your emotional patterns and their impact on trading
-            </p>
-          </div>
-          <div className="text-center space-y-4">
-            <BarChart2 className="h-12 w-12 mx-auto text-primary" />
-            <h3 className="text-xl font-semibold">Data Analytics</h3>
-            <p className="text-muted-foreground">
-              Make informed decisions based on comprehensive performance data
-            </p>
-          </div>
-          <div className="text-center space-y-4">
-            <Target className="h-12 w-12 mx-auto text-primary" />
-            <h3 className="text-xl font-semibold">Continuous Improvement</h3>
-            <p className="text-muted-foreground">
-              Track your progress and develop better trading habits over time
-            </p>
-          </div>
-        </div>
-      </section>
     </div>
   );
 };

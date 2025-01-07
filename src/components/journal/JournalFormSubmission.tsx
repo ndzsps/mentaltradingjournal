@@ -67,15 +67,6 @@ export const useJournalFormSubmission = ({
         });
         return;
       }
-
-      // Only validate trades if the outcome is not "no_trades"
-      if (selectedOutcome !== "no_trades" && trades.length === 0) {
-        toast.error("Missing Information", {
-          description: "Please add at least one trade for your trading session.",
-          duration: 5000,
-        });
-        return;
-      }
     }
 
     try {

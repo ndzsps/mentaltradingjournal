@@ -83,49 +83,48 @@ const Journal = () => {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
-          <JournalCalendar 
-            date={selectedDate}
-            onDateSelect={setSelectedDate}
-            entries={entries.map(entry => ({
-              date: new Date(entry.created_at),
-              emotion: entry.emotion
-            }))}
-          />
+        <JournalCalendar 
+          date={selectedDate}
+          onDateSelect={setSelectedDate}
+          entries={entries.map(entry => ({
+            date: new Date(entry.created_at),
+            emotion: entry.emotion,
+            trades: entry.trades
+          }))}
+        />
 
-          <Card className="p-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
-                Journal Entries
-              </h2>
-              <JournalFilters
-                emotionFilter={emotionFilter}
-                setEmotionFilter={setEmotionFilter}
-                detailFilter={detailFilter}
-                setDetailFilter={setDetailFilter}
-                timeFilter={timeFilter}
-                setTimeFilter={setTimeFilter}
-                outcomeFilter={outcomeFilter}
-                setOutcomeFilter={setOutcomeFilter}
-                allDetails={Array.from(new Set(entries.map(entry => entry.emotion_detail)))}
-              />
-            </div>
-            
-            <ScrollArea className="h-[600px] pr-4">
-              {filteredEntries.length > 0 ? (
-                <div className="space-y-4">
-                  {filteredEntries.map((entry) => (
-                    <JournalEntry key={entry.id} entry={entry} />
-                  ))}
-                </div>
-              ) : (
-                <p className="text-muted-foreground text-center py-8">
-                  No entries found for the selected filters
-                </p>
-              )}
-            </ScrollArea>
-          </Card>
-        </div>
+        <Card className="p-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
+              Journal Entries
+            </h2>
+            <JournalFilters
+              emotionFilter={emotionFilter}
+              setEmotionFilter={setEmotionFilter}
+              detailFilter={detailFilter}
+              setDetailFilter={setDetailFilter}
+              timeFilter={timeFilter}
+              setTimeFilter={setTimeFilter}
+              outcomeFilter={outcomeFilter}
+              setOutcomeFilter={setOutcomeFilter}
+              allDetails={Array.from(new Set(entries.map(entry => entry.emotion_detail)))}
+            />
+          </div>
+          
+          <ScrollArea className="h-[600px] pr-4">
+            {filteredEntries.length > 0 ? (
+              <div className="space-y-4">
+                {filteredEntries.map((entry) => (
+                  <JournalEntry key={entry.id} entry={entry} />
+                ))}
+              </div>
+            ) : (
+              <p className="text-muted-foreground text-center py-8">
+                No entries found for the selected filters
+              </p>
+            )}
+          </ScrollArea>
+        </Card>
       </div>
     </AppLayout>
   );

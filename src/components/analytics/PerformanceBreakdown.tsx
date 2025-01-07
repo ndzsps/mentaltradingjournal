@@ -1,5 +1,14 @@
 import { Card } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  Cell 
+} from "recharts";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
 
@@ -107,9 +116,6 @@ export const PerformanceBreakdown = () => {
               dataKey="averagePnL" 
               radius={[4, 4, 0, 0]}
               fill="hsl(142.1 76.2% 46.3%)"
-              style={{
-                fill: "url(#colorGradient)"
-              }}
             >
               {data.map((entry, index) => (
                 <Cell

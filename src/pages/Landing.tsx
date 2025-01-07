@@ -3,15 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { 
   ArrowRight, 
-  BarChart2, 
-  Brain, 
-  Target,
-  TrendingUp,
-  Clock,
+  Brain,
   LineChart,
-  PieChart,
   Activity,
-  Gauge
+  Gauge,
+  Heart,
+  Scale
 } from "lucide-react";
 import {
   Card,
@@ -26,45 +23,69 @@ const Landing = () => {
 
   const analyticsTools = [
     {
-      title: "Emotional Intelligence",
-      description: "Track emotional patterns and their impact on trading decisions",
+      title: "Emotional Intelligence Mastery",
+      description: "Transform emotions from trading obstacles into strategic advantages",
       icon: Brain,
-      features: ["Mood tracking", "Performance correlation", "Behavioral insights"],
+      features: [
+        "Identify emotional triggers affecting trades",
+        "Track mood-performance correlation",
+        "Build emotional resilience"
+      ],
       gradient: "from-violet-500/20 to-purple-500/20"
     },
     {
-      title: "Performance Analytics",
-      description: "Comprehensive analysis of your trading performance",
-      icon: BarChart2,
-      features: ["Win/loss ratios", "Profit analysis", "Risk assessment"],
-      gradient: "from-blue-500/20 to-cyan-500/20"
-    },
-    {
-      title: "Trade Duration",
-      description: "Analyze optimal holding periods and timing patterns",
-      icon: Clock,
-      features: ["Time analysis", "Peak performance hours", "Pattern recognition"],
-      gradient: "from-emerald-500/20 to-teal-500/20"
-    },
-    {
-      title: "Asset Performance",
-      description: "Track performance across different trading pairs",
-      icon: LineChart,
-      features: ["Pair analysis", "Success rates", "Market correlation"],
-      gradient: "from-orange-500/20 to-amber-500/20"
-    },
-    {
-      title: "Risk Management",
-      description: "Monitor and optimize your risk management strategies",
-      icon: Gauge,
-      features: ["Risk metrics", "Position sizing", "Exposure analysis"],
+      title: "Psychological Pattern Recognition",
+      description: "Understand and improve your trading psychology patterns",
+      icon: Heart,
+      features: [
+        "Behavioral pattern analysis",
+        "Decision-making insights",
+        "Stress response tracking"
+      ],
       gradient: "from-pink-500/20 to-rose-500/20"
     },
     {
-      title: "Pattern Recognition",
-      description: "Identify successful trading patterns and behaviors",
+      title: "Mental Balance Metrics",
+      description: "Maintain psychological equilibrium during market volatility",
+      icon: Scale,
+      features: [
+        "Stress level monitoring",
+        "Recovery time analysis",
+        "Mindset optimization"
+      ],
+      gradient: "from-blue-500/20 to-cyan-500/20"
+    },
+    {
+      title: "Performance Analytics",
+      description: "Comprehensive analysis of your trading decisions",
+      icon: LineChart,
+      features: [
+        "Win/loss pattern analysis",
+        "Risk management tracking",
+        "Performance metrics"
+      ],
+      gradient: "from-emerald-500/20 to-teal-500/20"
+    },
+    {
+      title: "Risk Psychology Profile",
+      description: "Understand your risk tolerance and decision patterns",
+      icon: Gauge,
+      features: [
+        "Risk behavior analysis",
+        "Emotional risk assessment",
+        "Decision confidence tracking"
+      ],
+      gradient: "from-orange-500/20 to-amber-500/20"
+    },
+    {
+      title: "Behavioral Pattern Analysis",
+      description: "Identify and optimize your trading behavior patterns",
       icon: Activity,
-      features: ["Behavior analysis", "Success patterns", "Strategy validation"],
+      features: [
+        "Trading habit analysis",
+        "Psychological biases detection",
+        "Behavior optimization tips"
+      ],
       gradient: "from-indigo-500/20 to-blue-500/20"
     }
   ];
@@ -96,11 +117,10 @@ const Landing = () => {
       <section className="container mx-auto px-4 py-16 bg-accent/5">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Powerful Analytics Suite
+            Trading Psychology Analytics
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Our comprehensive set of analytical tools helps you understand your trading behavior
-            and improve your decision-making process.
+            Transform your trading mindset with our comprehensive suite of psychological analysis tools
           </p>
         </div>
 
@@ -108,7 +128,7 @@ const Landing = () => {
           {analyticsTools.map((tool, index) => (
             <Card 
               key={index} 
-              className={`relative overflow-hidden transition-all duration-300 hover:shadow-lg border-none bg-gradient-to-br ${tool.gradient}`}
+              className={`relative overflow-hidden transition-all duration-300 hover:shadow-lg border-none bg-gradient-to-br ${tool.gradient} h-full`}
             >
               <CardHeader className="space-y-4">
                 <div className="flex items-center space-x-4">
@@ -144,7 +164,7 @@ const Landing = () => {
             size="lg"
             className="bg-primary hover:bg-primary/90"
           >
-            Explore Analytics
+            Start Your Psychology Journey
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </div>

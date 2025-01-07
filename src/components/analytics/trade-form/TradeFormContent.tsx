@@ -47,25 +47,26 @@ export const TradeFormContent = ({
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       
+      // First, get all entries for today
       const { data: entries, error: fetchError } = await supabase
         .from('journal_entries')
         .select('*')
         .eq('user_id', user?.id)
         .gte('created_at', today.toISOString())
         .lt('created_at', new Date(today.getTime() + 24 * 60 * 60 * 1000).toISOString())
-        .order('created_at', { ascending: false })
-        .limit(1);
+        .order('created_at', { ascending: false });
 
       if (fetchError) throw fetchError;
 
-      if (!entries || entries.length === 0) {
-        toast.error("No journal entry found for today");
+      // Find the most recent post-session entry
+      const postSessionEntry = entries?.find(entry => entry.session_type === 'post');
+      
+      if (!postSessionEntry) {
+        toast.error("No post-session entry found for today");
         return;
       }
 
-      const currentEntry = entries[0];
-      
-      const existingTrades = (currentEntry.trades || []).map((trade: any) => ({
+      const existingTrades = (postSessionEntry.trades || []).map((trade: any) => ({
         id: trade.id || crypto.randomUUID(),
         entryDate: trade.entryDate,
         instrument: trade.instrument,
@@ -99,7 +100,7 @@ export const TradeFormContent = ({
       const { error: updateError } = await supabase
         .from('journal_entries')
         .update({ trades: tradesForDb })
-        .eq('id', currentEntry.id);
+        .eq('id', postSessionEntry.id);
 
       if (updateError) throw updateError;
 

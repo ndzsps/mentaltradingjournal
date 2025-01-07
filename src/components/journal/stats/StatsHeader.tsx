@@ -3,48 +3,7 @@ import { DollarSign, Percent, Smile, Flame } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useProgressTracking } from "@/hooks/useProgressTracking";
-
-const EmotionGauge = ({ score }: { score: number }) => {
-  // Calculate the rotation angle based on the score (0-100)
-  // -90 to start at the left, then rotate based on score percentage
-  const rotation = -90 + (score / 100) * 180;
-  
-  return (
-    <div className="relative w-16 h-8 mx-auto mb-1">
-      {/* Background arc */}
-      <div 
-        className="absolute w-full h-full rounded-t-full overflow-hidden"
-        style={{
-          background: `conic-gradient(
-            from 180deg at 50% 100%,
-            #ea384c 0deg,      /* Start with red */
-            #ea384c 45deg,     /* Hold red for first quarter */
-            #FEF7CD 90deg,     /* Transition to yellow */
-            #FEF7CD 120deg,    /* Hold yellow */
-            #22c55e 180deg     /* End with green */
-          )`,
-          clipPath: 'polygon(0 50%, 100% 50%, 100% 0, 0 0)'
-        }}
-      />
-      {/* Indicator needle */}
-      <div 
-        className="absolute bottom-0 left-1/2 w-1 h-6 origin-bottom transition-transform duration-700"
-        style={{
-          transform: `translateX(-50%) rotate(${rotation}deg)`,
-          backgroundColor: score < 33 ? '#ea384c' : score < 66 ? '#FEF7CD' : '#22c55e'
-        }}
-      />
-      {/* Center point */}
-      <div 
-        className="absolute bottom-0 left-1/2 w-2 h-2 rounded-full"
-        style={{
-          backgroundColor: score < 33 ? '#ea384c' : score < 66 ? '#FEF7CD' : '#22c55e',
-          transform: 'translate(-50%, 50%)'
-        }}
-      />
-    </div>
-  );
-};
+import { EmotionGauge } from "./EmotionGauge";
 
 export const StatsHeader = () => {
   const { data: analytics, isLoading: isAnalyticsLoading } = useQuery({
@@ -131,12 +90,6 @@ export const StatsHeader = () => {
           <Smile className="h-4 w-4 text-accent-dark" />
         </div>
         <EmotionGauge score={emotionScore} />
-        <div className="text-2xl font-bold text-foreground text-center">
-          {emotionScore.toFixed(0)}%
-        </div>
-        <div className="text-sm text-muted-foreground text-center">
-          Positive Emotions
-        </div>
       </Card>
 
       <Card className="p-4 hover:shadow-lg transition-shadow">

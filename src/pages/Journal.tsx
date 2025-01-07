@@ -10,6 +10,7 @@ import { JournalEntry } from "@/components/journal/JournalEntry";
 import { JournalFilters } from "@/components/journal/JournalFilters";
 import { useJournalFilters } from "@/hooks/useJournalFilters";
 import { JournalEntryType } from "@/types/journal";
+import { StatsHeader } from "@/components/journal/stats/StatsHeader";
 
 const Journal = () => {
   const [entries, setEntries] = useState<JournalEntryType[]>([]);
@@ -42,7 +43,6 @@ const Journal = () => {
         return;
       }
 
-      console.log('Fetched entries:', data);
       setEntries(data || []);
     };
 
@@ -57,8 +57,7 @@ const Journal = () => {
           schema: 'public',
           table: 'journal_entries',
         },
-        (payload) => {
-          console.log('Realtime update received:', payload);
+        () => {
           fetchEntries();
         }
       )
@@ -72,14 +71,7 @@ const Journal = () => {
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto space-y-8 px-4">
-        <div className="space-y-3">
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
-            Trading Journal
-          </h1>
-          <p className="text-xl text-muted-foreground">
-            Track your emotional journey through your trading sessions
-          </p>
-        </div>
+        <StatsHeader />
 
         <div className="flex flex-col md:flex-row gap-6">
           <div className="flex-1">

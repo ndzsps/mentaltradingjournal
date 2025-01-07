@@ -57,6 +57,14 @@ export const PerformanceBreakdown = () => {
     (_, i) => -roundedMax + (i * interval)
   );
 
+  // Format number to K notation if >= 1000
+  const formatYAxisTick = (value: number) => {
+    if (Math.abs(value) >= 1000) {
+      return `$${(value / 1000).toFixed(1)}K`;
+    }
+    return `$${value}`;
+  };
+
   return (
     <Card className="p-4 md:p-6 space-y-4">
       <div className="space-y-2">
@@ -78,7 +86,7 @@ export const PerformanceBreakdown = () => {
               domain={domain}
               ticks={ticks}
               tick={{ fontSize: 12 }}
-              tickFormatter={(value) => `$${value}`}
+              tickFormatter={formatYAxisTick}
               label={{ 
                 value: 'Average P&L per Trade ($)', 
                 angle: -90, 

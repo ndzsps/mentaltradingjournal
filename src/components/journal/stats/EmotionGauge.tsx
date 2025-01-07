@@ -10,51 +10,50 @@ export const EmotionGauge = ({ score }: EmotionGaugeProps) => {
   
   return (
     <div className="flex items-center gap-6">
-      <div className="relative w-32 h-16">
-        {/* Main gauge background */}
+      <div className="relative w-40 h-20">
+        {/* Main semicircle background */}
         <div 
-          className="absolute inset-0 rounded-t-full overflow-hidden border-2 border-border"
+          className="absolute inset-0 rounded-t-full overflow-hidden"
           style={{
             background: `conic-gradient(
               from 180deg at 50% 100%,
-              #ef4444 0deg,      /* Red */
-              #ef4444 60deg,     /* Hold red */
-              #fbbf24 60deg,     /* Transition to yellow */
-              #fbbf24 120deg,    /* Hold yellow */
-              #22c55e 120deg,    /* Transition to green */
-              #22c55e 180deg     /* Hold green */
+              #FF0000 0deg,     /* Poor - Red */
+              #FF0000 36deg,    
+              #FF8C00 36deg,    /* Bad - Orange */
+              #FF8C00 72deg,
+              #FFD700 72deg,    /* Fair - Yellow */
+              #FFD700 108deg,
+              #90EE90 108deg,   /* Normal - Light green */
+              #90EE90 144deg,
+              #008000 144deg,   /* Good - Dark green */
+              #008000 180deg
             )`,
             clipPath: 'polygon(0 50%, 100% 50%, 100% 0, 0 0)',
           }}
         />
 
-        {/* Simple tick marks */}
+        {/* Labels */}
         <div className="absolute inset-0">
-          {[0, 45, 90, 135, 180].map((deg) => (
-            <div
-              key={deg}
-              className="absolute bottom-0 left-1/2 w-0.5 h-2 bg-white/40"
-              style={{
-                transform: `translateX(-50%) rotate(${deg - 90}deg)`,
-                transformOrigin: 'bottom'
-              }}
-            />
-          ))}
+          <span className="absolute text-[10px] font-medium text-white" style={{ left: '10%', top: '40%' }}>POOR</span>
+          <span className="absolute text-[10px] font-medium text-white" style={{ left: '30%', top: '25%' }}>BAD</span>
+          <span className="absolute text-[10px] font-medium text-white" style={{ left: '50%', top: '15%', transform: 'translateX(-50%)' }}>FAIR</span>
+          <span className="absolute text-[10px] font-medium text-white" style={{ right: '30%', top: '25%' }}>NORMAL</span>
+          <span className="absolute text-[10px] font-medium text-white" style={{ right: '10%', top: '40%' }}>GOOD</span>
         </div>
 
-        {/* Clean black needle */}
+        {/* Black base/housing */}
         <div 
-          className="absolute bottom-0 left-1/2 w-1 h-11 bg-black origin-bottom transition-transform duration-700"
+          className="absolute bottom-0 left-1/2 w-8 h-4 bg-black rounded-t-full"
           style={{
-            transform: `translateX(-50%) rotate(${rotation}deg)`,
+            transform: 'translateX(-50%)',
           }}
         />
 
-        {/* Simple center point */}
+        {/* Needle */}
         <div 
-          className="absolute bottom-0 left-1/2 w-3 h-3 rounded-full bg-black"
+          className="absolute bottom-0 left-1/2 w-1 h-16 bg-black origin-bottom transition-transform duration-700"
           style={{
-            transform: 'translate(-50%, 50%)',
+            transform: `translateX(-50%) rotate(${rotation}deg)`,
           }}
         />
       </div>

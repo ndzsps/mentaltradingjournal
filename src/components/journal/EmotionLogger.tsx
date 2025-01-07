@@ -118,7 +118,7 @@ export const EmotionLogger = () => {
             marketConditionsSelected={!!marketConditions}
             rulesSelected={followedRules.length > 0}
             mistakesReviewed={selectedMistakes.length > 0 || selectedOutcome !== "loss"}
-            tradesAdded={trades.length > 0}
+            tradesAdded={trades.length > 0 || selectedOutcome === "no_trades"}
             isPostSession={sessionType === "post"}
             showCelebration={showCelebration}
           />
@@ -180,6 +180,7 @@ export const EmotionLogger = () => {
             setNotes={setNotes}
             trades={trades}
             handleSubmit={handleSubmit}
+            selectedOutcome={selectedOutcome}
           />
         </div>
       </Card>

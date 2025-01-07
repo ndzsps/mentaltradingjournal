@@ -9,6 +9,7 @@ interface FormSubmissionSectionProps {
   setNotes: (notes: string) => void;
   trades: Trade[];
   handleSubmit: () => void;
+  selectedOutcome?: string;
 }
 
 export const FormSubmissionSection = ({
@@ -17,9 +18,10 @@ export const FormSubmissionSection = ({
   setNotes,
   trades,
   handleSubmit,
+  selectedOutcome,
 }: FormSubmissionSectionProps) => {
   const handleFormSubmit = () => {
-    if (sessionType === "post" && trades.length === 0) {
+    if (sessionType === "post" && trades.length === 0 && selectedOutcome !== "no_trades") {
       toast.error("Please add at least one trade before submitting your post-session entry", {
         description: "Click the 'Add Trade' button to log your trades.",
         duration: 5000,

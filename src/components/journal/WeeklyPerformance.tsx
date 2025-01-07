@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Trade } from "@/types/trade";
+import { JournalEntryType } from "@/types/journal";
 
 interface WeekSummary {
   weekNumber: number;
@@ -40,7 +41,7 @@ export const WeeklyPerformance = () => {
       }));
 
       // Process entries
-      entries?.forEach(entry => {
+      (entries as JournalEntryType[])?.forEach(entry => {
         const entryDate = new Date(entry.created_at);
         
         // Find which week this entry belongs to
@@ -50,9 +51,9 @@ export const WeeklyPerformance = () => {
           
           if (isWithinInterval(entryDate, { start: weekStart, end: weekEnd })) {
             // Calculate total P&L from trades
-            const trades = entry.trades as Trade[];
-            const dailyPnL = trades?.reduce((sum, trade) => 
-              sum + (Number(trade.pnl) || 0), 0) || 0;
+            const trades = (entry.trades || []) as Trade[];
+            const dailyPnL = trades.reduce((sum, trade) => 
+              sum + (Number(trade.pnl) || 0), 0);
             
             weeks[i].totalPnL += dailyPnL;
             

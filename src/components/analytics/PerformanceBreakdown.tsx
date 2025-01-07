@@ -104,6 +104,7 @@ export const PerformanceBreakdown = () => {
               }}
             />
             <Tooltip 
+              cursor={false}
               formatter={(value: number) => [formatYAxisTick(value), 'Average P&L']}
               contentStyle={{ 
                 backgroundColor: 'hsl(var(--background))',

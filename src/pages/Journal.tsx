@@ -31,6 +31,7 @@ const Journal = () => {
   const [emotionFilter, setEmotionFilter] = useState<string | null>(null);
   const [detailFilter, setDetailFilter] = useState<string | null>(null);
   const [timeFilter, setTimeFilter] = useState<TimeFilter>(null);
+  const [outcomeFilter, setOutcomeFilter] = useState<string | null>(null);
   const [entries, setEntries] = useState<JournalEntryType[]>([]);
   const { user } = useAuth();
 
@@ -78,9 +79,9 @@ const Journal = () => {
   const filteredEntries = entries.filter(entry => {
     const entryDate = new Date(entry.created_at);
     const matchesDate = !selectedDate || isSameDay(entryDate, selectedDate);
-    // Convert both to lowercase for case-insensitive comparison
     const matchesEmotion = !emotionFilter || entry.emotion.toLowerCase() === emotionFilter.toLowerCase();
     const matchesDetail = !detailFilter || entry.emotion_detail === detailFilter;
+    const matchesOutcome = !outcomeFilter || (entry.outcome === outcomeFilter && entry.session_type === 'post');
     
     let matchesTimeFilter = true;
     if (timeFilter) {
@@ -106,7 +107,7 @@ const Journal = () => {
       }
     }
 
-    return matchesDate && matchesEmotion && matchesDetail && matchesTimeFilter;
+    return matchesDate && matchesEmotion && matchesDetail && matchesTimeFilter && matchesOutcome;
   });
 
   console.log('Selected date:', selectedDate);
@@ -146,6 +147,8 @@ const Journal = () => {
                 setDetailFilter={setDetailFilter}
                 timeFilter={timeFilter}
                 setTimeFilter={setTimeFilter}
+                outcomeFilter={outcomeFilter}
+                setOutcomeFilter={setOutcomeFilter}
                 allDetails={Array.from(new Set(entries.map(entry => entry.emotion_detail)))}
               />
             </div>
@@ -159,7 +162,7 @@ const Journal = () => {
                 </div>
               ) : (
                 <p className="text-muted-foreground text-center py-8">
-                  No entries found for the selected date
+                  No entries found for the selected filters
                 </p>
               )}
             </ScrollArea>

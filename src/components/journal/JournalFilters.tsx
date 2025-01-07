@@ -19,6 +19,8 @@ interface JournalFiltersProps {
   setDetailFilter: (value: string | null) => void;
   timeFilter: TimeFilter;
   setTimeFilter: (value: TimeFilter) => void;
+  outcomeFilter: string | null;
+  setOutcomeFilter: (value: string | null) => void;
   allDetails: string[];
 }
 
@@ -29,6 +31,8 @@ export const JournalFilters = ({
   setDetailFilter,
   timeFilter,
   setTimeFilter,
+  outcomeFilter,
+  setOutcomeFilter,
   allDetails,
 }: JournalFiltersProps) => {
   return (
@@ -100,6 +104,30 @@ export const JournalFilters = ({
               {detail}
             </DropdownMenuItem>
           ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" className="gap-2">
+            Outcome <ChevronDown className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuLabel>Filter by Outcome</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => setOutcomeFilter(null)}>
+            All Outcomes
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setOutcomeFilter("win")}>
+            Win
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setOutcomeFilter("loss")}>
+            Loss
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setOutcomeFilter("no_trades")}>
+            No Trades
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

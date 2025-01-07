@@ -3,6 +3,7 @@ import { DollarSign, Percent, Smile, Flame } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useProgressTracking } from "@/hooks/useProgressTracking";
+import { TradeWinPercentage } from "./TradeWinPercentage";
 
 export const StatsHeader = () => {
   const { data: analytics, isLoading: isAnalyticsLoading } = useQuery({
@@ -45,8 +46,8 @@ export const StatsHeader = () => {
 
   if (isAnalyticsLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        {[...Array(4)].map((_, i) => (
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+        {[...Array(5)].map((_, i) => (
           <Card key={i} className="p-4 animate-pulse">
             <div className="h-16 bg-muted rounded"></div>
           </Card>
@@ -56,7 +57,7 @@ export const StatsHeader = () => {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+    <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
       <Card className="p-4 hover:shadow-lg transition-shadow">
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-medium text-muted-foreground">Net P&L</span>
@@ -95,6 +96,8 @@ export const StatsHeader = () => {
           Positive Emotions
         </div>
       </Card>
+
+      <TradeWinPercentage />
 
       <Card className="p-4 hover:shadow-lg transition-shadow">
         <div className="flex items-center justify-between mb-2">

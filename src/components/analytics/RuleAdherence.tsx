@@ -12,6 +12,7 @@ import {
 } from "recharts";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export const RuleAdherence = () => {
   const { data: analytics, isLoading } = useQuery({

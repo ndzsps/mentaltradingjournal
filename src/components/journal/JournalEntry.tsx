@@ -53,27 +53,27 @@ export const JournalEntry = ({ entry }: JournalEntryProps) => {
 
   return (
     <Card className="p-6 rounded-lg bg-background/50 border border-primary/10 min-h-[400px]">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between mb-6">
+        <div className="flex flex-wrap items-center gap-3">
           <Badge 
             variant={entry.session_type === 'pre' ? 'default' : 'secondary'}
-            className="capitalize"
+            className="capitalize px-4 py-1"
           >
             {entry.session_type}-Session
           </Badge>
           <Badge 
             variant="outline" 
-            className="bg-accent/10 hover:bg-accent/20 transition-colors"
+            className="bg-accent/10 hover:bg-accent/20 transition-colors px-4 py-1"
           >
             {capitalizeWords(entry.emotion)} - {capitalizeWords(entry.emotion_detail)}
           </Badge>
           {entry.session_type === 'post' && entry.outcome && (
             <Badge 
               variant="outline" 
-              className={`capitalize ${
+              className={`capitalize px-4 py-1 ${
                 entry.outcome === 'loss' 
-                  ? 'border-red-500/50 text-red-500' 
-                  : 'border-accent/50 text-accent-foreground'
+                  ? 'border-red-500/50 text-red-500 bg-red-500/5 hover:bg-red-500/10' 
+                  : 'border-green-500/50 text-green-500 bg-green-500/5 hover:bg-green-500/10'
               }`}
             >
               {capitalizeWords(entry.outcome)}

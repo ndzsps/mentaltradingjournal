@@ -73,7 +73,7 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
                 >
                   <span className={`
                     relative z-10
-                    ${isToday ? 'bg-yellow-100 px-2 py-1 rounded-full' : ''}
+                    ${isToday ? 'bg-primary text-primary-foreground px-2 py-1 rounded-full' : ''}
                   `}>
                     {dayDate.getDate()}
                   </span>

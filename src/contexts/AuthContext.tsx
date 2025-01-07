@@ -20,24 +20,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check for existing session on mount
+    // Check active session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       setLoading(false);
     });
 
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'TOKEN_REFRESHED') {
-        setUser(session?.user ?? null);
-      } else if (event === 'SIGNED_OUT') {
-        setUser(null);
-      } else if (event === 'SIGNED_IN') {
-        setUser(session?.user ?? null);
-      } else if (event === 'USER_UPDATED') {
-        setUser(session?.user ?? null);
-      }
-      
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null);
       setLoading(false);
     });
 
@@ -48,12 +41,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
       if (error) {
         toast({
           variant: "destructive",
           title: "Error signing in",
-          description: error.message
+          description: error.message,
         });
         throw error;
       }
@@ -65,20 +61,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUp = async (email: string, password: string) => {
     try {
-      const { error, data } = await supabase.auth.signUp({ 
-        email, 
+      const { error } = await supabase.auth.signUp({
+        email,
         password,
         options: {
           data: {
-            username: email.split('@')[0]
-          }
-        }
+            username: email.split("@")[0],
+          },
+        },
       });
       if (error) {
         toast({
           variant: "destructive",
           title: "Error signing up",
-          description: error.message
+          description: error.message,
         });
         throw error;
       }
@@ -95,7 +91,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         toast({
           variant: "destructive",
           title: "Error signing out",
-          description: error.message
+          description: error.message,
         });
         throw error;
       }
@@ -109,13 +105,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!user) return;
     try {
       const { error } = await supabase.auth.updateUser({
-        data: { username }
+        data: { username },
       });
       if (error) {
         toast({
           variant: "destructive",
           title: "Error updating username",
-          description: error.message
+          description: error.message,
         });
         throw error;
       }
@@ -125,11 +121,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  return (
-    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut, updateUsername }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  const value = {
+    user,
+    loading,
+    signIn,
+    signUp,
+    signOut,
+    updateUsername,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {

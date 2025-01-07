@@ -96,6 +96,7 @@ export const WinLossRatio = () => {
               outerRadius={80}
               paddingAngle={5}
               dataKey="value"
+              stroke="transparent" // Remove the white outline
             >
               {data.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

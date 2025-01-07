@@ -33,7 +33,6 @@ interface JournalFormSubmissionProps {
   preTradingActivities: string[];
   resetForm: () => void;
   onSubmitSuccess?: () => void;
-  selectedDate?: Date; // New prop for custom date
 }
 
 export const useJournalFormSubmission = ({
@@ -48,7 +47,6 @@ export const useJournalFormSubmission = ({
   preTradingActivities,
   resetForm,
   onSubmitSuccess,
-  selectedDate, // Add to props
 }: JournalFormSubmissionProps) => {
   const { showSuccessToast } = useJournalToast();
   const { updateProgress } = useProgressTracking();
@@ -81,7 +79,6 @@ export const useJournalFormSubmission = ({
       followedRules,
       selectedMistakes,
       preTradingActivities,
-      selectedDate,
     });
 
     // Validate pre-session requirements
@@ -107,9 +104,6 @@ export const useJournalFormSubmission = ({
     }
 
     try {
-      // Use the selected date or current date
-      const entryDate = selectedDate || new Date();
-      
       const { error } = await supabase.from('journal_entries').insert({
         user_id: user.id,
         session_type: sessionType,
@@ -121,8 +115,7 @@ export const useJournalFormSubmission = ({
         followed_rules: followedRules,
         mistakes: selectedMistakes,
         pre_trading_activities: preTradingActivities,
-        trades: [],
-        created_at: entryDate.toISOString(), // Use the custom date
+        trades: [], // Initialize with an empty array
       });
 
       if (error) throw error;

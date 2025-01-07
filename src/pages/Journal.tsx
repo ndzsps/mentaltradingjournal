@@ -7,7 +7,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { JournalEntry } from "@/components/journal/JournalEntry";
 import { JournalFilters } from "@/components/journal/JournalFilters";
-import { EmotionLogger } from "@/components/journal/EmotionLogger";
 import { subMonths, isWithinInterval, startOfMonth, endOfMonth, isSameDay } from "date-fns";
 
 type TimeFilter = "this-month" | "last-month" | "last-three-months" | null;
@@ -33,7 +32,6 @@ const Journal = () => {
   const [detailFilter, setDetailFilter] = useState<string | null>(null);
   const [timeFilter, setTimeFilter] = useState<TimeFilter>(null);
   const [entries, setEntries] = useState<JournalEntryType[]>([]);
-  const [showEmotionLogger, setShowEmotionLogger] = useState(false);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -80,6 +78,7 @@ const Journal = () => {
   const filteredEntries = entries.filter(entry => {
     const entryDate = new Date(entry.created_at);
     const matchesDate = !selectedDate || isSameDay(entryDate, selectedDate);
+    // Convert both to lowercase for case-insensitive comparison
     const matchesEmotion = !emotionFilter || entry.emotion.toLowerCase() === emotionFilter.toLowerCase();
     const matchesDetail = !detailFilter || entry.emotion_detail === detailFilter;
     
@@ -110,6 +109,9 @@ const Journal = () => {
     return matchesDate && matchesEmotion && matchesDetail && matchesTimeFilter;
   });
 
+  console.log('Selected date:', selectedDate);
+  console.log('Filtered entries:', filteredEntries);
+
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto space-y-8 px-4">
@@ -123,19 +125,14 @@ const Journal = () => {
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8">
-          <div className="space-y-4">
-            <JournalCalendar 
-              date={selectedDate}
-              onDateSelect={setSelectedDate}
-              entries={entries.map(entry => ({
-                date: new Date(entry.created_at),
-                emotion: entry.emotion
-              }))}
-            />
-            {selectedDate && (
-              <EmotionLogger selectedDate={selectedDate} />
-            )}
-          </div>
+          <JournalCalendar 
+            date={selectedDate}
+            onDateSelect={setSelectedDate}
+            entries={entries.map(entry => ({
+              date: new Date(entry.created_at),
+              emotion: entry.emotion
+            }))}
+          />
 
           <Card className="p-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
             <div className="flex items-center justify-between mb-6">

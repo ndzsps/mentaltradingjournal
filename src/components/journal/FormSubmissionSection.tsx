@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Trade } from "@/types/trade";
+import { toast } from "sonner";
 
 interface FormSubmissionSectionProps {
   sessionType: "pre" | "post";
@@ -15,8 +16,21 @@ export const FormSubmissionSection = ({
   sessionType,
   notes,
   setNotes,
+  trades,
   handleSubmit,
+  selectedOutcome,
 }: FormSubmissionSectionProps) => {
+  const handleFormSubmit = () => {
+    if (sessionType === "post" && trades.length === 0 && selectedOutcome !== "no_trades") {
+      toast.error("Please add at least one trade before submitting your post-session entry", {
+        description: "Click the 'Add Trade' button to log your trades.",
+        duration: 5000,
+      });
+      return;
+    }
+    handleSubmit();
+  };
+
   return (
     <div className="space-y-6">
       <Textarea
@@ -30,7 +44,7 @@ export const FormSubmissionSection = ({
       />
 
       <Button 
-        onClick={handleSubmit}
+        onClick={handleFormSubmit}
         className="w-full h-12 text-lg font-medium bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all duration-300"
       >
         Log {sessionType === "pre" ? "Pre" : "Post"}-Session Entry

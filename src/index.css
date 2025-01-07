@@ -74,17 +74,6 @@
   }
   body {
     @apply bg-background text-foreground;
-    background-image: radial-gradient(
-      circle at top right,
-      hsl(var(--primary) / 0.1),
-      transparent 40%
-    ),
-    radial-gradient(
-      circle at bottom left,
-      hsl(var(--accent) / 0.1),
-      transparent 40%
-    );
-    background-attachment: fixed;
   }
 
   /* Improve hover states for better text visibility */
@@ -96,4 +85,19 @@
   .hover-text-visible:hover {
     @apply text-foreground/90;
   }
+}
+
+/* Custom gradient backgrounds */
+.bg-gradient-glow {
+  background: radial-gradient(
+    circle at center,
+    var(--primary-color) 0%,
+    transparent 70%
+  );
+}
+
+.text-gradient {
+  background: linear-gradient(to right, #9b87f5, #FEC6A1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }

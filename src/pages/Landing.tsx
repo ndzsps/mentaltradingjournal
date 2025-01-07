@@ -1,6 +1,5 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { AnalyticsSection } from "@/components/landing/AnalyticsSection";
 import { CommunitySection } from "@/components/landing/CommunitySection";
@@ -9,26 +8,71 @@ const Landing = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#1A1F2C] text-white overflow-hidden">
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-8 md:py-12">
-        <div className="text-center space-y-6">
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tighter">
-            Master Your Trading Psychology
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Track, analyze, and improve your trading decisions with our advanced
-            emotional intelligence platform.
-          </p>
-          <div className="flex gap-4 justify-center">
-            <Button onClick={() => navigate("/login")} size="lg">
-              Get Started <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-            <Button variant="outline" size="lg" onClick={() => navigate("/login")}>
-              View Demo
-            </Button>
+      <section className="relative min-h-[90vh] flex items-center">
+        <div className="container mx-auto px-4 md:px-6 flex flex-col md:flex-row items-center gap-12">
+          {/* Left Content */}
+          <div className="flex-1 space-y-8 md:pr-8">
+            <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-tight">
+              Trading Psychology
+              <br />
+              <span className="bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
+                Mastered
+              </span>
+            </h1>
+            <p className="text-xl md:text-2xl text-gray-300 max-w-2xl leading-relaxed">
+              Elevate your trading performance with data-driven insights and emotional intelligence tools designed for success.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 pt-4">
+              <Button
+                size="lg"
+                className="text-lg px-8 py-6 bg-primary hover:bg-primary/90"
+                onClick={() => navigate("/login")}
+              >
+                Sign up with email
+              </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                className="text-lg px-8 py-6 border-gray-700 hover:bg-gray-800/50"
+                onClick={() => navigate("/login")}
+              >
+                Try Demo
+              </Button>
+            </div>
+            
+            {/* Featured Section */}
+            <div className="pt-12">
+              <p className="text-sm uppercase tracking-wider text-gray-400 mb-4">
+                Featured in
+              </p>
+              <div className="flex flex-wrap gap-8 items-center opacity-60">
+                <img src="/placeholder.svg" alt="Featured Logo 1" className="h-6 grayscale" />
+                <img src="/placeholder.svg" alt="Featured Logo 2" className="h-6 grayscale" />
+                <img src="/placeholder.svg" alt="Featured Logo 3" className="h-6 grayscale" />
+              </div>
+            </div>
+          </div>
+
+          {/* Right Content - App Preview */}
+          <div className="flex-1 relative w-full max-w-2xl">
+            <div className="relative aspect-[4/3] rounded-lg overflow-hidden shadow-2xl">
+              <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-accent/20 backdrop-blur-sm"></div>
+              <img
+                src="/lovable-uploads/13d2dda7-1923-4c1f-9a2d-bde3724fd8bb.png"
+                alt="App Preview"
+                className="w-full h-full object-cover rounded-lg transform hover:scale-105 transition-transform duration-500"
+              />
+            </div>
+            
+            {/* Decorative Elements */}
+            <div className="absolute -inset-4 bg-gradient-to-r from-primary/30 to-accent/30 blur-3xl -z-10"></div>
           </div>
         </div>
+
+        {/* Background Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5 -z-20"></div>
       </section>
 
       <AnalyticsSection />

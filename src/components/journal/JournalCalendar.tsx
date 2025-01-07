@@ -83,7 +83,7 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
           row: "flex w-full mt-4",
           cell: "w-[14.28%] h-32 lg:h-36 p-1 relative [&:has([aria-selected])]:bg-accent/50",
           day: "h-full w-full transition-all duration-200 cursor-pointer group",
-          day_today: "relative before:absolute before:inset-0 before:rounded-lg before:bg-gradient-to-br before:from-primary-light before:to-accent before:opacity-10 before:transition-opacity hover:before:opacity-20",
+          day_today: "relative before:absolute before:inset-0 before:rounded-lg before:bg-gradient-to-br before:from-primary-light before:to-accent before:opacity-10 before:transition-opacity hover:before:opacity-20 dark:before:opacity-20 dark:hover:before:opacity-30",
           day_selected: "!border-primary !border-2 !shadow-lg shadow-primary/20",
           caption: "flex justify-center pt-1 relative items-center",
           caption_label: "text-2xl font-semibold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent",

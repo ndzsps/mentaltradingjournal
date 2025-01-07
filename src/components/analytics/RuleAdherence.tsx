@@ -60,11 +60,13 @@ export const RuleAdherence = () => {
           name: "Rules Followed",
           wins: calculatePercentage(rulesFollowedStats.wins, rulesFollowedStats.total),
           losses: calculatePercentage(rulesFollowedStats.losses, rulesFollowedStats.total),
+          total: rulesFollowedStats.total,
         },
         {
           name: "Rules Not Followed",
           wins: calculatePercentage(rulesNotFollowedStats.wins, rulesNotFollowedStats.total),
           losses: calculatePercentage(rulesNotFollowedStats.losses, rulesNotFollowedStats.total),
+          total: rulesNotFollowedStats.total,
         },
       ];
     },
@@ -82,14 +84,17 @@ export const RuleAdherence = () => {
   }
 
   // Default values if analytics data is incomplete
-  const defaultStats = { wins: 0, losses: 0 };
+  const defaultStats = { wins: 0, losses: 0, total: 0 };
   const rulesFollowed = analytics[0] || { name: "Rules Followed", ...defaultStats };
   const rulesNotFollowed = analytics[1] || { name: "Rules Not Followed", ...defaultStats };
   
+  // Require minimum 5 sessions in each category for meaningful insights
+  const MINIMUM_SESSIONS = 5;
+  const hasEnoughData = rulesFollowed.total >= MINIMUM_SESSIONS && 
+                       rulesNotFollowed.total >= MINIMUM_SESSIONS;
+
   // Calculate insights only if we have valid data
   const winRateDifference = (rulesFollowed.wins || 0) - (rulesNotFollowed.wins || 0);
-  const hasEnoughData = (rulesFollowed.wins + rulesFollowed.losses > 0) && 
-                       (rulesNotFollowed.wins + rulesNotFollowed.losses > 0);
 
   return (
     <Card className="p-4 md:p-6 space-y-4">
@@ -131,7 +136,7 @@ export const RuleAdherence = () => {
               </p>
             </>
           ) : (
-            <p>Add more trading sessions to generate insights about your rule adherence.</p>
+            <p>Add at least {MINIMUM_SESSIONS} trading sessions in each category (following rules and not following rules) to generate meaningful insights about your rule adherence.</p>
           )}
         </div>
       </div>

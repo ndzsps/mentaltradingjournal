@@ -19,7 +19,7 @@ const Landing = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-16 md:py-24">
+      <section className="container mx-auto px-4 py-12 md:py-16">
         <div className="text-center space-y-6">
           <h1 className="text-4xl md:text-6xl font-bold tracking-tighter">
             Master Your Trading Psychology
@@ -40,63 +40,63 @@ const Landing = () => {
       </section>
 
       {/* Data-Driven Reports Section */}
-      <section className="container mx-auto px-4 py-16 bg-accent/10">
+      <section className="container mx-auto px-4 py-12 bg-accent/10">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Data-Driven Reports
           </h2>
-          <p className="text-xl text-muted-foreground">
+          <p className="text-xl text-muted-foreground mb-8">
             Gain Key Insights Into Your Trading Psychology
           </p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
           <Card className="relative overflow-hidden">
-            <CardHeader className="space-y-4 pb-8">
+            <CardHeader className="space-y-4">
               <Brain className="h-12 w-12 text-primary" />
               <div>
                 <CardTitle className="text-xl">Emotional Intelligence</CardTitle>
                 <CardDescription className="mt-2">
-                  Develop awareness of your emotional patterns and their impact on trading
+                  Track how your emotions correlate with trading performance and identify patterns that lead to better decision-making.
                 </CardDescription>
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="h-[300px]">
+            <CardContent className="p-0">
+              <div className="h-[400px] p-4">
                 <EmotionalTendencies />
               </div>
             </CardContent>
           </Card>
 
           <Card className="relative overflow-hidden">
-            <CardHeader className="space-y-4 pb-8">
+            <CardHeader className="space-y-4">
               <BarChart2 className="h-12 w-12 text-primary" />
               <div>
                 <CardTitle className="text-xl">Data Analytics</CardTitle>
                 <CardDescription className="mt-2">
-                  Make informed decisions based on comprehensive performance data
+                  Analyze performance across different currency pairs and understand which markets suit your trading style best.
                 </CardDescription>
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="h-[300px]">
+            <CardContent className="p-0">
+              <div className="h-[400px] p-4">
                 <AssetPairPerformance />
               </div>
             </CardContent>
           </Card>
 
           <Card className="relative overflow-hidden">
-            <CardHeader className="space-y-4 pb-8">
+            <CardHeader className="space-y-4">
               <Target className="h-12 w-12 text-primary" />
               <div>
                 <CardTitle className="text-xl">Continuous Improvement</CardTitle>
                 <CardDescription className="mt-2">
-                  Track your progress and develop better trading habits over time
+                  Identify common mistakes and their impact on your trading results to develop better strategies over time.
                 </CardDescription>
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="h-[300px]">
+            <CardContent className="p-0">
+              <div className="h-[400px] p-4">
                 <MistakeAnalysis />
               </div>
             </CardContent>

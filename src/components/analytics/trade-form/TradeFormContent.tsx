@@ -80,6 +80,7 @@ export const TradeFormContent = ({
         return;
       }
 
+      // Get existing trades for this session
       const existingTrades = (postSessionEntry.trades || []).map((trade: any) => ({
         id: trade.id || crypto.randomUUID(),
         entryDate: trade.entryDate,
@@ -96,10 +97,12 @@ export const TradeFormContent = ({
         fees: parseFloat(trade.fees),
       })) as Trade[];
 
+      // Update trades array
       const updatedTrades = editTrade 
         ? existingTrades.map(t => t.id === editTrade.id ? tradeData : t)
         : [...existingTrades, tradeData];
 
+      // Format trades for database
       const tradesForDb = updatedTrades.map(trade => ({
         ...trade,
         entryPrice: trade.entryPrice.toString(),
@@ -111,6 +114,7 @@ export const TradeFormContent = ({
         fees: trade.fees.toString(),
       }));
 
+      // Update the journal entry with the new trades
       const { error: updateError } = await supabase
         .from('journal_entries')
         .update({ trades: tradesForDb })

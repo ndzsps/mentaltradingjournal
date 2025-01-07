@@ -18,6 +18,7 @@ interface TooltipProps {
     value: number;
     dataKey: string;
     name: string;
+    color: string;  // Added color property to fix the type error
   }>;
   label?: string;
 }

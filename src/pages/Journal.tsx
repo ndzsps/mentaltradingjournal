@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { JournalEntry } from "@/components/journal/JournalEntry";
 import { JournalFilters } from "@/components/journal/JournalFilters";
-import { subMonths, isWithinInterval, startOfMonth, endOfMonth, isSameDay } from "date-fns";
+import { subMonths, isWithinInterval, startOfMonth, endOfMonth, isSameDay, startOfDay, endOfDay } from "date-fns";
 
 type TimeFilter = "this-month" | "last-month" | "last-three-months" | null;
 
@@ -48,7 +48,6 @@ const Journal = () => {
         return;
       }
 
-      console.log('Fetched entries:', data);
       setEntries(data || []);
     };
 
@@ -77,7 +76,12 @@ const Journal = () => {
   
   const filteredEntries = entries.filter(entry => {
     const entryDate = new Date(entry.created_at);
-    const matchesDate = !selectedDate || isSameDay(entryDate, selectedDate);
+    
+    // If a date is selected, only show entries for that specific day
+    const matchesDate = selectedDate 
+      ? isSameDay(entryDate, selectedDate)
+      : true;
+
     const matchesEmotion = !emotionFilter || entry.emotion.toLowerCase() === emotionFilter.toLowerCase();
     const matchesDetail = !detailFilter || entry.emotion_detail === detailFilter;
     

@@ -1,7 +1,5 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
 import { EmotionDetailDialog } from "./EmotionDetailDialog";
 import { SessionProgress } from "./SessionProgress";
 import { PostSessionSection } from "./PostSessionSection";
@@ -14,7 +12,7 @@ import { EmotionSelector } from "./EmotionSelector";
 import { emotions, tradingOutcome, mistakeCategories, tradingRules } from "./emotionConfig";
 import { AddTradeDialog } from "../analytics/AddTradeDialog";
 import { Trade } from "@/types/trade";
-import { toast } from "sonner";
+import { FormSubmissionSection } from "./FormSubmissionSection";
 
 const PRE_TRADING_ACTIVITIES = [
   "Meditation",
@@ -98,17 +96,6 @@ export const EmotionLogger = () => {
     setShowAddTradeDialog(false);
   };
 
-  const handleFormSubmit = () => {
-    if (sessionType === "post" && trades.length === 0) {
-      toast.error("Please add at least one trade before submitting your post-session entry", {
-        description: "Click the 'Add Trade' button to log your trades.",
-        duration: 5000,
-      });
-      return;
-    }
-    handleSubmit();
-  };
-
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr,300px]">
       <Card className="p-8 space-y-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
@@ -187,22 +174,13 @@ export const EmotionLogger = () => {
             </>
           )}
 
-          <Textarea
-            placeholder={sessionType === "pre" 
-              ? "How are you feeling before starting your trading session?" 
-              : "Reflect on your trading session. How do you feel about your performance and decisions?"
-            }
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            className="min-h-[120px] bg-card/50 border-primary/10 focus-visible:ring-primary/30 resize-none"
+          <FormSubmissionSection
+            sessionType={sessionType}
+            notes={notes}
+            setNotes={setNotes}
+            trades={trades}
+            handleSubmit={handleSubmit}
           />
-
-          <Button 
-            onClick={handleFormSubmit}
-            className="w-full h-12 text-lg font-medium bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all duration-300"
-          >
-            Log {sessionType === "pre" ? "Pre" : "Post"}-Session Entry
-          </Button>
         </div>
       </Card>
 

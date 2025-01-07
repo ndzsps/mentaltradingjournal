@@ -3,17 +3,18 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Trophy } from "lucide-react";
 
-interface SessionProgressProps {
+export interface SessionProgressProps {
   emotionSelected: boolean;
   emotionDetailSelected: boolean;
   activitiesSelected: boolean;
   notesEntered: boolean;
-  outcomeSelected?: boolean;
-  marketConditionsSelected?: boolean;
-  rulesSelected?: boolean;
-  mistakesReviewed?: boolean;
-  isPostSession?: boolean;
-  showCelebration?: boolean;
+  outcomeSelected: boolean;
+  marketConditionsSelected: boolean;
+  rulesSelected: boolean;
+  mistakesReviewed: boolean;
+  tradesAdded: boolean;
+  isPostSession: boolean;
+  showCelebration: boolean;
 }
 
 export const SessionProgress = ({
@@ -21,12 +22,13 @@ export const SessionProgress = ({
   emotionDetailSelected,
   activitiesSelected,
   notesEntered,
-  outcomeSelected = false,
-  marketConditionsSelected = false,
-  rulesSelected = false,
-  mistakesReviewed = false,
-  isPostSession = false,
-  showCelebration = false,
+  outcomeSelected,
+  marketConditionsSelected,
+  rulesSelected,
+  mistakesReviewed,
+  tradesAdded,
+  isPostSession,
+  showCelebration,
 }: SessionProgressProps) => {
   const [progress, setProgress] = useState(0);
 
@@ -35,12 +37,12 @@ export const SessionProgress = ({
       ? [
           emotionSelected,
           emotionDetailSelected,
-          activitiesSelected,
           notesEntered,
           outcomeSelected,
           marketConditionsSelected,
           rulesSelected,
           mistakesReviewed,
+          tradesAdded,
         ]
       : [emotionSelected, emotionDetailSelected, activitiesSelected, notesEntered];
 
@@ -60,6 +62,7 @@ export const SessionProgress = ({
     marketConditionsSelected,
     rulesSelected,
     mistakesReviewed,
+    tradesAdded,
     isPostSession,
   ]);
 

@@ -1,39 +1,31 @@
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { JournalCalendar } from "@/components/journal/JournalCalendar";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { JournalEntry } from "@/components/journal/JournalEntry";
 import { JournalFilters } from "@/components/journal/JournalFilters";
-import { subMonths, isWithinInterval, startOfMonth, endOfMonth, isSameDay } from "date-fns";
-
-type TimeFilter = "this-month" | "last-month" | "last-three-months" | null;
-
-interface JournalEntryType {
-  id: string;
-  created_at: string;
-  session_type: string;
-  emotion: string;
-  emotion_detail: string;
-  notes: string;
-  outcome?: string;
-  market_conditions?: string;
-  followed_rules?: string[];
-  mistakes?: string[];
-  pre_trading_activities?: string[];
-  trades?: any[];
-}
+import { useJournalFilters } from "@/hooks/useJournalFilters";
+import { JournalEntryType } from "@/types/journal";
 
 const Journal = () => {
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
-  const [emotionFilter, setEmotionFilter] = useState<string | null>(null);
-  const [detailFilter, setDetailFilter] = useState<string | null>(null);
-  const [timeFilter, setTimeFilter] = useState<TimeFilter>(null);
-  const [outcomeFilter, setOutcomeFilter] = useState<string | null>(null);
   const [entries, setEntries] = useState<JournalEntryType[]>([]);
   const { user } = useAuth();
+  const {
+    selectedDate,
+    setSelectedDate,
+    emotionFilter,
+    setEmotionFilter,
+    detailFilter,
+    setDetailFilter,
+    timeFilter,
+    setTimeFilter,
+    outcomeFilter,
+    setOutcomeFilter,
+    filteredEntries
+  } = useJournalFilters(entries);
 
   useEffect(() => {
     if (!user) return;
@@ -75,40 +67,6 @@ const Journal = () => {
       subscription.unsubscribe();
     };
   }, [user]);
-  
-  const filteredEntries = entries.filter(entry => {
-    const entryDate = new Date(entry.created_at);
-    const matchesDate = !selectedDate || isSameDay(entryDate, selectedDate);
-    const matchesEmotion = !emotionFilter || entry.emotion.toLowerCase() === emotionFilter.toLowerCase();
-    const matchesDetail = !detailFilter || entry.emotion_detail === detailFilter;
-    const matchesOutcome = !outcomeFilter || (entry.outcome === outcomeFilter && entry.session_type === 'post');
-    
-    let matchesTimeFilter = true;
-    if (timeFilter) {
-      const now = new Date();
-      const intervals: Record<Exclude<TimeFilter, null>, { start: Date; end: Date }> = {
-        "this-month": {
-          start: startOfMonth(now),
-          end: endOfMonth(now)
-        },
-        "last-month": {
-          start: startOfMonth(subMonths(now, 1)),
-          end: endOfMonth(subMonths(now, 1))
-        },
-        "last-three-months": {
-          start: startOfMonth(subMonths(now, 3)),
-          end: endOfMonth(now)
-        }
-      };
-
-      if (timeFilter) {
-        const interval = intervals[timeFilter];
-        matchesTimeFilter = isWithinInterval(entryDate, interval);
-      }
-    }
-
-    return matchesDate && matchesEmotion && matchesDetail && matchesTimeFilter && matchesOutcome;
-  });
 
   console.log('Selected date:', selectedDate);
   console.log('Filtered entries:', filteredEntries);

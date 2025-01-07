@@ -65,14 +65,6 @@ export const PerformanceBreakdown = () => {
     return `$${value}`;
   };
 
-  // Custom bar color based on value
-  const getBarColor = (value: number): string => {
-    if (value > 500) return "hsl(142.1 76.2% 36.3%)"; // Strong positive (green)
-    if (value > 0) return "hsl(142.1 76.2% 46.3%)"; // Positive (lighter green)
-    if (value > -500) return "hsl(346.8 77.2% 49.8%)"; // Negative (light red)
-    return "hsl(346.8 77.2% 39.8%)"; // Strong negative (darker red)
-  };
-
   return (
     <Card className="p-4 md:p-6 space-y-4">
       <div className="space-y-2">
@@ -114,8 +106,26 @@ export const PerformanceBreakdown = () => {
             <Bar 
               dataKey="averagePnL" 
               radius={[4, 4, 0, 0]}
-              fill={(entry) => getBarColor(entry.averagePnL)}
-            />
+              fill="hsl(142.1 76.2% 46.3%)"
+              style={{
+                fill: "url(#colorGradient)"
+              }}
+            >
+              {data.map((entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={
+                    entry.averagePnL > 500
+                      ? "hsl(142.1 76.2% 36.3%)"
+                      : entry.averagePnL > 0
+                      ? "hsl(142.1 76.2% 46.3%)"
+                      : entry.averagePnL > -500
+                      ? "hsl(346.8 77.2% 49.8%)"
+                      : "hsl(346.8 77.2% 39.8%)"
+                  }
+                />
+              ))}
+            </Bar>
           </BarChart>
         </ResponsiveContainer>
       </div>

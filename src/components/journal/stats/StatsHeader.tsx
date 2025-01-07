@@ -17,24 +17,28 @@ const EmotionGauge = ({ score }: { score: number }) => {
         style={{
           background: `conic-gradient(
             from 180deg at 50% 100%,
-            #ef4444 0deg,
-            #fbbf24 90deg,
-            #22c55e 180deg
+            #ea384c 0deg,    /* Start with red for negative emotions */
+            #ea384c 60deg,   /* Hold red for first third */
+            #FEF7CD 90deg,   /* Transition through yellow in middle */
+            #F2FCE2 120deg,  /* Start transitioning to green */
+            #22c55e 180deg   /* End with full green */
           )`,
           clipPath: 'polygon(0 50%, 100% 50%, 100% 0, 0 0)'
         }}
       />
       {/* Indicator needle */}
       <div 
-        className="absolute bottom-0 left-1/2 w-1 h-6 bg-foreground origin-bottom transition-transform duration-700"
+        className="absolute bottom-0 left-1/2 w-1 h-6 origin-bottom transition-transform duration-700"
         style={{
-          transform: `translateX(-50%) rotate(${rotation}deg)`
+          transform: `translateX(-50%) rotate(${rotation}deg)`,
+          backgroundColor: score < 33 ? '#ea384c' : score < 66 ? '#fbbf24' : '#22c55e'
         }}
       />
       {/* Center point */}
       <div 
-        className="absolute bottom-0 left-1/2 w-2 h-2 bg-foreground rounded-full"
+        className="absolute bottom-0 left-1/2 w-2 h-2 rounded-full"
         style={{
+          backgroundColor: score < 33 ? '#ea384c' : score < 66 ? '#fbbf24' : '#22c55e',
           transform: 'translate(-50%, 50%)'
         }}
       />

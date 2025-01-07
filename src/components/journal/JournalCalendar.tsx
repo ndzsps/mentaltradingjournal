@@ -84,6 +84,12 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
           day: "h-full w-full transition-all duration-200 cursor-pointer group",
           day_today: "relative before:absolute before:inset-0 before:rounded-lg before:bg-gradient-to-br before:from-primary-light before:to-accent before:opacity-10 before:transition-opacity hover:before:opacity-20",
           day_selected: "!border-primary !border-2 !shadow-lg shadow-primary/20",
+          caption: "flex justify-center pt-1 relative items-center",
+          caption_label: "text-2xl font-semibold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent",
+          nav: "space-x-1 flex items-center",
+          nav_button: "h-9 w-9 bg-transparent p-0 opacity-50 hover:opacity-100 hover:bg-primary hover:bg-opacity-10 rounded-full flex items-center justify-center transition-all duration-200",
+          nav_button_previous: "absolute left-1",
+          nav_button_next: "absolute right-1",
         }}
         components={{
           Day: ({ date: dayDate, ...props }: DayProps & { className?: string }) => {

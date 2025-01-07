@@ -49,20 +49,16 @@ export const EmotionGauge = ({ score }: EmotionGaugeProps) => {
           ))}
         </div>
 
-        {/* Indicator needle */}
-        <div 
-          className="absolute bottom-0 left-1/2 w-1 h-11 origin-bottom transition-transform duration-700"
-          style={{
-            transform: `translateX(-50%) rotate(${rotation}deg)`,
-            background: 'linear-gradient(to top, #000000 0%, #000000 100%)',
-          }}
-        />
-
         {/* Center point */}
         <div 
-          className="absolute bottom-0 left-1/2 w-3 h-3 rounded-full bg-black"
+          className="absolute bottom-0 left-1/2 w-3 h-3 -translate-x-1/2 translate-y-1/2 bg-black rounded-full z-20"
+        />
+
+        {/* Indicator needle */}
+        <div 
+          className="absolute bottom-0 left-1/2 w-1 h-11 bg-black origin-bottom transition-transform duration-700 z-10"
           style={{
-            transform: 'translate(-50%, 50%)',
+            transform: `translateX(-50%) rotate(${rotation}deg)`,
           }}
         />
       </div>

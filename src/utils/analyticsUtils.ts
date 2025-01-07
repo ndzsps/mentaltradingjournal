@@ -81,13 +81,13 @@ export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
     "Keep up the good work with emotional management.";
 
   return {
-    journalEntries,
+    journalEntries: journalEntries || [],
     performanceByEmotion,
     emotionalImpact: {
-      winRate: winRates,
-      dates: last5Days,
+      winRate: winRates || [],
+      dates: last5Days || [],
     },
-    emotionTrend,
+    emotionTrend: emotionTrend || [],
     emotionTrendInsights: {
       improvement: `Your emotional resilience has ${
         performanceByEmotion.positive > 50 ? 'improved' : 'decreased'
@@ -98,6 +98,15 @@ export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
     },
     mainInsight,
     recommendedAction,
-    dataRequirements,
+    dataRequirements: {
+      ...dataRequirements,
+      riskRewardAnalysis: {
+        hasEnoughData: journalEntries.some(entry => 
+          entry.trades?.some(trade => trade.stopLoss && trade.takeProfit)
+        ),
+        requiredFields: ['trades.stopLoss', 'trades.takeProfit', 'trades.entryPrice'],
+        description: 'Add stop loss and take profit levels to your trades',
+      },
+    },
   };
 };

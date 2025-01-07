@@ -4,7 +4,6 @@ import { DayProps } from "react-day-picker";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface JournalCalendarProps {
   date: Date | undefined;
@@ -88,7 +87,7 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
           caption: "flex justify-center pt-1 relative items-center",
           caption_label: "text-2xl font-semibold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent",
           nav: "space-x-1 flex items-center",
-          nav_button: "h-9 w-9 bg-transparent p-0 hover:opacity-100 rounded-full flex items-center justify-center transition-all duration-200 bg-gradient-to-r from-primary-light to-accent bg-clip-text",
+          nav_button: "h-9 w-9 bg-transparent p-0 opacity-50 hover:opacity-100 hover:bg-primary hover:bg-opacity-10 rounded-full flex items-center justify-center transition-all duration-200",
           nav_button_previous: "absolute left-1",
           nav_button_next: "absolute right-1",
         }}
@@ -146,14 +145,6 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
               </div>
             );
           }
-        }}
-        components={{
-          IconLeft: ({ ...props }) => (
-            <ChevronLeft className="w-5 h-5 text-transparent bg-gradient-to-r from-primary-light to-accent bg-clip-text" {...props} />
-          ),
-          IconRight: ({ ...props }) => (
-            <ChevronRight className="w-5 h-5 text-transparent bg-gradient-to-r from-primary-light to-accent bg-clip-text" {...props} />
-          ),
         }}
       />
     </Card>

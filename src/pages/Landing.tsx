@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { AnalyticsSection } from "@/components/landing/AnalyticsSection";
 import { CommunitySection } from "@/components/landing/CommunitySection";
-import { AppHeader } from "@/components/layout/AppHeader";
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -19,8 +18,6 @@ const Landing = () => {
       
       {/* Content */}
       <div className="relative z-10">
-        <AppHeader />
-        
         {/* Hero Section */}
         <section className="relative min-h-[90vh] flex items-center">
           <div className="container mx-auto px-4 md:px-6 flex flex-col md:flex-row items-center gap-12">

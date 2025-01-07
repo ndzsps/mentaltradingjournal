@@ -44,6 +44,80 @@ export const TradeFormContent = ({
     };
 
     try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      // First, get all entries for today
+      const { data: entries, error: fetchError } = await supabase
+        .from('journal_entries')
+        .select('*')
+        .eq('user_id', user?.id)
+        .gte('created_at', today.toISOString())
+        .lt('created_at', new Date(today.getTime() + 24 * 60 * 60 * 1000).toISOString())
+        .order('created_at', { ascending: false });
+
+      if (fetchError) throw fetchError;
+
+      // Find the most recent post-session entry
+      const postSessionEntry = entries?.find(entry => entry.session_type === 'post');
+      
+      if (!postSessionEntry) {
+        toast.error("Please create a post-session entry before adding trades", {
+          description: "Go back to the journal form and create a post-session entry first.",
+          duration: 5000,
+        });
+        onOpenChange(false);
+        return;
+      }
+
+      // Check if the post-session entry has "no_trades" outcome
+      if (postSessionEntry.outcome === "no_trades") {
+        toast.error("Cannot add trades to a no-trade session", {
+          description: "You've marked this session as having no trades. Please change the session outcome if you want to add trades.",
+          duration: 5000,
+        });
+        onOpenChange(false);
+        return;
+      }
+
+      const existingTrades = (postSessionEntry.trades || []).map((trade: any) => ({
+        id: trade.id || crypto.randomUUID(),
+        entryDate: trade.entryDate,
+        instrument: trade.instrument,
+        setup: trade.setup,
+        direction: trade.direction,
+        entryPrice: parseFloat(trade.entryPrice),
+        quantity: parseFloat(trade.quantity),
+        stopLoss: parseFloat(trade.stopLoss),
+        takeProfit: parseFloat(trade.takeProfit),
+        exitDate: trade.exitDate,
+        exitPrice: parseFloat(trade.exitPrice),
+        pnl: parseFloat(trade.pnl),
+        fees: parseFloat(trade.fees),
+      })) as Trade[];
+
+      const updatedTrades = editTrade 
+        ? existingTrades.map(t => t.id === editTrade.id ? tradeData : t)
+        : [...existingTrades, tradeData];
+
+      const tradesForDb = updatedTrades.map(trade => ({
+        ...trade,
+        entryPrice: trade.entryPrice.toString(),
+        quantity: trade.quantity.toString(),
+        stopLoss: trade.stopLoss.toString(),
+        takeProfit: trade.takeProfit.toString(),
+        exitPrice: trade.exitPrice.toString(),
+        pnl: trade.pnl.toString(),
+        fees: trade.fees.toString(),
+      }));
+
+      const { error: updateError } = await supabase
+        .from('journal_entries')
+        .update({ trades: tradesForDb })
+        .eq('id', postSessionEntry.id);
+
+      if (updateError) throw updateError;
+
       onSubmit(tradeData, !!editTrade);
       onOpenChange(false);
       toast.success(editTrade ? "Trade updated successfully!" : "Trade added successfully!");

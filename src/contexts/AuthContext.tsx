@@ -1,8 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import type { User, AuthChangeEvent } from "@supabase/supabase-js";
+import type { User } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
 
 interface AuthContextType {
   user: User | null;
@@ -19,59 +18,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  const navigate = useNavigate();
 
   useEffect(() => {
-    const initializeAuth = async () => {
-      try {
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        
-        if (sessionError) {
-          console.error("Session error:", sessionError);
-          setUser(null);
-          return;
-        }
+    // Check for existing session on mount
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
 
-        if (session?.user) {
-          setUser(session.user);
-          navigate("/");
-        } else {
-          setUser(null);
-          navigate("/login");
-        }
-      } catch (error) {
-        console.error("Auth initialization error:", error);
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'TOKEN_REFRESHED') {
+        setUser(session?.user ?? null);
+      } else if (event === 'SIGNED_OUT') {
         setUser(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    initializeAuth();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event: AuthChangeEvent, session) => {
-      console.log("Auth state change:", event);
-      
-      switch (event) {
-        case 'SIGNED_IN':
-          setUser(session?.user ?? null);
-          navigate("/");
-          break;
-        case 'SIGNED_OUT':
-          setUser(null);
-          navigate("/login");
-          break;
-        case 'TOKEN_REFRESHED':
-        case 'USER_UPDATED':
-          setUser(session?.user ?? null);
-          break;
-        default:
-          // Handle any other auth events, including user deletion
-          if (!session?.user) {
-            setUser(null);
-            navigate("/login");
-          }
-          break;
+      } else if (event === 'SIGNED_IN') {
+        setUser(session?.user ?? null);
+      } else if (event === 'USER_UPDATED') {
+        setUser(session?.user ?? null);
       }
       
       setLoading(false);
@@ -80,7 +44,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate]);
+  }, []);
 
   const signIn = async (email: string, password: string) => {
     try {
@@ -101,7 +65,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUp = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signUp({ 
+      const { error, data } = await supabase.auth.signUp({ 
         email, 
         password,
         options: {

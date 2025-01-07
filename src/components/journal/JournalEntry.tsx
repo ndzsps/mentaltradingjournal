@@ -51,8 +51,6 @@ export const JournalEntry = ({ entry }: JournalEntryProps) => {
     day: 'numeric'
   });
 
-  console.log('Trades in entry:', entry.trades); // Debug log
-
   return (
     <Card className="p-6 rounded-lg bg-background/50 border border-primary/10 min-h-[400px]">
       <div className="flex items-center justify-between mb-4">
@@ -62,6 +60,12 @@ export const JournalEntry = ({ entry }: JournalEntryProps) => {
             className="capitalize"
           >
             {entry.session_type}-Session
+          </Badge>
+          <Badge 
+            variant="outline" 
+            className="bg-accent/10 hover:bg-accent/20 transition-colors"
+          >
+            {capitalizeWords(entry.emotion)} - {capitalizeWords(entry.emotion_detail)}
           </Badge>
           {entry.session_type === 'post' && entry.outcome && (
             <Badge 
@@ -80,9 +84,6 @@ export const JournalEntry = ({ entry }: JournalEntryProps) => {
           {formattedDate}
         </span>
       </div>
-      <p className="font-medium text-foreground mb-2">
-        Feeling: {capitalizeWords(entry.emotion)} - {capitalizeWords(entry.emotion_detail)}
-      </p>
       {entry.market_conditions && (
         <p className="text-sm text-muted-foreground mb-3">
           Market Conditions: {capitalizeWords(entry.market_conditions)}

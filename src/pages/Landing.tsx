@@ -47,8 +47,8 @@ const Landing = () => {
           </div>
         </header>
 
-        {/* Hero Section */}
-        <section className="relative min-h-[90vh] flex items-center pt-16">
+        {/* Hero Section - Updated with better spacing */}
+        <section className="relative pt-40 min-h-[90vh] flex items-center">
           <div className="container mx-auto px-4 md:px-6 flex flex-col md:flex-row items-center gap-12">
             {/* Left Content */}
             <div className="flex-1 space-y-8 md:pr-8">
@@ -110,7 +110,6 @@ const Landing = () => {
           </div>
         </section>
 
-        {/* Psychology Focus Section */}
         <section className="relative min-h-screen flex items-center py-24">
           <div className="container mx-auto px-4 md:px-6">
             <div className="flex flex-col-reverse md:flex-row items-center gap-12">

@@ -55,39 +55,62 @@ export const JournalEntry = ({ entry }: JournalEntryProps) => {
 
   return (
     <Card className="p-6 rounded-lg bg-background/50 border border-primary/10 min-h-[400px]">
-      <div className={`flex ${isPreSession ? 'items-center justify-between' : 'flex-col space-y-4 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between'} mb-6`}>
-        <div className="flex items-center gap-3">
-          <Badge 
-            variant={isPreSession ? 'default' : 'secondary'}
-            className="capitalize px-4 py-1.5 rounded-full text-sm font-medium"
-          >
-            {entry.session_type}-Session
-          </Badge>
-          <Badge 
-            variant="outline" 
-            className="bg-background/80 hover:bg-accent/5 transition-colors px-4 py-1.5 rounded-full text-sm font-medium border-none"
-          >
-            {capitalizeWords(entry.emotion)} - {capitalizeWords(entry.emotion_detail)}
-          </Badge>
-          {!isPreSession && entry.outcome && (
+      {isPreSession ? (
+        <>
+          <div className="text-sm text-muted-foreground mb-4">
+            {formattedDate}
+          </div>
+          <div className="flex items-center flex-wrap gap-3">
+            <Badge 
+              variant="default"
+              className="capitalize px-4 py-1.5 rounded-full text-sm font-medium"
+            >
+              Pre-Session
+            </Badge>
             <Badge 
               variant="outline" 
-              className={`capitalize px-4 py-1.5 rounded-full text-sm font-medium ${
-                entry.outcome === 'loss' 
-                  ? 'border-red-500/50 text-red-500 bg-red-500/5 hover:bg-red-500/10' 
-                  : 'border-green-500/50 text-green-500 bg-green-500/5 hover:bg-green-500/10'
-              }`}
+              className="bg-background/80 hover:bg-accent/5 transition-colors px-4 py-1.5 rounded-full text-sm font-medium border-none"
             >
-              {capitalizeWords(entry.outcome)}
+              {capitalizeWords(entry.emotion)} - {capitalizeWords(entry.emotion_detail)}
             </Badge>
-          )}
+          </div>
+        </>
+      ) : (
+        <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <Badge 
+              variant="secondary"
+              className="capitalize px-4 py-1.5 rounded-full text-sm font-medium"
+            >
+              Post-Session
+            </Badge>
+            <Badge 
+              variant="outline" 
+              className="bg-background/80 hover:bg-accent/5 transition-colors px-4 py-1.5 rounded-full text-sm font-medium border-none"
+            >
+              {capitalizeWords(entry.emotion)} - {capitalizeWords(entry.emotion_detail)}
+            </Badge>
+            {entry.outcome && (
+              <Badge 
+                variant="outline" 
+                className={`capitalize px-4 py-1.5 rounded-full text-sm font-medium ${
+                  entry.outcome === 'loss' 
+                    ? 'border-red-500/50 text-red-500 bg-red-500/5 hover:bg-red-500/10' 
+                    : 'border-green-500/50 text-green-500 bg-green-500/5 hover:bg-green-500/10'
+                }`}
+              >
+                {capitalizeWords(entry.outcome)}
+              </Badge>
+            )}
+          </div>
+          <span className="text-sm text-muted-foreground whitespace-nowrap">
+            {formattedDate}
+          </span>
         </div>
-        <span className="text-sm text-muted-foreground whitespace-nowrap">
-          {formattedDate}
-        </span>
-      </div>
+      )}
+
       {entry.market_conditions && (
-        <p className="text-sm text-muted-foreground mb-3">
+        <p className="text-sm text-muted-foreground mb-3 mt-4">
           Market Conditions: {capitalizeWords(entry.market_conditions)}
         </p>
       )}

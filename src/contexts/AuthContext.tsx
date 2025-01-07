@@ -65,9 +65,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         case 'USER_UPDATED':
           setUser(session?.user ?? null);
           break;
-        case 'USER_DELETED':
-          setUser(null);
-          navigate("/login");
+        default:
+          // Handle any other auth events, including user deletion
+          if (!session?.user) {
+            setUser(null);
+            navigate("/login");
+          }
           break;
       }
       

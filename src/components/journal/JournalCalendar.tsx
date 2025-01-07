@@ -51,12 +51,14 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
           row: "w-full",
           cell: "w-[14.28%] h-14 lg:h-16 p-0 relative",
           day: "relative w-full h-full rounded-md transition-all duration-200 cursor-pointer group",
-          day_today: "bg-accent/40 text-accent-foreground hover:bg-accent/60",
+          day_today: "!bg-primary-light text-primary-foreground hover:!bg-primary-light/90",
           day_selected: "!bg-primary text-primary-foreground hover:bg-primary/90",
         }}
         components={{
           Day: ({ date: dayDate, ...props }: DayProps & { className?: string }) => {
             const emotionStyle = getEmotionStyle(dayDate);
+            const isToday = dayDate.toDateString() === new Date().toDateString();
+            
             return (
               <div className="relative w-full h-full">
                 <button 
@@ -67,6 +69,7 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
                     after:absolute after:inset-[15%] after:rounded-md after:transition-colors after:duration-200
                     hover:after:bg-primary/10 dark:hover:after:bg-primary/20
                     group-hover:font-medium
+                    ${isToday ? 'ring-2 ring-primary-light ring-offset-2' : ''}
                   `}
                 >
                   <span className="relative z-10">

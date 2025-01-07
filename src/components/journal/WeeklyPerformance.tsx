@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { startOfWeek, endOfWeek, format, addWeeks, isWithinInterval, startOfYear } from "date-fns";
+import { startOfWeek, endOfWeek, format, addWeeks, isWithinInterval } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -17,14 +17,13 @@ interface Trade {
 export const WeeklyPerformance = () => {
   const { user } = useAuth();
   const currentDate = new Date();
-  const startOfCurrentYear = startOfYear(currentDate);
 
   const { data: weeklyStats, isLoading } = useQuery({
     queryKey: ['weekly-performance'],
     queryFn: async () => {
       if (!user) return [];
 
-      const startDate = startOfYear(currentDate);
+      const startDate = startOfWeek(addWeeks(currentDate, -5));
       const endDate = endOfWeek(currentDate);
 
       const { data: entries, error } = await supabase
@@ -36,14 +35,9 @@ export const WeeklyPerformance = () => {
 
       if (error) throw error;
 
-      // Get current week number (1-based)
-      const currentWeekNumber = Math.ceil(
-        (currentDate.getTime() - startOfCurrentYear.getTime()) / (7 * 24 * 60 * 60 * 1000)
-      );
-
-      // Initialize weeks array with the last 6 weeks
+      // Initialize 6 weeks of data
       const weeks: WeekSummary[] = Array.from({ length: 6 }, (_, i) => ({
-        weekNumber: currentWeekNumber - 5 + i,
+        weekNumber: i + 1,
         totalPnL: 0,
         tradingDays: 0,
       }));
@@ -51,25 +45,27 @@ export const WeeklyPerformance = () => {
       // Process entries
       entries?.forEach(entry => {
         const entryDate = new Date(entry.created_at);
-        const entryWeekNumber = Math.ceil(
-          (entryDate.getTime() - startOfCurrentYear.getTime()) / (7 * 24 * 60 * 60 * 1000)
-        );
         
-        // Find the corresponding week in our array
-        const weekIndex = weeks.findIndex(w => w.weekNumber === entryWeekNumber);
-        if (weekIndex !== -1) {
-          // Calculate total P&L from trades
-          const trades = entry.trades as Trade[] || [];
-          const dailyPnL = trades.reduce((sum, trade) => {
-            const pnlValue = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : Number(trade.pnl);
-            return sum + (isNaN(pnlValue) ? 0 : pnlValue);
-          }, 0);
-
-          weeks[weekIndex].totalPnL += dailyPnL;
+        // Find which week this entry belongs to
+        for (let i = 0; i < 6; i++) {
+          const weekStart = startOfWeek(addWeeks(currentDate, -5 + i));
+          const weekEnd = endOfWeek(addWeeks(currentDate, -5 + i));
           
-          // Only count unique trading days
-          if (dailyPnL !== 0) {
-            weeks[weekIndex].tradingDays += 1;
+          if (isWithinInterval(entryDate, { start: weekStart, end: weekEnd })) {
+            // Calculate total P&L from trades
+            const dailyPnL = entry.trades?.reduce((sum: number, trade: Trade) => {
+              // Convert trade.pnl to number, defaulting to 0 if invalid
+              const pnlValue = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : Number(trade.pnl);
+              return sum + (isNaN(pnlValue) ? 0 : pnlValue);
+            }, 0) || 0;
+            
+            weeks[i].totalPnL += dailyPnL;
+            
+            // Only count unique trading days
+            if (dailyPnL !== 0) {
+              weeks[i].tradingDays += 1;
+            }
+            break;
           }
         }
       });

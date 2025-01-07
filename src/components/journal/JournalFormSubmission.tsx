@@ -3,23 +3,7 @@ import { useProgressTracking } from "@/hooks/useProgressTracking";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-
-interface Trade {
-  entryDate: string;
-  instrument: string;
-  setup: string;
-  direction: 'buy' | 'sell';
-  entryPrice: number;
-  quantity: number;
-  stopLoss: number;
-  takeProfit: number;
-  exitDate: string;
-  exitPrice: number;
-  pnl: number;
-  fees: number;
-}
-
-type ValidOutcome = 'win' | 'loss' | 'breakeven' | null;
+import { Trade } from "@/types/trade";
 
 interface JournalFormSubmissionProps {
   sessionType: "pre" | "post";
@@ -31,6 +15,7 @@ interface JournalFormSubmissionProps {
   followedRules?: string[];
   selectedMistakes?: string[];
   preTradingActivities: string[];
+  trades: Trade[];
   resetForm: () => void;
   onSubmitSuccess?: () => void;
 }
@@ -45,20 +30,13 @@ export const useJournalFormSubmission = ({
   followedRules,
   selectedMistakes,
   preTradingActivities,
+  trades,
   resetForm,
   onSubmitSuccess,
 }: JournalFormSubmissionProps) => {
   const { showSuccessToast } = useJournalToast();
   const { updateProgress } = useProgressTracking();
   const { user } = useAuth();
-
-  const validateOutcome = (outcome?: string): ValidOutcome => {
-    if (!outcome) return null;
-    if (['win', 'loss', 'breakeven'].includes(outcome.toLowerCase())) {
-      return outcome.toLowerCase() as ValidOutcome;
-    }
-    throw new Error('Invalid outcome value. Must be "win", "loss", or "breakeven".');
-  };
 
   const handleSubmit = async () => {
     if (!user) {
@@ -68,18 +46,6 @@ export const useJournalFormSubmission = ({
       });
       return;
     }
-
-    console.log('Submitting journal entry:', {
-      sessionType,
-      selectedEmotion,
-      selectedEmotionDetail,
-      notes,
-      selectedOutcome,
-      marketConditions,
-      followedRules,
-      selectedMistakes,
-      preTradingActivities,
-    });
 
     // Validate pre-session requirements
     if (sessionType === "pre") {
@@ -94,9 +60,9 @@ export const useJournalFormSubmission = ({
 
     // Validate post-session requirements
     if (sessionType === "post") {
-      if (!selectedEmotion || !selectedEmotionDetail || !notes || !marketConditions || followedRules?.length === 0) {
+      if (!selectedEmotion || !selectedEmotionDetail || !notes || !marketConditions || followedRules?.length === 0 || trades.length === 0) {
         toast.error("Missing Information", {
-          description: "Please fill in all required fields for post-session.",
+          description: "Please fill in all required fields for post-session, including at least one trade.",
           duration: 5000,
         });
         return;
@@ -110,12 +76,21 @@ export const useJournalFormSubmission = ({
         emotion: selectedEmotion,
         emotion_detail: selectedEmotionDetail,
         notes,
-        outcome: sessionType === "pre" ? null : validateOutcome(selectedOutcome),
+        outcome: sessionType === "pre" ? null : selectedOutcome,
         market_conditions: marketConditions,
         followed_rules: followedRules,
         mistakes: selectedMistakes,
         pre_trading_activities: preTradingActivities,
-        trades: [], // Initialize with an empty array
+        trades: sessionType === "post" ? trades.map(trade => ({
+          ...trade,
+          entryPrice: trade.entryPrice.toString(),
+          quantity: trade.quantity.toString(),
+          stopLoss: trade.stopLoss.toString(),
+          takeProfit: trade.takeProfit.toString(),
+          exitPrice: trade.exitPrice.toString(),
+          pnl: trade.pnl.toString(),
+          fees: trade.fees.toString(),
+        })) : [],
       });
 
       if (error) throw error;

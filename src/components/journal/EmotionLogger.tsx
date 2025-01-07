@@ -12,6 +12,9 @@ import { SessionTypeSelector } from "./SessionTypeSelector";
 import { PreTradingActivities } from "./PreTradingActivities";
 import { EmotionSelector } from "./EmotionSelector";
 import { emotions, tradingOutcome, mistakeCategories, tradingRules } from "./emotionConfig";
+import { AddTradeDialog } from "../analytics/AddTradeDialog";
+import { Trade } from "@/types/trade";
+import { toast } from "sonner";
 
 const PRE_TRADING_ACTIVITIES = [
   "Meditation",
@@ -34,6 +37,8 @@ export const EmotionLogger = () => {
   const [followedRules, setFollowedRules] = useState<string[]>([]);
   const [preTradingActivities, setPreTradingActivities] = useState<string[]>([]);
   const [showCelebration, setShowCelebration] = useState(false);
+  const [showAddTradeDialog, setShowAddTradeDialog] = useState(false);
+  const [trades, setTrades] = useState<Trade[]>([]);
   
   const { stats } = useProgressTracking();
 
@@ -46,6 +51,7 @@ export const EmotionLogger = () => {
     setMarketConditions("");
     setFollowedRules([]);
     setPreTradingActivities([]);
+    setTrades([]);
   };
 
   const { handleSubmit } = useJournalFormSubmission({
@@ -58,6 +64,7 @@ export const EmotionLogger = () => {
     followedRules,
     selectedMistakes,
     preTradingActivities,
+    trades,
     resetForm,
     onSubmitSuccess: () => {
       setShowCelebration(true);
@@ -86,6 +93,22 @@ export const EmotionLogger = () => {
     setShowCelebration(false);
   };
 
+  const handleTradeSubmit = (tradeData: Trade) => {
+    setTrades([...trades, tradeData]);
+    setShowAddTradeDialog(false);
+  };
+
+  const handleFormSubmit = () => {
+    if (sessionType === "post" && trades.length === 0) {
+      toast.error("Please add at least one trade before submitting your post-session entry", {
+        description: "Click the 'Add Trade' button to log your trades.",
+        duration: 5000,
+      });
+      return;
+    }
+    handleSubmit();
+  };
+
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr,300px]">
       <Card className="p-8 space-y-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
@@ -108,6 +131,7 @@ export const EmotionLogger = () => {
             marketConditionsSelected={!!marketConditions}
             rulesSelected={followedRules.length > 0}
             mistakesReviewed={selectedMistakes.length > 0 || selectedOutcome !== "loss"}
+            tradesAdded={trades.length > 0}
             isPostSession={sessionType === "post"}
             showCelebration={showCelebration}
           />
@@ -138,19 +162,29 @@ export const EmotionLogger = () => {
           />
 
           {sessionType === "post" && (
-            <PostSessionSection
-              selectedOutcome={selectedOutcome}
-              setSelectedOutcome={setSelectedOutcome}
-              marketConditions={marketConditions}
-              setMarketConditions={setMarketConditions}
-              followedRules={followedRules}
-              setFollowedRules={setFollowedRules}
-              selectedMistakes={selectedMistakes}
-              setSelectedMistakes={setSelectedMistakes}
-              tradingOutcome={tradingOutcome}
-              mistakeCategories={mistakeCategories}
-              tradingRules={tradingRules}
-            />
+            <>
+              <PostSessionSection
+                selectedOutcome={selectedOutcome}
+                setSelectedOutcome={setSelectedOutcome}
+                marketConditions={marketConditions}
+                setMarketConditions={setMarketConditions}
+                followedRules={followedRules}
+                setFollowedRules={setFollowedRules}
+                selectedMistakes={selectedMistakes}
+                setSelectedMistakes={setSelectedMistakes}
+                tradingOutcome={tradingOutcome}
+                mistakeCategories={mistakeCategories}
+                tradingRules={tradingRules}
+                onAddTrade={() => setShowAddTradeDialog(true)}
+                trades={trades}
+              />
+
+              <AddTradeDialog
+                open={showAddTradeDialog}
+                onOpenChange={setShowAddTradeDialog}
+                onSubmit={handleTradeSubmit}
+              />
+            </>
           )}
 
           <Textarea
@@ -164,7 +198,7 @@ export const EmotionLogger = () => {
           />
 
           <Button 
-            onClick={handleSubmit}
+            onClick={handleFormSubmit}
             className="w-full h-12 text-lg font-medium bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all duration-300"
           >
             Log {sessionType === "pre" ? "Pre" : "Post"}-Session Entry

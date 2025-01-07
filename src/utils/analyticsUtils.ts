@@ -13,7 +13,7 @@ export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
     throw error;
   }
 
-  const journalEntries = entries as JournalEntry[];
+  const journalEntries = entries as JournalEntry[] || [];
   const dataRequirements = calculateDataRequirements(journalEntries);
 
   // Calculate performance by emotion
@@ -25,7 +25,7 @@ export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
   };
 
   journalEntries.forEach(entry => {
-    const emotion = entry.emotion.toLowerCase();
+    const emotion = entry.emotion?.toLowerCase() || '';
     if (emotion.includes('positive')) emotionCounts.positive++;
     else if (emotion.includes('neutral')) emotionCounts.neutral++;
     else if (emotion.includes('negative')) emotionCounts.negative++;
@@ -55,11 +55,11 @@ export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
 
   // Generate emotion trend data
   const emotionTrend = journalEntries.slice(0, 30).map(entry => {
-    const emotionalScore = entry.emotion.toLowerCase().includes('positive') ? 75 :
-      entry.emotion.toLowerCase().includes('neutral') ? 50 : 25;
+    const emotionalScore = entry.emotion?.toLowerCase().includes('positive') ? 75 :
+      entry.emotion?.toLowerCase().includes('neutral') ? 50 : 25;
     
     const tradingResult = entry.trades?.reduce((acc, trade) => {
-      return acc + (trade.pnl || 0);
+      return acc + (Number(trade.pnl) || 0);
     }, 0) || 0;
 
     return {

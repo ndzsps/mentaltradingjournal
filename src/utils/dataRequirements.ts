@@ -1,4 +1,4 @@
-export const calculateDataRequirements = (journalEntries: any[]) => ({
+export const calculateDataRequirements = (journalEntries: any[] = []) => ({
   assetPairPerformance: {
     hasEnoughData: journalEntries.some(entry => entry.trades?.length > 0),
     requiredFields: ['trades.instrument', 'trades.pnl'],

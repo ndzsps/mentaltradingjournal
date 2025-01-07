@@ -77,11 +77,11 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
           months: "w-full space-y-4",
           month: "w-full space-y-4",
           table: "w-full border-collapse",
-          head_row: "flex w-full",
-          head_cell: "text-center w-[14.28%] font-normal text-sm text-gray-600",
-          row: "flex w-full mt-4",
+          head_row: "flex w-full mb-2",
+          head_cell: "text-sm text-gray-600 font-normal w-[14.28%] text-center",
+          row: "flex w-full mt-2",
           cell: "w-[14.28%] h-24 lg:h-28 p-0.5 relative [&:has([aria-selected])]:bg-accent/50",
-          day: "h-full w-full rounded-lg transition-all duration-200 hover:scale-[1.02] cursor-pointer group border border-gray-100/50 hover:shadow-lg hover:border-gray-200",
+          day: "h-full w-full rounded-lg transition-all duration-200 hover:scale-[1.02] cursor-pointer group border border-gray-100 hover:shadow-lg hover:border-gray-200",
           day_today: "!border-primary-light border-2",
           day_selected: "!border-primary border-2 !shadow-lg shadow-primary/20",
         }}
@@ -104,12 +104,12 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
                     transition-all duration-200 ease-in-out
                   `}
                 >
-                  <span className="text-sm text-gray-500 mb-4">
+                  <span className="text-sm text-gray-500 w-full text-center">
                     {dayDate.getDate()}
                   </span>
                   
                   {stats && (
-                    <div className="space-y-1 text-center">
+                    <div className="mt-4 space-y-1 text-center w-full">
                       <p className={`text-lg font-semibold ${stats.totalPL >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
                         {formatCurrency(stats.totalPL)}
                       </p>

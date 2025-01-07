@@ -53,8 +53,8 @@ export const JournalEntry = ({ entry }: JournalEntryProps) => {
   });
 
   return (
-    <Card className="p-4 rounded-lg bg-background/50 border border-primary/10 min-h-[200px] transition-all duration-300 hover:shadow-md">
-      <div className="flex flex-col h-full">
+    <Card className="p-6 rounded-lg bg-background/50 border border-primary/10 transition-all duration-300 hover:shadow-md">
+      <div className="flex flex-col gap-6">
         <SessionHeader
           date={formattedDate}
           sessionType={entry.session_type}
@@ -63,9 +63,9 @@ export const JournalEntry = ({ entry }: JournalEntryProps) => {
           outcome={entry.outcome}
         />
 
-        <div className="flex-grow space-y-3">
+        <div className="space-y-6">
           {entry.market_conditions && (
-            <p className="text-sm text-muted-foreground mt-3">
+            <p className="text-sm text-muted-foreground">
               Market Conditions: {capitalizeWords(entry.market_conditions)}
             </p>
           )}
@@ -78,8 +78,8 @@ export const JournalEntry = ({ entry }: JournalEntryProps) => {
 
           {/* Display Trading Rules Followed */}
           {Array.isArray(entry.followed_rules) && entry.followed_rules.length > 0 && (
-            <div className="mt-3">
-              <h4 className="text-sm font-medium text-muted-foreground mb-2">Trading Rules Followed:</h4>
+            <div>
+              <h4 className="text-sm font-medium text-muted-foreground mb-3">Trading Rules Followed:</h4>
               <div className="flex flex-wrap gap-2">
                 {entry.followed_rules.map((rule, index) => (
                   <Badge 
@@ -97,8 +97,8 @@ export const JournalEntry = ({ entry }: JournalEntryProps) => {
 
         {/* Display Trades */}
         {Array.isArray(entry.trades) && entry.trades.length > 0 && (
-          <div className="mt-4">
-            <Separator className="mb-4" />
+          <div>
+            <Separator className="mb-6" />
             <div className="space-y-4">
               <h4 className="text-sm font-medium text-muted-foreground">Trades</h4>
               <Accordion type="single" collapsible className="w-full space-y-2">

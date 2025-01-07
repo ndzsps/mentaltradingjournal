@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { JournalCalendar } from "@/components/journal/JournalCalendar";
+import { WeeklyPerformance } from "@/components/journal/WeeklyPerformance";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { JournalEntry } from "@/components/journal/JournalEntry";
@@ -68,9 +69,6 @@ const Journal = () => {
     };
   }, [user]);
 
-  console.log('Selected date:', selectedDate);
-  console.log('Filtered entries:', filteredEntries);
-
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto space-y-8 px-4">
@@ -83,15 +81,22 @@ const Journal = () => {
           </p>
         </div>
 
-        <JournalCalendar 
-          date={selectedDate}
-          onDateSelect={setSelectedDate}
-          entries={entries.map(entry => ({
-            date: new Date(entry.created_at),
-            emotion: entry.emotion,
-            trades: entry.trades
-          }))}
-        />
+        <div className="flex flex-col md:flex-row gap-6">
+          <div className="flex-1">
+            <JournalCalendar 
+              date={selectedDate}
+              onDateSelect={setSelectedDate}
+              entries={entries.map(entry => ({
+                date: new Date(entry.created_at),
+                emotion: entry.emotion,
+                trades: entry.trades
+              }))}
+            />
+          </div>
+          <div className="md:pt-8">
+            <WeeklyPerformance />
+          </div>
+        </div>
 
         <Card className="p-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
           <div className="flex items-center justify-between mb-6">

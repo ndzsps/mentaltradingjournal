@@ -50,20 +50,27 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
           head_row: "w-full",
           row: "w-full",
           cell: "w-[14.28%] h-14 lg:h-16 p-0 relative",
-          day: "w-full h-full rounded-md transition-all duration-200 hover:bg-primary/20 hover:scale-110 active:scale-95 cursor-pointer",
-          day_today: "bg-accent text-accent-foreground hover:bg-accent/80",
-          day_selected: "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+          day: "relative w-full h-full rounded-md transition-all duration-200 hover:bg-primary/10 active:scale-95 cursor-pointer group",
+          day_today: "bg-accent/40 text-accent-foreground hover:bg-accent/60",
+          day_selected: "!bg-primary text-primary-foreground hover:bg-primary/90",
         }}
         components={{
           Day: ({ date: dayDate, ...props }: DayProps & { className?: string }) => {
             const emotionStyle = getEmotionStyle(dayDate);
             return (
-              <div className="relative w-full h-full group">
+              <div className="relative w-full h-full">
                 <button 
                   {...props} 
-                  className={`w-full h-full transition-all duration-200 ${props.className || ''}`}
+                  className={`
+                    ${props.className || ''} 
+                    after:absolute after:inset-1 after:rounded-md after:transition-colors after:duration-200
+                    hover:after:bg-primary/5 dark:hover:after:bg-primary/10
+                    group-hover:font-medium
+                  `}
                 >
-                  {dayDate.getDate()}
+                  <span className="relative z-10">
+                    {dayDate.getDate()}
+                  </span>
                 </button>
                 {emotionStyle && (
                   <div 

@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { AnalyticsSection } from "@/components/landing/AnalyticsSection";
 import { CommunitySection } from "@/components/landing/CommunitySection";
+import { User, ArrowRightCircle } from "lucide-react";
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -18,8 +19,36 @@ const Landing = () => {
       
       {/* Content */}
       <div className="relative z-10">
+        {/* Header */}
+        <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-b border-border/40">
+          <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+            <div className="flex items-center">
+              <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                TradingMind
+              </span>
+            </div>
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                className="flex items-center gap-2"
+                onClick={() => navigate("/login")}
+              >
+                <User className="h-4 w-4" />
+                Sign In
+              </Button>
+              <Button
+                className="flex items-center gap-2"
+                onClick={() => navigate("/login")}
+              >
+                <span>Get Started</span>
+                <ArrowRightCircle className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </header>
+
         {/* Hero Section */}
-        <section className="relative min-h-[90vh] flex items-center">
+        <section className="relative min-h-[90vh] flex items-center pt-16">
           <div className="container mx-auto px-4 md:px-6 flex flex-col md:flex-row items-center gap-12">
             {/* Left Content */}
             <div className="flex-1 space-y-8 md:pr-8">

@@ -50,8 +50,8 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
           head_row: "w-full",
           row: "w-full",
           cell: "w-[14.28%] h-14 lg:h-16 p-0 relative",
-          day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 hover:bg-primary/10 rounded-full transition-colors duration-200",
-          day_today: "bg-primary text-primary-foreground",
+          day: "relative w-full h-full rounded-md transition-all duration-200 cursor-pointer group",
+          day_today: "text-primary-foreground",
           day_selected: "!bg-primary text-primary-foreground hover:bg-primary/90",
         }}
         components={{
@@ -60,16 +60,19 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
             const isToday = dayDate.toDateString() === new Date().toDateString();
             
             return (
-              <div className="relative w-full h-full flex items-center justify-center">
+              <div className="relative w-full h-full">
                 <button 
                   {...props} 
                   className={`
                     ${props.className || ''} 
-                    flex items-center justify-center
+                    flex items-center justify-center w-full h-full
+                    hover:after:absolute hover:after:inset-[25%]
+                    hover:after:bg-primary/10 hover:after:rounded-full
+                    dark:hover:after:bg-primary/20
                   `}
                 >
                   <span className={`
-                    flex items-center justify-center w-9 h-9 rounded-full
+                    relative z-10 flex items-center justify-center w-9 h-9 rounded-full
                     ${isToday ? 'bg-primary text-primary-foreground' : ''}
                   `}>
                     {dayDate.getDate()}
@@ -77,7 +80,7 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
                 </button>
                 {emotionStyle && (
                   <div 
-                    className={`absolute bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full ${emotionStyle.emotion}`}
+                    className={`absolute bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full transition-transform duration-200 group-hover:scale-125 ${emotionStyle.emotion}`}
                   />
                 )}
               </div>

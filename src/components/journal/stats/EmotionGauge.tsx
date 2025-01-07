@@ -6,7 +6,9 @@ interface EmotionGaugeProps {
 
 export const EmotionGauge = ({ score }: EmotionGaugeProps) => {
   // Calculate the rotation angle based on the score (0-100)
-  const rotation = -90 + (score / 100) * 180;
+  // Since we want the needle to start from the bottom (180 degrees)
+  // and rotate counter-clockwise to 0 degrees based on the score
+  const rotation = 180 - (score / 100) * 180;
   
   return (
     <div className="flex items-center gap-6">
@@ -40,7 +42,7 @@ export const EmotionGauge = ({ score }: EmotionGaugeProps) => {
               key={deg}
               className="absolute bottom-0 left-1/2 w-0.5 h-2 bg-border/60"
               style={{
-                transform: `translateX(-50%) rotate(${deg - 90}deg)`,
+                transform: `translateX(-50%) rotate(${deg}deg)`,
                 transformOrigin: 'bottom'
               }}
             />

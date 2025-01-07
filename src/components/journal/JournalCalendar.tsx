@@ -20,9 +20,6 @@ interface JournalCalendarProps {
 }
 
 export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendarProps) => {
-  // Get dates that have entries matching the current filters
-  const datesWithMatchingEntries = entries.map(entry => entry.date);
-
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -58,8 +55,9 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
     if (!stats) return null;
 
     return {
-      bg: stats.totalPL >= 0 ? "bg-emerald-500/10" : "bg-red-500/10",
-      border: stats.totalPL >= 0 ? "border-emerald-500/20" : "border-red-500/20",
+      bg: stats.totalPL >= 0 ? "bg-emerald-50" : "bg-red-50",
+      border: stats.totalPL >= 0 ? "border-emerald-100" : "border-red-100",
+      shadow: stats.totalPL >= 0 ? "shadow-emerald-100/50" : "shadow-red-100/50",
     };
   };
 
@@ -69,29 +67,29 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
   };
 
   return (
-    <Card className="p-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
+    <Card className="p-8 bg-white border-gray-100 shadow-xl rounded-2xl">
       <Calendar
         mode="single"
         selected={date}
         onSelect={handleDateSelect}
         className="w-full"
         classNames={{
-          months: "w-full",
-          month: "w-full",
-          table: "w-full",
-          head_row: "w-full",
-          row: "w-full",
-          cell: "w-[14.28%] h-24 lg:h-28 p-0 relative",
-          day: "h-full w-full rounded-lg transition-all duration-200 hover:scale-105 cursor-pointer group border border-border/20",
-          day_today: "!border-primary",
-          day_selected: "!border-primary border-2",
+          months: "w-full space-y-4",
+          month: "w-full space-y-4",
+          table: "w-full border-collapse",
+          head_row: "flex w-full",
+          head_cell: "w-[14.28%] font-medium text-sm text-gray-600 pb-4",
+          row: "flex w-full mt-2",
+          cell: "w-[14.28%] h-24 lg:h-28 p-0.5 relative",
+          day: "h-full w-full rounded-xl transition-all duration-200 hover:scale-[1.02] cursor-pointer group border border-gray-100 hover:shadow-lg hover:border-gray-200",
+          day_today: "!border-primary-light border-2",
+          day_selected: "!border-primary border-2 !shadow-lg shadow-primary/20",
         }}
         components={{
           Day: ({ date: dayDate, ...props }: DayProps & { className?: string }) => {
             const entry = entries.find(e => e.date.toDateString() === dayDate.toDateString());
             const stats = entry ? calculateDayStats(entry) : null;
             const style = getEmotionStyle(dayDate);
-            const isToday = dayDate.toDateString() === new Date().toDateString();
             
             return (
               <div className="w-full h-full p-0.5">
@@ -99,26 +97,26 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
                   {...props} 
                   className={`
                     ${props.className || ''} 
-                    ${style?.bg || ''}
+                    ${style?.bg || 'hover:bg-gray-50'}
                     ${style?.border || ''}
-                    relative flex flex-col items-stretch justify-start p-1
-                    hover:shadow-lg transition-all duration-200
-                    border border-border/10
+                    ${style?.shadow || ''}
+                    relative flex flex-col items-stretch justify-start p-2
+                    transition-all duration-200 ease-in-out
                   `}
                 >
-                  <span className="text-sm text-muted-foreground absolute top-1 right-1">
+                  <span className="text-sm text-gray-400 absolute top-2 right-2">
                     {dayDate.getDate()}
                   </span>
                   
                   {stats && (
-                    <div className="mt-4 space-y-0.5 text-left">
-                      <p className="text-base font-medium">
+                    <div className="mt-6 space-y-1">
+                      <p className={`text-lg font-semibold ${stats.totalPL >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
                         {formatCurrency(stats.totalPL)}
                       </p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-sm text-gray-500">
                         {stats.numTrades} trade{stats.numTrades !== 1 ? 's' : ''}
                       </p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-gray-400">
                         {stats.avgRR}R, {stats.winRate.toFixed(1)}%
                       </p>
                     </div>

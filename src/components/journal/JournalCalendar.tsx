@@ -77,13 +77,13 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
           months: "w-full space-y-4",
           month: "w-full space-y-4",
           table: "w-full border-collapse",
-          head_row: "flex w-full mb-2",
-          head_cell: "text-sm text-gray-600 font-normal w-[14.28%] text-center",
-          row: "flex w-full mt-2",
-          cell: "w-[14.28%] h-24 lg:h-28 p-0.5 relative [&:has([aria-selected])]:bg-accent/50",
-          day: "h-full w-full rounded-lg transition-all duration-200 hover:scale-[1.02] cursor-pointer group border-2 border-gray-200 hover:shadow-lg hover:border-gray-300",
-          day_today: "!border-primary-light border-2",
-          day_selected: "!border-primary border-2 !shadow-lg shadow-primary/20",
+          head_row: "flex w-full mb-4",
+          head_cell: "text-sm font-medium text-gray-600 w-[14.28%] text-center",
+          row: "flex w-full mt-4",
+          cell: "w-[14.28%] h-32 lg:h-36 p-1 relative [&:has([aria-selected])]:bg-accent/50",
+          day: "h-full w-full transition-all duration-200 cursor-pointer group",
+          day_today: "!border-primary-light !border-2",
+          day_selected: "!border-primary !border-2 !shadow-lg shadow-primary/20",
         }}
         components={{
           Day: ({ date: dayDate, ...props }: DayProps & { className?: string }) => {
@@ -100,27 +100,34 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
                     ${style?.bg || 'hover:bg-gray-50'}
                     ${style?.border || ''}
                     ${style?.shadow || ''}
-                    relative flex flex-col items-stretch justify-start p-2
+                    relative flex flex-col h-full w-full
+                    border-2 border-gray-200 rounded-lg
+                    hover:border-primary hover:shadow-lg
                     transition-all duration-200 ease-in-out
+                    overflow-hidden
                   `}
                 >
-                  <div className="flex justify-end mb-2">
-                    <span className="text-sm text-gray-500">
+                  {/* Date number in top-right corner */}
+                  <div className="absolute top-2 right-2">
+                    <span className="text-sm font-medium text-gray-500">
                       {dayDate.getDate()}
                     </span>
                   </div>
                   
+                  {/* Stats container with gradient overlay */}
                   {stats && (
-                    <div className="space-y-1 text-center w-full">
-                      <p className={`text-lg font-semibold ${stats.totalPL >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
-                        {formatCurrency(stats.totalPL)}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        {stats.numTrades} trade{stats.numTrades !== 1 ? 's' : ''}
-                      </p>
-                      <p className="text-xs text-gray-400">
-                        {stats.avgRR}R, {stats.winRate.toFixed(1)}%
-                      </p>
+                    <div className="absolute inset-0 flex flex-col justify-end p-2 bg-gradient-to-t from-white/90 to-transparent">
+                      <div className="space-y-1 text-center w-full">
+                        <p className={`text-lg font-semibold ${stats.totalPL >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                          {formatCurrency(stats.totalPL)}
+                        </p>
+                        <p className="text-xs text-gray-600">
+                          {stats.numTrades} trade{stats.numTrades !== 1 ? 's' : ''}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {stats.avgRR}R • {stats.winRate.toFixed(0)}%
+                        </p>
+                      </div>
                     </div>
                   )}
                 </button>

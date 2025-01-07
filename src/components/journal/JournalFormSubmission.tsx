@@ -70,7 +70,7 @@ export const useJournalFormSubmission = ({
 
       // Only validate trades if the outcome is not "no_trades"
       if (selectedOutcome !== "no_trades" && trades.length === 0) {
-        toast.error("Missing Information", {
+        toast.error("Missing Trades", {
           description: "Please add at least one trade for your trading session.",
           duration: 5000,
         });

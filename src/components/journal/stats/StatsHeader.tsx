@@ -17,11 +17,11 @@ const EmotionGauge = ({ score }: { score: number }) => {
         style={{
           background: `conic-gradient(
             from 180deg at 50% 100%,
-            #ea384c 0deg,    /* Start with red for negative emotions */
-            #ea384c 60deg,   /* Hold red for first third */
-            #FEF7CD 90deg,   /* Transition through yellow in middle */
-            #F2FCE2 120deg,  /* Start transitioning to green */
-            #22c55e 180deg   /* End with full green */
+            #ea384c 0deg,      /* Start with red */
+            #ea384c 45deg,     /* Hold red for first quarter */
+            #FEF7CD 90deg,     /* Transition to yellow */
+            #FEF7CD 120deg,    /* Hold yellow */
+            #22c55e 180deg     /* End with green */
           )`,
           clipPath: 'polygon(0 50%, 100% 50%, 100% 0, 0 0)'
         }}
@@ -31,14 +31,14 @@ const EmotionGauge = ({ score }: { score: number }) => {
         className="absolute bottom-0 left-1/2 w-1 h-6 origin-bottom transition-transform duration-700"
         style={{
           transform: `translateX(-50%) rotate(${rotation}deg)`,
-          backgroundColor: score < 33 ? '#ea384c' : score < 66 ? '#fbbf24' : '#22c55e'
+          backgroundColor: score < 33 ? '#ea384c' : score < 66 ? '#FEF7CD' : '#22c55e'
         }}
       />
       {/* Center point */}
       <div 
         className="absolute bottom-0 left-1/2 w-2 h-2 rounded-full"
         style={{
-          backgroundColor: score < 33 ? '#ea384c' : score < 66 ? '#fbbf24' : '#22c55e',
+          backgroundColor: score < 33 ? '#ea384c' : score < 66 ? '#FEF7CD' : '#22c55e',
           transform: 'translate(-50%, 50%)'
         }}
       />

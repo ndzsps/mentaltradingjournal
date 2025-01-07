@@ -58,7 +58,7 @@ export const PerformanceBreakdown = () => {
   );
 
   // Format number to K notation if >= 1000
-  const formatYAxisTick = (value: number) => {
+  const formatYAxisTick = (value: number): string => {
     if (Math.abs(value) >= 1000) {
       return `$${(value / 1000).toFixed(1)}K`;
     }
@@ -66,7 +66,7 @@ export const PerformanceBreakdown = () => {
   };
 
   // Custom bar color based on value
-  const getBarColor = (value: number) => {
+  const getBarColor = (value: number): string => {
     if (value > 500) return "hsl(142.1 76.2% 36.3%)"; // Strong positive (green)
     if (value > 0) return "hsl(142.1 76.2% 46.3%)"; // Positive (lighter green)
     if (value > -500) return "hsl(346.8 77.2% 49.8%)"; // Negative (light red)
@@ -113,7 +113,6 @@ export const PerformanceBreakdown = () => {
             />
             <Bar 
               dataKey="averagePnL" 
-              fill="var(--primary)"
               radius={[4, 4, 0, 0]}
               fill={(entry) => getBarColor(entry.averagePnL)}
             />

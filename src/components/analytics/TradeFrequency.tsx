@@ -49,11 +49,11 @@ export const TradeFrequency = () => {
     };
   });
 
-  const formatYAxisTick = (value: number) => {
+  const formatYAxisTick = (value: number): string => {
     if (value >= 1000) {
       return `${(value / 1000).toFixed(1)}K`;
     }
-    return value;
+    return value.toString();
   };
 
   const averageTrades = data.reduce((sum, day) => sum + day.trades, 0) / data.length;

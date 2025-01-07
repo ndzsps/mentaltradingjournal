@@ -48,6 +48,7 @@ const Journal = () => {
         return;
       }
 
+      console.log('Fetched entries:', data);
       setEntries(data || []);
     };
 
@@ -75,15 +76,9 @@ const Journal = () => {
   }, [user]);
   
   const filteredEntries = entries.filter(entry => {
-    // Convert entry.created_at string to Date object
     const entryDate = new Date(entry.created_at);
-    
-    // If no date is selected, show all entries
-    if (!selectedDate) return true;
-    
-    // Compare dates using isSameDay
-    const matchesDate = isSameDay(entryDate, selectedDate);
-
+    const matchesDate = !selectedDate || isSameDay(entryDate, selectedDate);
+    // Convert both to lowercase for case-insensitive comparison
     const matchesEmotion = !emotionFilter || entry.emotion.toLowerCase() === emotionFilter.toLowerCase();
     const matchesDetail = !detailFilter || entry.emotion_detail === detailFilter;
     
@@ -113,6 +108,9 @@ const Journal = () => {
 
     return matchesDate && matchesEmotion && matchesDetail && matchesTimeFilter;
   });
+
+  console.log('Selected date:', selectedDate);
+  console.log('Filtered entries:', filteredEntries);
 
   return (
     <AppLayout>
@@ -160,23 +158,9 @@ const Journal = () => {
                   ))}
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center h-[400px] text-center">
-                  <p className="text-lg text-muted-foreground mb-2">
-                    {selectedDate ? (
-                      `No journal entries found for ${selectedDate.toLocaleDateString('en-US', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      })}`
-                    ) : (
-                      'No journal entries found'
-                    )}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Select a different date or create a new entry
-                  </p>
-                </div>
+                <p className="text-muted-foreground text-center py-8">
+                  No entries found for the selected date
+                </p>
               )}
             </ScrollArea>
           </Card>

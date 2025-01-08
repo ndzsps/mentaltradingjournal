@@ -11,6 +11,7 @@ import { JournalFilters } from "@/components/journal/JournalFilters";
 import { useJournalFilters } from "@/hooks/useJournalFilters";
 import { JournalEntryType } from "@/types/journal";
 import { StatsHeader } from "@/components/journal/stats/StatsHeader";
+import { TimeFilterProvider } from "@/contexts/TimeFilterContext";
 
 const Journal = () => {
   const [entries, setEntries] = useState<JournalEntryType[]>([]);
@@ -77,59 +78,61 @@ const Journal = () => {
 
   return (
     <AppLayout>
-      <div className="max-w-7xl mx-auto space-y-8 px-4">
-        <StatsHeader />
+      <TimeFilterProvider>
+        <div className="max-w-7xl mx-auto space-y-8 px-4">
+          <StatsHeader />
 
-        <div className="flex flex-col md:flex-row gap-6">
-          <div className="flex-1">
-            <JournalCalendar 
-              date={selectedDate}
-              onDateSelect={setSelectedDate}
-              entries={entries.map(entry => ({
-                date: new Date(entry.created_at),
-                emotion: entry.emotion,
-                trades: entry.trades
-              }))}
-            />
+          <div className="flex flex-col md:flex-row gap-6">
+            <div className="flex-1">
+              <JournalCalendar 
+                date={selectedDate}
+                onDateSelect={setSelectedDate}
+                entries={entries.map(entry => ({
+                  date: new Date(entry.created_at),
+                  emotion: entry.emotion,
+                  trades: entry.trades
+                }))}
+              />
+            </div>
+            <div className="md:pt-8">
+              <WeeklyPerformance />
+            </div>
           </div>
-          <div className="md:pt-8">
-            <WeeklyPerformance />
-          </div>
+
+          <Card className="p-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
+                Journal Entries
+              </h2>
+              <JournalFilters
+                emotionFilter={emotionFilter}
+                setEmotionFilter={setEmotionFilter}
+                detailFilter={detailFilter}
+                setDetailFilter={setDetailFilter}
+                timeFilter={timeFilter}
+                setTimeFilter={setTimeFilter}
+                outcomeFilter={outcomeFilter}
+                setOutcomeFilter={setOutcomeFilter}
+                allDetails={Array.from(new Set(entries.map(entry => entry.emotion_detail)))}
+              />
+            </div>
+            
+            <ScrollArea className="h-[600px] pr-4">
+              {filteredEntries.length > 0 ? (
+                <div className="space-y-4">
+                  {filteredEntries.map((entry) => (
+                    <JournalEntry key={entry.id} entry={entry} />
+                  ))}
+                </div>
+              ) : (
+                <p className="text-muted-foreground text-center py-8">
+                  No entries found for the selected filters
+                </p>
+              )}
+            </ScrollArea>
+          </Card>
         </div>
-
-        <Card className="p-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
-              Journal Entries
-            </h2>
-            <JournalFilters
-              emotionFilter={emotionFilter}
-              setEmotionFilter={setEmotionFilter}
-              detailFilter={detailFilter}
-              setDetailFilter={setDetailFilter}
-              timeFilter={timeFilter}
-              setTimeFilter={setTimeFilter}
-              outcomeFilter={outcomeFilter}
-              setOutcomeFilter={setOutcomeFilter}
-              allDetails={Array.from(new Set(entries.map(entry => entry.emotion_detail)))}
-            />
-          </div>
-          
-          <ScrollArea className="h-[600px] pr-4">
-            {filteredEntries.length > 0 ? (
-              <div className="space-y-4">
-                {filteredEntries.map((entry) => (
-                  <JournalEntry key={entry.id} entry={entry} />
-                ))}
-              </div>
-            ) : (
-              <p className="text-muted-foreground text-center py-8">
-                No entries found for the selected filters
-              </p>
-            )}
-          </ScrollArea>
-        </Card>
-      </div>
+      </TimeFilterProvider>
     </AppLayout>
   );
 };

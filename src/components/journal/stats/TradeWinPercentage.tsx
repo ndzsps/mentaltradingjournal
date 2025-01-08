@@ -4,18 +4,59 @@ import { ArrowUpDown } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useState } from "react";
+import { TimeFilter } from "@/hooks/useJournalFilters";
+import { startOfMonth, subMonths, startOfQuarter, isWithinInterval, endOfMonth } from "date-fns";
 
-export const TradeWinPercentage = () => {
+interface TradeWinPercentageProps {
+  timeFilter: TimeFilter;
+}
+
+export const TradeWinPercentage = ({ timeFilter }: TradeWinPercentageProps) => {
   const [emotionFilter, setEmotionFilter] = useState<string>("all");
   const { data: analytics, isLoading } = useQuery({
     queryKey: ['analytics'],
     queryFn: generateAnalytics,
   });
 
+  const getTimeInterval = () => {
+    const now = new Date();
+    switch (timeFilter) {
+      case "this-month":
+        return {
+          start: startOfMonth(now),
+          end: now
+        };
+      case "last-month":
+        return {
+          start: startOfMonth(subMonths(now, 1)),
+          end: endOfMonth(subMonths(now, 1))
+        };
+      case "last-three-months":
+        return {
+          start: startOfMonth(subMonths(now, 3)),
+          end: now
+        };
+      default:
+        return null;
+    }
+  };
+
   const calculateWinRate = () => {
     if (!analytics?.journalEntries) return 0;
 
-    const filteredEntries = analytics.journalEntries.filter(entry => {
+    let filteredEntries = analytics.journalEntries;
+    
+    // Apply time filter
+    const interval = getTimeInterval();
+    if (interval) {
+      filteredEntries = filteredEntries.filter(entry => {
+        const entryDate = new Date(entry.created_at);
+        return isWithinInterval(entryDate, interval);
+      });
+    }
+
+    // Apply emotion filter
+    filteredEntries = filteredEntries.filter(entry => {
       if (emotionFilter === "all") return true;
       return entry.emotion?.toLowerCase().includes(emotionFilter.toLowerCase());
     });

@@ -86,7 +86,7 @@ export const StatsHeader = () => {
   if (isAnalyticsLoading) {
     return (
       <div className="space-y-4">
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-start gap-2">
           <div className="h-10 w-32 bg-muted animate-pulse rounded-md" />
           <div className="h-10 w-32 bg-muted animate-pulse rounded-md" />
           <div className="h-10 w-32 bg-muted animate-pulse rounded-md" />
@@ -104,7 +104,7 @@ export const StatsHeader = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end gap-2">
+      <div className="flex justify-start gap-2">
         <Button 
           variant={timeFilter === "this-month" ? "default" : "outline"}
           onClick={() => setTimeFilter("this-month")}

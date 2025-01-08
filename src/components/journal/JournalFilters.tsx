@@ -28,7 +28,7 @@ export const JournalFilters = ({
   allDetails,
 }: JournalFiltersProps) => {
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-2 justify-start">
       <TimeFilterDropdown 
         timeFilter={timeFilter}
         setTimeFilter={setTimeFilter}

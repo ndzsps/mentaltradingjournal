@@ -32,7 +32,6 @@ interface Session {
   stopLoss: number;
   takeProfit: number;
   pnl: number;
-  fees: number;
   weeklyUrl: string | null;
   dailyUrl: string | null;
   fourHourUrl: string | null;
@@ -85,7 +84,6 @@ export default function BlueprintSessions() {
         stopLoss: session.stop_loss || 0,
         takeProfit: session.take_profit || 0,
         pnl: session.pnl || 0,
-        fees: session.fees || 0,
         weeklyUrl: session.weekly_url,
         dailyUrl: session.daily_url,
         fourHourUrl: session.four_hour_url,
@@ -149,7 +147,6 @@ export default function BlueprintSessions() {
                   <TableHead className="text-right">Stop Loss</TableHead>
                   <TableHead className="text-right">Take Profit</TableHead>
                   <TableHead className="text-right">P&L</TableHead>
-                  <TableHead className="text-right">Fees</TableHead>
                   <TableHead className="text-center">Weekly</TableHead>
                   <TableHead className="text-center">Daily</TableHead>
                   <TableHead className="text-center">4H</TableHead>
@@ -185,7 +182,6 @@ export default function BlueprintSessions() {
                     }`}>
                       {formatCurrency(session.pnl)}
                     </TableCell>
-                    <TableCell className="text-right">{formatCurrency(session.fees)}</TableCell>
                     <TableCell className="text-center">{renderUrlLink(session.weeklyUrl, 'Weekly')}</TableCell>
                     <TableCell className="text-center">{renderUrlLink(session.dailyUrl, 'Daily')}</TableCell>
                     <TableCell className="text-center">{renderUrlLink(session.fourHourUrl, '4H')}</TableCell>

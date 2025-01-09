@@ -22,7 +22,7 @@ export function BacktestingForm() {
             <div className="space-y-2">
               <Label htmlFor="entry-date">Entry Date</Label>
               <Input
-                type="datetime-local"
+                type="date"
                 id="entry-date"
                 className="flex-1"
               />
@@ -56,18 +56,18 @@ export function BacktestingForm() {
 
             <div className="space-y-2">
               <Label>Direction *</Label>
-              <div className="flex gap-2">
+              <div className="flex flex-col gap-2">
                 <Button
                   type="button"
                   variant="outline"
-                  className="flex-1 hover:bg-green-500/10"
+                  className="w-full hover:bg-green-500/10"
                 >
                   Buy
                 </Button>
                 <Button
                   type="button"
                   variant="outline"
-                  className="flex-1 hover:bg-red-500/10"
+                  className="w-full hover:bg-red-500/10"
                 >
                   Sell
                 </Button>

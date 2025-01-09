@@ -83,6 +83,12 @@ const Journal = () => {
       })
     : filteredEntries;
 
+  const calendarEntries = entries.map(entry => ({
+    date: parseISO(entry.created_at),
+    emotion: entry.emotion,
+    trades: entry.trades
+  }));
+
   return (
     <AppLayout>
       <TimeFilterProvider>
@@ -94,11 +100,7 @@ const Journal = () => {
               <JournalCalendar 
                 date={selectedDate}
                 onDateSelect={setSelectedDate}
-                entries={entries.map(entry => ({
-                  date: new Date(entry.created_at),
-                  emotion: entry.emotion,
-                  trades: entry.trades
-                }))}
+                entries={calendarEntries}
               />
             </div>
             <div className="w-64">

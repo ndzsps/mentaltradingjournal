@@ -48,9 +48,7 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
         entry.trades.forEach(trade => {
           if (trade) {
             totalTrades++;
-            // Get the P&L value from either profit_loss or pnl field
             const pnlValue = trade.pnl || trade.profit_loss || 0;
-            // Convert to number, handling both string and number types
             const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
             totalPL += isNaN(numericPnL) ? 0 : numericPnL;
           }
@@ -81,12 +79,17 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
     };
   };
 
+  const handleDateSelect = (newDate: Date | undefined) => {
+    console.log('Date selected:', newDate);
+    onDateSelect(newDate);
+  };
+
   return (
     <Card className="p-8 bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800 shadow-xl rounded-2xl">
       <Calendar
         mode="single"
         selected={date}
-        onSelect={onDateSelect}
+        onSelect={handleDateSelect}
         className="w-full"
         classNames={{
           months: "w-full space-y-4",
@@ -95,7 +98,7 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
           head_row: "flex w-full h-8",
           head_cell: "text-sm font-medium bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent w-[14.28%] text-center",
           row: "flex w-full h-24",
-          cell: "w-[14.28%] p-1 relative [&:has([aria-selected])]:bg-accent/50",
+          cell: "w-[14.28%] p-1 relative [&:has([aria-selected])]:bg-accent/50 cursor-pointer",
           day: "h-full w-full transition-all duration-200 cursor-pointer group",
           day_today: "relative before:absolute before:inset-0 before:rounded-lg before:bg-gradient-to-br before:from-primary-light before:to-accent before:opacity-10 before:transition-opacity hover:before:opacity-20 dark:before:opacity-20 dark:hover:before:opacity-30",
           day_selected: "border-primary-light border-2 shadow-lg shadow-primary-light/20 dark:border-primary-light dark:shadow-primary-light/20",
@@ -126,6 +129,7 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
               <div className="w-full h-full p-0.5">
                 <button 
                   {...props} 
+                  onClick={() => handleDateSelect(dayDate)}
                   className={`
                     ${props.className || ''} 
                     ${style?.bg || 'hover:bg-gray-50 dark:hover:bg-gray-800'}

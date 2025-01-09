@@ -2,7 +2,6 @@ import { Trade } from "@/types/trade";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import Image from "next/image";
 
 interface TradesListProps {
   trades: Trade[];
@@ -68,11 +67,10 @@ export const TradesList = ({ trades }: TradesListProps) => {
                     {trade.screenshots.map((screenshot, idx) => (
                       <div key={idx} className="relative rounded-lg overflow-hidden border">
                         <AspectRatio ratio={16 / 9}>
-                          <Image
+                          <img
                             src={screenshot}
                             alt={`Trade screenshot ${idx + 1}`}
-                            fill
-                            className="object-cover"
+                            className="absolute inset-0 w-full h-full object-cover"
                           />
                         </AspectRatio>
                       </div>

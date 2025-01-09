@@ -11,6 +11,7 @@ export interface Trade {
   exitDate: string;
   exitPrice: number;
   pnl: number;
+  profit_loss?: number; // Adding this optional field for backward compatibility
   fees: number;
   forecastScreenshot?: string;
   resultScreenshot?: string;

@@ -45,8 +45,7 @@ export const useWeeklyStats = () => {
         if (weekNumber >= 1 && weekNumber <= 5) {
           const trades = (entry.trades || []) as Trade[];
           const dailyPnL = trades.reduce((sum, trade) => {
-            // Convert PnL value to number, handling both string and number types
-            const pnlValue = trade.pnl || trade.profit_loss || 0;
+            const pnlValue = trade.pnl;
             const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
             return sum + (isNaN(numericPnL) ? 0 : numericPnL);
           }, 0);

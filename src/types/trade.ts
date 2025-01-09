@@ -1,15 +1,19 @@
 export interface Trade {
   id: string;
-  entryDate: string;
+  direction: "buy" | "sell";
   instrument: string;
   setup: string;
-  direction: 'buy' | 'sell';
-  entryPrice: number;
-  quantity: number;
-  stopLoss: number;
-  takeProfit: number;
+  entryDate: string;
+  entryPrice: string;
   exitDate: string;
-  exitPrice: number;
-  pnl: number;
-  fees: number;
+  exitPrice: string;
+  quantity: string;
+  takeProfit: string;
+  stopLoss: string;
+  fees: string;
+  pnl: string;
+  forecastImage?: string;
+  forecastUrl?: string;
+  resultImage?: string;
+  resultUrl?: string;
 }

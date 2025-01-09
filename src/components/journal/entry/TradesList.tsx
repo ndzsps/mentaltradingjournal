@@ -1,6 +1,8 @@
 import { Trade } from "@/types/trade";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { ArrowDownIcon, ArrowUpIcon } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface TradesListProps {
   trades: Trade[];
@@ -8,59 +10,103 @@ interface TradesListProps {
 
 export const TradesList = ({ trades }: TradesListProps) => {
   return (
-    <Accordion type="single" collapsible className="w-full space-y-2">
-      {trades.map((trade, index) => (
-        <AccordionItem key={trade.id || index} value={`trade-${index}`} className="border rounded-lg px-4">
-          <AccordionTrigger className="hover:no-underline py-3">
-            <div className="flex items-center justify-between w-full pr-4">
-              <span className="font-medium">{trade.instrument}</span>
-              <div className="flex items-center gap-3">
+    <ScrollArea className="h-[300px]">
+      <div className="space-y-4">
+        {trades.map((trade, index) => (
+          <Card key={trade.id} className="p-4 bg-card/50">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Badge variant={trade.direction === "buy" ? "default" : "destructive"}>
+                    {trade.direction === "buy" ? (
+                      <ArrowUpIcon className="w-3 h-3 mr-1" />
+                    ) : (
+                      <ArrowDownIcon className="w-3 h-3 mr-1" />
+                    )}
+                    {trade.direction.toUpperCase()}
+                  </Badge>
+                  <span className="text-sm font-medium">{trade.instrument}</span>
+                </div>
                 <Badge 
-                  variant={trade.direction === 'buy' ? 'default' : 'destructive'}
-                  className="capitalize"
+                  variant={Number(trade.pnl) >= 0 ? "outline" : "destructive"}
+                  className={`${
+                    Number(trade.pnl) >= 0 
+                      ? "border-green-500/50 text-green-500 bg-green-500/5" 
+                      : "border-red-500/50 text-red-500 bg-red-500/5"
+                  }`}
                 >
-                  {trade.direction}
+                  {Number(trade.pnl) >= 0 ? "+" : ""}{trade.pnl}
                 </Badge>
-                <span className={`font-medium ${
-                  Number(trade.pnl) >= 0 ? 'text-green-500' : 'text-red-500'
-                }`}>
-                  {Number(trade.pnl) >= 0 ? '+' : ''}{trade.pnl}
-                </span>
               </div>
-            </div>
-          </AccordionTrigger>
-          <AccordionContent className="pb-4">
-            <div className="space-y-6 pt-2">
-              <div className="grid grid-cols-2 gap-6">
-                <div className="space-y-3">
-                  <h4 className="text-sm font-medium text-muted-foreground">Entry Details</h4>
-                  <div className="space-y-2">
-                    <p className="text-sm">Date: {new Date(trade.entryDate).toLocaleString()}</p>
-                    <p className="text-sm">Price: {trade.entryPrice}</p>
-                    <p className="text-sm">Stop Loss: {trade.stopLoss}</p>
-                    <p className="text-sm">Take Profit: {trade.takeProfit}</p>
-                  </div>
+
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="text-muted-foreground">Entry</p>
+                  <p>{trade.entryPrice}</p>
                 </div>
-                <div className="space-y-3">
-                  <h4 className="text-sm font-medium text-muted-foreground">Exit Details</h4>
-                  <div className="space-y-2">
-                    <p className="text-sm">Date: {new Date(trade.exitDate).toLocaleString()}</p>
-                    <p className="text-sm">Price: {trade.exitPrice}</p>
-                    <p className="text-sm">Quantity: {trade.quantity}</p>
-                    <p className="text-sm">Fees: {trade.fees}</p>
-                  </div>
+                <div>
+                  <p className="text-muted-foreground">Exit</p>
+                  <p>{trade.exitPrice}</p>
                 </div>
               </div>
-              {trade.setup && (
+
+              {/* Screenshots Section */}
+              {(trade.forecastImage || trade.forecastUrl || trade.resultImage || trade.resultUrl) && (
                 <div className="space-y-2">
-                  <h4 className="text-sm font-medium text-muted-foreground">Setup</h4>
-                  <p className="text-sm">{trade.setup}</p>
+                  <p className="text-sm font-medium text-muted-foreground">Screenshots</p>
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Forecast Image/URL */}
+                    {(trade.forecastImage || trade.forecastUrl) && (
+                      <div>
+                        <p className="text-xs text-muted-foreground mb-1">Forecast</p>
+                        {trade.forecastImage ? (
+                          <img 
+                            src={trade.forecastImage} 
+                            alt="Trade Forecast" 
+                            className="rounded-md w-full h-32 object-cover"
+                          />
+                        ) : trade.forecastUrl && (
+                          <a 
+                            href={trade.forecastUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-primary hover:underline break-all"
+                          >
+                            {trade.forecastUrl}
+                          </a>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Result Image/URL */}
+                    {(trade.resultImage || trade.resultUrl) && (
+                      <div>
+                        <p className="text-xs text-muted-foreground mb-1">Result</p>
+                        {trade.resultImage ? (
+                          <img 
+                            src={trade.resultImage} 
+                            alt="Trade Result" 
+                            className="rounded-md w-full h-32 object-cover"
+                          />
+                        ) : trade.resultUrl && (
+                          <a 
+                            href={trade.resultUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-primary hover:underline break-all"
+                          >
+                            {trade.resultUrl}
+                          </a>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
-          </AccordionContent>
-        </AccordionItem>
-      ))}
-    </Accordion>
+          </Card>
+        ))}
+      </div>
+    </ScrollArea>
   );
 };

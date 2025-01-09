@@ -65,6 +65,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
+      {/* Remove any duplicate routes */}
     </Routes>
   );
 };

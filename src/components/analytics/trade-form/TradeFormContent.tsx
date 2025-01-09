@@ -41,8 +41,8 @@ export const TradeFormContent = ({
       exitPrice: parseFloat(formData.get('exitPrice') as string),
       pnl: parseFloat(formData.get('pnl') as string),
       fees: parseFloat(formData.get('fees') as string),
-      forecastScreenshot: formData.get('forecastScreenshot') as string || undefined,
-      resultScreenshot: formData.get('resultScreenshot') as string || undefined,
+      forecastScreenshot: formData.get('forecastScreenshot') as string || null,
+      resultScreenshot: formData.get('resultUrl') as string || null,
       htfBias: formData.get('htfBias') as string || undefined,
     };
 

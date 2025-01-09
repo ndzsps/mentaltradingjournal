@@ -21,7 +21,7 @@ export const WeeklyPerformance = () => {
     queryFn: async () => {
       if (!user) return [];
 
-      const startDate = startOfWeek(addWeeks(currentDate, -5));
+      const startDate = startOfWeek(addWeeks(currentDate, -4)); // Changed from -5 to -4 for 5 weeks
       const endDate = endOfWeek(currentDate);
 
       const { data: entries, error } = await supabase
@@ -33,7 +33,7 @@ export const WeeklyPerformance = () => {
 
       if (error) throw error;
 
-      const weeks: WeekSummary[] = Array.from({ length: 6 }, (_, i) => ({
+      const weeks: WeekSummary[] = Array.from({ length: 5 }, (_, i) => ({ // Changed from 6 to 5
         weekNumber: i + 1,
         totalPnL: 0,
         tradingDays: 0,
@@ -42,9 +42,9 @@ export const WeeklyPerformance = () => {
       (entries as JournalEntryType[])?.forEach(entry => {
         const entryDate = new Date(entry.created_at);
         
-        for (let i = 0; i < 6; i++) {
-          const weekStart = startOfWeek(addWeeks(currentDate, -5 + i));
-          const weekEnd = endOfWeek(addWeeks(currentDate, -5 + i));
+        for (let i = 0; i < 5; i++) { // Changed from 6 to 5
+          const weekStart = startOfWeek(addWeeks(currentDate, -4 + i)); // Changed from -5 to -4
+          const weekEnd = endOfWeek(addWeeks(currentDate, -4 + i)); // Changed from -5 to -4
           
           if (isWithinInterval(entryDate, { start: weekStart, end: weekEnd })) {
             const trades = (entry.trades || []) as Trade[];
@@ -66,10 +66,10 @@ export const WeeklyPerformance = () => {
 
   if (isLoading) {
     return (
-      <div className="grid grid-rows-6 h-[calc(100vh-12rem)] pt-[3.5rem]">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="h-24 flex items-center px-2">
-            <Card className="p-4 space-y-2 bg-primary/5 w-full">
+      <div className="grid grid-rows-5 h-[calc(100vh-12rem)] pt-[3.5rem]"> {/* Changed from 6 to 5 rows */}
+        {Array.from({ length: 5 }).map((_, i) => ( // Changed from 6 to 5
+          <div key={i} className="flex items-center px-2">
+            <Card className="p-4 space-y-2 bg-primary/5 w-full h-24">
               <div className="h-4 bg-primary/10 rounded w-1/3"></div>
               <div className="h-6 bg-primary/10 rounded w-2/3"></div>
             </Card>
@@ -80,11 +80,11 @@ export const WeeklyPerformance = () => {
   }
 
   return (
-    <div className="grid grid-rows-6 h-[calc(100vh-12rem)] pt-[3.5rem]">
+    <div className="grid grid-rows-5 h-[calc(100vh-12rem)] pt-[3.5rem]"> {/* Changed from 6 to 5 rows */}
       {weeklyStats?.map((week) => (
-        <div key={week.weekNumber} className="h-24 flex items-center px-2">
+        <div key={week.weekNumber} className="flex items-center px-2">
           <Card
-            className="p-4 space-y-2 bg-card/30 backdrop-blur-xl border-primary/10 hover:border-primary/20 transition-colors w-full"
+            className="p-4 space-y-2 bg-card/30 backdrop-blur-xl border-primary/10 hover:border-primary/20 transition-colors w-full h-24 flex flex-col justify-center"
           >
             <p className={`text-sm font-medium ${week.totalPnL === 0 ? 'text-muted-foreground' : ''}`}>
               Week {week.weekNumber}

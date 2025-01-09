@@ -1,6 +1,8 @@
 import { Trade } from "@/types/trade";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+import Image from "next/image";
 
 interface TradesListProps {
   trades: Trade[];
@@ -51,10 +53,45 @@ export const TradesList = ({ trades }: TradesListProps) => {
                   </div>
                 </div>
               </div>
+              
               {trade.setup && (
                 <div className="space-y-2">
                   <h4 className="text-sm font-medium text-muted-foreground">Setup</h4>
                   <p className="text-sm">{trade.setup}</p>
+                </div>
+              )}
+
+              {trade.screenshots && trade.screenshots.length > 0 && (
+                <div className="space-y-3">
+                  <h4 className="text-sm font-medium text-muted-foreground">Screenshots</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    {trade.screenshots.map((screenshot, idx) => (
+                      <div key={idx} className="relative rounded-lg overflow-hidden border">
+                        <AspectRatio ratio={16 / 9}>
+                          <Image
+                            src={screenshot}
+                            alt={`Trade screenshot ${idx + 1}`}
+                            fill
+                            className="object-cover"
+                          />
+                        </AspectRatio>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {trade.url && (
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium text-muted-foreground">Reference URL</h4>
+                  <a 
+                    href={trade.url} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="text-sm text-primary hover:underline"
+                  >
+                    {trade.url}
+                  </a>
                 </div>
               )}
             </div>

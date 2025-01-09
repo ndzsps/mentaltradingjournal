@@ -1,10 +1,25 @@
 import { Trade } from "@/types/trade";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ExternalLink } from "lucide-react";
 
 interface TradesListProps {
   trades: Trade[];
 }
+
+const formatDate = (dateString: string) => {
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      return 'Invalid date';
+    }
+    return date.toLocaleString();
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return 'Invalid date';
+  }
+};
 
 export const TradesList = ({ trades }: TradesListProps) => {
   return (
@@ -35,19 +50,43 @@ export const TradesList = ({ trades }: TradesListProps) => {
                 <div className="space-y-3">
                   <h4 className="text-sm font-medium text-muted-foreground">Entry Details</h4>
                   <div className="space-y-2">
-                    <p className="text-sm">Date: {new Date(trade.entryDate).toLocaleString()}</p>
+                    <p className="text-sm">Date: {formatDate(trade.entryDate)}</p>
                     <p className="text-sm">Price: {trade.entryPrice}</p>
                     <p className="text-sm">Stop Loss: {trade.stopLoss}</p>
                     <p className="text-sm">Take Profit: {trade.takeProfit}</p>
+                    {trade.forecastScreenshot && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm">Forecast:</span>
+                        <Button
+                          variant="link"
+                          className="h-auto p-0 text-primary"
+                          onClick={() => window.open(trade.forecastScreenshot, '_blank')}
+                        >
+                          View <ExternalLink className="ml-1 h-3 w-3" />
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="space-y-3">
                   <h4 className="text-sm font-medium text-muted-foreground">Exit Details</h4>
                   <div className="space-y-2">
-                    <p className="text-sm">Date: {new Date(trade.exitDate).toLocaleString()}</p>
+                    <p className="text-sm">Date: {formatDate(trade.exitDate)}</p>
                     <p className="text-sm">Price: {trade.exitPrice}</p>
                     <p className="text-sm">Quantity: {trade.quantity}</p>
                     <p className="text-sm">Fees: {trade.fees}</p>
+                    {trade.resultScreenshot && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm">Result:</span>
+                        <Button
+                          variant="link"
+                          className="h-auto p-0 text-primary"
+                          onClick={() => window.open(trade.resultScreenshot, '_blank')}
+                        >
+                          View <ExternalLink className="ml-1 h-3 w-3" />
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

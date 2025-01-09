@@ -15,23 +15,20 @@ interface WeekSummary {
 export const WeeklyPerformance = () => {
   const { user } = useAuth();
   const currentDate = new Date();
-  const currentWeekStart = startOfWeek(currentDate);
+  const monthStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+  const firstWeekStart = startOfWeek(monthStart);
 
   const { data: weeklyStats, isLoading } = useQuery({
     queryKey: ['weekly-performance'],
     queryFn: async () => {
       if (!user) return [];
 
-      // Get entries from 4 weeks ago until now
-      const startDate = startOfWeek(subWeeks(currentDate, 3));
-      const endDate = endOfWeek(currentDate);
-
       const { data: entries, error } = await supabase
         .from('journal_entries')
         .select('*')
         .eq('user_id', user.id)
-        .gte('created_at', startDate.toISOString())
-        .lte('created_at', endDate.toISOString());
+        .gte('created_at', firstWeekStart.toISOString())
+        .lte('created_at', endOfWeek(currentDate).toISOString());
 
       if (error) throw error;
 
@@ -47,9 +44,9 @@ export const WeeklyPerformance = () => {
         const entryDate = new Date(entry.created_at);
         const entryWeekStart = startOfWeek(entryDate);
         
-        // Calculate which week number this entry belongs to
+        // Calculate which week number this entry belongs to (1-based)
         const weekDiff = Math.floor(
-          (entryWeekStart.getTime() - startDate.getTime()) / (7 * 24 * 60 * 60 * 1000)
+          (entryWeekStart.getTime() - firstWeekStart.getTime()) / (7 * 24 * 60 * 60 * 1000)
         ) + 1;
 
         if (weekDiff >= 1 && weekDiff <= 5) {

@@ -33,31 +33,25 @@ export const WeeklyPerformance = () => {
 
       if (error) throw error;
 
-      // Initialize 6 weeks of data
       const weeks: WeekSummary[] = Array.from({ length: 6 }, (_, i) => ({
         weekNumber: i + 1,
         totalPnL: 0,
         tradingDays: 0,
       }));
 
-      // Process entries
       (entries as JournalEntryType[])?.forEach(entry => {
         const entryDate = new Date(entry.created_at);
         
-        // Find which week this entry belongs to
         for (let i = 0; i < 6; i++) {
           const weekStart = startOfWeek(addWeeks(currentDate, -5 + i));
           const weekEnd = endOfWeek(addWeeks(currentDate, -5 + i));
           
           if (isWithinInterval(entryDate, { start: weekStart, end: weekEnd })) {
-            // Calculate total P&L from trades
             const trades = (entry.trades || []) as Trade[];
             const dailyPnL = trades.reduce((sum, trade) => 
               sum + (Number(trade.pnl) || 0), 0);
             
             weeks[i].totalPnL += dailyPnL;
-            
-            // Only count unique trading days
             if (dailyPnL !== 0) {
               weeks[i].tradingDays += 1;
             }
@@ -72,9 +66,9 @@ export const WeeklyPerformance = () => {
 
   if (isLoading) {
     return (
-      <div className="grid grid-rows-6 gap-0 h-full pt-14">
+      <div className="flex flex-col h-[calc(100vh-12rem)] justify-between pt-8">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="animate-pulse h-32 flex items-center">
+          <div key={i} className="animate-pulse h-24">
             <Card className="p-4 space-y-2 bg-primary/5 w-full">
               <div className="h-4 bg-primary/10 rounded w-1/3"></div>
               <div className="h-6 bg-primary/10 rounded w-2/3"></div>
@@ -87,9 +81,9 @@ export const WeeklyPerformance = () => {
   }
 
   return (
-    <div className="grid grid-rows-6 gap-0 h-full pt-14">
+    <div className="flex flex-col h-[calc(100vh-12rem)] justify-between pt-8">
       {weeklyStats?.map((week) => (
-        <div key={week.weekNumber} className="h-32 flex items-center">
+        <div key={week.weekNumber} className="h-24">
           <Card
             className="p-4 space-y-2 bg-card/30 backdrop-blur-xl border-primary/10 hover:border-primary/20 transition-colors w-full"
           >

@@ -58,16 +58,6 @@ export const TradeExitSection = () => {
           />
         </div>
         <div className="grid w-full items-center gap-1.5">
-          <Label htmlFor="takeProfit">Take Profit</Label>
-          <Input
-            type="number"
-            id="takeProfit"
-            name="takeProfit"
-            placeholder="0.00"
-            step="0.01"
-          />
-        </div>
-        <div className="grid w-full items-center gap-1.5">
           <Label htmlFor="resultUrl">Result</Label>
           <Input
             type="url"

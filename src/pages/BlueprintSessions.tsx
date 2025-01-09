@@ -23,30 +23,21 @@ import {
 interface Session {
   id: string;
   name: string;
-  trades: number;
-  net_pnl: number;
-  win_rate: number;
-  missed_trades: number;
-  expectancy: number;
-  average_loser: number;
-  average_winner: number;
-  start_date: string;
-  end_date: string;
-  symbol: string;
-  market_type: string;
-}
-
-interface Blueprint {
-  id: string;
-  name: string;
-  rules: string[];
+  instrument: string;
+  direction: 'buy' | 'sell';
+  entryPrice: number;
+  quantity: number;
+  stopLoss: number;
+  takeProfit: number;
+  pnl: number;
+  created_at: string;
 }
 
 export default function BlueprintSessions() {
   const { blueprintId } = useParams();
   const navigate = useNavigate();
   const [sessions, setSessions] = useState<Session[]>([]);
-  const [blueprint, setBlueprint] = useState<Blueprint | null>(null);
+  const [blueprint, setBlueprint] = useState<{ id: string; name: string; } | null>(null);
 
   useEffect(() => {
     if (blueprintId) {
@@ -58,7 +49,7 @@ export default function BlueprintSessions() {
   const fetchBlueprint = async () => {
     const { data, error } = await supabase
       .from("trading_blueprints")
-      .select("*")
+      .select("id, name")
       .eq("id", blueprintId)
       .single();
 
@@ -75,18 +66,7 @@ export default function BlueprintSessions() {
       .order("created_at", { ascending: false });
 
     if (!error && data) {
-      // Transform the data to include calculated fields
-      const transformedSessions = data.map(session => ({
-        ...session,
-        trades: Math.floor(Math.random() * 10), // Placeholder - replace with actual data
-        net_pnl: Math.random() * 100000, // Placeholder - replace with actual data
-        win_rate: Math.random() * 100, // Placeholder - replace with actual data
-        missed_trades: Math.floor(Math.random() * 5), // Placeholder - replace with actual data
-        expectancy: Math.random() * 50000, // Placeholder - replace with actual data
-        average_loser: -(Math.random() * 10000), // Placeholder - replace with actual data
-        average_winner: Math.random() * 20000, // Placeholder - replace with actual data
-      }));
-      setSessions(transformedSessions);
+      setSessions(data as Session[]);
     }
   };
 
@@ -95,10 +75,6 @@ export default function BlueprintSessions() {
       style: 'currency',
       currency: 'USD',
     }).format(value);
-  };
-
-  const formatPercentage = (value: number) => {
-    return `${value.toFixed(2)}%`;
   };
 
   return (
@@ -124,28 +100,38 @@ export default function BlueprintSessions() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead className="text-right">Trades</TableHead>
-                  <TableHead className="text-right">Net P&L</TableHead>
-                  <TableHead className="text-right">Win Rate</TableHead>
-                  <TableHead className="text-right">Missed Trades</TableHead>
-                  <TableHead className="text-right">Expectancy</TableHead>
-                  <TableHead className="text-right">Average Loser</TableHead>
-                  <TableHead className="text-right">Average Winner</TableHead>
+                  <TableHead>Instrument</TableHead>
+                  <TableHead>Direction</TableHead>
+                  <TableHead className="text-right">Entry Price</TableHead>
+                  <TableHead className="text-right">Quantity</TableHead>
+                  <TableHead className="text-right">Stop Loss</TableHead>
+                  <TableHead className="text-right">Take Profit</TableHead>
+                  <TableHead className="text-right">P&L</TableHead>
                   <TableHead className="w-[50px]"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {sessions.map((session) => (
                   <TableRow key={session.id}>
-                    <TableCell>{session.name}</TableCell>
-                    <TableCell className="text-right">{session.trades}</TableCell>
-                    <TableCell className="text-right">{formatCurrency(session.net_pnl)}</TableCell>
-                    <TableCell className="text-right">{formatPercentage(session.win_rate)}</TableCell>
-                    <TableCell className="text-right">{session.missed_trades}</TableCell>
-                    <TableCell className="text-right">{formatCurrency(session.expectancy)}</TableCell>
-                    <TableCell className="text-right">{formatCurrency(session.average_loser)}</TableCell>
-                    <TableCell className="text-right">{formatCurrency(session.average_winner)}</TableCell>
+                    <TableCell>{session.instrument}</TableCell>
+                    <TableCell>
+                      <span className={`font-medium ${
+                        session.direction === 'buy' 
+                          ? 'text-green-600' 
+                          : 'text-red-600'
+                      }`}>
+                        {session.direction.toUpperCase()}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-right">{formatCurrency(session.entryPrice)}</TableCell>
+                    <TableCell className="text-right">{session.quantity}</TableCell>
+                    <TableCell className="text-right">{formatCurrency(session.stopLoss)}</TableCell>
+                    <TableCell className="text-right">{formatCurrency(session.takeProfit)}</TableCell>
+                    <TableCell className={`text-right font-medium ${
+                      session.pnl >= 0 ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {formatCurrency(session.pnl)}
+                    </TableCell>
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>

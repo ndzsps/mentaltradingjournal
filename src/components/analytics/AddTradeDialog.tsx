@@ -1,13 +1,12 @@
 import { DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { TradeFormDialog } from "./trade-form/TradeFormDialog";
-import { Trade } from "@/types/trade";
 
 interface AddTradeDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (tradeData: Trade) => void;
-  editTrade?: Trade;
+  onSubmit: (tradeData: any, isEdit: boolean) => void;
+  editTrade?: any;
 }
 
 export const AddTradeDialog = (props: AddTradeDialogProps) => {

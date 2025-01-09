@@ -6,6 +6,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ImageIcon, Link2Icon } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface TradeFormDialogProps {
   open: boolean;
@@ -26,6 +28,7 @@ export const TradeFormDialog = ({
   const [activeTab, setActiveTab] = useState<string>("regular");
   const [imageUrl, setImageUrl] = useState("");
   const [showUrlInput, setShowUrlInput] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -34,20 +37,58 @@ export const TradeFormDialog = ({
     }
   }, [editTrade]);
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files && files.length > 0) {
-      // Handle file upload logic here
-      console.log("Selected files:", files);
+  const uploadFile = async (file: File) => {
+    try {
+      setUploading(true);
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${crypto.randomUUID()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('trade-screenshots')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('trade-screenshots')
+        .getPublicUrl(filePath);
+
+      toast.success('Screenshot uploaded successfully!');
+      return publicUrl;
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      toast.error('Failed to upload screenshot');
+      return null;
+    } finally {
+      setUploading(false);
     }
   };
 
-  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('File size must be less than 5MB');
+        return;
+      }
+      await uploadFile(file);
+    }
+  };
+
+  const handleDrop = async (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     const files = event.dataTransfer.files;
     if (files && files.length > 0) {
-      // Handle file upload logic here
-      console.log("Dropped files:", files);
+      const file = files[0];
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('File size must be less than 5MB');
+        return;
+      }
+      await uploadFile(file);
     }
   };
 
@@ -55,12 +96,22 @@ export const TradeFormDialog = ({
     event.preventDefault();
   };
 
-  const handleUrlSubmit = () => {
-    if (imageUrl) {
-      // Handle URL submission logic here
-      console.log("Submitted URL:", imageUrl);
+  const handleUrlSubmit = async () => {
+    if (!imageUrl) return;
+
+    try {
+      setUploading(true);
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const file = new File([blob], 'image.jpg', { type: 'image/jpeg' });
+      await uploadFile(file);
       setImageUrl("");
       setShowUrlInput(false);
+    } catch (error) {
+      console.error('Error uploading image from URL:', error);
+      toast.error('Failed to upload image from URL');
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -97,7 +148,7 @@ export const TradeFormDialog = ({
                 multiple
               />
               <div 
-                className="p-8 border-2 border-dashed rounded-lg hover:border-primary/50 transition-colors cursor-pointer"
+                className={`p-8 border-2 border-dashed rounded-lg hover:border-primary/50 transition-colors cursor-pointer ${uploading ? 'opacity-50 pointer-events-none' : ''}`}
                 onClick={() => fileInputRef.current?.click()}
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
@@ -105,7 +156,7 @@ export const TradeFormDialog = ({
                 <div className="flex flex-col items-center gap-2">
                   <ImageIcon className="h-8 w-8 text-muted-foreground" />
                   <p className="text-muted-foreground">
-                    Drag and drop your trade screenshots here, or click to select files
+                    {uploading ? 'Uploading...' : 'Drag and drop your trade screenshots here, or click to select files'}
                   </p>
                 </div>
               </div>
@@ -114,6 +165,7 @@ export const TradeFormDialog = ({
                   variant="outline"
                   className="w-full"
                   onClick={() => setShowUrlInput(!showUrlInput)}
+                  disabled={uploading}
                 >
                   <Link2Icon className="mr-2 h-4 w-4" />
                   Paste Image URL
@@ -126,8 +178,14 @@ export const TradeFormDialog = ({
                       value={imageUrl}
                       onChange={(e) => setImageUrl(e.target.value)}
                       className="flex-1"
+                      disabled={uploading}
                     />
-                    <Button onClick={handleUrlSubmit}>Add</Button>
+                    <Button 
+                      onClick={handleUrlSubmit}
+                      disabled={!imageUrl || uploading}
+                    >
+                      Add
+                    </Button>
                   </div>
                 )}
               </div>

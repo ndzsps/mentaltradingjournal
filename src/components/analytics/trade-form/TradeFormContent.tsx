@@ -34,14 +34,14 @@ export const TradeFormContent = ({
       instrument: formData.get('instrument') as string,
       setup: formData.get('setup') as string,
       direction: direction as 'buy' | 'sell',
-      entryPrice: parseFloat(formData.get('entryPrice') as string),
-      quantity: parseFloat(formData.get('quantity') as string),
-      stopLoss: parseFloat(formData.get('stopLoss') as string),
-      takeProfit: parseFloat(formData.get('takeProfit') as string),
+      entryPrice: (formData.get('entryPrice') as string).toString(),
+      quantity: (formData.get('quantity') as string).toString(),
+      stopLoss: (formData.get('stopLoss') as string).toString(),
+      takeProfit: (formData.get('takeProfit') as string).toString(),
       exitDate: formData.get('exitDate') as string,
-      exitPrice: parseFloat(formData.get('exitPrice') as string),
-      pnl: parseFloat(formData.get('pnl') as string),
-      fees: parseFloat(formData.get('fees') as string),
+      exitPrice: (formData.get('exitPrice') as string).toString(),
+      pnl: (formData.get('pnl') as string).toString(),
+      fees: (formData.get('fees') as string).toString(),
     };
 
     try {

@@ -56,9 +56,15 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
     if (!stats) return null;
 
     return {
-      bg: stats.totalPL >= 0 ? "bg-emerald-50" : "bg-red-50",
-      border: stats.totalPL >= 0 ? "border-emerald-100" : "border-red-100",
-      shadow: stats.totalPL >= 0 ? "shadow-emerald-100/50" : "shadow-red-100/50",
+      bg: stats.totalPL >= 0 
+        ? "bg-emerald-50 dark:bg-emerald-950/30" 
+        : "bg-red-50 dark:bg-red-950/30",
+      border: stats.totalPL >= 0 
+        ? "border-emerald-100 dark:border-emerald-800" 
+        : "border-red-100 dark:border-red-800",
+      shadow: stats.totalPL >= 0 
+        ? "shadow-emerald-100/50 dark:shadow-emerald-900/50" 
+        : "shadow-red-100/50 dark:shadow-red-900/50",
     };
   };
 

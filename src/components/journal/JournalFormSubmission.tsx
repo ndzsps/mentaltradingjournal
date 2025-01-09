@@ -60,18 +60,19 @@ export const useJournalFormSubmission = ({
 
     // Validate post-session requirements
     if (sessionType === "post") {
-      if (!selectedEmotion || !selectedEmotionDetail || !notes || !selectedOutcome || !marketConditions || followedRules?.length === 0) {
-        toast.error("Missing Information", {
-          description: "Please fill in all required fields for post-session.",
+      // First check if there are any trades
+      if (trades.length === 0 && selectedOutcome !== "no_trades") {
+        toast.error("Trades Required", {
+          description: "Please add at least one trade before submitting your post-session entry.",
           duration: 5000,
         });
         return;
       }
 
-      // Only validate trades if the outcome is not "no_trades"
-      if (selectedOutcome !== "no_trades" && trades.length === 0) {
-        toast.error("Missing Trades", {
-          description: "Please add at least one trade for your trading session.",
+      // Then check other required fields
+      if (!selectedEmotion || !selectedEmotionDetail || !notes || !selectedOutcome || !marketConditions || followedRules?.length === 0) {
+        toast.error("Missing Information", {
+          description: "Please fill in all required fields for post-session.",
           duration: 5000,
         });
         return;

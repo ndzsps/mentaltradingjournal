@@ -86,7 +86,7 @@ export const TradesList = ({ trades }: TradesListProps) => {
                     href={trade.url} 
                     target="_blank" 
                     rel="noopener noreferrer" 
-                    className="text-sm text-primary hover:underline"
+                    className="text-sm text-primary hover:underline break-all"
                   >
                     {trade.url}
                   </a>

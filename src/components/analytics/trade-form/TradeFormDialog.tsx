@@ -2,6 +2,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useState, useEffect } from "react";
 import { TradeFormContent } from "./TradeFormContent";
 import { Trade } from "@/types/trade";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface TradeFormDialogProps {
   open: boolean;
@@ -29,11 +30,13 @@ export const TradeFormDialog = ({ open, onOpenChange, onSubmit, editTrade }: Tra
         <div className="p-6 pb-0">
           <DialogTitle>{editTrade ? 'Edit Trade' : 'Add Trade'}</DialogTitle>
         </div>
-        <TradeFormContent
-          direction={direction}
-          setDirection={setDirection}
-          onSubmit={handleSubmit}
-        />
+        <ScrollArea className="flex-1 p-6">
+          <TradeFormContent
+            direction={direction}
+            setDirection={setDirection}
+            onSubmit={handleSubmit}
+          />
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );

@@ -25,7 +25,7 @@ export const WeeklyPerformance = () => {
       const currentWeekStart = startOfWeek(currentDate);
       
       // Start date is 4 weeks before the current week
-      const startDate = startOfWeek(subWeeks(currentWeekStart, 4));
+      const startDate = startOfWeek(subWeeks(currentDate, 4));
       const endDate = endOfWeek(currentDate);
 
       const { data: entries, error } = await supabase
@@ -37,22 +37,30 @@ export const WeeklyPerformance = () => {
 
       if (error) throw error;
 
-      // Initialize weeks array (1 is oldest, 5 is current week)
+      // Initialize weeks array (1 is current week, 5 is oldest week)
       const weeks: WeekSummary[] = Array.from({ length: 5 }, (_, i) => ({
-        weekNumber: i + 1, // Week 1 is oldest, Week 5 is current week
+        weekNumber: i + 1,
         totalPnL: 0,
         tradingDays: 0,
       }));
 
+      console.log('Current date:', currentDate);
+      console.log('Start date:', startDate);
+      console.log('End date:', endDate);
+
       (entries as JournalEntryType[])?.forEach(entry => {
         const entryDate = new Date(entry.created_at);
+        console.log('Processing entry date:', entryDate);
         
         // Find which week this entry belongs to
         for (let i = 0; i < 5; i++) {
-          const weekStart = startOfWeek(subWeeks(currentWeekStart, 4 - i));
-          const weekEnd = endOfWeek(subWeeks(currentWeekStart, 4 - i));
+          const weekStart = startOfWeek(subWeeks(currentDate, i));
+          const weekEnd = endOfWeek(subWeeks(currentDate, i));
+          
+          console.log(`Week ${i + 1} - Start: ${weekStart}, End: ${weekEnd}`);
           
           if (isWithinInterval(entryDate, { start: weekStart, end: weekEnd })) {
+            console.log(`Entry belongs to week ${i + 1}`);
             const trades = (entry.trades || []) as Trade[];
             const dailyPnL = trades.reduce((sum, trade) => 
               sum + (Number(trade.pnl) || 0), 0);
@@ -66,7 +74,8 @@ export const WeeklyPerformance = () => {
         }
       });
 
-      return weeks;
+      // Sort weeks to display from oldest to newest (5 to 1)
+      return weeks.reverse();
     },
   });
 

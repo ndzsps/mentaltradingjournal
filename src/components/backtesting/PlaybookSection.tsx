@@ -69,6 +69,7 @@ export function PlaybookSection() {
             {blueprints.map((blueprint) => (
               <BlueprintCard
                 key={blueprint.id}
+                id={blueprint.id}
                 name={blueprint.name}
                 instrument={blueprint.rules[0]?.replace("Instrument: ", "") || "N/A"}
               />

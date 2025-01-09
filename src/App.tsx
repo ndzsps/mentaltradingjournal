@@ -53,7 +53,7 @@ const App = () => {
                   <Route path="/" element={<Landing />} />
                   <Route path="/login" element={<Login />} />
                   <Route
-                    path="/dashboard"
+                    path="/journal-entry"
                     element={
                       <ProtectedRoute>
                         <Index />

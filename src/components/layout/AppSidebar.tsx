@@ -20,7 +20,7 @@ import {
 import { useState } from "react";
 
 const menuItems = [
-  { title: "Journal Entry", icon: Home, url: "/dashboard" },
+  { title: "Journal Entry", icon: Home, url: "/journal-entry" },
   { title: "Journal", icon: BookOpen, url: "/journal" },
   { title: "Analytics", icon: BarChart2, url: "/analytics" },
   { title: "Settings", icon: Settings, url: "/settings" },

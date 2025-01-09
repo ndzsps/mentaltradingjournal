@@ -52,9 +52,13 @@ export const StatsHeader = () => {
 
   const filteredEntries = analytics ? filterEntriesByTime(analytics.journalEntries) : [];
 
-  // Calculate net P&L from filtered trades
+  // Calculate net P&L from filtered trades with proper numeric conversion
   const netPnL = filteredEntries.reduce((total, entry) => {
-    const tradePnL = entry.trades?.reduce((sum, trade) => sum + (Number(trade.pnl) || 0), 0) || 0;
+    const tradePnL = entry.trades?.reduce((sum: number, trade: any) => {
+      const pnlValue = trade.pnl || trade.profit_loss || 0;
+      const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
+      return sum + (isNaN(numericPnL) ? 0 : numericPnL);
+    }, 0) || 0;
     return total + tradePnL;
   }, 0);
 

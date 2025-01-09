@@ -1,9 +1,6 @@
 import { Calendar } from "@/components/ui/calendar";
 import { Card } from "@/components/ui/card";
 import { DayProps } from "react-day-picker";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface JournalCalendarProps {
@@ -14,7 +11,7 @@ interface JournalCalendarProps {
     emotion: string;
     trades?: Array<{
       profit_loss?: number;
-      pnl?: number;
+      pnl?: number | string;
       risk_reward?: number;
       win?: boolean;
     }>;
@@ -48,6 +45,7 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
         entry.trades.forEach(trade => {
           if (trade) {
             totalTrades++;
+            // Handle both pnl and profit_loss fields
             const pnlValue = trade.pnl || trade.profit_loss || 0;
             const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
             totalPL += isNaN(numericPnL) ? 0 : numericPnL;
@@ -80,7 +78,14 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
   };
 
   const handleDateSelect = (newDate: Date | undefined) => {
-    console.log('Date selected:', newDate);
+    console.log('Date selected:', {
+      _type: 'Date',
+      value: {
+        iso: newDate?.toISOString(),
+        value: newDate?.getTime(),
+        local: newDate?.toString()
+      }
+    });
     onDateSelect(newDate);
   };
 

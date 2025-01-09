@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { GeneralSection } from "./GeneralSection";
 import { TradeEntrySection } from "./TradeEntrySection";
 import { TradeExitSection } from "./TradeExitSection";
+import { TradeScreenshotsSection } from "./TradeScreenshotsSection";
 import { Trade } from "@/types/trade";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -64,6 +65,9 @@ export const TradeFormContent = ({
         </div>
         <div className="flex-1 p-4 border rounded-lg bg-background/50">
           <TradeExitSection />
+        </div>
+        <div className="flex-1 p-4 border rounded-lg bg-background/50">
+          <TradeScreenshotsSection />
         </div>
       </div>
       <div className="p-6 pt-0 border-t">

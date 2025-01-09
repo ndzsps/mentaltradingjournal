@@ -12,4 +12,5 @@ export interface Trade {
   exitPrice: number;
   pnl: number;
   fees: number;
+  screenshots?: string[];
 }

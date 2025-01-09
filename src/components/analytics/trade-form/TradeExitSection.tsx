@@ -1,8 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Link2Icon } from "lucide-react";
+import { useState } from "react";
 
 export const TradeExitSection = () => {
+  const [showResultUrl, setShowResultUrl] = useState(false);
+
   const setTodayDate = (inputId: string) => {
     const now = new Date();
     const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
@@ -66,6 +70,35 @@ export const TradeExitSection = () => {
             placeholder="0.00"
             step="0.01"
           />
+        </div>
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">Trade Result</Label>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Input
+                type="file"
+                accept="image/*"
+                name="resultImage"
+                className="cursor-pointer file:cursor-pointer file:border-0 file:bg-primary/10 file:text-primary file:px-2 file:py-1 file:mr-2 file:rounded-md hover:file:bg-primary/20 transition-all text-sm"
+              />
+              <button
+                type="button"
+                onClick={() => setShowResultUrl(!showResultUrl)}
+                className="p-1.5 rounded-md hover:bg-muted transition-colors"
+                title="Toggle URL input"
+              >
+                <Link2Icon className="w-4 h-4" />
+              </button>
+            </div>
+            {showResultUrl && (
+              <Input
+                type="url"
+                name="resultUrl"
+                placeholder="Enter image URL"
+                className="text-sm"
+              />
+            )}
+          </div>
         </div>
       </div>
     </div>

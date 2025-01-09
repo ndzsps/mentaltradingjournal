@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { GeneralSection } from "./GeneralSection";
 import { TradeEntrySection } from "./TradeEntrySection";
 import { TradeExitSection } from "./TradeExitSection";
-import { TradeScreenshotsSection } from "./TradeScreenshotsSection";
 import { Trade } from "@/types/trade";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -42,6 +41,10 @@ export const TradeFormContent = ({
       exitPrice: (formData.get('exitPrice') as string).toString(),
       pnl: (formData.get('pnl') as string).toString(),
       fees: (formData.get('fees') as string).toString(),
+      forecastImage: formData.get('forecastImage') as string || undefined,
+      forecastUrl: formData.get('forecastUrl') as string || undefined,
+      resultImage: formData.get('resultImage') as string || undefined,
+      resultUrl: formData.get('resultUrl') as string || undefined,
     };
 
     try {
@@ -68,7 +71,6 @@ export const TradeFormContent = ({
             <TradeExitSection />
           </div>
         </div>
-        <TradeScreenshotsSection />
       </div>
       <div className="sticky bottom-0 mt-4 p-4 bg-background border-t">
         <Button type="submit" className="w-full">

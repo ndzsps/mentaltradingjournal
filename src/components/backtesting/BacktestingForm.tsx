@@ -3,21 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
 
 export function BacktestingForm() {
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
-
-  const setTodayDate = (setter: (date: Date) => void) => {
-    setter(new Date());
-  };
 
   return (
     <Card className="w-full">
@@ -32,20 +21,21 @@ export function BacktestingForm() {
             
             <div className="space-y-2">
               <Label htmlFor="entry-date">Entry Date</Label>
-              <div className="flex gap-2">
-                <Input
-                  type="datetime-local"
-                  id="entry-date"
-                  className="flex-1"
-                />
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => setTodayDate(setStartDate)}
-                >
-                  Today
-                </Button>
-              </div>
+              <Input
+                type="datetime-local"
+                id="entry-date"
+                className="flex-1"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="entry-duration">Duration (minutes)</Label>
+              <Input
+                type="number"
+                id="entry-duration"
+                placeholder="Enter duration in minutes"
+                min="0"
+              />
             </div>
 
             <div className="space-y-2">
@@ -144,20 +134,21 @@ export function BacktestingForm() {
             
             <div className="space-y-2">
               <Label htmlFor="exit-date">Exit Date</Label>
-              <div className="flex gap-2">
-                <Input
-                  type="datetime-local"
-                  id="exit-date"
-                  className="flex-1"
-                />
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => setTodayDate(setEndDate)}
-                >
-                  Today
-                </Button>
-              </div>
+              <Input
+                type="datetime-local"
+                id="exit-date"
+                className="flex-1"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="exit-duration">Duration (minutes)</Label>
+              <Input
+                type="number"
+                id="exit-duration"
+                placeholder="Enter duration in minutes"
+                min="0"
+              />
             </div>
 
             <div className="space-y-2">

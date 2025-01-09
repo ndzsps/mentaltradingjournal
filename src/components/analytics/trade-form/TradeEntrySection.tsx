@@ -47,7 +47,7 @@ export const TradeEntrySection = () => {
           />
         </div>
         <div className="grid w-full items-center gap-1.5">
-          <Label htmlFor="forecastScreenshot">Forecast Screenshot URL</Label>
+          <Label htmlFor="forecastScreenshot">Forecast</Label>
           <Input
             type="url"
             id="forecastScreenshot"

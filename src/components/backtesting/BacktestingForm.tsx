@@ -6,18 +6,58 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 interface Blueprint {
   id: string;
   name: string;
 }
 
+interface FormData {
+  entryDate: string;
+  entryDuration: number;
+  instrument: string;
+  setup: string;
+  direction: 'buy' | 'sell' | null;
+  entryPrice: number;
+  quantity: number;
+  stopLoss: number;
+  takeProfit: number;
+  exitDate: string;
+  exitDuration: number;
+  exitPrice: number;
+  pnl: number;
+  fees: number;
+  forecastScreenshot: string;
+  resultScreenshot: string;
+}
+
 export function BacktestingForm() {
-  const [startDate, setStartDate] = useState<Date>();
-  const [endDate, setEndDate] = useState<Date>();
   const [blueprints, setBlueprints] = useState<Blueprint[]>([]);
   const [selectedBlueprint, setSelectedBlueprint] = useState<string>();
+  const [direction, setDirection] = useState<'buy' | 'sell' | null>(null);
   const { user } = useAuth();
+  const navigate = useNavigate();
+  
+  const [formData, setFormData] = useState<FormData>({
+    entryDate: '',
+    entryDuration: 0,
+    instrument: '',
+    setup: '',
+    direction: null,
+    entryPrice: 0,
+    quantity: 0,
+    stopLoss: 0,
+    takeProfit: 0,
+    exitDate: '',
+    exitDuration: 0,
+    exitPrice: 0,
+    pnl: 0,
+    fees: 0,
+    forecastScreenshot: '',
+    resultScreenshot: ''
+  });
 
   useEffect(() => {
     if (user) {
@@ -36,6 +76,57 @@ export function BacktestingForm() {
 
     if (!error && data) {
       setBlueprints(data);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [id]: value
+    }));
+  };
+
+  const handleDirectionSelect = (selectedDirection: 'buy' | 'sell') => {
+    setDirection(selectedDirection);
+    setFormData(prev => ({
+      ...prev,
+      direction: selectedDirection
+    }));
+  };
+
+  const handleSubmit = async () => {
+    if (!user || !selectedBlueprint) {
+      toast.error("Please select a playbook first");
+      return;
+    }
+
+    if (!formData.instrument || !formData.direction || !formData.entryPrice) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from("backtesting_sessions")
+        .insert({
+          user_id: user.id,
+          playbook_id: selectedBlueprint,
+          name: `${formData.instrument} ${formData.direction.toUpperCase()} Session`,
+          market_type: "forex", // You might want to make this configurable
+          symbol: formData.instrument,
+          start_balance: 10000, // You might want to make this configurable
+          start_date: formData.entryDate || new Date().toISOString(),
+          end_date: formData.exitDate || new Date().toISOString(),
+        });
+
+      if (error) throw error;
+
+      toast.success("Session created successfully!");
+      navigate(`/blueprint/${selectedBlueprint}`);
+    } catch (error) {
+      console.error("Error creating session:", error);
+      toast.error("Failed to create session");
     }
   };
 
@@ -70,7 +161,9 @@ export function BacktestingForm() {
               <Label htmlFor="entry-date">Entry Date</Label>
               <Input
                 type="date"
-                id="entry-date"
+                id="entryDate"
+                value={formData.entryDate}
+                onChange={handleInputChange}
                 className="flex-1"
               />
             </div>
@@ -79,7 +172,9 @@ export function BacktestingForm() {
               <Label htmlFor="entry-duration">Duration (minutes)</Label>
               <Input
                 type="number"
-                id="entry-duration"
+                id="entryDuration"
+                value={formData.entryDuration}
+                onChange={handleInputChange}
                 placeholder="Enter duration in minutes"
                 min="0"
               />
@@ -89,6 +184,8 @@ export function BacktestingForm() {
               <Label htmlFor="instrument">Instrument *</Label>
               <Input
                 id="instrument"
+                value={formData.instrument}
+                onChange={handleInputChange}
                 placeholder="e.g., EUR/USD, AAPL"
               />
             </div>
@@ -97,6 +194,8 @@ export function BacktestingForm() {
               <Label htmlFor="setup">Setup</Label>
               <Input
                 id="setup"
+                value={formData.setup}
+                onChange={handleInputChange}
                 placeholder="Enter your trading setup"
               />
             </div>
@@ -106,15 +205,17 @@ export function BacktestingForm() {
               <div className="flex flex-col gap-2">
                 <Button
                   type="button"
-                  variant="outline"
-                  className="w-full hover:bg-green-500/10"
+                  variant={direction === 'buy' ? 'default' : 'outline'}
+                  onClick={() => handleDirectionSelect('buy')}
+                  className={`w-full ${direction === 'buy' ? 'bg-green-500 hover:bg-green-600' : 'hover:bg-green-500/10'}`}
                 >
                   Buy
                 </Button>
                 <Button
                   type="button"
-                  variant="outline"
-                  className="w-full hover:bg-red-500/10"
+                  variant={direction === 'sell' ? 'default' : 'outline'}
+                  onClick={() => handleDirectionSelect('sell')}
+                  className={`w-full ${direction === 'sell' ? 'bg-red-500 hover:bg-red-600' : 'hover:bg-red-500/10'}`}
                 >
                   Sell
                 </Button>
@@ -240,7 +341,7 @@ export function BacktestingForm() {
         </div>
 
         <div className="flex gap-4 mt-6">
-          <Button className="flex-1">Create Session</Button>
+          <Button onClick={handleSubmit} className="flex-1">Create Session</Button>
           <Button variant="outline" className="flex-1">Cancel</Button>
         </div>
       </CardContent>

@@ -31,42 +31,46 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
     }).format(amount);
   };
 
-  const calculateDayStats = (entry: typeof entries[0]) => {
-    if (!entry.trades || entry.trades.length === 0) return null;
+  const calculateDayStats = (date: Date) => {
+    // Find all entries for this day
+    const dayEntries = entries.filter(entry => 
+      entry.date.toDateString() === date.toDateString()
+    );
+
+    if (dayEntries.length === 0) return null;
 
     let totalPL = 0;
-    let tradeCount = 0;
+    let totalTrades = 0;
 
-    entry.trades.forEach(trade => {
-      if (trade) {
-        tradeCount++;
-        // Get the P&L value from either profit_loss or pnl field
-        const tradeValue = trade.profit_loss || trade.pnl || 0;
-        // Convert string to number if necessary and add to total
-        const numericValue = typeof tradeValue === 'string' ? parseFloat(tradeValue) : tradeValue;
-        totalPL += numericValue;
-        console.log('Trade:', trade);
-        console.log('Trade value:', tradeValue);
-        console.log('Numeric value:', numericValue);
-        console.log('Running total:', totalPL);
-        console.log('Trade count:', tradeCount);
+    // Iterate through all entries for the day
+    dayEntries.forEach(entry => {
+      if (entry.trades && entry.trades.length > 0) {
+        entry.trades.forEach(trade => {
+          if (trade) {
+            totalTrades++;
+            // Get the P&L value from either profit_loss or pnl field
+            const tradeValue = trade.profit_loss || trade.pnl || 0;
+            // Convert string to number if necessary and add to total
+            const numericValue = typeof tradeValue === 'string' ? parseFloat(tradeValue) : tradeValue;
+            totalPL += numericValue;
+            console.log('Processing trade:', trade);
+            console.log('Trade value:', tradeValue);
+            console.log('Numeric value:', numericValue);
+            console.log('Running total:', totalPL);
+            console.log('Trade count:', totalTrades);
+          }
+        });
       }
     });
 
     return {
       totalPL,
-      numTrades: tradeCount,
+      numTrades: totalTrades,
     };
   };
 
   const getEmotionStyle = (date: Date) => {
-    const entry = entries.find(e => 
-      e.date.toDateString() === date.toDateString()
-    );
-    
-    if (!entry) return null;
-
-    const stats = calculateDayStats(entry);
+    const stats = calculateDayStats(date);
     if (!stats) return null;
 
     return {
@@ -124,8 +128,7 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
             </div>
           ),
           Day: ({ date: dayDate, ...props }: DayProps & { className?: string }) => {
-            const entry = entries.find(e => e.date.toDateString() === dayDate.toDateString());
-            const stats = entry ? calculateDayStats(entry) : null;
+            const stats = calculateDayStats(dayDate);
             const style = getEmotionStyle(dayDate);
             const isToday = dayDate.toDateString() === new Date().toDateString();
             

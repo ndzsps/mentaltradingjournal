@@ -126,7 +126,7 @@ export const BacktestingForm = () => {
               name="playbook_id"
               render={({ field }) => (
                 <FormItem className="flex-1 mr-4">
-                  <FormLabel>Connect to playbook</FormLabel>
+                  <FormLabel>Connect to trading blueprint</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>

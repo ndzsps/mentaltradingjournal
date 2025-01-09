@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import Journal from "./pages/Journal";
 import Analytics from "./pages/Analytics";
 import Backtesting from "./pages/Backtesting";
+import BlueprintSessions from "./pages/BlueprintSessions";
 import Login from "./pages/Login";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 
@@ -82,6 +83,14 @@ const App = () => {
                     element={
                       <ProtectedRoute>
                         <Backtesting />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/blueprint/:blueprintId"
+                    element={
+                      <ProtectedRoute>
+                        <BlueprintSessions />
                       </ProtectedRoute>
                     }
                   />

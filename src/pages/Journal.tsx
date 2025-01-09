@@ -12,7 +12,7 @@ import { useJournalFilters } from "@/hooks/useJournalFilters";
 import { JournalEntryType } from "@/types/journal";
 import { StatsHeader } from "@/components/journal/stats/StatsHeader";
 import { TimeFilterProvider } from "@/contexts/TimeFilterContext";
-import { startOfDay, endOfDay, isSameDay } from "date-fns";
+import { startOfDay, endOfDay } from "date-fns";
 
 const Journal = () => {
   const [entries, setEntries] = useState<JournalEntryType[]>([]);
@@ -75,9 +75,12 @@ const Journal = () => {
 
   // Filter entries based on selected date
   const displayedEntries = selectedDate
-    ? filteredEntries.filter(entry => 
-        isSameDay(new Date(entry.created_at), selectedDate)
-      )
+    ? filteredEntries.filter(entry => {
+        const entryDate = new Date(entry.created_at);
+        const start = startOfDay(selectedDate);
+        const end = endOfDay(selectedDate);
+        return entryDate >= start && entryDate <= end;
+      })
     : filteredEntries;
 
   return (

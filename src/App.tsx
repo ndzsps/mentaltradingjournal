@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import Journal from "./pages/Journal";
 import Analytics from "./pages/Analytics";
 import Login from "./pages/Login";
+import Blueprint from "./pages/Blueprint";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 
 const queryClient = new QueryClient({
@@ -73,6 +74,14 @@ const App = () => {
                     element={
                       <ProtectedRoute>
                         <Analytics />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/blueprint"
+                    element={
+                      <ProtectedRoute>
+                        <Blueprint />
                       </ProtectedRoute>
                     }
                   />

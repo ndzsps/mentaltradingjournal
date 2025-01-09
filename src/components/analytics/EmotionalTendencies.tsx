@@ -11,47 +11,7 @@ import {
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
-
-interface TooltipProps {
-  active?: boolean;
-  payload?: Array<{
-    value: number;
-    dataKey: string;
-    name: string;
-    color: string;  // Added color property to fix the type error
-  }>;
-  label?: string;
-}
-
-const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
-  if (active && payload && payload.length >= 2) {
-    const emotionalScore = payload[0]?.value;
-    const pnlValue = payload[1]?.value;
-
-    return (
-      <div className="bg-background border border-border rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95">
-        <p className="font-medium text-sm text-foreground mb-2">{label}</p>
-        {payload.map((item, index) => (
-          <div key={index} className="flex items-center gap-2 text-sm">
-            <div
-              className="w-2 h-2 rounded-full"
-              style={{ backgroundColor: item.color }}
-            />
-            <span className="text-muted-foreground">
-              {item.name}:
-            </span>
-            <span className="font-medium text-foreground">
-              {item.name === "Emotional Score" 
-                ? `${typeof item.value === 'number' ? item.value : 'N/A'}`
-                : `$${typeof item.value === 'number' ? item.value.toFixed(2) : 'N/A'}`}
-            </span>
-          </div>
-        ))}
-      </div>
-    );
-  }
-  return null;
-};
+import { CustomTooltip } from "./shared/CustomTooltip";
 
 export const EmotionalTendencies = () => {
   const { data: analytics, isLoading } = useQuery({
@@ -72,6 +32,13 @@ export const EmotionalTendencies = () => {
 
   const data = analytics.emotionTrend;
 
+  const formatValue = (value: number) => {
+    if (value >= 1000) {
+      return `$${(value / 1000).toFixed(1)}K`;
+    }
+    return `$${value.toFixed(2)}`;
+  };
+
   return (
     <Card className="p-4 md:p-6 space-y-4">
       <div className="space-y-2">
@@ -84,7 +51,7 @@ export const EmotionalTendencies = () => {
       <div className="h-[250px] md:h-[300px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" />
+            <CartesianGrid strokeDasharray="3 3" className="opacity-50" />
             <XAxis dataKey="date" tick={{ fontSize: 12 }} />
             <YAxis 
               yAxisId="emotion"
@@ -108,7 +75,9 @@ export const EmotionalTendencies = () => {
                 style: { fontSize: '12px' }
               }}
             />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip 
+              content={<CustomTooltip valueFormatter={formatValue} />}
+            />
             <Legend />
             <Line
               yAxisId="emotion"

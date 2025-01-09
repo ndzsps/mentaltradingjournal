@@ -1,42 +1,8 @@
-import { useState } from "react";
 import { Card } from "@/components/ui/card";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from "recharts";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-
-// Custom tooltip component with improved styling
-const CustomTooltip = ({ active, payload, label }: any) => {
-  if (!active || !payload || !payload.length) return null;
-
-  return (
-    <div className="bg-background border border-border rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95">
-      <p className="font-medium text-sm text-foreground mb-2">{label}</p>
-      {payload.map((item: any, index: number) => (
-        <div key={index} className="flex items-center gap-2 text-sm">
-          <div
-            className="w-2 h-2 rounded-full"
-            style={{ backgroundColor: item.color }}
-          />
-          <span className="text-muted-foreground">
-            {item.name}:
-          </span>
-          <span className="font-medium text-foreground">
-            {item.value}%
-          </span>
-        </div>
-      ))}
-    </div>
-  );
-};
+import { RuleAdherenceChart } from "./rule-adherence/RuleAdherenceChart";
+import { RuleAdherenceInsight } from "./rule-adherence/RuleAdherenceInsight";
 
 export const RuleAdherence = () => {
   const { data: analytics, isLoading } = useQuery({
@@ -139,64 +105,13 @@ export const RuleAdherence = () => {
         </p>
       </div>
 
-      <div className="h-[250px] md:h-[300px] w-full">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={analytics} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" className="opacity-50" />
-            <XAxis 
-              dataKey="name" 
-              tick={{ fontSize: 12 }}
-              axisLine={{ stroke: '#E5E7EB' }}
-            />
-            <YAxis 
-              tick={{ fontSize: 12 }}
-              axisLine={{ stroke: '#E5E7EB' }}
-              label={{ 
-                value: 'Percentage (%)', 
-                angle: -90, 
-                position: 'insideLeft',
-                style: { fontSize: '12px' }
-              }}
-            />
-            <Tooltip content={<CustomTooltip />} />
-            <Legend />
-            <Bar 
-              dataKey="wins" 
-              name="Wins" 
-              fill="#6E59A5"
-              radius={[4, 4, 0, 0]}
-            />
-            <Bar 
-              dataKey="losses" 
-              name="Losses" 
-              fill="#FEC6A1"
-              radius={[4, 4, 0, 0]}
-            />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
+      <RuleAdherenceChart data={analytics} />
 
-      <div className="space-y-2 bg-accent/10 p-3 md:p-4 rounded-lg">
-        <h4 className="font-semibold text-sm md:text-base">AI Insight</h4>
-        <div className="space-y-2 text-xs md:text-sm text-muted-foreground">
-          {hasEnoughData ? (
-            <>
-              <p>
-                {winRateDifference > 0
-                  ? `Following your trading rules resulted in a ${winRateDifference}% higher win rate.`
-                  : `Your win rate was ${Math.abs(winRateDifference)}% lower when following rules - review your rule set.`}
-              </p>
-              <p>
-                {rulesFollowed.wins > 50
-                  ? "Your trading rules are effective when followed consistently."
-                  : "Consider reviewing and adjusting your trading rules for better performance."}
-              </p>
-            </>
-          ) : (
-            <p>Add at least {MINIMUM_SESSIONS} trading sessions in each category (following rules and not following rules) to generate meaningful insights about your rule adherence.</p>
-          )}
-        </div>
-      </div>
+      <RuleAdherenceInsight 
+        hasEnoughData={hasEnoughData}
+        winRateDifference={winRateDifference}
+        rulesFollowed={rulesFollowed}
+      />
     </Card>
   );
 };

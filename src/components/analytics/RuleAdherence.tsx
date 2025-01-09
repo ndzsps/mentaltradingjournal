@@ -13,6 +13,31 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
+// Custom tooltip component with improved styling
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (!active || !payload || !payload.length) return null;
+
+  return (
+    <div className="bg-background border border-border rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95">
+      <p className="font-medium text-sm text-foreground mb-2">{label}</p>
+      {payload.map((item: any, index: number) => (
+        <div key={index} className="flex items-center gap-2 text-sm">
+          <div
+            className="w-2 h-2 rounded-full"
+            style={{ backgroundColor: item.color }}
+          />
+          <span className="text-muted-foreground">
+            {item.name}:
+          </span>
+          <span className="font-medium text-foreground">
+            {item.value}%
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 export const RuleAdherence = () => {
   const { data: analytics, isLoading } = useQuery({
     queryKey: ['ruleAdherence'],
@@ -116,14 +141,37 @@ export const RuleAdherence = () => {
 
       <div className="h-[250px] md:h-[300px] w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={analytics} margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-            <YAxis tick={{ fontSize: 12 }} />
-            <Tooltip />
+          <BarChart data={analytics} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" className="opacity-50" />
+            <XAxis 
+              dataKey="name" 
+              tick={{ fontSize: 12 }}
+              axisLine={{ stroke: '#E5E7EB' }}
+            />
+            <YAxis 
+              tick={{ fontSize: 12 }}
+              axisLine={{ stroke: '#E5E7EB' }}
+              label={{ 
+                value: 'Percentage (%)', 
+                angle: -90, 
+                position: 'insideLeft',
+                style: { fontSize: '12px' }
+              }}
+            />
+            <Tooltip content={<CustomTooltip />} />
             <Legend />
-            <Bar dataKey="wins" fill="#6E59A5" name="Wins %" />
-            <Bar dataKey="losses" fill="#FEC6A1" name="Losses %" />
+            <Bar 
+              dataKey="wins" 
+              name="Wins" 
+              fill="#6E59A5"
+              radius={[4, 4, 0, 0]}
+            />
+            <Bar 
+              dataKey="losses" 
+              name="Losses" 
+              fill="#FEC6A1"
+              radius={[4, 4, 0, 0]}
+            />
           </BarChart>
         </ResponsiveContainer>
       </div>

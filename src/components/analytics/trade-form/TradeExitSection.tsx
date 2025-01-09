@@ -58,15 +58,6 @@ export const TradeExitSection = () => {
           />
         </div>
         <div className="grid w-full items-center gap-1.5">
-          <Label htmlFor="resultUrl">Result</Label>
-          <Input
-            type="url"
-            id="resultUrl"
-            name="resultUrl"
-            placeholder="Enter result screenshot URL"
-          />
-        </div>
-        <div className="grid w-full items-center gap-1.5">
           <Label htmlFor="fees">Fees</Label>
           <Input
             type="number"
@@ -74,6 +65,15 @@ export const TradeExitSection = () => {
             name="fees"
             placeholder="0.00"
             step="0.01"
+          />
+        </div>
+        <div className="grid w-full items-center gap-1.5">
+          <Label htmlFor="resultUrl">Result</Label>
+          <Input
+            type="url"
+            id="resultUrl"
+            name="resultUrl"
+            placeholder="Enter result screenshot URL"
           />
         </div>
       </div>

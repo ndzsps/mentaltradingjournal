@@ -35,6 +35,11 @@ interface Session {
   fees: number;
   beforeUrl: string | null;
   afterUrl: string | null;
+  weeklyUrl: string | null;
+  dailyUrl: string | null;
+  fourHourUrl: string | null;
+  oneHourUrl: string | null;
+  refinedEntryUrl: string | null;
 }
 
 export default function BlueprintSessions() {
@@ -85,6 +90,11 @@ export default function BlueprintSessions() {
         fees: session.fees || 0,
         beforeUrl: session.before_url,
         afterUrl: session.after_url,
+        weeklyUrl: session.weekly_url,
+        dailyUrl: session.daily_url,
+        fourHourUrl: session.four_hour_url,
+        oneHourUrl: session.one_hour_url,
+        refinedEntryUrl: session.refined_entry_url,
       }));
       setSessions(mappedSessions);
     }
@@ -95,6 +105,19 @@ export default function BlueprintSessions() {
       style: 'currency',
       currency: 'USD',
     }).format(value);
+  };
+
+  const renderUrlLink = (url: string | null, label: string) => {
+    return url ? (
+      <a 
+        href={url} 
+        target="_blank" 
+        rel="noopener noreferrer"
+        className="text-blue-600 hover:text-blue-800"
+      >
+        <ExternalLink className="h-4 w-4" />
+      </a>
+    ) : '-';
   };
 
   return (
@@ -116,7 +139,7 @@ export default function BlueprintSessions() {
         </div>
 
         {sessions.length > 0 ? (
-          <div className="rounded-md border">
+          <div className="rounded-md border overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -133,6 +156,11 @@ export default function BlueprintSessions() {
                   <TableHead className="text-right">Fees</TableHead>
                   <TableHead className="text-center">Before</TableHead>
                   <TableHead className="text-center">After</TableHead>
+                  <TableHead className="text-center">Weekly</TableHead>
+                  <TableHead className="text-center">Daily</TableHead>
+                  <TableHead className="text-center">4H</TableHead>
+                  <TableHead className="text-center">1H</TableHead>
+                  <TableHead className="text-center">Entry</TableHead>
                   <TableHead className="w-[50px]"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -164,30 +192,13 @@ export default function BlueprintSessions() {
                       {formatCurrency(session.pnl)}
                     </TableCell>
                     <TableCell className="text-right">{formatCurrency(session.fees)}</TableCell>
-                    <TableCell className="text-center">
-                      {session.beforeUrl ? (
-                        <a 
-                          href={session.beforeUrl} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-800"
-                        >
-                          <ExternalLink className="h-4 w-4" />
-                        </a>
-                      ) : '-'}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      {session.afterUrl ? (
-                        <a 
-                          href={session.afterUrl} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-800"
-                        >
-                          <ExternalLink className="h-4 w-4" />
-                        </a>
-                      ) : '-'}
-                    </TableCell>
+                    <TableCell className="text-center">{renderUrlLink(session.beforeUrl, 'Before')}</TableCell>
+                    <TableCell className="text-center">{renderUrlLink(session.afterUrl, 'After')}</TableCell>
+                    <TableCell className="text-center">{renderUrlLink(session.weeklyUrl, 'Weekly')}</TableCell>
+                    <TableCell className="text-center">{renderUrlLink(session.dailyUrl, 'Daily')}</TableCell>
+                    <TableCell className="text-center">{renderUrlLink(session.fourHourUrl, '4H')}</TableCell>
+                    <TableCell className="text-center">{renderUrlLink(session.oneHourUrl, '1H')}</TableCell>
+                    <TableCell className="text-center">{renderUrlLink(session.refinedEntryUrl, 'Entry')}</TableCell>
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>

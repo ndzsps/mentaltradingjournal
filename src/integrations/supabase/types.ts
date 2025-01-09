@@ -228,42 +228,57 @@ export type Database = {
       trading_blueprints: {
         Row: {
           created_at: string
+          daily_url: string | null
           description: string | null
           entry_rules: string[] | null
           exit_rules: string[] | null
+          four_hour_url: string | null
           id: string
           name: string
+          one_hour_url: string | null
+          refined_entry_url: string | null
           risk_management: string[] | null
           rules: string[] | null
           setup_criteria: string[] | null
           updated_at: string
           user_id: string
+          weekly_url: string | null
         }
         Insert: {
           created_at?: string
+          daily_url?: string | null
           description?: string | null
           entry_rules?: string[] | null
           exit_rules?: string[] | null
+          four_hour_url?: string | null
           id?: string
           name: string
+          one_hour_url?: string | null
+          refined_entry_url?: string | null
           risk_management?: string[] | null
           rules?: string[] | null
           setup_criteria?: string[] | null
           updated_at?: string
           user_id: string
+          weekly_url?: string | null
         }
         Update: {
           created_at?: string
+          daily_url?: string | null
           description?: string | null
           entry_rules?: string[] | null
           exit_rules?: string[] | null
+          four_hour_url?: string | null
           id?: string
           name?: string
+          one_hour_url?: string | null
+          refined_entry_url?: string | null
           risk_management?: string[] | null
           rules?: string[] | null
           setup_criteria?: string[] | null
           updated_at?: string
           user_id?: string
+          weekly_url?: string | null
         }
         Relationships: []
       }

@@ -14,6 +14,7 @@ export type Database = {
           after_url: string | null
           before_url: string | null
           created_at: string
+          daily_url: string | null
           description: string | null
           direction: string | null
           end_date: string
@@ -21,14 +22,17 @@ export type Database = {
           entry_price: number | null
           exit_price: number | null
           fees: number | null
+          four_hour_url: string | null
           id: string
           instrument: string | null
           leverage: number | null
           market_type: string
           name: string
+          one_hour_url: string | null
           playbook_id: string | null
           pnl: number | null
           quantity: number | null
+          refined_entry_url: string | null
           setup: string | null
           start_balance: number
           start_date: string
@@ -37,11 +41,13 @@ export type Database = {
           take_profit: number | null
           updated_at: string
           user_id: string
+          weekly_url: string | null
         }
         Insert: {
           after_url?: string | null
           before_url?: string | null
           created_at?: string
+          daily_url?: string | null
           description?: string | null
           direction?: string | null
           end_date: string
@@ -49,14 +55,17 @@ export type Database = {
           entry_price?: number | null
           exit_price?: number | null
           fees?: number | null
+          four_hour_url?: string | null
           id?: string
           instrument?: string | null
           leverage?: number | null
           market_type: string
           name: string
+          one_hour_url?: string | null
           playbook_id?: string | null
           pnl?: number | null
           quantity?: number | null
+          refined_entry_url?: string | null
           setup?: string | null
           start_balance: number
           start_date: string
@@ -65,11 +74,13 @@ export type Database = {
           take_profit?: number | null
           updated_at?: string
           user_id: string
+          weekly_url?: string | null
         }
         Update: {
           after_url?: string | null
           before_url?: string | null
           created_at?: string
+          daily_url?: string | null
           description?: string | null
           direction?: string | null
           end_date?: string
@@ -77,14 +88,17 @@ export type Database = {
           entry_price?: number | null
           exit_price?: number | null
           fees?: number | null
+          four_hour_url?: string | null
           id?: string
           instrument?: string | null
           leverage?: number | null
           market_type?: string
           name?: string
+          one_hour_url?: string | null
           playbook_id?: string | null
           pnl?: number | null
           quantity?: number | null
+          refined_entry_url?: string | null
           setup?: string | null
           start_balance?: number
           start_date?: string
@@ -93,6 +107,7 @@ export type Database = {
           take_profit?: number | null
           updated_at?: string
           user_id?: string
+          weekly_url?: string | null
         }
         Relationships: []
       }

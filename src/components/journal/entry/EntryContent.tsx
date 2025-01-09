@@ -46,7 +46,7 @@ export const EntryContent = ({
         <div>
           <Separator className="mb-6" />
           <div className="space-y-4">
-            <h4 className="text-sm font-medium text-muted-foreground">Screenshots</h4>
+            <h4 className="text-sm font-medium text-muted-foreground">Session Screenshots</h4>
             <ScrollArea className="h-[300px] w-full rounded-md border p-4">
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {screenshots.map((url, index) => (
@@ -59,7 +59,7 @@ export const EntryContent = ({
                   >
                     <img
                       src={url}
-                      alt={`Trade screenshot ${index + 1}`}
+                      alt={`Session screenshot ${index + 1}`}
                       className="object-cover w-full h-full"
                     />
                   </a>

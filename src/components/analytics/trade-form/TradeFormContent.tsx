@@ -43,6 +43,7 @@ export const TradeFormContent = ({
       fees: parseFloat(formData.get('fees') as string),
       forecastScreenshot: formData.get('forecastScreenshot') as string || undefined,
       resultScreenshot: formData.get('resultScreenshot') as string || undefined,
+      htfBias: formData.get('htfBias') as string || undefined,
     };
 
     try {

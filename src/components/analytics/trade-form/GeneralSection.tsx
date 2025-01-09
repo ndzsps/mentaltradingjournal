@@ -83,6 +83,15 @@ export const GeneralSection = ({ direction, setDirection }: GeneralSectionProps)
             </Button>
           </div>
         </div>
+        <div className="grid w-full items-center gap-1.5">
+          <Label htmlFor="htfBias">Higher Time Frame Bias</Label>
+          <Input
+            type="text"
+            id="htfBias"
+            name="htfBias"
+            placeholder="Enter higher time frame bias"
+          />
+        </div>
       </div>
     </div>
   );

@@ -15,4 +15,5 @@ export interface Trade {
   fees: number;
   forecastScreenshot?: string;
   resultScreenshot?: string;
+  htfBias?: string;
 }

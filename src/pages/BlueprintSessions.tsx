@@ -1,20 +1,36 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { MoreHorizontal } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface Session {
   id: string;
   name: string;
-  start_date: string;
-  end_date: string;
-  symbol: string;
-  market_type: string;
+  direction: 'buy' | 'sell';
+  entry_price: number;
+  quantity: number;
+  stop_loss: number;
+  take_profit: number;
+  pnl: number;
+  created_at: string;
 }
 
 interface Blueprint {
@@ -60,8 +76,11 @@ export default function BlueprintSessions() {
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString();
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(value);
   };
 
   return (
@@ -83,36 +102,64 @@ export default function BlueprintSessions() {
         </div>
 
         {sessions.length > 0 ? (
-          <ScrollArea className="w-full">
-            <div className="flex space-x-4 pb-4">
-              {sessions.map((session) => (
-                <Card key={session.id} className="min-w-[300px]">
-                  <CardHeader className="py-3">
-                    <CardTitle className="text-sm font-medium">{session.name}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="py-2">
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Symbol:</span>
-                        <span>{session.symbol}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Market:</span>
-                        <span>{session.market_type}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Period:</span>
-                        <span>
-                          {formatDate(session.start_date)} - {formatDate(session.end_date)}
-                        </span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-            <ScrollBar orientation="horizontal" />
-          </ScrollArea>
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Direction</TableHead>
+                  <TableHead>P&L</TableHead>
+                  <TableHead>Entry Price</TableHead>
+                  <TableHead>Quantity</TableHead>
+                  <TableHead>Stop Loss</TableHead>
+                  <TableHead>Take Profit</TableHead>
+                  <TableHead className="w-[50px]"></TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {sessions.map((session) => (
+                  <TableRow key={session.id}>
+                    <TableCell className="font-medium">
+                      {session.direction}
+                    </TableCell>
+                    <TableCell className={session.pnl >= 0 ? "text-green-600" : "text-red-600"}>
+                      {formatCurrency(session.pnl)}
+                    </TableCell>
+                    <TableCell>{formatCurrency(session.entry_price)}</TableCell>
+                    <TableCell>{session.quantity}</TableCell>
+                    <TableCell>{formatCurrency(session.stop_loss)}</TableCell>
+                    <TableCell>{formatCurrency(session.take_profit)}</TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={() => {
+                              // Add view details functionality
+                              console.log("View details", session.id);
+                            }}
+                          >
+                            View details
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              // Add delete functionality
+                              console.log("Delete session", session.id);
+                            }}
+                          >
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         ) : (
           <p className="text-center text-muted-foreground">
             No sessions found for this blueprint

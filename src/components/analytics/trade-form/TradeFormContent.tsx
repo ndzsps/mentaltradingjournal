@@ -56,7 +56,18 @@ export const TradeFormContent = ({ onSubmit, direction, setDirection }: TradeFor
   const handleSubmit = (values: z.infer<typeof tradeFormSchema>) => {
     const tradeData: Trade = {
       id: crypto.randomUUID(),
-      ...values,
+      instrument: values.instrument,
+      direction: values.direction,
+      quantity: values.quantity,
+      entryPrice: values.entryPrice,
+      exitPrice: values.exitPrice,
+      stopLoss: values.stopLoss,
+      takeProfit: values.takeProfit,
+      entryDate: values.entryDate,
+      exitDate: values.exitDate,
+      setup: values.setup,
+      fees: values.fees,
+      pnl: values.pnl,
       screenshots,
       url: url.trim() || undefined,
     };

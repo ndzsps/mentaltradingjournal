@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { GeneralSection } from "./GeneralSection";
 import { TradeEntrySection } from "./TradeEntrySection";
 import { TradeExitSection } from "./TradeExitSection";
+import { TradeScreenshotsSection } from "./TradeScreenshotsSection";
 import { Trade } from "@/types/trade";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -55,16 +56,19 @@ export const TradeFormContent = ({
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col flex-1">
-      <div className="flex-1 p-6 space-y-4 md:space-y-0 md:space-x-4 md:flex">
-        <div className="flex-1 p-4 border rounded-lg bg-background/50">
-          <GeneralSection direction={direction} setDirection={setDirection} />
+      <div className="flex-1 p-6 space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="p-4 border rounded-lg bg-background/50">
+            <GeneralSection direction={direction} setDirection={setDirection} />
+          </div>
+          <div className="p-4 border rounded-lg bg-background/50">
+            <TradeEntrySection />
+          </div>
+          <div className="p-4 border rounded-lg bg-background/50">
+            <TradeExitSection />
+          </div>
         </div>
-        <div className="flex-1 p-4 border rounded-lg bg-background/50">
-          <TradeEntrySection />
-        </div>
-        <div className="flex-1 p-4 border rounded-lg bg-background/50">
-          <TradeExitSection />
-        </div>
+        <TradeScreenshotsSection />
       </div>
       <div className="p-6 pt-0 border-t">
         <Button type="submit" className="w-full">

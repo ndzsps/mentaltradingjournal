@@ -6,7 +6,7 @@ import { Trade } from "@/types/trade";
 interface TradeFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (tradeData: Trade, isEdit: boolean) => void;
+  onSubmit: (tradeData: Trade) => void;
   editTrade?: Trade;
 }
 
@@ -19,6 +19,10 @@ export const TradeFormDialog = ({ open, onOpenChange, onSubmit, editTrade }: Tra
     }
   }, [editTrade]);
 
+  const handleSubmit = (tradeData: Trade) => {
+    onSubmit(tradeData);
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] flex flex-col p-0 sm:max-w-[1000px]">
@@ -28,9 +32,7 @@ export const TradeFormDialog = ({ open, onOpenChange, onSubmit, editTrade }: Tra
         <TradeFormContent
           direction={direction}
           setDirection={setDirection}
-          onSubmit={onSubmit}
-          editTrade={editTrade}
-          onOpenChange={onOpenChange}
+          onSubmit={handleSubmit}
         />
       </DialogContent>
     </Dialog>

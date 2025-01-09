@@ -27,9 +27,11 @@ const tradeFormSchema = z.object({
 
 interface TradeFormContentProps {
   onSubmit: (data: Trade) => void;
+  direction: 'buy' | 'sell' | null;
+  setDirection: (direction: 'buy' | 'sell') => void;
 }
 
-export const TradeFormContent = ({ onSubmit }: TradeFormContentProps) => {
+export const TradeFormContent = ({ onSubmit, direction, setDirection }: TradeFormContentProps) => {
   const [screenshots, setScreenshots] = useState<string[]>([]);
   const [url, setUrl] = useState("");
 
@@ -37,6 +39,7 @@ export const TradeFormContent = ({ onSubmit }: TradeFormContentProps) => {
     resolver: zodResolver(tradeFormSchema),
     defaultValues: {
       direction: "buy",
+      instrument: "",
       quantity: "",
       entryPrice: "",
       exitPrice: "",
@@ -51,20 +54,21 @@ export const TradeFormContent = ({ onSubmit }: TradeFormContentProps) => {
   });
 
   const handleSubmit = (values: z.infer<typeof tradeFormSchema>) => {
-    onSubmit({
-      ...values,
+    const tradeData: Trade = {
       id: crypto.randomUUID(),
+      ...values,
       screenshots,
       url: url.trim() || undefined,
-    });
+    };
+    onSubmit(tradeData);
   };
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
-        <GeneralSection form={form} />
-        <TradeEntrySection form={form} />
-        <TradeExitSection form={form} />
+        <GeneralSection direction={direction} setDirection={setDirection} />
+        <TradeEntrySection />
+        <TradeExitSection />
         <TradeScreenshotsSection
           screenshots={screenshots}
           setScreenshots={setScreenshots}

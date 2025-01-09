@@ -7,12 +7,39 @@ import { TradeWinPercentage } from "./TradeWinPercentage";
 import { Button } from "@/components/ui/button";
 import { useTimeFilter } from "@/contexts/TimeFilterContext";
 import { startOfMonth, subMonths, startOfQuarter, isWithinInterval, endOfMonth } from "date-fns";
+import { useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const StatsHeader = () => {
+  const queryClient = useQueryClient();
   const { data: analytics, isLoading: isAnalyticsLoading } = useQuery({
     queryKey: ['analytics'],
     queryFn: generateAnalytics,
   });
+
+  // Subscribe to real-time updates
+  useEffect(() => {
+    const channel = supabase
+      .channel('journal_entries_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'journal_entries',
+        },
+        () => {
+          // Invalidate and refetch analytics when journal entries change
+          queryClient.invalidateQueries({ queryKey: ['analytics'] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
 
   const { stats } = useProgressTracking();
   const { timeFilter, setTimeFilter } = useTimeFilter();

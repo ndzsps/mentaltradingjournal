@@ -81,17 +81,12 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
     };
   };
 
-  const handleDateSelect = (newDate: Date | undefined) => {
-    console.log("Selected date:", newDate);
-    onDateSelect(newDate);
-  };
-
   return (
     <Card className="p-8 bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800 shadow-xl rounded-2xl">
       <Calendar
         mode="single"
         selected={date}
-        onSelect={handleDateSelect}
+        onSelect={onDateSelect}
         className="w-full"
         classNames={{
           months: "w-full space-y-4",

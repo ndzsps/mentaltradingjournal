@@ -134,6 +134,13 @@ export type Database = {
         }
         Returns: number
       }
+      get_trade_duration: {
+        Args: {
+          entry_date: string
+          exit_date: string
+        }
+        Returns: unknown
+      }
     }
     Enums: {
       [_ in never]: never

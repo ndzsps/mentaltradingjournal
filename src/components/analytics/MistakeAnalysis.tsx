@@ -23,7 +23,6 @@ const CustomTooltip = ({ active, payload }: {
 }) => {
   if (!active || !payload || !payload.length) return null;
 
-  // For PieChart, the payload structure is different
   const data = payload[0];
   return (
     <div className="bg-background border border-border rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95">
@@ -67,13 +66,18 @@ export const MistakeAnalysis = () => {
       </Card>
     );
   }
-  
-  const data = [
-    { name: "Revenge Trading", value: 15, loss: 5000 },
-    { name: "Moving Stop-Loss", value: 25, loss: 3000 },
-    { name: "FOMO Trades", value: 35, loss: 2000 },
-    { name: "Over-leveraging", value: 25, loss: 2500 },
-  ];
+
+  const totalMistakes = Object.values(analytics.mistakeFrequencies)
+    .reduce((sum, { count }) => sum + count, 0);
+
+  const data = Object.entries(analytics.mistakeFrequencies)
+    .map(([name, { count, loss }]) => ({
+      name: name.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
+      value: (count / totalMistakes) * 100,
+      loss,
+    }))
+    .sort((a, b) => b.loss - a.loss)
+    .slice(0, 4);
 
   const COLORS = ['#6E59A5', '#0EA5E9', '#FEC6A1', '#F87171'];
 
@@ -112,8 +116,18 @@ export const MistakeAnalysis = () => {
       <div className="space-y-2 bg-accent/10 p-3 md:p-4 rounded-lg">
         <h4 className="font-semibold text-sm md:text-base">AI Insight</h4>
         <div className="space-y-2 text-xs md:text-sm text-muted-foreground">
-          <p>Revenge trading occurred in 15% of your trades and led to 90% of your total losses.</p>
-          <p>Avoiding revenge trading could have saved you $5,000 this month.</p>
+          {data.length > 0 ? (
+            <>
+              <p>
+                {data[0].name} is your most frequent mistake, occurring in {data[0].value.toFixed(1)}% of losing trades.
+              </p>
+              <p>
+                This mistake has cost you ${data[0].loss.toLocaleString()} in losses.
+              </p>
+            </>
+          ) : (
+            <p>Start logging your trading mistakes to get insights on areas for improvement.</p>
+          )}
         </div>
       </div>
     </Card>

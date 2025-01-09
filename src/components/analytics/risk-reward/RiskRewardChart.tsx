@@ -13,6 +13,7 @@ interface RiskRewardData {
   risk: number;
   reward: number;
   size: number;
+  direction: 'buy' | 'sell';
 }
 
 interface RiskRewardChartProps {
@@ -26,6 +27,11 @@ const CustomTooltip = ({ active, payload }: any) => {
       <div className="bg-background border border-border rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95">
         <p className="font-medium text-sm text-foreground mb-2">Trade Details</p>
         <div className="space-y-1">
+          <div className="flex items-center gap-2 text-sm">
+            <div className="w-2 h-2 rounded-full bg-primary" />
+            <span className="text-muted-foreground">Direction:</span>
+            <span className="font-medium text-foreground capitalize">{data.direction}</span>
+          </div>
           <div className="flex items-center gap-2 text-sm">
             <div className="w-2 h-2 rounded-full bg-primary" />
             <span className="text-muted-foreground">Risk:</span>

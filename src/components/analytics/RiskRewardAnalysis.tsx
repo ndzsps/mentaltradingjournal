@@ -29,14 +29,25 @@ export const RiskRewardAnalysis = () => {
       const stopLoss = Number(trade.stopLoss);
       const takeProfit = Number(trade.takeProfit);
       const size = Number(trade.quantity);
-
-      const risk = Math.abs(entryPrice - stopLoss);
-      const reward = Math.abs(takeProfit - entryPrice);
+      
+      // Calculate risk and reward based on trade direction
+      let risk, reward;
+      
+      if (trade.direction === 'buy') {
+        // For long positions
+        risk = Math.abs(entryPrice - stopLoss);
+        reward = Math.abs(takeProfit - entryPrice);
+      } else {
+        // For short positions
+        risk = Math.abs(stopLoss - entryPrice);
+        reward = Math.abs(entryPrice - takeProfit);
+      }
 
       return {
         risk,
         reward,
         size,
+        direction: trade.direction,
       };
     })
     .filter(d => d.risk > 0 && d.reward > 0); // Filter out invalid data

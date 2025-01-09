@@ -1,80 +1,78 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { GeneralSection } from "./GeneralSection";
 import { TradeEntrySection } from "./TradeEntrySection";
 import { TradeExitSection } from "./TradeExitSection";
 import { TradeScreenshotsSection } from "./TradeScreenshotsSection";
+import { useState } from "react";
 import { Trade } from "@/types/trade";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
-import { toast } from "sonner";
+
+const tradeFormSchema = z.object({
+  instrument: z.string().min(1, "Instrument is required"),
+  direction: z.enum(["buy", "sell"]),
+  quantity: z.string().min(1, "Quantity is required"),
+  entryPrice: z.string().min(1, "Entry price is required"),
+  exitPrice: z.string().min(1, "Exit price is required"),
+  stopLoss: z.string().min(1, "Stop loss is required"),
+  takeProfit: z.string(),
+  entryDate: z.string().min(1, "Entry date is required"),
+  exitDate: z.string().min(1, "Exit date is required"),
+  setup: z.string(),
+  fees: z.string(),
+  pnl: z.string(),
+});
 
 interface TradeFormContentProps {
-  direction: 'buy' | 'sell' | null;
-  setDirection: (direction: 'buy' | 'sell') => void;
-  onSubmit: (tradeData: Trade, isEdit: boolean) => void;
-  editTrade?: Trade;
-  onOpenChange: (open: boolean) => void;
+  onSubmit: (data: Trade) => void;
 }
 
-export const TradeFormContent = ({ 
-  direction, 
-  setDirection, 
-  onSubmit, 
-  editTrade, 
-  onOpenChange 
-}: TradeFormContentProps) => {
-  const { user } = useAuth();
+export const TradeFormContent = ({ onSubmit }: TradeFormContentProps) => {
+  const [screenshots, setScreenshots] = useState<string[]>([]);
+  const [url, setUrl] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const tradeData: Trade = {
-      id: editTrade?.id || crypto.randomUUID(),
-      entryDate: formData.get('entryDate') as string,
-      instrument: formData.get('instrument') as string,
-      setup: formData.get('setup') as string,
-      direction: direction as 'buy' | 'sell',
-      entryPrice: parseFloat(formData.get('entryPrice') as string),
-      quantity: parseFloat(formData.get('quantity') as string),
-      stopLoss: parseFloat(formData.get('stopLoss') as string),
-      takeProfit: parseFloat(formData.get('takeProfit') as string),
-      exitDate: formData.get('exitDate') as string,
-      exitPrice: parseFloat(formData.get('exitPrice') as string),
-      pnl: parseFloat(formData.get('pnl') as string),
-      fees: parseFloat(formData.get('fees') as string),
-    };
+  const form = useForm<z.infer<typeof tradeFormSchema>>({
+    resolver: zodResolver(tradeFormSchema),
+    defaultValues: {
+      direction: "buy",
+      quantity: "",
+      entryPrice: "",
+      exitPrice: "",
+      stopLoss: "",
+      takeProfit: "",
+      entryDate: "",
+      exitDate: "",
+      setup: "",
+      fees: "",
+      pnl: "",
+    },
+  });
 
-    try {
-      onSubmit(tradeData, !!editTrade);
-      onOpenChange(false);
-      toast.success(editTrade ? "Trade updated successfully!" : "Trade added successfully!");
-    } catch (error) {
-      console.error('Error managing trade:', error);
-      toast.error("Failed to manage trade");
-    }
+  const handleSubmit = (values: z.infer<typeof tradeFormSchema>) => {
+    onSubmit({
+      ...values,
+      id: crypto.randomUUID(),
+      screenshots,
+      url: url.trim() || undefined,
+    });
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col h-full max-h-[85vh] overflow-y-auto">
-      <div className="flex-1 p-4 space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="p-4 border rounded-lg bg-background/50">
-            <GeneralSection direction={direction} setDirection={setDirection} />
-          </div>
-          <div className="p-4 border rounded-lg bg-background/50">
-            <TradeEntrySection />
-          </div>
-          <div className="p-4 border rounded-lg bg-background/50">
-            <TradeExitSection />
-          </div>
-        </div>
-        <TradeScreenshotsSection />
-      </div>
-      <div className="sticky bottom-0 mt-4 p-4 bg-background border-t">
-        <Button type="submit" className="w-full">
-          {editTrade ? 'Update' : 'Submit'}
-        </Button>
-      </div>
-    </form>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+        <GeneralSection form={form} />
+        <TradeEntrySection form={form} />
+        <TradeExitSection form={form} />
+        <TradeScreenshotsSection
+          screenshots={screenshots}
+          setScreenshots={setScreenshots}
+          url={url}
+          setUrl={setUrl}
+        />
+        <Button type="submit" className="w-full">Submit Trade</Button>
+      </form>
+    </Form>
   );
 };

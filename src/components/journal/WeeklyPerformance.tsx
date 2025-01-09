@@ -66,13 +66,12 @@ export const WeeklyPerformance = () => {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col h-[calc(100vh-12rem)] justify-between pt-8">
+      <div className="grid grid-rows-6 h-[calc(100vh-12rem)] pt-[3.5rem]">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="animate-pulse h-24">
+          <div key={i} className="h-24 flex items-center px-2">
             <Card className="p-4 space-y-2 bg-primary/5 w-full">
               <div className="h-4 bg-primary/10 rounded w-1/3"></div>
               <div className="h-6 bg-primary/10 rounded w-2/3"></div>
-              <div className="h-4 bg-primary/10 rounded w-1/4"></div>
             </Card>
           </div>
         ))}
@@ -81,9 +80,9 @@ export const WeeklyPerformance = () => {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-12rem)] justify-between pt-8">
+    <div className="grid grid-rows-6 h-[calc(100vh-12rem)] pt-[3.5rem]">
       {weeklyStats?.map((week) => (
-        <div key={week.weekNumber} className="h-24">
+        <div key={week.weekNumber} className="h-24 flex items-center px-2">
           <Card
             className="p-4 space-y-2 bg-card/30 backdrop-blur-xl border-primary/10 hover:border-primary/20 transition-colors w-full"
           >
@@ -98,9 +97,6 @@ export const WeeklyPerformance = () => {
                   : 'text-muted-foreground'
             }`}>
               ${week.totalPnL.toFixed(2)}
-            </p>
-            <p className="text-sm text-muted-foreground">
-              {week.tradingDays} {week.tradingDays === 1 ? 'day' : 'days'}
             </p>
           </Card>
         </div>

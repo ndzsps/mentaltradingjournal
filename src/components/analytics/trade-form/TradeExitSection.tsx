@@ -67,6 +67,15 @@ export const TradeExitSection = () => {
             step="0.01"
           />
         </div>
+        <div className="grid w-full items-center gap-1.5">
+          <Label htmlFor="resultScreenshot">Result Screenshot URL</Label>
+          <Input
+            type="url"
+            id="resultScreenshot"
+            name="resultScreenshot"
+            placeholder="Enter screenshot URL"
+          />
+        </div>
       </div>
     </div>
   );

@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -43,6 +44,15 @@ export const TradeEntrySection = () => {
             name="takeProfit"
             placeholder="0.00"
             step="0.01"
+          />
+        </div>
+        <div className="grid w-full items-center gap-1.5">
+          <Label htmlFor="forecastScreenshot">Forecast Screenshot URL</Label>
+          <Input
+            type="url"
+            id="forecastScreenshot"
+            name="forecastScreenshot"
+            placeholder="Enter screenshot URL"
           />
         </div>
       </div>

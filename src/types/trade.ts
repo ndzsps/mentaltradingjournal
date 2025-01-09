@@ -12,4 +12,6 @@ export interface Trade {
   exitPrice: number;
   pnl: number;
   fees: number;
+  forecastScreenshot?: string;
+  resultScreenshot?: string;
 }

@@ -82,7 +82,7 @@ const Journal = () => {
         <div className="max-w-7xl mx-auto space-y-8 px-4">
           <StatsHeader />
 
-          <div className="flex flex-col md:flex-row gap-6">
+          <div className="flex gap-6">
             <div className="flex-1">
               <JournalCalendar 
                 date={selectedDate}
@@ -94,7 +94,7 @@ const Journal = () => {
                 }))}
               />
             </div>
-            <div className="md:pt-8">
+            <div className="w-64">
               <WeeklyPerformance />
             </div>
           </div>

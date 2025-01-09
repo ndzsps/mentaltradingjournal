@@ -12,6 +12,17 @@ export interface JournalEntry {
   created_at: string;
 }
 
+interface MistakeFrequency {
+  count: number;
+  loss: number;
+}
+
+interface AssetPairStat {
+  profit: number;
+  loss: number;
+  total: number;
+}
+
 export interface AnalyticsInsight {
   journalEntries: JournalEntry[];
   performanceByEmotion: {
@@ -41,4 +52,19 @@ export interface AnalyticsInsight {
       description: string;
     };
   };
+  // Add new properties for real data analytics
+  mistakeFrequencies: Record<string, MistakeFrequency>;
+  assetPairStats: Record<string, AssetPairStat>;
+  emotionRecovery: Record<string, number>;
+  tradeDurations: Record<string, { count: number; wins: number }>;
+  volatilityData: Array<{
+    volatility: number;
+    performance: number;
+    emotional: string;
+  }>;
+  riskRewardData: Array<{
+    risk: number;
+    reward: number;
+    size: number;
+  }>;
 }

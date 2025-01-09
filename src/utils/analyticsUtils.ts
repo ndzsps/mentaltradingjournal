@@ -130,9 +130,9 @@ export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
     mainInsight: "Based on your journal entries, there's a strong correlation between emotional state and trading performance.",
     recommendedAction: "Focus on maintaining emotional balance during trading sessions.",
     dataRequirements,
-    // Additional data for components
-    assetPairStats,
+    // Additional real data
     mistakeFrequencies,
+    assetPairStats,
     emotionRecovery,
     tradeDurations,
     volatilityData,

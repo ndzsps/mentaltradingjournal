@@ -13,7 +13,8 @@ interface JournalCalendarProps {
     date: Date;
     emotion: string;
     trades?: Array<{
-      profit_loss: number;
+      profit_loss?: number;
+      pnl?: number;
       risk_reward?: number;
       win?: boolean;
     }>;
@@ -33,7 +34,12 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
   const calculateDayStats = (entry: typeof entries[0]) => {
     if (!entry.trades || entry.trades.length === 0) return null;
 
-    const totalPL = entry.trades.reduce((sum, trade) => sum + (trade.profit_loss || 0), 0);
+    const totalPL = entry.trades.reduce((sum, trade) => {
+      // Check for both profit_loss and pnl fields
+      const tradeValue = trade.profit_loss || trade.pnl || 0;
+      // Convert string to number if necessary
+      return sum + (typeof tradeValue === 'string' ? parseFloat(tradeValue) : tradeValue);
+    }, 0);
 
     return {
       totalPL,

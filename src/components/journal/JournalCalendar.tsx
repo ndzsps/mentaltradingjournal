@@ -34,14 +34,10 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
     if (!entry.trades || entry.trades.length === 0) return null;
 
     const totalPL = entry.trades.reduce((sum, trade) => sum + (trade.profit_loss || 0), 0);
-    const winRate = entry.trades.filter(t => t.win).length / entry.trades.length * 100;
-    const avgRR = entry.trades.reduce((sum, trade) => sum + (trade.risk_reward || 0), 0) / entry.trades.length;
 
     return {
       totalPL,
       numTrades: entry.trades.length,
-      winRate,
-      avgRR: avgRR.toFixed(2),
     };
   };
 
@@ -149,9 +145,6 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
                         </p>
                         <p className="text-xs text-gray-600 dark:text-gray-300">
                           {stats.numTrades} trade{stats.numTrades !== 1 ? 's' : ''}
-                        </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          {stats.avgRR}R • {stats.winRate.toFixed(0)}%
                         </p>
                       </div>
                     </div>

@@ -1,5 +1,13 @@
-import { ResponsiveContainer, ScatterChart, Scatter, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
-import { Card } from '@/components/ui/card';
+import {
+  ScatterChart,
+  Scatter,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  ZAxis,
+} from "recharts";
 
 interface RiskRewardData {
   risk: number;
@@ -13,12 +21,9 @@ interface RiskRewardChartProps {
 }
 
 const CustomTooltip = ({ active, payload }: any) => {
-  if (!active || !payload?.length) return null;
-
-  const data = payload[0].payload;
-
-  return (
-    <Card>
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
       <div className="bg-background border border-border rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95">
         <p className="font-medium text-sm text-foreground mb-2">Trade Details</p>
         <div className="space-y-1">
@@ -42,38 +47,52 @@ const CustomTooltip = ({ active, payload }: any) => {
             <span className="text-muted-foreground">Position Size:</span>
             <span className="font-medium text-foreground">{data.size}</span>
           </div>
+          <div className="flex items-center gap-2 text-sm">
+            <div className="w-2 h-2 rounded-full bg-primary" />
+            <span className="text-muted-foreground">R:R Ratio:</span>
+            <span className="font-medium text-foreground">
+              {Math.round(data.reward / data.risk)}:1
+            </span>
+          </div>
         </div>
       </div>
-    </Card>
-  );
+    );
+  }
+  return null;
 };
 
 export const RiskRewardChart = ({ data }: RiskRewardChartProps) => {
   return (
-    <div className="w-full h-[300px]">
+    <div className="h-[250px] md:h-[300px] w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+        <ScatterChart margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis 
-            type="number" 
             dataKey="risk" 
-            name="Risk" 
+            name="Risk ($)" 
             unit="$"
-            label={{ value: 'Risk ($)', position: 'bottom' }} 
+            tick={{ fontSize: 12 }}
+            label={{ 
+              value: 'Risk ($)', 
+              position: 'bottom',
+              style: { fontSize: '12px' }
+            }}
           />
           <YAxis 
-            type="number" 
             dataKey="reward" 
-            name="Reward" 
+            name="Reward ($)" 
             unit="$"
-            label={{ value: 'Reward ($)', angle: -90, position: 'left' }} 
+            tick={{ fontSize: 12 }}
+            label={{ 
+              value: 'Reward ($)', 
+              angle: -90, 
+              position: 'insideLeft',
+              style: { fontSize: '12px' }
+            }}
           />
+          <ZAxis dataKey="size" range={[50, 400]} />
           <Tooltip content={<CustomTooltip />} />
-          <Scatter 
-            name="Risk/Reward" 
-            data={data} 
-            fill="var(--primary)" 
-          />
+          <Scatter name="Trades" data={data} fill="#6E59A5" />
         </ScatterChart>
       </ResponsiveContainer>
     </div>

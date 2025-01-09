@@ -9,6 +9,54 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      backtesting_sessions: {
+        Row: {
+          created_at: string
+          description: string | null
+          end_date: string
+          id: string
+          leverage: number | null
+          market_type: string
+          name: string
+          playbook_id: string | null
+          start_balance: number
+          start_date: string
+          symbol: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          end_date: string
+          id?: string
+          leverage?: number | null
+          market_type: string
+          name: string
+          playbook_id?: string | null
+          start_balance: number
+          start_date: string
+          symbol: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          end_date?: string
+          id?: string
+          leverage?: number | null
+          market_type?: string
+          name?: string
+          playbook_id?: string | null
+          start_balance?: number
+          start_date?: string
+          symbol?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       journal_entries: {
         Row: {
           created_at: string

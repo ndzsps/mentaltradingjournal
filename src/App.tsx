@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import Journal from "./pages/Journal";
 import Analytics from "./pages/Analytics";
 import Login from "./pages/Login";
+import Backtesting from "./pages/Backtesting";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 
 const queryClient = new QueryClient({
@@ -80,12 +81,7 @@ const App = () => {
                     path="/backtesting"
                     element={
                       <ProtectedRoute>
-                        <div className="container mx-auto p-4">
-                          <h1 className="text-2xl font-bold mb-4">Backtesting</h1>
-                          <p className="text-muted-foreground">
-                            This feature is coming soon. Stay tuned!
-                          </p>
-                        </div>
+                        <Backtesting />
                       </ProtectedRoute>
                     }
                   />

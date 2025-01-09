@@ -11,6 +11,25 @@ import {
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
 
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-background border border-border rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95">
+        <p className="font-medium text-sm text-foreground mb-2">{label}</p>
+        <div className="flex items-center gap-2 text-sm">
+          <div
+            className="w-2 h-2 rounded-full"
+            style={{ backgroundColor: payload[0].color }}
+          />
+          <span className="text-muted-foreground">Frequency:</span>
+          <span className="font-medium text-foreground">{payload[0].value}%</span>
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+
 export const EmotionRecovery = () => {
   const { data: analytics, isLoading } = useQuery({
     queryKey: ['analytics'],
@@ -27,32 +46,22 @@ export const EmotionRecovery = () => {
       </Card>
     );
   }
-  
-  const data = [
-    { days: "< 1 day", frequency: 40 },
-    { days: "1-2 days", frequency: 30 },
-    { days: "2-3 days", frequency: 20 },
-    { days: "> 3 days", frequency: 10 },
-  ];
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-background border border-border rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95">
-          <p className="font-medium text-sm text-foreground mb-2">{label}</p>
-          <div className="flex items-center gap-2 text-sm">
-            <div
-              className="w-2 h-2 rounded-full"
-              style={{ backgroundColor: payload[0].color }}
-            />
-            <span className="text-muted-foreground">Frequency:</span>
-            <span className="font-medium text-foreground">{payload[0].value}%</span>
-          </div>
-        </div>
-      );
-    }
-    return null;
-  };
+  // Transform emotionRecovery data into the format needed for the chart
+  const totalRecoveries = Object.values(analytics.emotionRecovery).reduce((a, b) => a + b, 0);
+  const data = Object.entries(analytics.emotionRecovery).map(([days, frequency]) => ({
+    days,
+    frequency: (frequency / totalRecoveries) * 100
+  })).sort((a, b) => {
+    // Custom sort to maintain the correct order
+    const order = {
+      '< 1 day': 1,
+      '1-2 days': 2,
+      '2-3 days': 3,
+      '> 3 days': 4
+    };
+    return order[a.days as keyof typeof order] - order[b.days as keyof typeof order];
+  });
 
   return (
     <Card className="p-4 md:p-6 space-y-4">
@@ -78,8 +87,22 @@ export const EmotionRecovery = () => {
       <div className="space-y-2 bg-accent/10 p-3 md:p-4 rounded-lg">
         <h4 className="font-semibold text-sm md:text-base">AI Insight</h4>
         <div className="space-y-2 text-xs md:text-sm text-muted-foreground">
-          <p>It takes an average of 2 days for you to regain emotional balance after a loss. Avoid trading immediately after significant losses.</p>
-          <p>Faster recovery times (under 1 day) correlate with a 25% higher win rate.</p>
+          {data.length > 0 ? (
+            <>
+              <p>
+                {data[0].frequency > 40 
+                  ? "You show strong emotional resilience, typically recovering within a day after losses."
+                  : "Consider developing strategies to improve emotional recovery time after losses."}
+              </p>
+              <p>
+                {data[0].days === '< 1 day' 
+                  ? "Quick recovery times indicate good emotional management."
+                  : "Longer recovery times might be impacting your trading performance."}
+              </p>
+            </>
+          ) : (
+            <p>Start logging more trades to see insights about your emotional recovery patterns.</p>
+          )}
         </div>
       </div>
     </Card>

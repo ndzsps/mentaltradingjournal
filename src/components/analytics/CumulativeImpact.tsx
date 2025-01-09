@@ -11,6 +11,7 @@ import {
 } from "recharts";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
+import { format } from "date-fns";
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
@@ -55,12 +56,27 @@ export const CumulativeImpact = () => {
       </Card>
     );
   }
-  
-  const data = Array.from({ length: 30 }, (_, i) => ({
-    day: `Day ${i + 1}`,
-    profit: Math.floor(Math.random() * 1000) * (Math.random() > 0.3 ? 1 : -1),
-    emotionalScore: Math.floor(Math.random() * 100),
-  }));
+
+  // Process journal entries to calculate cumulative impact
+  const data = analytics.journalEntries
+    .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+    .map((entry, index, array) => {
+      const dailyPnL = entry.trades?.reduce((sum, trade) => sum + (Number(trade.pnl) || 0), 0) || 0;
+      const emotionalScore = entry.emotion?.toLowerCase().includes('positive') ? 75 :
+        entry.emotion?.toLowerCase().includes('neutral') ? 50 : 25;
+
+      // Calculate cumulative P&L
+      const cumulativePnL = array
+        .slice(0, index + 1)
+        .reduce((sum, e) => sum + (e.trades?.reduce((s, t) => s + (Number(t.pnl) || 0), 0) || 0), 0);
+
+      return {
+        date: format(new Date(entry.created_at), 'MMM d'),
+        emotionalScore,
+        cumulativePnL
+      };
+    })
+    .slice(-30); // Show last 30 days
 
   return (
     <Card className="p-4 md:p-6 space-y-4">
@@ -75,17 +91,37 @@ export const CumulativeImpact = () => {
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="day" tick={{ fontSize: 12 }} />
-            <YAxis yAxisId="left" tick={{ fontSize: 12 }} />
-            <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 12 }} />
+            <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+            <YAxis 
+              yAxisId="left" 
+              tick={{ fontSize: 12 }}
+              label={{ 
+                value: 'Cumulative P&L ($)', 
+                angle: -90, 
+                position: 'insideLeft',
+                style: { fontSize: '12px' }
+              }}
+            />
+            <YAxis 
+              yAxisId="right" 
+              orientation="right" 
+              domain={[0, 100]}
+              tick={{ fontSize: 12 }}
+              label={{ 
+                value: 'Emotional Score', 
+                angle: 90, 
+                position: 'insideRight',
+                style: { fontSize: '12px' }
+              }}
+            />
             <Tooltip content={<CustomTooltip />} />
             <Legend />
             <Line
               yAxisId="left"
               type="monotone"
-              dataKey="profit"
+              dataKey="cumulativePnL"
               stroke="#6E59A5"
-              name="Profit/Loss ($)"
+              name="Cumulative P&L ($)"
             />
             <Line
               yAxisId="right"
@@ -100,9 +136,27 @@ export const CumulativeImpact = () => {
 
       <div className="space-y-2 bg-accent/10 p-3 md:p-4 rounded-lg">
         <h4 className="font-semibold text-sm md:text-base">AI Insight</h4>
-        <p className="text-xs md:text-sm text-muted-foreground">
-          A consistent positive emotional state led to cumulative profits of $10,000, while emotional dips correlated with cumulative losses of $5,000.
-        </p>
+        <div className="space-y-2 text-xs md:text-sm text-muted-foreground">
+          {data.length > 0 ? (
+            <>
+              <p>
+                Your emotional state shows a {
+                  data[data.length - 1].emotionalScore > data[0].emotionalScore
+                    ? "positive"
+                    : "negative"
+                } trend over the period.
+              </p>
+              <p>
+                {Math.abs(data[data.length - 1].cumulativePnL) > Math.abs(data[0].cumulativePnL)
+                  ? `Overall P&L has ${data[data.length - 1].cumulativePnL > 0 ? "improved" : "declined"}`
+                  : "P&L remains relatively stable"}
+                {" "}with a cumulative ${Math.abs(data[data.length - 1].cumulativePnL).toLocaleString()}.
+              </p>
+            </>
+          ) : (
+            <p>Start logging more trades to see insights about your emotional and financial trends.</p>
+          )}
+        </div>
       </div>
     </Card>
   );

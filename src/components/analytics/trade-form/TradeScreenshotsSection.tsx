@@ -8,15 +8,15 @@ export const TradeScreenshotsSection = () => {
   const [showResultUrl, setShowResultUrl] = useState(false);
 
   return (
-    <div className="space-y-4 p-6 border rounded-lg bg-background/50">
-      <div className="flex items-center gap-2 mb-4">
+    <div className="space-y-4 p-4 border rounded-lg bg-background/50">
+      <div className="flex items-center gap-2 mb-2">
         <ImageIcon className="w-5 h-5 text-muted-foreground" />
         <h3 className="text-lg font-semibold">Screenshots</h3>
       </div>
 
-      <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Forecast Section */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           <Label className="text-sm font-medium">Forecast</Label>
           <div className="space-y-2">
             <div className="flex items-center gap-2">
@@ -24,12 +24,12 @@ export const TradeScreenshotsSection = () => {
                 type="file"
                 accept="image/*"
                 name="forecastImage"
-                className="cursor-pointer file:cursor-pointer file:border-0 file:bg-primary/10 file:text-primary file:px-4 file:py-2 file:mr-4 file:rounded-md hover:file:bg-primary/20 transition-all"
+                className="cursor-pointer file:cursor-pointer file:border-0 file:bg-primary/10 file:text-primary file:px-2 file:py-1 file:mr-2 file:rounded-md hover:file:bg-primary/20 transition-all text-sm"
               />
               <button
                 type="button"
                 onClick={() => setShowForecastUrl(!showForecastUrl)}
-                className="p-2 rounded-md hover:bg-muted transition-colors"
+                className="p-1.5 rounded-md hover:bg-muted transition-colors"
                 title="Toggle URL input"
               >
                 <Link2Icon className="w-4 h-4" />
@@ -40,14 +40,14 @@ export const TradeScreenshotsSection = () => {
                 type="url"
                 name="forecastUrl"
                 placeholder="Enter image URL"
-                className="mt-2"
+                className="text-sm"
               />
             )}
           </div>
         </div>
 
         {/* Trade Result Section */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           <Label className="text-sm font-medium">Trade Result</Label>
           <div className="space-y-2">
             <div className="flex items-center gap-2">
@@ -55,12 +55,12 @@ export const TradeScreenshotsSection = () => {
                 type="file"
                 accept="image/*"
                 name="resultImage"
-                className="cursor-pointer file:cursor-pointer file:border-0 file:bg-primary/10 file:text-primary file:px-4 file:py-2 file:mr-4 file:rounded-md hover:file:bg-primary/20 transition-all"
+                className="cursor-pointer file:cursor-pointer file:border-0 file:bg-primary/10 file:text-primary file:px-2 file:py-1 file:mr-2 file:rounded-md hover:file:bg-primary/20 transition-all text-sm"
               />
               <button
                 type="button"
                 onClick={() => setShowResultUrl(!showResultUrl)}
-                className="p-2 rounded-md hover:bg-muted transition-colors"
+                className="p-1.5 rounded-md hover:bg-muted transition-colors"
                 title="Toggle URL input"
               >
                 <Link2Icon className="w-4 h-4" />
@@ -71,7 +71,7 @@ export const TradeScreenshotsSection = () => {
                 type="url"
                 name="resultUrl"
                 placeholder="Enter image URL"
-                className="mt-2"
+                className="text-sm"
               />
             )}
           </div>

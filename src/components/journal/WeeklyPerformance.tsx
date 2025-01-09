@@ -68,7 +68,7 @@ export const WeeklyPerformance = () => {
     return (
       <div className="grid grid-rows-5 h-[calc(100vh-12rem)] pt-[150px]">
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="flex items-center px-2">
+          <div key={i} className="flex items-center px-2 mb-8">
             <Card className="p-4 space-y-2 bg-primary/5 w-full h-[4.5rem]">
               <div className="h-4 bg-primary/10 rounded w-1/3"></div>
               <div className="h-6 bg-primary/10 rounded w-2/3"></div>
@@ -82,7 +82,7 @@ export const WeeklyPerformance = () => {
   return (
     <div className="flex flex-col justify-between h-[calc(100vh-12rem)] pt-[150px]">
       {weeklyStats?.map((week) => (
-        <div key={week.weekNumber} className="px-2">
+        <div key={week.weekNumber} className="px-2 mb-4">
           <Card
             className="p-4 bg-card/30 backdrop-blur-xl border-primary/10 hover:border-primary/20 transition-colors w-full h-[4.5rem] flex flex-col justify-center"
           >

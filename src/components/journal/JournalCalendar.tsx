@@ -55,10 +55,17 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
     const stats = calculateDayStats(entry);
     if (!stats) return null;
 
+    // Updated styles for better text visibility
     return {
-      bg: stats.totalPL >= 0 ? "bg-emerald-50" : "bg-red-50",
-      border: stats.totalPL >= 0 ? "border-emerald-100" : "border-red-100",
-      shadow: stats.totalPL >= 0 ? "shadow-emerald-100/50" : "shadow-red-100/50",
+      bg: stats.totalPL >= 0 
+        ? "bg-gradient-to-br from-emerald-50/90 to-emerald-100/90" 
+        : "bg-gradient-to-br from-red-50/90 to-red-100/90",
+      border: stats.totalPL >= 0 
+        ? "border-emerald-200" 
+        : "border-red-200",
+      shadow: stats.totalPL >= 0 
+        ? "shadow-emerald-100/50" 
+        : "shadow-red-100/50",
     };
   };
 
@@ -136,15 +143,15 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
                   </div>
                   
                   {stats && (
-                    <div className="absolute inset-0 flex flex-col justify-end p-2 bg-gradient-to-t from-white/90 to-transparent dark:from-gray-900/90">
-                      <div className="space-y-1 text-center w-full">
-                        <p className={`text-lg font-semibold ${stats.totalPL >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}`}>
+                    <div className="absolute inset-0 flex flex-col justify-end p-2">
+                      <div className="space-y-1 text-center w-full backdrop-blur-sm bg-white/30 dark:bg-gray-900/30 rounded-lg p-2">
+                        <p className={`text-lg font-bold ${stats.totalPL >= 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-red-700 dark:text-red-400'}`}>
                           {formatCurrency(stats.totalPL)}
                         </p>
-                        <p className="text-xs text-gray-600 dark:text-gray-300">
+                        <p className="text-xs font-medium text-gray-700 dark:text-gray-300">
                           {stats.numTrades} trade{stats.numTrades !== 1 ? 's' : ''}
                         </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                        <p className="text-xs font-medium text-gray-600 dark:text-gray-400">
                           {stats.avgRR}R • {stats.winRate.toFixed(0)}%
                         </p>
                       </div>

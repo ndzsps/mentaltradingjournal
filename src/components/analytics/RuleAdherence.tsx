@@ -10,21 +10,27 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
-import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 export const RuleAdherence = () => {
   const { data: analytics, isLoading } = useQuery({
-    queryKey: ['analytics'],
+    queryKey: ['ruleAdherence'],
     queryFn: async () => {
+      console.log("Fetching rule adherence data...");
+      
       const { data: entries, error } = await supabase
         .from('journal_entries')
         .select('*')
         .eq('session_type', 'post')
         .not('outcome', 'eq', 'no_trades');
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching entries:", error);
+        throw error;
+      }
+
+      console.log("Fetched entries:", entries);
 
       const rulesFollowedStats = {
         wins: 0,
@@ -51,6 +57,9 @@ export const RuleAdherence = () => {
           if (entry.outcome === 'loss') rulesNotFollowedStats.losses++;
         }
       });
+
+      console.log("Rules followed stats:", rulesFollowedStats);
+      console.log("Rules not followed stats:", rulesNotFollowedStats);
 
       const calculatePercentage = (value: number, total: number) => 
         total > 0 ? Math.round((value / total) * 100) : 0;

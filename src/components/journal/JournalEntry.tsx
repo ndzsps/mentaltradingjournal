@@ -12,9 +12,8 @@ interface JournalEntry {
   notes: string;
   outcome?: string;
   market_conditions?: string;
-  followed_rules?: string[];
   trades?: Trade[];
-  screenshots?: string[];
+  followed_rules?: string[];
 }
 
 interface JournalEntryProps {
@@ -28,12 +27,6 @@ export const JournalEntry = ({ entry }: JournalEntryProps) => {
     month: 'long',
     day: 'numeric'
   });
-
-  // Ensure trades have their screenshots
-  const tradesWithScreenshots = entry.trades?.map(trade => ({
-    ...trade,
-    screenshots: trade.screenshots || []
-  }));
 
   return (
     <Card className="p-6 rounded-lg bg-background/50 border border-primary/10 transition-all duration-300 hover:shadow-md">
@@ -50,8 +43,7 @@ export const JournalEntry = ({ entry }: JournalEntryProps) => {
           marketConditions={entry.market_conditions}
           notes={entry.notes}
           followedRules={entry.followed_rules}
-          trades={tradesWithScreenshots}
-          screenshots={entry.screenshots}
+          trades={entry.trades}
         />
       </div>
     </Card>

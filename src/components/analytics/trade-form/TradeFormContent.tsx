@@ -6,7 +6,6 @@ import { Trade } from "@/types/trade";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import { useEffect } from "react";
 
 interface TradeFormContentProps {
   direction: 'buy' | 'sell' | null;
@@ -14,8 +13,6 @@ interface TradeFormContentProps {
   onSubmit: (tradeData: Trade, isEdit: boolean) => void;
   editTrade?: Trade;
   onOpenChange: (open: boolean) => void;
-  formData: Partial<Trade>;
-  onFormDataChange: (data: Partial<Trade>) => void;
 }
 
 export const TradeFormContent = ({ 
@@ -23,17 +20,9 @@ export const TradeFormContent = ({
   setDirection, 
   onSubmit, 
   editTrade, 
-  onOpenChange,
-  formData,
-  onFormDataChange
+  onOpenChange 
 }: TradeFormContentProps) => {
   const { user } = useAuth();
-
-  useEffect(() => {
-    if (editTrade) {
-      onFormDataChange(editTrade);
-    }
-  }, [editTrade, onFormDataChange]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -64,34 +53,17 @@ export const TradeFormContent = ({
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type } = e.target;
-    const newValue = type === 'number' ? parseFloat(value) : value;
-    onFormDataChange({ ...formData, [name]: newValue });
-  };
-
   return (
     <form onSubmit={handleSubmit} className="flex flex-col flex-1">
       <div className="flex-1 p-6 space-y-4 md:space-y-0 md:space-x-4 md:flex">
         <div className="flex-1 p-4 border rounded-lg bg-background/50">
-          <GeneralSection 
-            direction={direction} 
-            setDirection={setDirection}
-            formData={formData}
-            onInputChange={handleInputChange}
-          />
+          <GeneralSection direction={direction} setDirection={setDirection} />
         </div>
         <div className="flex-1 p-4 border rounded-lg bg-background/50">
-          <TradeEntrySection
-            formData={formData}
-            onInputChange={handleInputChange}
-          />
+          <TradeEntrySection />
         </div>
         <div className="flex-1 p-4 border rounded-lg bg-background/50">
-          <TradeExitSection
-            formData={formData}
-            onInputChange={handleInputChange}
-          />
+          <TradeExitSection />
         </div>
       </div>
       <div className="p-6 pt-0 border-t">

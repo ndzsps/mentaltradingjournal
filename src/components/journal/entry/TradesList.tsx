@@ -3,6 +3,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 
 interface TradesListProps {
   trades: Trade[];
@@ -54,18 +55,6 @@ export const TradesList = ({ trades }: TradesListProps) => {
                     <p className="text-sm">Price: {trade.entryPrice}</p>
                     <p className="text-sm">Stop Loss: {trade.stopLoss}</p>
                     <p className="text-sm">Take Profit: {trade.takeProfit}</p>
-                    {trade.forecastScreenshot && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm">Forecast:</span>
-                        <Button
-                          variant="link"
-                          className="h-auto p-0 text-primary"
-                          onClick={() => window.open(trade.forecastScreenshot, '_blank')}
-                        >
-                          View <ExternalLink className="ml-1 h-3 w-3" />
-                        </Button>
-                      </div>
-                    )}
                   </div>
                 </div>
                 <div className="space-y-3">
@@ -75,21 +64,41 @@ export const TradesList = ({ trades }: TradesListProps) => {
                     <p className="text-sm">Price: {trade.exitPrice}</p>
                     <p className="text-sm">Quantity: {trade.quantity}</p>
                     <p className="text-sm">Fees: {trade.fees}</p>
-                    {trade.resultScreenshot && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm">Result:</span>
-                        <Button
-                          variant="link"
-                          className="h-auto p-0 text-primary"
-                          onClick={() => window.open(trade.resultScreenshot, '_blank')}
-                        >
-                          View <ExternalLink className="ml-1 h-3 w-3" />
-                        </Button>
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>
+
+              {(trade.forecastScreenshot || trade.resultScreenshot) && (
+                <>
+                  <Separator />
+                  <div className="space-y-3">
+                    <h4 className="text-sm font-medium text-muted-foreground">Trade Screenshots</h4>
+                    <div className="flex gap-4">
+                      {trade.forecastScreenshot && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex items-center gap-2"
+                          onClick={() => window.open(trade.forecastScreenshot, '_blank')}
+                        >
+                          View Forecast <ExternalLink className="h-4 w-4" />
+                        </Button>
+                      )}
+                      {trade.resultScreenshot && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex items-center gap-2"
+                          onClick={() => window.open(trade.resultScreenshot, '_blank')}
+                        >
+                          View Result <ExternalLink className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
+
               {trade.setup && (
                 <div className="space-y-2">
                   <h4 className="text-sm font-medium text-muted-foreground">Setup</h4>

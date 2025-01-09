@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { startOfWeek, endOfWeek, format, addWeeks, isWithinInterval, subWeeks } from "date-fns";
+import { startOfWeek, endOfWeek, format, isWithinInterval, subWeeks } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -21,8 +21,11 @@ export const WeeklyPerformance = () => {
     queryFn: async () => {
       if (!user) return [];
 
-      // Start from 4 weeks ago
-      const startDate = startOfWeek(subWeeks(currentDate, 4));
+      // Get the start of the current week
+      const currentWeekStart = startOfWeek(currentDate);
+      
+      // Start date is 4 weeks before the current week
+      const startDate = startOfWeek(subWeeks(currentWeekStart, 4));
       const endDate = endOfWeek(currentDate);
 
       const { data: entries, error } = await supabase
@@ -34,9 +37,9 @@ export const WeeklyPerformance = () => {
 
       if (error) throw error;
 
-      // Initialize weeks array with 5 weeks (current week and 4 previous weeks)
+      // Initialize weeks array (1 is oldest, 5 is current week)
       const weeks: WeekSummary[] = Array.from({ length: 5 }, (_, i) => ({
-        weekNumber: 5 - i, // Week 5 is current week, Week 1 is 4 weeks ago
+        weekNumber: i + 1, // Week 1 is oldest, Week 5 is current week
         totalPnL: 0,
         tradingDays: 0,
       }));
@@ -44,10 +47,10 @@ export const WeeklyPerformance = () => {
       (entries as JournalEntryType[])?.forEach(entry => {
         const entryDate = new Date(entry.created_at);
         
-        // Calculate which week the entry belongs to
+        // Find which week this entry belongs to
         for (let i = 0; i < 5; i++) {
-          const weekStart = startOfWeek(subWeeks(currentDate, 4 - i));
-          const weekEnd = endOfWeek(subWeeks(currentDate, 4 - i));
+          const weekStart = startOfWeek(subWeeks(currentWeekStart, 4 - i));
+          const weekEnd = endOfWeek(subWeeks(currentWeekStart, 4 - i));
           
           if (isWithinInterval(entryDate, { start: weekStart, end: weekEnd })) {
             const trades = (entry.trades || []) as Trade[];

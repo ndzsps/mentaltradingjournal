@@ -1,15 +1,14 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { GeneralSection } from "./form-sections/GeneralSection";
 import { TradeEntrySection } from "./form-sections/TradeEntrySection";
 import { TradeExitSection } from "./form-sections/TradeExitSection";
+import { PlaybookSelector } from "./form-sections/PlaybookSelector";
+import { ScreenshotLinksSection } from "./form-sections/ScreenshotLinksSection";
 import { useBacktestingForm } from "@/hooks/useBacktestingForm";
 
 interface Blueprint {
@@ -59,21 +58,11 @@ export function BacktestingForm() {
         <CardTitle>Create new session</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="mb-6">
-          <Label htmlFor="playbook">Select Playbook *</Label>
-          <Select value={selectedBlueprint} onValueChange={setSelectedBlueprint}>
-            <SelectTrigger className="w-full mt-2">
-              <SelectValue placeholder="Choose a playbook" />
-            </SelectTrigger>
-            <SelectContent>
-              {blueprints.map((blueprint) => (
-                <SelectItem key={blueprint.id} value={blueprint.id}>
-                  {blueprint.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <PlaybookSelector 
+          blueprints={blueprints}
+          selectedBlueprint={selectedBlueprint}
+          onBlueprintSelect={setSelectedBlueprint}
+        />
 
         {validationError && (
           <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
@@ -98,65 +87,10 @@ export function BacktestingForm() {
           />
         </div>
 
-        <div className="mt-6 p-4 border rounded-lg bg-background/50">
-          <h3 className="text-lg font-semibold mb-4">Screenshot Links</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-3">
-              <div className="grid w-full items-center gap-1.5">
-                <Label htmlFor="weeklyUrl">Weekly</Label>
-                <Input
-                  type="url"
-                  id="weeklyUrl"
-                  name="weeklyUrl"
-                  placeholder="Enter weekly chart link"
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div className="grid w-full items-center gap-1.5">
-                <Label htmlFor="fourHourUrl">4 HR</Label>
-                <Input
-                  type="url"
-                  id="fourHourUrl"
-                  name="fourHourUrl"
-                  placeholder="Enter 4 hour chart link"
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div className="grid w-full items-center gap-1.5">
-                <Label htmlFor="refinedEntryUrl">Refined Entry</Label>
-                <Input
-                  type="url"
-                  id="refinedEntryUrl"
-                  name="refinedEntryUrl"
-                  placeholder="Enter refined entry link"
-                  onChange={handleInputChange}
-                />
-              </div>
-            </div>
-            <div className="space-y-3">
-              <div className="grid w-full items-center gap-1.5">
-                <Label htmlFor="dailyUrl">Daily</Label>
-                <Input
-                  type="url"
-                  id="dailyUrl"
-                  name="dailyUrl"
-                  placeholder="Enter daily chart link"
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div className="grid w-full items-center gap-1.5">
-                <Label htmlFor="oneHourUrl">1 HR</Label>
-                <Input
-                  type="url"
-                  id="oneHourUrl"
-                  name="oneHourUrl"
-                  placeholder="Enter 1 hour chart link"
-                  onChange={handleInputChange}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
+        <ScreenshotLinksSection 
+          formData={formData}
+          onInputChange={handleInputChange}
+        />
 
         <div className="flex gap-4 mt-6">
           <Button onClick={handleSubmit} className="flex-1">Create Session</Button>

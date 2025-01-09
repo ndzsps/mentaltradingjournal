@@ -35,18 +35,27 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
     if (!entry.trades || entry.trades.length === 0) return null;
 
     let totalPL = 0;
+    let tradeCount = 0;
+
     entry.trades.forEach(trade => {
-      // Get the P&L value from either profit_loss or pnl field
-      const tradeValue = trade.profit_loss || trade.pnl || 0;
-      // Convert string to number if necessary and add to total
-      const numericValue = typeof tradeValue === 'string' ? parseFloat(tradeValue) : tradeValue;
-      totalPL += numericValue;
-      console.log('Trade value:', tradeValue, 'Numeric value:', numericValue, 'Running total:', totalPL);
+      if (trade) {
+        tradeCount++;
+        // Get the P&L value from either profit_loss or pnl field
+        const tradeValue = trade.profit_loss || trade.pnl || 0;
+        // Convert string to number if necessary and add to total
+        const numericValue = typeof tradeValue === 'string' ? parseFloat(tradeValue) : tradeValue;
+        totalPL += numericValue;
+        console.log('Trade:', trade);
+        console.log('Trade value:', tradeValue);
+        console.log('Numeric value:', numericValue);
+        console.log('Running total:', totalPL);
+        console.log('Trade count:', tradeCount);
+      }
     });
 
     return {
       totalPL,
-      numTrades: entry.trades.length,
+      numTrades: tradeCount,
     };
   };
 

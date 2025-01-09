@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { startOfWeek, endOfWeek, format, addWeeks, isWithinInterval, subWeeks } from "date-fns";
+import { startOfWeek, endOfWeek, format, addWeeks, isWithinInterval, subWeeks, getWeek } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -15,8 +15,9 @@ interface WeekSummary {
 export const WeeklyPerformance = () => {
   const { user } = useAuth();
   const currentDate = new Date();
+  const currentWeek = getWeek(currentDate);
   const monthStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-  const firstWeekStart = startOfWeek(monthStart);
+  const firstWeekOfMonth = getWeek(monthStart);
 
   const { data: weeklyStats, isLoading } = useQuery({
     queryKey: ['weekly-performance'],
@@ -27,7 +28,7 @@ export const WeeklyPerformance = () => {
         .from('journal_entries')
         .select('*')
         .eq('user_id', user.id)
-        .gte('created_at', firstWeekStart.toISOString())
+        .gte('created_at', monthStart.toISOString())
         .lte('created_at', endOfWeek(currentDate).toISOString());
 
       if (error) throw error;
@@ -42,24 +43,26 @@ export const WeeklyPerformance = () => {
       // Process entries
       (entries as JournalEntryType[])?.forEach(entry => {
         const entryDate = new Date(entry.created_at);
-        const entryWeekStart = startOfWeek(entryDate);
+        const entryWeek = getWeek(entryDate);
         
-        // Calculate which week number this entry belongs to (1-based)
-        const weekDiff = Math.floor(
-          (entryWeekStart.getTime() - firstWeekStart.getTime()) / (7 * 24 * 60 * 60 * 1000)
-        ) + 1;
+        // Calculate relative week number (1-based)
+        const weekNumber = entryWeek - firstWeekOfMonth + 1;
 
-        if (weekDiff >= 1 && weekDiff <= 5) {
+        if (weekNumber >= 1 && weekNumber <= 5) {
           const trades = (entry.trades || []) as Trade[];
           const dailyPnL = trades.reduce((sum, trade) => 
             sum + (Number(trade.pnl) || 0), 0);
           
-          weeks[weekDiff - 1].totalPnL += dailyPnL;
+          weeks[weekNumber - 1].totalPnL += dailyPnL;
           if (dailyPnL !== 0) {
-            weeks[weekDiff - 1].tradingDays += 1;
+            weeks[weekNumber - 1].tradingDays += 1;
           }
         }
       });
+
+      console.log('Current week:', currentWeek);
+      console.log('First week of month:', firstWeekOfMonth);
+      console.log('Processed weeks:', weeks);
 
       return weeks;
     },

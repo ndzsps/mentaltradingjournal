@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { startOfWeek, endOfWeek, format, addWeeks, isWithinInterval } from "date-fns";
+import { startOfWeek, endOfWeek, format, addWeeks, isWithinInterval, subWeeks } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -15,13 +15,15 @@ interface WeekSummary {
 export const WeeklyPerformance = () => {
   const { user } = useAuth();
   const currentDate = new Date();
+  const currentWeekStart = startOfWeek(currentDate);
 
   const { data: weeklyStats, isLoading } = useQuery({
     queryKey: ['weekly-performance'],
     queryFn: async () => {
       if (!user) return [];
 
-      const startDate = startOfWeek(addWeeks(currentDate, -4));
+      // Get entries from 4 weeks ago until now
+      const startDate = startOfWeek(subWeeks(currentDate, 3));
       const endDate = endOfWeek(currentDate);
 
       const { data: entries, error } = await supabase
@@ -33,34 +35,36 @@ export const WeeklyPerformance = () => {
 
       if (error) throw error;
 
+      // Initialize weeks array (5 weeks)
       const weeks: WeekSummary[] = Array.from({ length: 5 }, (_, i) => ({
         weekNumber: i + 1,
         totalPnL: 0,
         tradingDays: 0,
       }));
 
+      // Process entries
       (entries as JournalEntryType[])?.forEach(entry => {
         const entryDate = new Date(entry.created_at);
+        const entryWeekStart = startOfWeek(entryDate);
         
-        for (let i = 0; i < 5; i++) {
-          const weekStart = startOfWeek(addWeeks(currentDate, -4 + i));
-          const weekEnd = endOfWeek(addWeeks(currentDate, -4 + i));
+        // Calculate which week number this entry belongs to
+        const weekDiff = Math.floor(
+          (entryWeekStart.getTime() - startDate.getTime()) / (7 * 24 * 60 * 60 * 1000)
+        ) + 1;
+
+        if (weekDiff >= 1 && weekDiff <= 5) {
+          const trades = (entry.trades || []) as Trade[];
+          const dailyPnL = trades.reduce((sum, trade) => 
+            sum + (Number(trade.pnl) || 0), 0);
           
-          if (isWithinInterval(entryDate, { start: weekStart, end: weekEnd })) {
-            const trades = (entry.trades || []) as Trade[];
-            const dailyPnL = trades.reduce((sum, trade) => 
-              sum + (Number(trade.pnl) || 0), 0);
-            
-            weeks[i].totalPnL += dailyPnL;
-            if (dailyPnL !== 0) {
-              weeks[i].tradingDays += 1;
-            }
-            break;
+          weeks[weekDiff - 1].totalPnL += dailyPnL;
+          if (dailyPnL !== 0) {
+            weeks[weekDiff - 1].tradingDays += 1;
           }
         }
       });
 
-      return weeks.sort((a, b) => a.weekNumber - b.weekNumber);
+      return weeks;
     },
   });
 
@@ -80,7 +84,7 @@ export const WeeklyPerformance = () => {
   }
 
   return (
-    <div className="flex flex-col justify-between h-[calc(100vh-20rem)] pt-[150px]">
+    <div className="flex flex-col h-[calc(100vh-20rem)] pt-[150px]">
       {weeklyStats?.map((week) => (
         <div key={week.weekNumber} className="px-2 mb-6">
           <Card

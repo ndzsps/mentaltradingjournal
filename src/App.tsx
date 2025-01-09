@@ -9,6 +9,7 @@ import Landing from "./pages/Landing";
 import Index from "./pages/Index";
 import Journal from "./pages/Journal";
 import Analytics from "./pages/Analytics";
+import Backtesting from "./pages/Backtesting";
 import Login from "./pages/Login";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 
@@ -73,6 +74,14 @@ const App = () => {
                     element={
                       <ProtectedRoute>
                         <Analytics />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/backtesting"
+                    element={
+                      <ProtectedRoute>
+                        <Backtesting />
                       </ProtectedRoute>
                     }
                   />

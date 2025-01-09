@@ -66,17 +66,16 @@ export const WeeklyPerformance = () => {
         }
       });
 
-      // Sort weeks in ascending order by weekNumber
       return weeks.sort((a, b) => a.weekNumber - b.weekNumber);
     },
   });
 
   if (isLoading) {
     return (
-      <div className="space-y-[2.75rem] pt-[4.5rem]">
+      <div className="grid grid-rows-6 gap-0 h-full pt-14">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="animate-pulse">
-            <Card className="p-4 space-y-2 bg-primary/5">
+          <div key={i} className="animate-pulse h-32 flex items-center">
+            <Card className="p-4 space-y-2 bg-primary/5 w-full">
               <div className="h-4 bg-primary/10 rounded w-1/3"></div>
               <div className="h-6 bg-primary/10 rounded w-2/3"></div>
               <div className="h-4 bg-primary/10 rounded w-1/4"></div>
@@ -88,28 +87,29 @@ export const WeeklyPerformance = () => {
   }
 
   return (
-    <div className="space-y-[2.75rem] pt-[4.5rem]">
+    <div className="grid grid-rows-6 gap-0 h-full pt-14">
       {weeklyStats?.map((week) => (
-        <Card
-          key={week.weekNumber}
-          className="p-4 space-y-2 bg-card/30 backdrop-blur-xl border-primary/10 hover:border-primary/20 transition-colors"
-        >
-          <p className={`text-sm font-medium ${week.totalPnL === 0 ? 'text-muted-foreground' : ''}`}>
-            Week {week.weekNumber}
-          </p>
-          <p className={`text-lg font-bold ${
-            week.totalPnL > 0 
-              ? 'text-emerald-500 dark:text-emerald-400'
-              : week.totalPnL < 0
-                ? 'text-red-500 dark:text-red-400'
-                : 'text-muted-foreground'
-          }`}>
-            ${week.totalPnL.toFixed(2)}
-          </p>
-          <p className="text-sm text-muted-foreground">
-            {week.tradingDays} {week.tradingDays === 1 ? 'day' : 'days'}
-          </p>
-        </Card>
+        <div key={week.weekNumber} className="h-32 flex items-center">
+          <Card
+            className="p-4 space-y-2 bg-card/30 backdrop-blur-xl border-primary/10 hover:border-primary/20 transition-colors w-full"
+          >
+            <p className={`text-sm font-medium ${week.totalPnL === 0 ? 'text-muted-foreground' : ''}`}>
+              Week {week.weekNumber}
+            </p>
+            <p className={`text-lg font-bold ${
+              week.totalPnL > 0 
+                ? 'text-emerald-500 dark:text-emerald-400'
+                : week.totalPnL < 0
+                  ? 'text-red-500 dark:text-red-400'
+                  : 'text-muted-foreground'
+            }`}>
+              ${week.totalPnL.toFixed(2)}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {week.tradingDays} {week.tradingDays === 1 ? 'day' : 'days'}
+            </p>
+          </Card>
+        </div>
       ))}
     </div>
   );

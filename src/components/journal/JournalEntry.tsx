@@ -12,8 +12,9 @@ interface JournalEntry {
   notes: string;
   outcome?: string;
   market_conditions?: string;
-  trades?: Trade[];
   followed_rules?: string[];
+  trades?: Trade[];
+  screenshots?: string[];
 }
 
 interface JournalEntryProps {
@@ -44,6 +45,7 @@ export const JournalEntry = ({ entry }: JournalEntryProps) => {
           notes={entry.notes}
           followedRules={entry.followed_rules}
           trades={entry.trades}
+          screenshots={entry.screenshots}
         />
       </div>
     </Card>

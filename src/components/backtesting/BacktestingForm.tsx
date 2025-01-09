@@ -17,11 +17,19 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string().optional(),
+  playbook_id: z.string().optional(),
   marketType: z.string().min(1, "Market type is required"),
   symbol: z.string().min(1, "Symbol is required"),
   startBalance: z.number().min(1, "Start balance must be greater than 0"),
@@ -36,11 +44,25 @@ export function BacktestingForm() {
   const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const { data: blueprints } = useQuery({
+    queryKey: ["trading-blueprints"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("trading_blueprints")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       description: "",
+      playbook_id: "",
       marketType: "",
       symbol: "",
       startBalance: 10000,
@@ -59,6 +81,7 @@ export function BacktestingForm() {
         user_id: user.id,
         name: values.name,
         description: values.description,
+        playbook_id: values.playbook_id,
         market_type: values.marketType,
         symbol: values.symbol,
         start_balance: values.startBalance,
@@ -119,6 +142,31 @@ export function BacktestingForm() {
                     {...field}
                   />
                 </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="playbook_id"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Trading Blueprint</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a trading blueprint" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {blueprints?.map((blueprint) => (
+                      <SelectItem key={blueprint.id} value={blueprint.id}>
+                        {blueprint.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}

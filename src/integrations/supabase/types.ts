@@ -171,6 +171,48 @@ export type Database = {
         }
         Relationships: []
       }
+      trading_blueprints: {
+        Row: {
+          created_at: string
+          description: string | null
+          entry_rules: string[] | null
+          exit_rules: string[] | null
+          id: string
+          name: string
+          risk_management: string[] | null
+          rules: string[] | null
+          setup_criteria: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          entry_rules?: string[] | null
+          exit_rules?: string[] | null
+          id?: string
+          name: string
+          risk_management?: string[] | null
+          rules?: string[] | null
+          setup_criteria?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          entry_rules?: string[] | null
+          exit_rules?: string[] | null
+          id?: string
+          name?: string
+          risk_management?: string[] | null
+          rules?: string[] | null
+          setup_criteria?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

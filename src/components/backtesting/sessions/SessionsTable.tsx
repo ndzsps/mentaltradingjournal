@@ -20,6 +20,13 @@ const formatCurrency = (value: number) => {
   }).format(value);
 };
 
+const formatNumber = (value: number) => {
+  return new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value);
+};
+
 const renderUrlLink = (url: string | null, label: string) => {
   return url ? (
     <a 
@@ -73,11 +80,11 @@ export const SessionsTable = ({ sessions }: SessionsTableProps) => {
                   {session.direction ? session.direction.toUpperCase() : '-'}
                 </span>
               </TableCell>
-              <TableCell className="text-right">{formatCurrency(session.entryPrice)}</TableCell>
-              <TableCell className="text-right">{formatCurrency(session.exitPrice)}</TableCell>
+              <TableCell className="text-right">{formatNumber(session.entryPrice)}</TableCell>
+              <TableCell className="text-right">{formatNumber(session.exitPrice)}</TableCell>
               <TableCell className="text-right">{session.quantity}</TableCell>
-              <TableCell className="text-right">{formatCurrency(session.stopLoss)}</TableCell>
-              <TableCell className="text-right">{formatCurrency(session.takeProfit)}</TableCell>
+              <TableCell className="text-right">{formatNumber(session.stopLoss)}</TableCell>
+              <TableCell className="text-right">{formatNumber(session.takeProfit)}</TableCell>
               <TableCell className={`text-right font-medium ${
                 session.pnl >= 0 ? 'text-green-600' : 'text-red-600'
               }`}>

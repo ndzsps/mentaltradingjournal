@@ -19,6 +19,11 @@ interface FormData {
   fees: number;
   beforeUrl: string;
   afterUrl: string;
+  weeklyUrl: string;
+  dailyUrl: string;
+  fourHourUrl: string;
+  oneHourUrl: string;
+  refinedEntryUrl: string;
 }
 
 export function useBacktestingForm(userId: string | undefined, navigate: (path: string) => void) {
@@ -42,7 +47,12 @@ export function useBacktestingForm(userId: string | undefined, navigate: (path: 
     pnl: 0,
     fees: 0,
     beforeUrl: '',
-    afterUrl: ''
+    afterUrl: '',
+    weeklyUrl: '',
+    dailyUrl: '',
+    fourHourUrl: '',
+    oneHourUrl: '',
+    refinedEntryUrl: ''
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -94,7 +104,6 @@ export function useBacktestingForm(userId: string | undefined, navigate: (path: 
     }
 
     try {
-      // First fetch the blueprint details
       const { data: blueprint, error: blueprintError } = await supabase
         .from("trading_blueprints")
         .select("*")
@@ -103,7 +112,6 @@ export function useBacktestingForm(userId: string | undefined, navigate: (path: 
 
       if (blueprintError) throw blueprintError;
 
-      // Create the backtesting session with blueprint data
       const { error } = await supabase
         .from("backtesting_sessions")
         .insert({
@@ -128,7 +136,12 @@ export function useBacktestingForm(userId: string | undefined, navigate: (path: 
           pnl: formData.pnl,
           fees: formData.fees,
           before_url: formData.beforeUrl,
-          after_url: formData.afterUrl
+          after_url: formData.afterUrl,
+          weekly_url: formData.weeklyUrl,
+          daily_url: formData.dailyUrl,
+          four_hour_url: formData.fourHourUrl,
+          one_hour_url: formData.oneHourUrl,
+          refined_entry_url: formData.refinedEntryUrl
         });
 
       if (error) throw error;

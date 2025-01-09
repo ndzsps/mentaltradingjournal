@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -95,6 +96,66 @@ export function BacktestingForm() {
             formData={formData}
             onInputChange={handleInputChange}
           />
+        </div>
+
+        <div className="mt-6 p-4 border rounded-lg bg-background/50">
+          <h3 className="text-lg font-semibold mb-4">Screenshots</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-3">
+              <div className="grid w-full items-center gap-1.5">
+                <Label htmlFor="weeklyUrl">Weekly Chart URL</Label>
+                <Input
+                  type="url"
+                  id="weeklyUrl"
+                  name="weeklyUrl"
+                  placeholder="Enter weekly chart URL"
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="grid w-full items-center gap-1.5">
+                <Label htmlFor="dailyUrl">Daily Chart URL</Label>
+                <Input
+                  type="url"
+                  id="dailyUrl"
+                  name="dailyUrl"
+                  placeholder="Enter daily chart URL"
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="grid w-full items-center gap-1.5">
+                <Label htmlFor="fourHourUrl">4 Hour Chart URL</Label>
+                <Input
+                  type="url"
+                  id="fourHourUrl"
+                  name="fourHourUrl"
+                  placeholder="Enter 4 hour chart URL"
+                  onChange={handleInputChange}
+                />
+              </div>
+            </div>
+            <div className="space-y-3">
+              <div className="grid w-full items-center gap-1.5">
+                <Label htmlFor="oneHourUrl">1 Hour Chart URL</Label>
+                <Input
+                  type="url"
+                  id="oneHourUrl"
+                  name="oneHourUrl"
+                  placeholder="Enter 1 hour chart URL"
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="grid w-full items-center gap-1.5">
+                <Label htmlFor="refinedEntryUrl">Refined Entry URL</Label>
+                <Input
+                  type="url"
+                  id="refinedEntryUrl"
+                  name="refinedEntryUrl"
+                  placeholder="Enter refined entry URL"
+                  onChange={handleInputChange}
+                />
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="flex gap-4 mt-6">

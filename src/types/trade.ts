@@ -1,19 +1,18 @@
 export interface Trade {
-  id: string;
-  entryDate: string;
-  instrument: string;
-  setup: string;
-  direction: 'buy' | 'sell';
-  entryPrice: number;
-  quantity: number;
-  stopLoss: number;
-  takeProfit: number;
-  exitDate: string;
-  exitPrice: number;
-  pnl: number;
-  profit_loss?: number; // Adding this optional field for backward compatibility
-  fees: number;
+  id?: string;
+  instrument?: string;
+  direction?: 'buy' | 'sell';
+  entryDate?: string;
+  exitDate?: string;
+  entryPrice?: number;
+  exitPrice?: number;
+  stopLoss?: number;
+  takeProfit?: number;
+  quantity?: number;
+  fees?: number;
+  setup?: string;
+  pnl?: number | string;
+  profit_loss?: number | string;
   forecastScreenshot?: string;
   resultScreenshot?: string;
-  htfBias?: string;
 }

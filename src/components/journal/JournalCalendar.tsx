@@ -2,6 +2,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Card } from "@/components/ui/card";
 import { DayProps } from "react-day-picker";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Trade } from "@/types/trade";
 
 interface JournalCalendarProps {
   date: Date | undefined;
@@ -9,12 +10,7 @@ interface JournalCalendarProps {
   entries: Array<{
     date: Date;
     emotion: string;
-    trades?: Array<{
-      profit_loss?: number;
-      pnl?: number | string;
-      risk_reward?: number;
-      win?: boolean;
-    }>;
+    trades?: Trade[];
   }>;
 }
 

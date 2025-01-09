@@ -21,7 +21,7 @@ import { useState } from "react";
 
 const menuItems = [
   { title: "Journal Entry", icon: Home, url: "/journal-entry" },
-  { title: "Journal", icon: BookOpen, url: "/journal" },
+  { title: "Dashboard", icon: BookOpen, url: "/dashboard" },
   { title: "Analytics", icon: BarChart2, url: "/analytics" },
   { title: "Settings", icon: Settings, url: "/settings" },
 ];

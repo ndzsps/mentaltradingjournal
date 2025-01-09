@@ -28,7 +28,7 @@ export function AppHeader() {
   
   const navigationItems = [
     { icon: Home, label: "Home", path: "/" },
-    { icon: BookOpen, label: "Journal", path: "/journal" },
+    { icon: BookOpen, label: "Dashboard", path: "/dashboard" },
     { icon: BarChart2, label: "Analytics", path: "/analytics" },
   ];
 

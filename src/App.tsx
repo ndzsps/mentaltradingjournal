@@ -61,7 +61,7 @@ const App = () => {
                     }
                   />
                   <Route
-                    path="/journal"
+                    path="/dashboard"
                     element={
                       <ProtectedRoute>
                         <Journal />

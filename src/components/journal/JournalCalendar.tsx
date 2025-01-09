@@ -140,7 +140,7 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
                   {stats && (
                     <div className="absolute inset-0 flex flex-col justify-end p-2 bg-gradient-to-t from-white/90 to-transparent dark:from-gray-900/90">
                       <div className="space-y-1 text-center w-full">
-                        <p className={`text-base font-semibold tabular-nums tracking-tight ${stats.totalPL >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}`}>
+                        <p className={`text-lg font-semibold ${stats.totalPL >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}`}>
                           {formatCurrency(stats.totalPL)}
                         </p>
                         <p className="text-xs text-gray-600 dark:text-gray-300">

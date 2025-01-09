@@ -20,18 +20,34 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export const BlueprintDashboard = () => {
-  const { data: blueprints, isLoading } = useQuery({
+  const { data: blueprints, isLoading, error } = useQuery({
     queryKey: ["blueprints"],
     queryFn: async () => {
+      console.log("Fetching blueprints...");
       const { data, error } = await supabase
         .from("trading_blueprints")
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching blueprints:", error);
+        throw error;
+      }
+      
+      console.log("Fetched blueprints:", data);
       return data;
     },
   });
+
+  if (error) {
+    return (
+      <div className="container mx-auto p-4">
+        <div className="bg-destructive/10 text-destructive p-4 rounded-lg">
+          <p>Error loading blueprints. Please try again later.</p>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (

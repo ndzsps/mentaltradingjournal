@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { startOfWeek, endOfWeek, format, addWeeks, isWithinInterval } from "date-fns";
+import { startOfWeek, endOfWeek, format, addWeeks, isWithinInterval, subWeeks } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -21,7 +21,8 @@ export const WeeklyPerformance = () => {
     queryFn: async () => {
       if (!user) return [];
 
-      const startDate = startOfWeek(addWeeks(currentDate, -4));
+      // Start from 4 weeks ago
+      const startDate = startOfWeek(subWeeks(currentDate, 4));
       const endDate = endOfWeek(currentDate);
 
       const { data: entries, error } = await supabase
@@ -33,8 +34,9 @@ export const WeeklyPerformance = () => {
 
       if (error) throw error;
 
+      // Initialize weeks array with 5 weeks (current week and 4 previous weeks)
       const weeks: WeekSummary[] = Array.from({ length: 5 }, (_, i) => ({
-        weekNumber: i + 1,
+        weekNumber: 5 - i, // Week 5 is current week, Week 1 is 4 weeks ago
         totalPnL: 0,
         tradingDays: 0,
       }));
@@ -42,9 +44,10 @@ export const WeeklyPerformance = () => {
       (entries as JournalEntryType[])?.forEach(entry => {
         const entryDate = new Date(entry.created_at);
         
+        // Calculate which week the entry belongs to
         for (let i = 0; i < 5; i++) {
-          const weekStart = startOfWeek(addWeeks(currentDate, -4 + i));
-          const weekEnd = endOfWeek(addWeeks(currentDate, -4 + i));
+          const weekStart = startOfWeek(subWeeks(currentDate, 4 - i));
+          const weekEnd = endOfWeek(subWeeks(currentDate, 4 - i));
           
           if (isWithinInterval(entryDate, { start: weekStart, end: weekEnd })) {
             const trades = (entry.trades || []) as Trade[];
@@ -60,7 +63,7 @@ export const WeeklyPerformance = () => {
         }
       });
 
-      return weeks.sort((a, b) => a.weekNumber - b.weekNumber);
+      return weeks;
     },
   });
 

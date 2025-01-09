@@ -23,13 +23,12 @@ import {
 interface Session {
   id: string;
   name: string;
-  instrument: string;
-  direction: 'buy' | 'sell';
-  entryPrice: number;
-  quantity: number;
-  stopLoss: number;
-  takeProfit: number;
-  pnl: number;
+  symbol: string;
+  market_type: string;
+  start_balance: number;
+  leverage: number;
+  start_date: string;
+  end_date: string;
   created_at: string;
 }
 
@@ -66,7 +65,7 @@ export default function BlueprintSessions() {
       .order("created_at", { ascending: false });
 
     if (!error && data) {
-      setSessions(data as Session[]);
+      setSessions(data);
     }
   };
 
@@ -100,38 +99,26 @@ export default function BlueprintSessions() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Instrument</TableHead>
-                  <TableHead>Direction</TableHead>
-                  <TableHead className="text-right">Entry Price</TableHead>
-                  <TableHead className="text-right">Quantity</TableHead>
-                  <TableHead className="text-right">Stop Loss</TableHead>
-                  <TableHead className="text-right">Take Profit</TableHead>
-                  <TableHead className="text-right">P&L</TableHead>
+                  <TableHead>Symbol</TableHead>
+                  <TableHead>Market Type</TableHead>
+                  <TableHead className="text-right">Start Balance</TableHead>
+                  <TableHead className="text-right">Leverage</TableHead>
+                  <TableHead>Start Date</TableHead>
+                  <TableHead>End Date</TableHead>
                   <TableHead className="w-[50px]"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {sessions.map((session) => (
                   <TableRow key={session.id}>
-                    <TableCell>{session.instrument}</TableCell>
-                    <TableCell>
-                      <span className={`font-medium ${
-                        session.direction === 'buy' 
-                          ? 'text-green-600' 
-                          : 'text-red-600'
-                      }`}>
-                        {session.direction.toUpperCase()}
-                      </span>
+                    <TableCell>{session.symbol}</TableCell>
+                    <TableCell>{session.market_type}</TableCell>
+                    <TableCell className="text-right">
+                      {formatCurrency(session.start_balance)}
                     </TableCell>
-                    <TableCell className="text-right">{formatCurrency(session.entryPrice)}</TableCell>
-                    <TableCell className="text-right">{session.quantity}</TableCell>
-                    <TableCell className="text-right">{formatCurrency(session.stopLoss)}</TableCell>
-                    <TableCell className="text-right">{formatCurrency(session.takeProfit)}</TableCell>
-                    <TableCell className={`text-right font-medium ${
-                      session.pnl >= 0 ? 'text-green-600' : 'text-red-600'
-                    }`}>
-                      {formatCurrency(session.pnl)}
-                    </TableCell>
+                    <TableCell className="text-right">{session.leverage}x</TableCell>
+                    <TableCell>{new Date(session.start_date).toLocaleDateString()}</TableCell>
+                    <TableCell>{new Date(session.end_date).toLocaleDateString()}</TableCell>
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>

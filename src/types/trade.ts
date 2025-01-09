@@ -15,4 +15,5 @@ export interface Trade {
   profit_loss?: number | string;
   forecastScreenshot?: string;
   resultScreenshot?: string;
+  htfBias?: string;
 }

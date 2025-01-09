@@ -67,15 +67,15 @@ export const PostSessionSection = ({
                   : value === "win"
                     ? "bg-gradient-to-br from-[#40C057] to-[#69DB7C] text-white shadow-lg shadow-green-500/20"
                     : value === "breakeven"
-                      ? "bg-gradient-to-br from-[#868E96] to-[#ADB5BD] text-white shadow-lg shadow-gray-500/20"
-                      : "bg-gradient-to-br from-[#FAB005] to-[#FFD43B] text-white shadow-lg shadow-yellow-500/20"
+                      ? "bg-gradient-to-br from-[#FAB005] to-[#FFD43B] text-white shadow-lg shadow-yellow-500/20"
+                      : "bg-gradient-to-br from-[#D3E4FD] to-[#A5C8FF] text-white shadow-lg shadow-blue-500/20"
                 : value === "loss"
                   ? "hover:bg-gradient-to-br hover:from-[#FFF5F5] hover:to-[#FFE3E3] hover:border-[#FF8787]/50 group-hover:text-[#FA5252]"
                   : value === "win"
                     ? "hover:bg-gradient-to-br hover:from-[#EBFBEE] hover:to-[#D3F9D8] hover:border-[#69DB7C]/50 group-hover:text-[#37B24D]"
                     : value === "breakeven"
-                      ? "hover:bg-gradient-to-br hover:from-[#F1F3F5] hover:to-[#DEE2E6] hover:border-[#ADB5BD]/50 group-hover:text-[#495057]"
-                      : "hover:bg-gradient-to-br hover:from-[#FFF9DB] hover:to-[#FFE066] hover:border-[#FFD43B]/50 group-hover:text-[#F59F00]"
+                      ? "hover:bg-gradient-to-br hover:from-[#FFF9DB] hover:to-[#FFE066] hover:border-[#FFD43B]/50 group-hover:text-[#F59F00]"
+                      : "hover:bg-gradient-to-br hover:from-[#EBF5FF] hover:to-[#D3E4FD] hover:border-[#A5C8FF]/50 group-hover:text-[#228BE6]"
             }`}
             onClick={() => setSelectedOutcome(value)}
           >
@@ -88,8 +88,8 @@ export const PostSessionSection = ({
                     : value === "win"
                       ? "text-[#37B24D] group-hover:text-[#37B24D]"
                       : value === "breakeven"
-                        ? "text-[#495057] group-hover:text-[#495057]"
-                        : "text-[#F59F00] group-hover:text-[#F59F00]"
+                        ? "text-[#F59F00] group-hover:text-[#F59F00]"
+                        : "text-[#228BE6] group-hover:text-[#228BE6]"
               }`} />
               <span className={`font-medium ${
                 selectedOutcome === value 
@@ -99,8 +99,8 @@ export const PostSessionSection = ({
                     : value === "win"
                       ? "text-[#37B24D] group-hover:text-[#37B24D]"
                       : value === "breakeven"
-                        ? "text-[#495057] group-hover:text-[#495057]"
-                        : "text-[#F59F00] group-hover:text-[#F59F00]"
+                        ? "text-[#F59F00] group-hover:text-[#F59F00]"
+                        : "text-[#228BE6] group-hover:text-[#228BE6]"
               }`}>
                 {capitalizeWords(label)}
               </span>

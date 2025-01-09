@@ -48,10 +48,23 @@ export const WeeklyPerformance = () => {
         // Calculate relative week number (1-based)
         const weekNumber = entryWeek - firstWeekOfMonth + 1;
 
+        console.log('Processing entry:', {
+          date: entryDate,
+          entryWeek,
+          firstWeekOfMonth,
+          calculatedWeekNumber: weekNumber,
+          trades: entry.trades
+        });
+
         if (weekNumber >= 1 && weekNumber <= 5) {
           const trades = (entry.trades || []) as Trade[];
-          const dailyPnL = trades.reduce((sum, trade) => 
-            sum + (Number(trade.pnl) || 0), 0);
+          const dailyPnL = trades.reduce((sum, trade) => {
+            const pnl = Number(trade.pnl) || 0;
+            console.log('Trade PnL:', pnl);
+            return sum + pnl;
+          }, 0);
+          
+          console.log('Daily PnL for week', weekNumber, ':', dailyPnL);
           
           weeks[weekNumber - 1].totalPnL += dailyPnL;
           if (dailyPnL !== 0) {

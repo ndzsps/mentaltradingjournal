@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
-import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
+import { generateAnalytics } from "@/utils/analyticsUtils";
 import { RiskRewardChart } from "./risk-reward/RiskRewardChart";
 import { RiskRewardInsight } from "./risk-reward/RiskRewardInsight";
 
@@ -9,7 +9,7 @@ export const RiskRewardAnalysis = () => {
     queryKey: ['analytics'],
     queryFn: generateAnalytics,
   });
-  
+
   if (isLoading || !analytics) {
     return (
       <Card className="p-4 md:p-6 space-y-4">
@@ -21,63 +21,28 @@ export const RiskRewardAnalysis = () => {
     );
   }
 
-  // Process trades to calculate risk/reward data
-  const data = analytics.journalEntries
-    .flatMap(entry => entry.trades || [])
-    .map(trade => {
-      const entryPrice = Number(trade.entryPrice);
-      const stopLoss = Number(trade.stopLoss);
-      const takeProfit = Number(trade.takeProfit);
-      const size = Number(trade.quantity);
-      
-      // Calculate risk and reward based on trade direction
-      let risk, reward;
-      
-      if (trade.direction === 'buy') {
-        // For long positions
-        risk = Math.abs(entryPrice - stopLoss);
-        reward = Math.abs(takeProfit - entryPrice);
-      } else {
-        // For short positions
-        risk = Math.abs(stopLoss - entryPrice);
-        reward = Math.abs(entryPrice - takeProfit);
-      }
+  const { riskRewardData } = analytics;
 
-      return {
-        risk,
-        reward,
-        size,
-        direction: trade.direction,
-      };
-    })
-    .filter(d => d.risk > 0 && d.reward > 0); // Filter out invalid data
-
-  // Calculate average risk:reward ratio
-  const avgRiskReward = Math.round(
-    data.reduce((sum, item) => sum + (item.reward / item.risk), 0) / (data.length || 1)
+  // Filter out trades with invalid risk/reward values
+  const validTrades = riskRewardData.filter(trade => 
+    trade.risk > 0 && 
+    trade.reward > 0 && 
+    !isNaN(trade.risk) && 
+    !isNaN(trade.reward)
   );
-
-  // Calculate percentage of trades with favorable ratio
-  const favorableRatioPercentage = data.filter(d => 
-    Math.round(d.reward / d.risk) >= 2
-  ).length / data.length;
 
   return (
     <Card className="p-4 md:p-6 space-y-4">
       <div className="space-y-2">
         <h3 className="text-xl md:text-2xl font-bold">Risk/Reward Analysis</h3>
         <p className="text-sm text-muted-foreground">
-          Visualization of risk vs reward ratios in your trades
+          Analyze your risk management and potential returns
         </p>
       </div>
 
-      <RiskRewardChart data={data} />
-
-      <RiskRewardInsight 
-        avgRiskReward={avgRiskReward}
-        favorableRatioPercentage={favorableRatioPercentage}
-        hasData={data.length > 0}
-      />
+      <RiskRewardChart data={validTrades} />
+      
+      <RiskRewardInsight data={validTrades} />
     </Card>
   );
 };

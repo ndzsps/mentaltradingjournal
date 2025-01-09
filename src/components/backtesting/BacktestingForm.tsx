@@ -37,6 +37,7 @@ export function BacktestingForm() {
   const [blueprints, setBlueprints] = useState<Blueprint[]>([]);
   const [selectedBlueprint, setSelectedBlueprint] = useState<string>();
   const [direction, setDirection] = useState<'buy' | 'sell' | null>(null);
+  const [validationError, setValidationError] = useState<string>("");
   const { user } = useAuth();
   const navigate = useNavigate();
   
@@ -95,14 +96,35 @@ export function BacktestingForm() {
     }));
   };
 
+  const validateForm = () => {
+    if (!selectedBlueprint) {
+      setValidationError("Please select a playbook");
+      return false;
+    }
+    if (!formData.instrument) {
+      setValidationError("Please enter an instrument");
+      return false;
+    }
+    if (!direction) {
+      setValidationError("Please select a direction (buy/sell)");
+      return false;
+    }
+    if (!formData.entryPrice) {
+      setValidationError("Please enter an entry price");
+      return false;
+    }
+    setValidationError("");
+    return true;
+  };
+
   const handleSubmit = async () => {
-    if (!user || !selectedBlueprint) {
-      toast.error("Please select a playbook first");
+    if (!validateForm()) {
+      toast.error("Please fill in all required fields");
       return;
     }
 
-    if (!formData.instrument || !formData.direction || !formData.entryPrice) {
-      toast.error("Please fill in all required fields");
+    if (!user || !selectedBlueprint) {
+      toast.error("Please select a playbook first");
       return;
     }
 
@@ -112,10 +134,10 @@ export function BacktestingForm() {
         .insert({
           user_id: user.id,
           playbook_id: selectedBlueprint,
-          name: `${formData.instrument} ${formData.direction.toUpperCase()} Session`,
-          market_type: "forex", // You might want to make this configurable
+          name: `${formData.instrument} ${direction?.toUpperCase()} Session`,
+          market_type: "forex",
           symbol: formData.instrument,
-          start_balance: 10000, // You might want to make this configurable
+          start_balance: 10000,
           start_date: formData.entryDate || new Date().toISOString(),
           end_date: formData.exitDate || new Date().toISOString(),
         });
@@ -137,7 +159,7 @@ export function BacktestingForm() {
       </CardHeader>
       <CardContent>
         <div className="mb-6">
-          <Label htmlFor="playbook">Select Playbook</Label>
+          <Label htmlFor="playbook">Select Playbook *</Label>
           <Select value={selectedBlueprint} onValueChange={setSelectedBlueprint}>
             <SelectTrigger className="w-full mt-2">
               <SelectValue placeholder="Choose a playbook" />
@@ -152,31 +174,25 @@ export function BacktestingForm() {
           </Select>
         </div>
 
+        {validationError && (
+          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+            {validationError}
+          </div>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* General Section */}
           <div className="space-y-4 p-6 bg-background/50 border rounded-lg">
             <h3 className="text-lg font-semibold">General</h3>
             
             <div className="space-y-2">
-              <Label htmlFor="entry-date">Entry Date</Label>
+              <Label htmlFor="entryDate">Entry Date</Label>
               <Input
                 type="date"
                 id="entryDate"
                 value={formData.entryDate}
                 onChange={handleInputChange}
                 className="flex-1"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="entry-duration">Duration (minutes)</Label>
-              <Input
-                type="number"
-                id="entryDuration"
-                value={formData.entryDuration}
-                onChange={handleInputChange}
-                placeholder="Enter duration in minutes"
-                min="0"
               />
             </div>
 
@@ -228,10 +244,12 @@ export function BacktestingForm() {
             <h3 className="text-lg font-semibold">Trade Entry</h3>
             
             <div className="space-y-2">
-              <Label htmlFor="entry-price">Entry Price *</Label>
+              <Label htmlFor="entryPrice">Entry Price *</Label>
               <Input
                 type="number"
-                id="entry-price"
+                id="entryPrice"
+                value={formData.entryPrice || ''}
+                onChange={handleInputChange}
                 placeholder="0.00"
                 step="0.01"
               />
@@ -242,36 +260,33 @@ export function BacktestingForm() {
               <Input
                 type="number"
                 id="quantity"
+                value={formData.quantity || ''}
+                onChange={handleInputChange}
                 placeholder="Enter lot size or contracts"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="stop-loss">Stop Loss</Label>
+              <Label htmlFor="stopLoss">Stop Loss</Label>
               <Input
                 type="number"
-                id="stop-loss"
+                id="stopLoss"
+                value={formData.stopLoss || ''}
+                onChange={handleInputChange}
                 placeholder="0.00"
                 step="0.01"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="take-profit">Take Profit</Label>
+              <Label htmlFor="takeProfit">Take Profit</Label>
               <Input
                 type="number"
-                id="take-profit"
+                id="takeProfit"
+                value={formData.takeProfit || ''}
+                onChange={handleInputChange}
                 placeholder="0.00"
                 step="0.01"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="forecast-screenshot">Forecast Screenshot URL</Label>
-              <Input
-                type="url"
-                id="forecast-screenshot"
-                placeholder="Enter screenshot URL"
               />
             </div>
           </div>
@@ -281,29 +296,23 @@ export function BacktestingForm() {
             <h3 className="text-lg font-semibold">Trade Exit</h3>
             
             <div className="space-y-2">
-              <Label htmlFor="exit-date">Exit Date</Label>
+              <Label htmlFor="exitDate">Exit Date</Label>
               <Input
-                type="datetime-local"
-                id="exit-date"
+                type="date"
+                id="exitDate"
+                value={formData.exitDate}
+                onChange={handleInputChange}
                 className="flex-1"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="exit-duration">Duration (minutes)</Label>
+              <Label htmlFor="exitPrice">Exit Price</Label>
               <Input
                 type="number"
-                id="exit-duration"
-                placeholder="Enter duration in minutes"
-                min="0"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="exit-price">Exit Price</Label>
-              <Input
-                type="number"
-                id="exit-price"
+                id="exitPrice"
+                value={formData.exitPrice || ''}
+                onChange={handleInputChange}
                 placeholder="0.00"
                 step="0.01"
               />
@@ -314,6 +323,8 @@ export function BacktestingForm() {
               <Input
                 type="number"
                 id="pnl"
+                value={formData.pnl || ''}
+                onChange={handleInputChange}
                 placeholder="0.00"
                 step="0.01"
               />
@@ -324,17 +335,10 @@ export function BacktestingForm() {
               <Input
                 type="number"
                 id="fees"
+                value={formData.fees || ''}
+                onChange={handleInputChange}
                 placeholder="0.00"
                 step="0.01"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="result-screenshot">Result Screenshot URL</Label>
-              <Input
-                type="url"
-                id="result-screenshot"
-                placeholder="Enter screenshot URL"
               />
             </div>
           </div>
@@ -342,7 +346,7 @@ export function BacktestingForm() {
 
         <div className="flex gap-4 mt-6">
           <Button onClick={handleSubmit} className="flex-1">Create Session</Button>
-          <Button variant="outline" className="flex-1">Cancel</Button>
+          <Button variant="outline" className="flex-1" onClick={() => navigate('/backtesting')}>Cancel</Button>
         </div>
       </CardContent>
     </Card>

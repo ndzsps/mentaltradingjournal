@@ -92,6 +92,7 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
         mode="single"
         selected={date}
         onSelect={handleDateSelect}
+        showOutsideDays={false}
         className="w-full"
         classNames={{
           months: "w-full space-y-4",

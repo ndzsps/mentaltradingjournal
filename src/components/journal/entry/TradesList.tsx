@@ -28,6 +28,7 @@ export const TradesList = ({ trades }: TradesListProps) => {
   return (
     <Accordion type="single" collapsible className="w-full space-y-2">
       {trades.map((trade, index) => {
+        console.log(`Trade ${index}:`, trade);
         console.log(`Trade ${index} screenshots:`, {
           forecast: trade.forecastScreenshot,
           result: trade.resultScreenshot
@@ -59,7 +60,7 @@ export const TradesList = ({ trades }: TradesListProps) => {
                   <div className="space-y-3">
                     <h4 className="text-sm font-medium text-muted-foreground">Entry Details</h4>
                     <div className="space-y-2">
-                      <p className="text-sm">Date: {formatDate(trade.entryDate)}</p>
+                      <p className="text-sm">Date: {formatDate(trade.entryDate || '')}</p>
                       <p className="text-sm">Price: {trade.entryPrice}</p>
                       <p className="text-sm">Stop Loss: {trade.stopLoss}</p>
                       <p className="text-sm">Take Profit: {trade.takeProfit}</p>
@@ -68,7 +69,7 @@ export const TradesList = ({ trades }: TradesListProps) => {
                   <div className="space-y-3">
                     <h4 className="text-sm font-medium text-muted-foreground">Exit Details</h4>
                     <div className="space-y-2">
-                      <p className="text-sm">Date: {formatDate(trade.exitDate)}</p>
+                      <p className="text-sm">Date: {formatDate(trade.exitDate || '')}</p>
                       <p className="text-sm">Price: {trade.exitPrice}</p>
                       <p className="text-sm">Quantity: {trade.quantity}</p>
                       <p className="text-sm">Fees: {trade.fees}</p>

@@ -60,7 +60,6 @@ export const useJournalFormSubmission = ({
 
     // Validate post-session requirements
     if (sessionType === "post") {
-      // First check if there are any trades
       if (trades.length === 0 && selectedOutcome !== "no_trades") {
         toast.error("Trades Required", {
           description: "Please add at least one trade before submitting your post-session entry.",
@@ -69,7 +68,6 @@ export const useJournalFormSubmission = ({
         return;
       }
 
-      // Then check other required fields
       if (!selectedEmotion || !selectedEmotionDetail || !notes || !selectedOutcome || !marketConditions || followedRules?.length === 0) {
         toast.error("Missing Information", {
           description: "Please fill in all required fields for post-session.",
@@ -80,6 +78,25 @@ export const useJournalFormSubmission = ({
     }
 
     try {
+      // Format trades as JSONB array
+      const formattedTrades = trades.map(trade => ({
+        id: trade.id,
+        entryDate: trade.entryDate,
+        instrument: trade.instrument,
+        setup: trade.setup,
+        direction: trade.direction,
+        entryPrice: trade.entryPrice.toString(),
+        quantity: trade.quantity.toString(),
+        stopLoss: trade.stopLoss.toString(),
+        takeProfit: trade.takeProfit.toString(),
+        exitDate: trade.exitDate,
+        exitPrice: trade.exitPrice.toString(),
+        pnl: trade.pnl.toString(),
+        fees: trade.fees.toString(),
+        forecastScreenshot: trade.forecastScreenshot,
+        resultScreenshot: trade.resultScreenshot,
+      }));
+
       const { error } = await supabase.from('journal_entries').insert({
         user_id: user.id,
         session_type: sessionType,
@@ -91,16 +108,7 @@ export const useJournalFormSubmission = ({
         followed_rules: followedRules,
         mistakes: selectedMistakes,
         pre_trading_activities: preTradingActivities,
-        trades: sessionType === "post" ? trades.map(trade => ({
-          ...trade,
-          entryPrice: trade.entryPrice.toString(),
-          quantity: trade.quantity.toString(),
-          stopLoss: trade.stopLoss.toString(),
-          takeProfit: trade.takeProfit.toString(),
-          exitPrice: trade.exitPrice.toString(),
-          pnl: trade.pnl.toString(),
-          fees: trade.fees.toString(),
-        })) : [],
+        trades: formattedTrades,
       });
 
       if (error) throw error;

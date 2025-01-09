@@ -12,6 +12,7 @@ import { useJournalFilters } from "@/hooks/useJournalFilters";
 import { JournalEntryType } from "@/types/journal";
 import { StatsHeader } from "@/components/journal/stats/StatsHeader";
 import { TimeFilterProvider } from "@/contexts/TimeFilterContext";
+import { startOfDay, endOfDay, isSameDay } from "date-fns";
 
 const Journal = () => {
   const [entries, setEntries] = useState<JournalEntryType[]>([]);
@@ -46,10 +47,6 @@ const Journal = () => {
       }
 
       console.log('Fetched entries:', data);
-      console.log('Entries for January 7th:', data?.filter(entry => 
-        new Date(entry.created_at).toDateString() === new Date('2024-01-07').toDateString()
-      ));
-
       setEntries(data || []);
     };
 
@@ -75,6 +72,13 @@ const Journal = () => {
       subscription.unsubscribe();
     };
   }, [user]);
+
+  // Filter entries based on selected date
+  const displayedEntries = selectedDate
+    ? filteredEntries.filter(entry => 
+        isSameDay(new Date(entry.created_at), selectedDate)
+      )
+    : filteredEntries;
 
   return (
     <AppLayout>
@@ -102,7 +106,15 @@ const Journal = () => {
           <Card className="p-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
-                Journal Entries
+                {selectedDate 
+                  ? `Journal Entries for ${selectedDate.toLocaleDateString('en-US', { 
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}`
+                  : 'Journal Entries'
+                }
               </h2>
               <JournalFilters
                 emotionFilter={emotionFilter}
@@ -118,15 +130,18 @@ const Journal = () => {
             </div>
             
             <ScrollArea className="h-[600px] pr-4">
-              {filteredEntries.length > 0 ? (
+              {displayedEntries.length > 0 ? (
                 <div className="space-y-4">
-                  {filteredEntries.map((entry) => (
+                  {displayedEntries.map((entry) => (
                     <JournalEntry key={entry.id} entry={entry} />
                   ))}
                 </div>
               ) : (
                 <p className="text-muted-foreground text-center py-8">
-                  No entries found for the selected filters
+                  {selectedDate 
+                    ? `No entries found for ${selectedDate.toLocaleDateString()}`
+                    : 'No entries found for the selected filters'
+                  }
                 </p>
               )}
             </ScrollArea>

@@ -10,31 +10,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 
-export function BacktestingForm({ onPlaybookSelect }: { onPlaybookSelect: (playbook: any) => void }) {
+export function BacktestingForm() {
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
-
-  const { data: playbooks } = useQuery({
-    queryKey: ['playbooks'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('trading_blueprints')
-        .select('*');
-      
-      if (error) throw error;
-      return data;
-    }
-  });
-
-  const handlePlaybookSelect = (playbookId: string) => {
-    const selectedPlaybook = playbooks?.find(p => p.id === playbookId);
-    if (selectedPlaybook) {
-      onPlaybookSelect(selectedPlaybook);
-    }
-  };
 
   return (
     <Card className="w-full">
@@ -54,16 +33,13 @@ export function BacktestingForm({ onPlaybookSelect }: { onPlaybookSelect: (playb
 
         <div className="space-y-2">
           <Label>Connect to playbook</Label>
-          <Select onValueChange={handlePlaybookSelect}>
+          <Select>
             <SelectTrigger>
               <SelectValue placeholder="Select a playbook" />
             </SelectTrigger>
             <SelectContent>
-              {playbooks?.map((playbook) => (
-                <SelectItem key={playbook.id} value={playbook.id}>
-                  {playbook.name}
-                </SelectItem>
-              ))}
+              <SelectItem value="playbook1">Playbook 1</SelectItem>
+              <SelectItem value="playbook2">Playbook 2</SelectItem>
             </SelectContent>
           </Select>
         </div>

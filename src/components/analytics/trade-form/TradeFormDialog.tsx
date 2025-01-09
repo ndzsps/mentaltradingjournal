@@ -24,16 +24,22 @@ export const TradeFormDialog = ({
   const [activeTab, setActiveTab] = useState<string>("regular");
   const [uploading, setUploading] = useState(false);
   const [screenshots, setScreenshots] = useState<string[]>([]);
+  const [formData, setFormData] = useState<Partial<Trade>>({});
 
   useEffect(() => {
     if (editTrade) {
       setDirection(editTrade.direction);
       setScreenshots(editTrade.screenshots || []);
+      setFormData(editTrade);
     }
   }, [editTrade]);
 
   const handleScreenshotUpload = (url: string) => {
     setScreenshots([...screenshots, url]);
+  };
+
+  const handleFormDataChange = (data: Partial<Trade>) => {
+    setFormData(data);
   };
 
   const handleSubmit = (tradeData: Trade, isEdit: boolean) => {
@@ -60,6 +66,8 @@ export const TradeFormDialog = ({
               onSubmit={handleSubmit}
               editTrade={editTrade}
               onOpenChange={onOpenChange}
+              formData={formData}
+              onFormDataChange={handleFormDataChange}
             />
           </TabsContent>
           <TabsContent value="screenshots" className="mt-0 p-6 border-t">

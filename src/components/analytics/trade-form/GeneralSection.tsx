@@ -1,13 +1,21 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Trade } from "@/types/trade";
 
 interface GeneralSectionProps {
   direction: 'buy' | 'sell' | null;
   setDirection: (direction: 'buy' | 'sell') => void;
+  formData: Partial<Trade>;
+  onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-export const GeneralSection = ({ direction, setDirection }: GeneralSectionProps) => {
+export const GeneralSection = ({ 
+  direction, 
+  setDirection,
+  formData,
+  onInputChange
+}: GeneralSectionProps) => {
   const setTodayDate = (inputId: string) => {
     const now = new Date();
     const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
@@ -16,6 +24,8 @@ export const GeneralSection = ({ direction, setDirection }: GeneralSectionProps)
     const input = document.getElementById(inputId) as HTMLInputElement;
     if (input) {
       input.value = localDateTime;
+      const event = new Event('change', { bubbles: true });
+      input.dispatchEvent(event);
     }
   };
 
@@ -31,6 +41,8 @@ export const GeneralSection = ({ direction, setDirection }: GeneralSectionProps)
               id="entryDate"
               name="entryDate"
               className="w-full"
+              value={formData.entryDate || ''}
+              onChange={onInputChange}
             />
             <Button 
               type="button" 
@@ -49,6 +61,8 @@ export const GeneralSection = ({ direction, setDirection }: GeneralSectionProps)
             id="instrument"
             name="instrument"
             placeholder="e.g., EUR/USD, AAPL"
+            value={formData.instrument || ''}
+            onChange={onInputChange}
           />
         </div>
         <div className="grid w-full items-center gap-1.5">
@@ -58,6 +72,8 @@ export const GeneralSection = ({ direction, setDirection }: GeneralSectionProps)
             id="setup"
             name="setup"
             placeholder="Enter your trading setup"
+            value={formData.setup || ''}
+            onChange={onInputChange}
           />
         </div>
         <div className="grid w-full gap-1.5">

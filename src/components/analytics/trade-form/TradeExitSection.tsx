@@ -1,8 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Trade } from "@/types/trade";
 
-export const TradeExitSection = () => {
+interface TradeExitSectionProps {
+  formData: Partial<Trade>;
+  onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+export const TradeExitSection = ({ formData, onInputChange }: TradeExitSectionProps) => {
   const setTodayDate = (inputId: string) => {
     const now = new Date();
     const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
@@ -11,6 +17,8 @@ export const TradeExitSection = () => {
     const input = document.getElementById(inputId) as HTMLInputElement;
     if (input) {
       input.value = localDateTime;
+      const event = new Event('change', { bubbles: true });
+      input.dispatchEvent(event);
     }
   };
 
@@ -26,6 +34,8 @@ export const TradeExitSection = () => {
               id="exitDate"
               name="exitDate"
               className="w-full"
+              value={formData.exitDate || ''}
+              onChange={onInputChange}
             />
             <Button 
               type="button" 
@@ -45,6 +55,8 @@ export const TradeExitSection = () => {
             name="exitPrice"
             placeholder="0.00"
             step="0.01"
+            value={formData.exitPrice || ''}
+            onChange={onInputChange}
           />
         </div>
         <div className="grid w-full items-center gap-1.5">
@@ -55,6 +67,8 @@ export const TradeExitSection = () => {
             name="pnl"
             placeholder="0.00"
             step="0.01"
+            value={formData.pnl || ''}
+            onChange={onInputChange}
           />
         </div>
         <div className="grid w-full items-center gap-1.5">
@@ -65,6 +79,8 @@ export const TradeExitSection = () => {
             name="fees"
             placeholder="0.00"
             step="0.01"
+            value={formData.fees || ''}
+            onChange={onInputChange}
           />
         </div>
       </div>

@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowDownIcon, ArrowUpIcon } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { format } from "date-fns";
 
 interface TradesListProps {
   trades: Trade[];
@@ -12,7 +13,7 @@ export const TradesList = ({ trades }: TradesListProps) => {
   return (
     <ScrollArea className="h-[300px]">
       <div className="space-y-4">
-        {trades.map((trade, index) => (
+        {trades.map((trade) => (
           <Card key={trade.id} className="p-4 bg-card/50">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
@@ -41,13 +42,46 @@ export const TradesList = ({ trades }: TradesListProps) => {
 
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
+                  <p className="text-muted-foreground">Setup</p>
+                  <p>{trade.setup}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Quantity</p>
+                  <p>{trade.quantity}</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
                   <p className="text-muted-foreground">Entry</p>
-                  <p>{trade.entryPrice}</p>
+                  <p className="font-medium">{trade.entryPrice}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {format(new Date(trade.entryDate), "MMM d, yyyy HH:mm")}
+                  </p>
                 </div>
                 <div>
                   <p className="text-muted-foreground">Exit</p>
-                  <p>{trade.exitPrice}</p>
+                  <p className="font-medium">{trade.exitPrice}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {format(new Date(trade.exitDate), "MMM d, yyyy HH:mm")}
+                  </p>
                 </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="text-muted-foreground">Stop Loss</p>
+                  <p>{trade.stopLoss}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Take Profit</p>
+                  <p>{trade.takeProfit}</p>
+                </div>
+              </div>
+
+              <div className="text-sm">
+                <p className="text-muted-foreground">Fees</p>
+                <p>{trade.fees}</p>
               </div>
 
               {/* Screenshots Section */}

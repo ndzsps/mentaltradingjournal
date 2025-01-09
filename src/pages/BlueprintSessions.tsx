@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, MoreVertical } from "lucide-react";
+import { ArrowLeft, MoreVertical, ExternalLink } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -33,6 +33,8 @@ interface Session {
   takeProfit: number;
   pnl: number;
   fees: number;
+  beforeUrl?: string;
+  afterUrl?: string;
 }
 
 export default function BlueprintSessions() {
@@ -68,7 +70,6 @@ export default function BlueprintSessions() {
       .order("created_at", { ascending: false });
 
     if (!error && data) {
-      // Map the database fields to our Session interface
       const mappedSessions = data.map(session => ({
         id: session.id,
         entryDate: session.entry_date || '',
@@ -82,6 +83,8 @@ export default function BlueprintSessions() {
         takeProfit: session.take_profit || 0,
         pnl: session.pnl || 0,
         fees: session.fees || 0,
+        beforeUrl: session.before_url,
+        afterUrl: session.after_url,
       }));
       setSessions(mappedSessions);
     }
@@ -128,6 +131,8 @@ export default function BlueprintSessions() {
                   <TableHead className="text-right">Take Profit</TableHead>
                   <TableHead className="text-right">P&L</TableHead>
                   <TableHead className="text-right">Fees</TableHead>
+                  <TableHead className="text-center">Before</TableHead>
+                  <TableHead className="text-center">After</TableHead>
                   <TableHead className="w-[50px]"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -159,6 +164,30 @@ export default function BlueprintSessions() {
                       {formatCurrency(session.pnl)}
                     </TableCell>
                     <TableCell className="text-right">{formatCurrency(session.fees)}</TableCell>
+                    <TableCell className="text-center">
+                      {session.beforeUrl ? (
+                        <a 
+                          href={session.beforeUrl} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-800"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                        </a>
+                      ) : '-'}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {session.afterUrl ? (
+                        <a 
+                          href={session.afterUrl} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-800"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                        </a>
+                      ) : '-'}
+                    </TableCell>
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>

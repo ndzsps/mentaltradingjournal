@@ -58,6 +58,15 @@ export const TradeExitSection = () => {
           />
         </div>
         <div className="grid w-full items-center gap-1.5">
+          <Label htmlFor="beforeUrl">Before Screenshot URL</Label>
+          <Input
+            type="url"
+            id="beforeUrl"
+            name="beforeUrl"
+            placeholder="Enter before screenshot URL"
+          />
+        </div>
+        <div className="grid w-full items-center gap-1.5">
           <Label htmlFor="fees">Fees</Label>
           <Input
             type="number"
@@ -68,12 +77,12 @@ export const TradeExitSection = () => {
           />
         </div>
         <div className="grid w-full items-center gap-1.5">
-          <Label htmlFor="resultScreenshot">Result Screenshot URL</Label>
+          <Label htmlFor="afterUrl">After Screenshot URL</Label>
           <Input
             type="url"
-            id="resultScreenshot"
-            name="resultScreenshot"
-            placeholder="Enter screenshot URL"
+            id="afterUrl"
+            name="afterUrl"
+            placeholder="Enter after screenshot URL"
           />
         </div>
       </div>

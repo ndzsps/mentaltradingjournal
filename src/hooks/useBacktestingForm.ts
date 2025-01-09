@@ -17,8 +17,8 @@ interface FormData {
   exitPrice: number;
   pnl: number;
   fees: number;
-  forecastScreenshot: string;
-  resultScreenshot: string;
+  beforeUrl: string;
+  afterUrl: string;
 }
 
 export function useBacktestingForm(userId: string | undefined, navigate: (path: string) => void) {
@@ -41,8 +41,8 @@ export function useBacktestingForm(userId: string | undefined, navigate: (path: 
     exitPrice: 0,
     pnl: 0,
     fees: 0,
-    forecastScreenshot: '',
-    resultScreenshot: ''
+    beforeUrl: '',
+    afterUrl: ''
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -126,7 +126,9 @@ export function useBacktestingForm(userId: string | undefined, navigate: (path: 
           stop_loss: formData.stopLoss,
           take_profit: formData.takeProfit,
           pnl: formData.pnl,
-          fees: formData.fees
+          fees: formData.fees,
+          before_url: formData.beforeUrl,
+          after_url: formData.afterUrl
         });
 
       if (error) throw error;

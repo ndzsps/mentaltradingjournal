@@ -1,4 +1,4 @@
-import { Home, BookOpen, BarChart2, Settings, UserCog } from "lucide-react";
+import { Home, BookOpen, BarChart2, Settings, UserCog, LineChart } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
   Sidebar,
@@ -23,6 +23,7 @@ const menuItems = [
   { title: "Journal Entry", icon: Home, url: "/journal-entry" },
   { title: "Dashboard", icon: BookOpen, url: "/dashboard" },
   { title: "Analytics", icon: BarChart2, url: "/analytics" },
+  { title: "Backtesting", icon: LineChart, url: "/backtesting" },
   { title: "Settings", icon: Settings, url: "/settings" },
 ];
 

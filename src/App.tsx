@@ -76,6 +76,19 @@ const App = () => {
                       </ProtectedRoute>
                     }
                   />
+                  <Route
+                    path="/backtesting"
+                    element={
+                      <ProtectedRoute>
+                        <div className="container mx-auto p-4">
+                          <h1 className="text-2xl font-bold mb-4">Backtesting</h1>
+                          <p className="text-muted-foreground">
+                            This feature is coming soon. Stay tuned!
+                          </p>
+                        </div>
+                      </ProtectedRoute>
+                    }
+                  />
                 </Routes>
               </BrowserRouter>
             </TooltipProvider>

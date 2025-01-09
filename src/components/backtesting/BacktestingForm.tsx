@@ -123,12 +123,12 @@ export function BacktestingForm() {
                 />
               </div>
               <div className="grid w-full items-center gap-1.5">
-                <Label htmlFor="oneHourUrl">1 HR</Label>
+                <Label htmlFor="refinedEntryUrl">Refined Entry</Label>
                 <Input
                   type="url"
-                  id="oneHourUrl"
-                  name="oneHourUrl"
-                  placeholder="Enter 1 hour chart link"
+                  id="refinedEntryUrl"
+                  name="refinedEntryUrl"
+                  placeholder="Enter refined entry link"
                   onChange={handleInputChange}
                 />
               </div>
@@ -145,12 +145,12 @@ export function BacktestingForm() {
                 />
               </div>
               <div className="grid w-full items-center gap-1.5">
-                <Label htmlFor="refinedEntryUrl">Refined Entry</Label>
+                <Label htmlFor="oneHourUrl">1 HR</Label>
                 <Input
                   type="url"
-                  id="refinedEntryUrl"
-                  name="refinedEntryUrl"
-                  placeholder="Enter refined entry link"
+                  id="oneHourUrl"
+                  name="oneHourUrl"
+                  placeholder="Enter 1 hour chart link"
                   onChange={handleInputChange}
                 />
               </div>

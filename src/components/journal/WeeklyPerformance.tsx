@@ -82,7 +82,7 @@ export const WeeklyPerformance = () => {
   return (
     <div className="flex flex-col justify-between h-[calc(100vh-12rem)] pt-[150px]">
       {weeklyStats?.map((week) => (
-        <div key={week.weekNumber} className="px-2 mb-4">
+        <div key={week.weekNumber} className="px-2 mb-6">
           <Card
             className="p-4 bg-card/30 backdrop-blur-xl border-primary/10 hover:border-primary/20 transition-colors w-full h-[4.5rem] flex flex-col justify-center"
           >

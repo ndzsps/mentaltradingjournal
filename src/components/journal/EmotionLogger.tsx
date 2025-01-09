@@ -13,6 +13,8 @@ import { emotions, tradingOutcome, mistakeCategories, tradingRules } from "./emo
 import { AddTradeDialog } from "../analytics/AddTradeDialog";
 import { Trade } from "@/types/trade";
 import { FormSubmissionSection } from "./FormSubmissionSection";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { HelpCircle } from "lucide-react";
 
 const PRE_TRADING_ACTIVITIES = [
   "Meditation",
@@ -100,9 +102,23 @@ export const EmotionLogger = () => {
     <div className="grid gap-6 lg:grid-cols-[1fr,300px]">
       <Card className="p-8 space-y-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
         <div className="space-y-4">
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
-            {sessionType === "pre" ? "Pre-Session Check-in" : "Post-Session Review"}
-          </h2>
+          <div className="flex items-center gap-2">
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
+              {sessionType === "pre" ? "Pre-Session Check-in" : "Post-Session Review"}
+            </h2>
+            {sessionType === "pre" && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <HelpCircle className="w-5 h-5 text-muted-foreground" />
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-[300px] p-4">
+                    <p>Pre-sessions are designed to be completed daily before your post-session entry to help you track your mood. Many traders overlook this step, but it plays a significant role in improving your performance and decision-making over time.</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+          </div>
           
           <SessionTypeSelector
             sessionType={sessionType}

@@ -38,7 +38,7 @@ const CustomTooltip = ({ active, payload }: any) => {
             <div className="w-2 h-2 rounded-full bg-primary" />
             <span className="text-muted-foreground">R:R Ratio:</span>
             <span className="font-medium text-foreground">
-              {(data.reward / data.risk).toFixed(2)}:1
+              {Math.round(data.reward / data.risk)}:1
             </span>
           </div>
         </div>
@@ -86,7 +86,7 @@ export const RiskRewardAnalysis = () => {
     .filter(d => d.risk > 0 && d.reward > 0); // Filter out invalid data
 
   // Calculate average risk:reward ratio
-  const avgRiskReward = data.reduce((sum, item) => sum + (item.reward / item.risk), 0) / (data.length || 1);
+  const avgRiskReward = Math.round(data.reduce((sum, item) => sum + (item.reward / item.risk), 0) / (data.length || 1));
 
   return (
     <Card className="p-4 md:p-6 space-y-4">
@@ -137,13 +137,13 @@ export const RiskRewardAnalysis = () => {
           {data.length > 0 ? (
             <>
               <p>
-                Your average risk:reward ratio is {avgRiskReward.toFixed(2)}:1.
+                Your average risk:reward ratio is {avgRiskReward}:1.
                 {avgRiskReward >= 2 
                   ? " This is a healthy ratio that supports long-term profitability."
                   : " Consider adjusting your take profit levels to improve this ratio."}
               </p>
               <p>
-                {data.filter(d => d.reward / d.risk >= 2).length / data.length >= 0.7
+                {data.filter(d => Math.round(d.reward / d.risk) >= 2).length / data.length >= 0.7
                   ? "The majority of your trades maintain a favorable risk:reward ratio."
                   : "Look for setups that offer better reward potential relative to risk."}
               </p>

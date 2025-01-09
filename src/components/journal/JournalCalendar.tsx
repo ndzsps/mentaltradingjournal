@@ -34,12 +34,15 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
   const calculateDayStats = (entry: typeof entries[0]) => {
     if (!entry.trades || entry.trades.length === 0) return null;
 
-    const totalPL = entry.trades.reduce((sum, trade) => {
-      // Check for both profit_loss and pnl fields
+    let totalPL = 0;
+    entry.trades.forEach(trade => {
+      // Get the P&L value from either profit_loss or pnl field
       const tradeValue = trade.profit_loss || trade.pnl || 0;
-      // Convert string to number if necessary
-      return sum + (typeof tradeValue === 'string' ? parseFloat(tradeValue) : tradeValue);
-    }, 0);
+      // Convert string to number if necessary and add to total
+      const numericValue = typeof tradeValue === 'string' ? parseFloat(tradeValue) : tradeValue;
+      totalPL += numericValue;
+      console.log('Trade value:', tradeValue, 'Numeric value:', numericValue, 'Running total:', totalPL);
+    });
 
     return {
       totalPL,

@@ -42,24 +42,15 @@ export const useWeeklyStats = () => {
         const entryWeek = getWeek(entryDate);
         const weekNumber = entryWeek - firstWeekOfMonth + 1;
 
-        console.log('Processing entry:', {
-          date: entryDate,
-          entryWeek,
-          firstWeekOfMonth,
-          calculatedWeekNumber: weekNumber,
-          trades: entry.trades
-        });
-
         if (weekNumber >= 1 && weekNumber <= 5) {
           const trades = (entry.trades || []) as Trade[];
           const dailyPnL = trades.reduce((sum, trade) => {
-            const pnl = Number(trade.pnl) || 0;
-            console.log('Trade PnL:', pnl);
-            return sum + pnl;
+            // Convert PnL value to number, handling both string and number types
+            const pnlValue = trade.pnl || trade.profit_loss || 0;
+            const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
+            return sum + (isNaN(numericPnL) ? 0 : numericPnL);
           }, 0);
-          
-          console.log('Daily PnL for week', weekNumber, ':', dailyPnL);
-          
+
           weeks[weekNumber - 1].totalPnL += dailyPnL;
           if (dailyPnL !== 0) {
             weeks[weekNumber - 1].tradingDays += 1;

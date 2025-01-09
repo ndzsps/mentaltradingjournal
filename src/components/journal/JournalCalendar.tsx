@@ -49,15 +49,10 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
           if (trade) {
             totalTrades++;
             // Get the P&L value from either profit_loss or pnl field
-            const tradeValue = trade.profit_loss || trade.pnl || 0;
-            // Convert string to number if necessary and add to total
-            const numericValue = typeof tradeValue === 'string' ? parseFloat(tradeValue) : tradeValue;
-            totalPL += numericValue;
-            console.log('Processing trade:', trade);
-            console.log('Trade value:', tradeValue);
-            console.log('Numeric value:', numericValue);
-            console.log('Running total:', totalPL);
-            console.log('Trade count:', totalTrades);
+            const pnlValue = trade.pnl || trade.profit_loss || 0;
+            // Convert to number, handling both string and number types
+            const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
+            totalPL += isNaN(numericPnL) ? 0 : numericPnL;
           }
         });
       }

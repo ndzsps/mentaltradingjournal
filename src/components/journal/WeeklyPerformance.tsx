@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { startOfWeek, endOfWeek, format, isWithinInterval, subWeeks } from "date-fns";
+import { startOfWeek, endOfWeek, format, addWeeks, isWithinInterval } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -21,11 +21,7 @@ export const WeeklyPerformance = () => {
     queryFn: async () => {
       if (!user) return [];
 
-      // Get the start of the current week
-      const currentWeekStart = startOfWeek(currentDate);
-      
-      // Start date is 4 weeks before the current week
-      const startDate = startOfWeek(subWeeks(currentDate, 4));
+      const startDate = startOfWeek(addWeeks(currentDate, -4));
       const endDate = endOfWeek(currentDate);
 
       const { data: entries, error } = await supabase
@@ -37,30 +33,20 @@ export const WeeklyPerformance = () => {
 
       if (error) throw error;
 
-      // Initialize weeks array (1 is current week, 5 is oldest week)
       const weeks: WeekSummary[] = Array.from({ length: 5 }, (_, i) => ({
         weekNumber: i + 1,
         totalPnL: 0,
         tradingDays: 0,
       }));
 
-      console.log('Current date:', currentDate);
-      console.log('Start date:', startDate);
-      console.log('End date:', endDate);
-
       (entries as JournalEntryType[])?.forEach(entry => {
         const entryDate = new Date(entry.created_at);
-        console.log('Processing entry date:', entryDate);
         
-        // Find which week this entry belongs to
         for (let i = 0; i < 5; i++) {
-          const weekStart = startOfWeek(subWeeks(currentDate, i));
-          const weekEnd = endOfWeek(subWeeks(currentDate, i));
-          
-          console.log(`Week ${i + 1} - Start: ${weekStart}, End: ${weekEnd}`);
+          const weekStart = startOfWeek(addWeeks(currentDate, -4 + i));
+          const weekEnd = endOfWeek(addWeeks(currentDate, -4 + i));
           
           if (isWithinInterval(entryDate, { start: weekStart, end: weekEnd })) {
-            console.log(`Entry belongs to week ${i + 1}`);
             const trades = (entry.trades || []) as Trade[];
             const dailyPnL = trades.reduce((sum, trade) => 
               sum + (Number(trade.pnl) || 0), 0);
@@ -74,8 +60,7 @@ export const WeeklyPerformance = () => {
         }
       });
 
-      // Sort weeks to display from oldest to newest (5 to 1)
-      return weeks.reverse();
+      return weeks.sort((a, b) => a.weekNumber - b.weekNumber);
     },
   });
 
@@ -95,7 +80,7 @@ export const WeeklyPerformance = () => {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-20rem)] pt-[150px]">
+    <div className="flex flex-col justify-between h-[calc(100vh-20rem)] pt-[150px]">
       {weeklyStats?.map((week) => (
         <div key={week.weekNumber} className="px-2 mb-6">
           <Card

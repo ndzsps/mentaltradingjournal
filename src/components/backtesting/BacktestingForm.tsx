@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/popover";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { DateRange } from "react-day-picker";
 
 type BacktestFormData = {
   name: string;
@@ -39,8 +40,7 @@ type BacktestFormData = {
   market_type: string;
   symbol: string;
   start_balance: number;
-  start_date: Date;
-  end_date: Date;
+  dateRange: DateRange | undefined;
   leverage: number;
 };
 
@@ -50,6 +50,7 @@ export const BacktestingForm = () => {
   const form = useForm<BacktestFormData>({
     defaultValues: {
       leverage: 1.1,
+      dateRange: undefined,
     },
   });
 
@@ -67,10 +68,16 @@ export const BacktestingForm = () => {
   });
 
   const onSubmit = async (data: BacktestFormData) => {
+    if (!data.dateRange?.from || !data.dateRange?.to) {
+      return;
+    }
+
     try {
       const { error } = await supabase.from("backtesting_sessions").insert({
         ...data,
         user_id: user?.id,
+        start_date: data.dateRange.from.toISOString(),
+        end_date: data.dateRange.to.toISOString(),
       });
 
       if (error) throw error;
@@ -218,7 +225,7 @@ export const BacktestingForm = () => {
 
             <FormField
               control={form.control}
-              name="start_date"
+              name="dateRange"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
                   <FormLabel>Date range*</FormLabel>
@@ -233,8 +240,15 @@ export const BacktestingForm = () => {
                           )}
                         >
                           <CalendarIcon className="mr-2 h-4 w-4" />
-                          {field.value ? (
-                            format(field.value, "PPP")
+                          {field.value?.from ? (
+                            field.value.to ? (
+                              <>
+                                {format(field.value.from, "LLL dd, y")} -{" "}
+                                {format(field.value.to, "LLL dd, y")}
+                              </>
+                            ) : (
+                              format(field.value.from, "LLL dd, y")
+                            )
                           ) : (
                             <span>Select date range</span>
                           )}
@@ -243,10 +257,12 @@ export const BacktestingForm = () => {
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
                       <Calendar
+                        initialFocus
                         mode="range"
+                        defaultMonth={field.value?.from}
                         selected={field.value}
                         onSelect={field.onChange}
-                        initialFocus
+                        numberOfMonths={2}
                       />
                     </PopoverContent>
                   </Popover>

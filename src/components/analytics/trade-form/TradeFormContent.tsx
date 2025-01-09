@@ -55,8 +55,8 @@ export const TradeFormContent = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col flex-1">
-      <div className="flex-1 p-6 space-y-4">
+    <form onSubmit={handleSubmit} className="flex flex-col h-full max-h-[85vh] overflow-y-auto">
+      <div className="flex-1 p-4 space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="p-4 border rounded-lg bg-background/50">
             <GeneralSection direction={direction} setDirection={setDirection} />
@@ -70,7 +70,7 @@ export const TradeFormContent = ({
         </div>
         <TradeScreenshotsSection />
       </div>
-      <div className="p-6 pt-0 border-t">
+      <div className="sticky bottom-0 mt-4 p-4 bg-background border-t">
         <Button type="submit" className="w-full">
           {editTrade ? 'Update' : 'Submit'}
         </Button>

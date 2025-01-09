@@ -5,6 +5,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus } from "lucide-react";
 import { Trade } from "@/types/trade";
 import { TradingOutcome, MistakeCategory, TradingRule } from "./types";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { HelpCircle } from "lucide-react";
 
 interface PostSessionSectionProps {
   selectedOutcome: string;
@@ -126,14 +128,26 @@ export const PostSessionSection = ({
       </div>
 
       <div className="space-y-6">
-        <Button
-          onClick={onAddTrade}
-          className="flex items-center gap-2 bg-[#0EA5E9] hover:bg-[#0EA5E9]/90 text-white shadow-lg shadow-[#0EA5E9]/20"
-          size="sm"
-        >
-          <Plus className="w-4 h-4" />
-          Add Trade {trades.length > 0 && `(${trades.length})`}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={onAddTrade}
+            className="flex items-center gap-2 bg-[#0EA5E9] hover:bg-[#0EA5E9]/90 text-white shadow-lg shadow-[#0EA5E9]/20"
+            size="sm"
+          >
+            <Plus className="w-4 h-4" />
+            Add Trade {trades.length > 0 && `(${trades.length})`}
+          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <HelpCircle className="w-4 h-4 text-muted-foreground" />
+              </TooltipTrigger>
+              <TooltipContent className="max-w-[300px] p-4">
+                <p>You can add multiple trades by clicking 'Add Trade' before submitting your post-session review.</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
 
         <div className="space-y-4">
           <Label className="text-lg font-medium">Trading Rules Followed</Label>

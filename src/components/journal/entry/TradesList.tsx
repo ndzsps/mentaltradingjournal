@@ -3,11 +3,24 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowDownIcon, ArrowUpIcon } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { format } from "date-fns";
+import { format, isValid, parseISO } from "date-fns";
 
 interface TradesListProps {
   trades: Trade[];
 }
+
+const formatDate = (dateString: string) => {
+  try {
+    const date = parseISO(dateString);
+    if (!isValid(date)) {
+      return "Invalid date";
+    }
+    return format(date, "MMM d, yyyy HH:mm");
+  } catch (error) {
+    console.error("Error formatting date:", error);
+    return "Invalid date";
+  }
+};
 
 export const TradesList = ({ trades }: TradesListProps) => {
   return (
@@ -56,14 +69,14 @@ export const TradesList = ({ trades }: TradesListProps) => {
                   <p className="text-muted-foreground">Entry</p>
                   <p className="font-medium">{trade.entryPrice}</p>
                   <p className="text-xs text-muted-foreground">
-                    {format(new Date(trade.entryDate), "MMM d, yyyy HH:mm")}
+                    {formatDate(trade.entryDate)}
                   </p>
                 </div>
                 <div>
                   <p className="text-muted-foreground">Exit</p>
                   <p className="font-medium">{trade.exitPrice}</p>
                   <p className="text-xs text-muted-foreground">
-                    {format(new Date(trade.exitDate), "MMM d, yyyy HH:mm")}
+                    {formatDate(trade.exitDate)}
                   </p>
                 </div>
               </div>

@@ -34,7 +34,7 @@ export const WeeklyPerformance = () => {
       if (error) throw error;
 
       const weeks: WeekSummary[] = Array.from({ length: 5 }, (_, i) => ({
-        weekNumber: i + 1,
+        weekNumber: 5 - i, // Reverse the week numbers so week 1 is the current week
         totalPnL: 0,
         tradingDays: 0,
       }));
@@ -43,24 +43,24 @@ export const WeeklyPerformance = () => {
         const entryDate = new Date(entry.created_at);
         
         for (let i = 0; i < 5; i++) {
-          const weekStart = startOfWeek(addWeeks(currentDate, -4 + i));
-          const weekEnd = endOfWeek(addWeeks(currentDate, -4 + i));
+          const weekStart = startOfWeek(addWeeks(currentDate, -i));
+          const weekEnd = endOfWeek(addWeeks(currentDate, -i));
           
           if (isWithinInterval(entryDate, { start: weekStart, end: weekEnd })) {
             const trades = (entry.trades || []) as Trade[];
             const dailyPnL = trades.reduce((sum, trade) => 
               sum + (Number(trade.pnl) || 0), 0);
             
-            weeks[i].totalPnL += dailyPnL;
+            weeks[4 - i].totalPnL += dailyPnL;
             if (dailyPnL !== 0) {
-              weeks[i].tradingDays += 1;
+              weeks[4 - i].tradingDays += 1;
             }
             break;
           }
         }
       });
 
-      return weeks.sort((a, b) => a.weekNumber - b.weekNumber);
+      return weeks;
     },
   });
 

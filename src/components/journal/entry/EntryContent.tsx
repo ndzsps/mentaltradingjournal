@@ -3,7 +3,6 @@ import { TradesList } from "./TradesList";
 import { TradingRules } from "./TradingRules";
 import { Trade } from "@/types/trade";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import Image from "next/image";
 
 interface EntryContentProps {
   marketConditions?: string;

@@ -130,7 +130,7 @@ export const BacktestingForm = () => {
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a playbook" />
+                        <SelectValue placeholder="Select a Trading Blueprint" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -152,7 +152,7 @@ export const BacktestingForm = () => {
               onClick={() => navigate("/blueprint")}
             >
               <Plus className="mr-2 h-4 w-4" />
-              Create new playbook
+              Create New Trading Blueprint
             </Button>
           </div>
 

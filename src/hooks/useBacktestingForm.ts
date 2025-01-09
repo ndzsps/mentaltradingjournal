@@ -94,17 +94,39 @@ export function useBacktestingForm(userId: string | undefined, navigate: (path: 
     }
 
     try {
+      // First fetch the blueprint details
+      const { data: blueprint, error: blueprintError } = await supabase
+        .from("trading_blueprints")
+        .select("*")
+        .eq("id", selectedBlueprint)
+        .single();
+
+      if (blueprintError) throw blueprintError;
+
+      // Create the backtesting session with blueprint data
       const { error } = await supabase
         .from("backtesting_sessions")
         .insert({
           user_id: userId,
           playbook_id: selectedBlueprint,
           name: `${formData.instrument} ${direction?.toUpperCase()} Session`,
+          description: blueprint.description,
           market_type: "forex",
           symbol: formData.instrument,
           start_balance: 10000,
           start_date: formData.entryDate || new Date().toISOString(),
           end_date: formData.exitDate || new Date().toISOString(),
+          entry_date: formData.entryDate,
+          instrument: formData.instrument,
+          setup: formData.setup,
+          direction: direction,
+          entry_price: formData.entryPrice,
+          exit_price: formData.exitPrice,
+          quantity: formData.quantity,
+          stop_loss: formData.stopLoss,
+          take_profit: formData.takeProfit,
+          pnl: formData.pnl,
+          fees: formData.fees
         });
 
       if (error) throw error;

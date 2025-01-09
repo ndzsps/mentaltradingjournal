@@ -13,45 +13,78 @@ export type Database = {
         Row: {
           created_at: string
           description: string | null
+          direction: string | null
           end_date: string
+          entry_date: string | null
+          entry_price: number | null
+          exit_price: number | null
+          fees: number | null
           id: string
+          instrument: string | null
           leverage: number | null
           market_type: string
           name: string
           playbook_id: string | null
+          pnl: number | null
+          quantity: number | null
+          setup: string | null
           start_balance: number
           start_date: string
+          stop_loss: number | null
           symbol: string
+          take_profit: number | null
           updated_at: string
           user_id: string
         }
         Insert: {
           created_at?: string
           description?: string | null
+          direction?: string | null
           end_date: string
+          entry_date?: string | null
+          entry_price?: number | null
+          exit_price?: number | null
+          fees?: number | null
           id?: string
+          instrument?: string | null
           leverage?: number | null
           market_type: string
           name: string
           playbook_id?: string | null
+          pnl?: number | null
+          quantity?: number | null
+          setup?: string | null
           start_balance: number
           start_date: string
+          stop_loss?: number | null
           symbol: string
+          take_profit?: number | null
           updated_at?: string
           user_id: string
         }
         Update: {
           created_at?: string
           description?: string | null
+          direction?: string | null
           end_date?: string
+          entry_date?: string | null
+          entry_price?: number | null
+          exit_price?: number | null
+          fees?: number | null
           id?: string
+          instrument?: string | null
           leverage?: number | null
           market_type?: string
           name?: string
           playbook_id?: string | null
+          pnl?: number | null
+          quantity?: number | null
+          setup?: string | null
           start_balance?: number
           start_date?: string
+          stop_loss?: number | null
           symbol?: string
+          take_profit?: number | null
           updated_at?: string
           user_id?: string
         }

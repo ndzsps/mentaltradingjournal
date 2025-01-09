@@ -25,7 +25,7 @@ interface Session {
   entryDate: string;
   instrument: string;
   setup: string;
-  direction: 'buy' | 'sell';
+  direction: 'buy' | 'sell' | null;
   entryPrice: number;
   exitPrice: number;
   quantity: number;
@@ -68,7 +68,22 @@ export default function BlueprintSessions() {
       .order("created_at", { ascending: false });
 
     if (!error && data) {
-      setSessions(data);
+      // Map the database fields to our Session interface
+      const mappedSessions = data.map(session => ({
+        id: session.id,
+        entryDate: session.entry_date || '',
+        instrument: session.instrument || '',
+        setup: session.setup || '',
+        direction: session.direction as 'buy' | 'sell' | null,
+        entryPrice: session.entry_price || 0,
+        exitPrice: session.exit_price || 0,
+        quantity: session.quantity || 0,
+        stopLoss: session.stop_loss || 0,
+        takeProfit: session.take_profit || 0,
+        pnl: session.pnl || 0,
+        fees: session.fees || 0,
+      }));
+      setSessions(mappedSessions);
     }
   };
 
@@ -119,16 +134,18 @@ export default function BlueprintSessions() {
               <TableBody>
                 {sessions.map((session) => (
                   <TableRow key={session.id}>
-                    <TableCell>{new Date(session.entryDate).toLocaleDateString()}</TableCell>
-                    <TableCell>{session.instrument}</TableCell>
-                    <TableCell>{session.setup}</TableCell>
+                    <TableCell>{session.entryDate ? new Date(session.entryDate).toLocaleDateString() : '-'}</TableCell>
+                    <TableCell>{session.instrument || '-'}</TableCell>
+                    <TableCell>{session.setup || '-'}</TableCell>
                     <TableCell>
                       <span className={`font-medium ${
                         session.direction === 'buy' 
                           ? 'text-green-600' 
-                          : 'text-red-600'
+                          : session.direction === 'sell'
+                            ? 'text-red-600'
+                            : ''
                       }`}>
-                        {session.direction.toUpperCase()}
+                        {session.direction ? session.direction.toUpperCase() : '-'}
                       </span>
                     </TableCell>
                     <TableCell className="text-right">{formatCurrency(session.entryPrice)}</TableCell>

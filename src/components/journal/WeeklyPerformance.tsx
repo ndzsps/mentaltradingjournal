@@ -66,10 +66,10 @@ export const WeeklyPerformance = () => {
 
   if (isLoading) {
     return (
-      <div className="grid grid-rows-5 h-[calc(100vh-12rem)] pt-[3.55rem]">
+      <div className="flex flex-col h-[calc(100vh-12rem)] pt-[3.55rem] justify-between">
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="flex items-center px-2 mb-4">
-            <Card className="p-4 space-y-2 bg-primary/5 w-full h-[4.5rem]">
+          <div key={i} className="h-24 px-2">
+            <Card className="p-4 space-y-2 bg-primary/5 w-full h-full">
               <div className="h-4 bg-primary/10 rounded w-1/3"></div>
               <div className="h-6 bg-primary/10 rounded w-2/3"></div>
             </Card>
@@ -80,11 +80,11 @@ export const WeeklyPerformance = () => {
   }
 
   return (
-    <div className="flex flex-col justify-between h-[calc(100vh-12rem)] pt-[3.55rem]">
+    <div className="flex flex-col h-[calc(100vh-12rem)] pt-[3.55rem] justify-between">
       {weeklyStats?.map((week) => (
-        <div key={week.weekNumber} className="px-2 mb-2">
+        <div key={week.weekNumber} className="h-24 px-2">
           <Card
-            className="p-4 bg-card/30 backdrop-blur-xl border-primary/10 hover:border-primary/20 transition-colors w-full h-[4.5rem] flex flex-col justify-center"
+            className="p-4 bg-card/30 backdrop-blur-xl border-primary/10 hover:border-primary/20 transition-colors w-full h-full flex flex-col justify-center"
           >
             <p className={`text-sm font-medium ${week.totalPnL === 0 ? 'text-muted-foreground' : ''}`}>
               Week {week.weekNumber}

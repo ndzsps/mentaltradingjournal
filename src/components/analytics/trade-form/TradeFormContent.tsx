@@ -33,18 +33,14 @@ export const TradeFormContent = ({
       instrument: formData.get('instrument') as string,
       setup: formData.get('setup') as string,
       direction: direction as 'buy' | 'sell',
-      entryPrice: (formData.get('entryPrice') as string).toString(),
-      quantity: (formData.get('quantity') as string).toString(),
-      stopLoss: (formData.get('stopLoss') as string).toString(),
-      takeProfit: (formData.get('takeProfit') as string).toString(),
+      entryPrice: parseFloat(formData.get('entryPrice') as string),
+      quantity: parseFloat(formData.get('quantity') as string),
+      stopLoss: parseFloat(formData.get('stopLoss') as string),
+      takeProfit: parseFloat(formData.get('takeProfit') as string),
       exitDate: formData.get('exitDate') as string,
-      exitPrice: (formData.get('exitPrice') as string).toString(),
-      pnl: (formData.get('pnl') as string).toString(),
-      fees: (formData.get('fees') as string).toString(),
-      forecastImage: formData.get('forecastImage') as string || undefined,
-      forecastUrl: formData.get('forecastUrl') as string || undefined,
-      resultImage: formData.get('resultImage') as string || undefined,
-      resultUrl: formData.get('resultUrl') as string || undefined,
+      exitPrice: parseFloat(formData.get('exitPrice') as string),
+      pnl: parseFloat(formData.get('pnl') as string),
+      fees: parseFloat(formData.get('fees') as string),
     };
 
     try {
@@ -58,21 +54,19 @@ export const TradeFormContent = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col h-full max-h-[85vh] overflow-y-auto">
-      <div className="flex-1 p-4 space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="p-4 border rounded-lg bg-background/50">
-            <GeneralSection direction={direction} setDirection={setDirection} />
-          </div>
-          <div className="p-4 border rounded-lg bg-background/50">
-            <TradeEntrySection />
-          </div>
-          <div className="p-4 border rounded-lg bg-background/50">
-            <TradeExitSection />
-          </div>
+    <form onSubmit={handleSubmit} className="flex flex-col flex-1">
+      <div className="flex-1 p-6 space-y-4 md:space-y-0 md:space-x-4 md:flex">
+        <div className="flex-1 p-4 border rounded-lg bg-background/50">
+          <GeneralSection direction={direction} setDirection={setDirection} />
+        </div>
+        <div className="flex-1 p-4 border rounded-lg bg-background/50">
+          <TradeEntrySection />
+        </div>
+        <div className="flex-1 p-4 border rounded-lg bg-background/50">
+          <TradeExitSection />
         </div>
       </div>
-      <div className="sticky bottom-0 mt-4 p-4 bg-background border-t">
+      <div className="p-6 pt-0 border-t">
         <Button type="submit" className="w-full">
           {editTrade ? 'Update' : 'Submit'}
         </Button>

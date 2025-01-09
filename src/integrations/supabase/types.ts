@@ -11,6 +11,8 @@ export type Database = {
     Tables: {
       backtesting_sessions: {
         Row: {
+          after_url: string | null
+          before_url: string | null
           created_at: string
           description: string | null
           direction: string | null
@@ -37,6 +39,8 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          after_url?: string | null
+          before_url?: string | null
           created_at?: string
           description?: string | null
           direction?: string | null
@@ -63,6 +67,8 @@ export type Database = {
           user_id: string
         }
         Update: {
+          after_url?: string | null
+          before_url?: string | null
           created_at?: string
           description?: string | null
           direction?: string | null

@@ -33,8 +33,8 @@ interface Session {
   takeProfit: number;
   pnl: number;
   fees: number;
-  beforeUrl?: string;
-  afterUrl?: string;
+  beforeUrl: string | null;
+  afterUrl: string | null;
 }
 
 export default function BlueprintSessions() {

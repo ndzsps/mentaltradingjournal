@@ -1,12 +1,43 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+
+interface Blueprint {
+  id: string;
+  name: string;
+}
 
 export function BacktestingForm() {
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
+  const [blueprints, setBlueprints] = useState<Blueprint[]>([]);
+  const [selectedBlueprint, setSelectedBlueprint] = useState<string>();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      fetchBlueprints();
+    }
+  }, [user]);
+
+  const fetchBlueprints = async () => {
+    if (!user) return;
+    
+    const { data, error } = await supabase
+      .from("trading_blueprints")
+      .select("id, name")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
+
+    if (!error && data) {
+      setBlueprints(data);
+    }
+  };
 
   return (
     <Card className="w-full">
@@ -14,6 +45,22 @@ export function BacktestingForm() {
         <CardTitle>Create new session</CardTitle>
       </CardHeader>
       <CardContent>
+        <div className="mb-6">
+          <Label htmlFor="playbook">Select Playbook</Label>
+          <Select value={selectedBlueprint} onValueChange={setSelectedBlueprint}>
+            <SelectTrigger className="w-full mt-2">
+              <SelectValue placeholder="Choose a playbook" />
+            </SelectTrigger>
+            <SelectContent>
+              {blueprints.map((blueprint) => (
+                <SelectItem key={blueprint.id} value={blueprint.id}>
+                  {blueprint.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* General Section */}
           <div className="space-y-4 p-6 bg-background/50 border rounded-lg">

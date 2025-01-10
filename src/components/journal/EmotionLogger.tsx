@@ -9,7 +9,7 @@ import { FormSubmissionSection } from "./FormSubmissionSection";
 import { FormHeader } from "./form/FormHeader";
 import { EmotionSection } from "./form/EmotionSection";
 import { PostSessionFormSection } from "./form/PostSessionFormSection";
-import { ProgressStats } from "./ProgressStats"; // Added this import
+import { ProgressStats } from "./ProgressStats";
 
 const PRE_TRADING_ACTIVITIES = [
   "Meditation",
@@ -28,7 +28,6 @@ export const EmotionLogger = () => {
   const [customDetails, setCustomDetails] = useState<string[]>([]);
   const [sessionType, setSessionType] = useState<"pre" | "post">("pre");
   const [selectedMistakes, setSelectedMistakes] = useState<string[]>([]);
-  const [marketConditions, setMarketConditions] = useState("");
   const [followedRules, setFollowedRules] = useState<string[]>([]);
   const [preTradingActivities, setPreTradingActivities] = useState<string[]>([]);
   const [showCelebration, setShowCelebration] = useState(false);
@@ -43,7 +42,6 @@ export const EmotionLogger = () => {
     setSelectedOutcome("");
     setNotes("");
     setSelectedMistakes([]);
-    setMarketConditions("");
     setFollowedRules([]);
     setPreTradingActivities([]);
     setTrades([]);
@@ -55,7 +53,6 @@ export const EmotionLogger = () => {
     selectedEmotionDetail,
     notes,
     selectedOutcome,
-    marketConditions,
     followedRules,
     selectedMistakes,
     preTradingActivities,
@@ -106,7 +103,6 @@ export const EmotionLogger = () => {
           activitiesSelected={preTradingActivities.length > 0}
           notesEntered={notes.length > 0}
           outcomeSelected={!!selectedOutcome}
-          marketConditionsSelected={!!marketConditions}
           rulesSelected={followedRules.length > 0}
           mistakesReviewed={selectedMistakes.length > 0 || selectedOutcome !== "loss"}
           tradesAdded={trades.length > 0 || selectedOutcome === "no_trades"}
@@ -139,8 +135,6 @@ export const EmotionLogger = () => {
             <PostSessionFormSection
               selectedOutcome={selectedOutcome}
               setSelectedOutcome={setSelectedOutcome}
-              marketConditions={marketConditions}
-              setMarketConditions={setMarketConditions}
               followedRules={followedRules}
               setFollowedRules={setFollowedRules}
               selectedMistakes={selectedMistakes}

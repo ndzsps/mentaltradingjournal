@@ -5,6 +5,15 @@ interface WeekCardProps {
   totalPnL: number;
 }
 
+const formatCurrency = (value: number) => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value);
+};
+
 export const WeekCard = ({ weekNumber, totalPnL }: WeekCardProps) => {
   return (
     <div className="px-2 mb-6">
@@ -21,7 +30,7 @@ export const WeekCard = ({ weekNumber, totalPnL }: WeekCardProps) => {
               ? 'text-red-500 dark:text-red-400'
               : 'text-muted-foreground'
         }`}>
-          ${totalPnL.toFixed(2)}
+          {formatCurrency(totalPnL)}
         </p>
       </Card>
     </div>

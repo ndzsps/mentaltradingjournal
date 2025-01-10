@@ -70,14 +70,14 @@ export const PostSessionSection = ({
                     ? "bg-gradient-to-br from-[#40C057] to-[#69DB7C] text-white shadow-lg shadow-green-500/20"
                     : value === "breakeven"
                       ? "bg-gradient-to-br from-[#868E96] to-[#ADB5BD] text-white shadow-lg shadow-gray-500/20"
-                      : "bg-gradient-to-br from-[#FAB005] to-[#FFD43B] text-white shadow-lg shadow-yellow-500/20"
+                      : "bg-gradient-to-br from-[#0EA5E9] to-[#38BDF8] text-white shadow-lg shadow-blue-500/20"
                 : value === "loss"
                   ? "hover:bg-gradient-to-br hover:from-[#FFF5F5] hover:to-[#FFE3E3] hover:border-[#FF8787]/50 group-hover:text-[#FA5252]"
                   : value === "win"
                     ? "hover:bg-gradient-to-br hover:from-[#EBFBEE] hover:to-[#D3F9D8] hover:border-[#69DB7C]/50 group-hover:text-[#37B24D]"
                     : value === "breakeven"
                       ? "hover:bg-gradient-to-br hover:from-[#F1F3F5] hover:to-[#DEE2E6] hover:border-[#ADB5BD]/50 group-hover:text-[#495057]"
-                      : "hover:bg-gradient-to-br hover:from-[#FFF9DB] hover:to-[#FFE066] hover:border-[#FFD43B]/50 group-hover:text-[#F59F00]"
+                      : "hover:bg-gradient-to-br hover:from-[#E7F5FE] hover:to-[#D3E4FD] hover:border-[#38BDF8]/50 group-hover:text-[#0EA5E9]"
             }`}
             onClick={() => setSelectedOutcome(value)}
           >
@@ -91,7 +91,7 @@ export const PostSessionSection = ({
                       ? "text-[#37B24D] group-hover:text-[#37B24D]"
                       : value === "breakeven"
                         ? "text-[#495057] group-hover:text-[#495057]"
-                        : "text-[#F59F00] group-hover:text-[#F59F00]"
+                        : "text-[#0EA5E9] group-hover:text-[#0EA5E9]"
               }`} />
               <span className={`font-medium ${
                 selectedOutcome === value 
@@ -102,7 +102,7 @@ export const PostSessionSection = ({
                       ? "text-[#37B24D] group-hover:text-[#37B24D]"
                       : value === "breakeven"
                         ? "text-[#495057] group-hover:text-[#495057]"
-                        : "text-[#F59F00] group-hover:text-[#F59F00]"
+                        : "text-[#0EA5E9] group-hover:text-[#0EA5E9]"
               }`}>
                 {capitalizeWords(label)}
               </span>

@@ -9,7 +9,6 @@ export interface SessionProgressProps {
   activitiesSelected: boolean;
   notesEntered: boolean;
   outcomeSelected: boolean;
-  marketConditionsSelected: boolean;
   rulesSelected: boolean;
   mistakesReviewed: boolean;
   tradesAdded: boolean;
@@ -23,7 +22,6 @@ export const SessionProgress = ({
   activitiesSelected,
   notesEntered,
   outcomeSelected,
-  marketConditionsSelected,
   rulesSelected,
   mistakesReviewed,
   tradesAdded,
@@ -39,7 +37,6 @@ export const SessionProgress = ({
           emotionDetailSelected,
           notesEntered,
           outcomeSelected,
-          marketConditionsSelected,
           rulesSelected,
           mistakesReviewed,
           tradesAdded,
@@ -59,7 +56,6 @@ export const SessionProgress = ({
     activitiesSelected,
     notesEntered,
     outcomeSelected,
-    marketConditionsSelected,
     rulesSelected,
     mistakesReviewed,
     tradesAdded,

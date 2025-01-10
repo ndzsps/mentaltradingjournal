@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
-import { EmotionDetailDialog } from "./EmotionDetailDialog";
 import { SessionProgress } from "./SessionProgress";
 import { PostSessionSection } from "./PostSessionSection";
 import { ProgressStats } from "./ProgressStats";
@@ -26,11 +25,8 @@ const PRE_TRADING_ACTIVITIES = [
 
 export const EmotionLogger = () => {
   const [selectedEmotion, setSelectedEmotion] = useState("");
-  const [selectedEmotionDetail, setSelectedEmotionDetail] = useState("");
   const [selectedOutcome, setSelectedOutcome] = useState("");
   const [notes, setNotes] = useState("");
-  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
-  const [customDetails, setCustomDetails] = useState<string[]>([]);
   const [sessionType, setSessionType] = useState<"pre" | "post">("pre");
   const [selectedMistakes, setSelectedMistakes] = useState<string[]>([]);
   const [marketConditions, setMarketConditions] = useState("");
@@ -44,7 +40,6 @@ export const EmotionLogger = () => {
 
   const resetForm = () => {
     setSelectedEmotion("");
-    setSelectedEmotionDetail("");
     setSelectedOutcome("");
     setNotes("");
     setSelectedMistakes([]);
@@ -57,7 +52,7 @@ export const EmotionLogger = () => {
   const { handleSubmit } = useJournalFormSubmission({
     sessionType,
     selectedEmotion,
-    selectedEmotionDetail,
+    selectedEmotionDetail: "", // We'll pass an empty string since we're removing the detail
     notes,
     selectedOutcome,
     marketConditions,
@@ -71,22 +66,6 @@ export const EmotionLogger = () => {
       setTimeout(() => setShowCelebration(false), 5000);
     },
   });
-
-  const handleEmotionSelect = (value: string) => {
-    setSelectedEmotion(value);
-    setIsDetailDialogOpen(true);
-  };
-
-  const handleDetailSelect = (detail: string) => {
-    setSelectedEmotionDetail(detail);
-    setIsDetailDialogOpen(false);
-  };
-
-  const handleCustomDetailAdd = (detail: string) => {
-    if (!customDetails.includes(detail)) {
-      setCustomDetails([...customDetails, detail]);
-    }
-  };
 
   const handleSessionTypeChange = (value: "pre" | "post") => {
     setSessionType(value);
@@ -127,7 +106,7 @@ export const EmotionLogger = () => {
 
           <SessionProgress 
             emotionSelected={!!selectedEmotion}
-            emotionDetailSelected={!!selectedEmotionDetail}
+            emotionDetailSelected={true} // We'll always pass true since we removed this step
             activitiesSelected={preTradingActivities.length > 0}
             notesEntered={notes.length > 0}
             outcomeSelected={!!selectedOutcome}
@@ -151,17 +130,7 @@ export const EmotionLogger = () => {
         <div className="space-y-6">
           <EmotionSelector
             selectedEmotion={selectedEmotion}
-            onEmotionSelect={handleEmotionSelect}
-          />
-
-          <EmotionDetailDialog
-            isOpen={isDetailDialogOpen}
-            onOpenChange={setIsDetailDialogOpen}
-            details={selectedEmotion ? emotions.find(e => e.value === selectedEmotion)?.details || [] : []}
-            onDetailSelect={handleDetailSelect}
-            selectedDetail={selectedEmotionDetail}
-            customDetails={customDetails}
-            onCustomDetailAdd={handleCustomDetailAdd}
+            onEmotionSelect={setSelectedEmotion}
           />
 
           {sessionType === "post" && (

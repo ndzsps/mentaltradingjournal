@@ -14,7 +14,7 @@ import { useQuery } from "@tanstack/react-query";
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-background border border-border rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95">
+      <div className="bg-background/95 backdrop-blur-sm border border-border rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95">
         <p className="font-medium text-sm text-foreground mb-2">{label}</p>
         <div className="flex items-center gap-2 text-sm">
           <div
@@ -75,11 +75,28 @@ export const EmotionRecovery = () => {
       <div className="h-[250px] md:h-[300px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="days" tick={{ fontSize: 12 }} />
-            <YAxis tick={{ fontSize: 12 }} />
-            <Tooltip content={<CustomTooltip />} />
-            <Bar dataKey="frequency" fill="#6E59A5" name="Frequency" />
+            <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+            <XAxis 
+              dataKey="days" 
+              tick={{ fontSize: 12 }}
+              stroke="currentColor"
+              tickLine={{ stroke: 'currentColor' }}
+            />
+            <YAxis 
+              tick={{ fontSize: 12 }}
+              stroke="currentColor"
+              tickLine={{ stroke: 'currentColor' }}
+            />
+            <Tooltip 
+              content={<CustomTooltip />}
+              cursor={{ fill: 'currentColor', opacity: 0.1 }}
+            />
+            <Bar 
+              dataKey="frequency" 
+              fill="#6E59A5" 
+              name="Frequency"
+              radius={[4, 4, 0, 0]}
+            />
           </BarChart>
         </ResponsiveContainer>
       </div>

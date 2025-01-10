@@ -28,7 +28,7 @@ const CustomTooltip = ({ active, payload }: {
 
   const data = payload[0];
   return (
-    <div className="bg-background border border-border rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95">
+    <div className="bg-background/95 backdrop-blur-sm border border-border rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95">
       <p className="font-medium text-sm text-foreground mb-2">{data.payload.name}</p>
       <div className="flex items-center gap-2 text-sm">
         <div
@@ -96,13 +96,16 @@ export const WinLossRatio = () => {
               outerRadius={80}
               paddingAngle={5}
               dataKey="value"
-              stroke="transparent" // Remove the white outline
+              stroke="transparent"
             >
               {data.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip 
+              content={<CustomTooltip />}
+              cursor={{ fill: 'currentColor', opacity: 0.1 }}
+            />
             <Legend />
           </PieChart>
         </ResponsiveContainer>

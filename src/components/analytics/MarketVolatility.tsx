@@ -12,6 +12,35 @@ import {
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
 
+const CustomTooltip = ({ active, payload }: any) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="bg-background/95 backdrop-blur-sm border border-border rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95">
+        <p className="font-medium text-sm text-foreground mb-2">Trade Details</p>
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 text-sm">
+            <div className="w-2 h-2 rounded-full bg-primary" />
+            <span className="text-muted-foreground">Volatility:</span>
+            <span className="font-medium text-foreground">{data.volatility.toFixed(1)}%</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <div className="w-2 h-2 rounded-full bg-primary" />
+            <span className="text-muted-foreground">Performance:</span>
+            <span className="font-medium text-foreground">{data.performance.toFixed(1)}%</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <div className="w-2 h-2 rounded-full bg-primary" />
+            <span className="text-muted-foreground">Emotional State:</span>
+            <span className="font-medium text-foreground">{data.emotional}</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+
 export const MarketVolatility = () => {
   const { data: analytics, isLoading } = useQuery({
     queryKey: ['analytics'],
@@ -47,25 +76,32 @@ export const MarketVolatility = () => {
       <div className="h-[250px] md:h-[300px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <ScatterChart margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" />
+            <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
             <XAxis 
               dataKey="volatility" 
               name="Volatility" 
               unit="%" 
-              tick={{ fontSize: 12 }} 
+              tick={{ fontSize: 12 }}
+              stroke="currentColor"
+              tickLine={{ stroke: 'currentColor' }}
             />
             <YAxis 
               dataKey="performance" 
               name="Performance" 
               unit="%" 
-              tick={{ fontSize: 12 }} 
+              tick={{ fontSize: 12 }}
+              stroke="currentColor"
+              tickLine={{ stroke: 'currentColor' }}
             />
-            <Tooltip cursor={{ strokeDasharray: '3 3' }} />
+            <Tooltip 
+              content={<CustomTooltip />}
+              cursor={{ fill: 'currentColor', opacity: 0.1 }}
+            />
             <Legend />
             <Scatter 
               name="Trading Results" 
               data={data} 
-              fill="#6E59A5" 
+              fill="#6E59A5"
             />
           </ScatterChart>
         </ResponsiveContainer>

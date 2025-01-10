@@ -6,7 +6,6 @@ import { Trade } from "@/types/trade";
 import { TradingOutcome, MistakeCategory, TradingRule } from "./types";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { HelpCircle } from "lucide-react";
-import { Textarea } from "@/components/ui/textarea";
 
 interface PostSessionSectionProps {
   selectedOutcome: string;
@@ -20,8 +19,6 @@ interface PostSessionSectionProps {
   tradingRules: TradingRule[];
   onAddTrade: () => void;
   trades: Trade[];
-  tradingRulesNotes: string;
-  setTradingRulesNotes: (value: string) => void;
 }
 
 const capitalizeWords = (str: string) => {
@@ -43,8 +40,6 @@ export const PostSessionSection = ({
   tradingRules,
   onAddTrade,
   trades,
-  tradingRulesNotes,
-  setTradingRulesNotes,
 }: PostSessionSectionProps) => {
   return (
     <>
@@ -143,19 +138,6 @@ export const PostSessionSection = ({
                 <Label htmlFor={rule.value}>{capitalizeWords(rule.label)}</Label>
               </div>
             ))}
-          </div>
-          
-          <div className="mt-4">
-            <Label htmlFor="tradingRulesNotes" className="text-sm text-muted-foreground">
-              Additional Notes on Trading Rules
-            </Label>
-            <Textarea
-              id="tradingRulesNotes"
-              value={tradingRulesNotes}
-              onChange={(e) => setTradingRulesNotes(e.target.value)}
-              placeholder="Add any comments or notes about how you followed your trading rules..."
-              className="mt-2 min-h-[100px] bg-card/50 border-primary/10 focus-visible:ring-primary/30"
-            />
           </div>
         </div>
       </div>

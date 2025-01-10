@@ -125,7 +125,6 @@ export type Database = {
           pre_trading_activities: string[] | null
           session_type: string
           trades: Json[] | null
-          trading_rules_notes: string | null
           user_id: string
         }
         Insert: {
@@ -141,7 +140,6 @@ export type Database = {
           pre_trading_activities?: string[] | null
           session_type: string
           trades?: Json[] | null
-          trading_rules_notes?: string | null
           user_id: string
         }
         Update: {
@@ -157,7 +155,6 @@ export type Database = {
           pre_trading_activities?: string[] | null
           session_type?: string
           trades?: Json[] | null
-          trading_rules_notes?: string | null
           user_id?: string
         }
         Relationships: []

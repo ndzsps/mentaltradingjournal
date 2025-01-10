@@ -15,7 +15,6 @@ interface JournalFormSubmissionProps {
   selectedMistakes?: string[];
   preTradingActivities: string[];
   trades: Trade[];
-  tradingRulesNotes?: string;
   resetForm: () => void;
   onSubmitSuccess?: () => void;
 }
@@ -30,7 +29,6 @@ export const useJournalFormSubmission = ({
   selectedMistakes,
   preTradingActivities,
   trades,
-  tradingRulesNotes,
   resetForm,
   onSubmitSuccess,
 }: JournalFormSubmissionProps) => {
@@ -108,7 +106,6 @@ export const useJournalFormSubmission = ({
         mistakes: selectedMistakes,
         pre_trading_activities: preTradingActivities,
         trades: formattedTrades,
-        trading_rules_notes: tradingRulesNotes,
       });
 
       if (error) throw error;

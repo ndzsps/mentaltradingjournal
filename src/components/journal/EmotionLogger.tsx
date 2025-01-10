@@ -28,7 +28,6 @@ export const EmotionLogger = () => {
   const [sessionType, setSessionType] = useState<"pre" | "post">("pre");
   const [selectedMistakes, setSelectedMistakes] = useState<string[]>([]);
   const [followedRules, setFollowedRules] = useState<string[]>([]);
-  const [tradingRulesNotes, setTradingRulesNotes] = useState("");
   const [preTradingActivities, setPreTradingActivities] = useState<string[]>([]);
   const [showCelebration, setShowCelebration] = useState(false);
   const [showAddTradeDialog, setShowAddTradeDialog] = useState(false);
@@ -43,7 +42,6 @@ export const EmotionLogger = () => {
     setNotes("");
     setSelectedMistakes([]);
     setFollowedRules([]);
-    setTradingRulesNotes("");
     setPreTradingActivities([]);
     setTrades([]);
   };
@@ -58,7 +56,6 @@ export const EmotionLogger = () => {
     selectedMistakes,
     preTradingActivities,
     trades,
-    tradingRulesNotes,
     resetForm,
     onSubmitSuccess: () => {
       setShowCelebration(true);
@@ -145,8 +142,6 @@ export const EmotionLogger = () => {
               setShowAddTradeDialog={setShowAddTradeDialog}
               trades={trades}
               onTradeSubmit={handleTradeSubmit}
-              tradingRulesNotes={tradingRulesNotes}
-              setTradingRulesNotes={setTradingRulesNotes}
             />
           )}
 

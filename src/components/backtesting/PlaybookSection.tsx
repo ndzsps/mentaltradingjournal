@@ -34,15 +34,17 @@ export function PlaybookSection() {
   };
 
   return (
-    <Card className="w-full">
+    <Card className="w-full bg-white/50 backdrop-blur-sm shadow-lg animate-fade-in">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-        <CardTitle>Playbook</CardTitle>
+        <CardTitle className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+          Playbook
+        </CardTitle>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button 
               variant="outline" 
               size="sm" 
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 hover:bg-primary/10 transition-colors"
             >
               <Plus className="h-4 w-4" />
               Add Blueprint
@@ -61,11 +63,11 @@ export function PlaybookSection() {
       </CardHeader>
       <CardContent className="space-y-4">
         {blueprints.length === 0 ? (
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground text-center py-8 animate-fade-in">
             Select or create a playbook to view trading rules and strategies for your backtesting session.
           </p>
         ) : (
-          <div className="grid gap-4">
+          <div className="grid gap-4 animate-fade-in">
             {blueprints.map((blueprint) => (
               <BlueprintCard
                 key={blueprint.id}

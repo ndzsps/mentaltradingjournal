@@ -4,8 +4,8 @@ import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
-  SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarGroupContent,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -35,7 +35,7 @@ export function AppSidebar() {
       <Sidebar>
         <SidebarContent>
           <div className="p-4">
-            <h1 className="text-2xl font-bold text-primary">TradingMind</h1>
+            <h1 className="text-2xl font-bold text-primary">Mental</h1>
           </div>
           <SidebarGroup>
             <SidebarGroupLabel>Menu</SidebarGroupLabel>

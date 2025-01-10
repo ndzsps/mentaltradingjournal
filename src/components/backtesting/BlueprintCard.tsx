@@ -21,11 +21,11 @@ interface BlueprintCardProps {
 }
 
 const emojis = [
-  { icon: Smile, label: "Smile", color: "#FFD93D" },
-  { icon: ThumbsUp, label: "Thumbs Up", color: "#4CAF50" },
-  { icon: Heart, label: "Heart", color: "#FF6B6B" },
-  { icon: Star, label: "Star", color: "#FFD700" },
-  { icon: Trophy, label: "Trophy", color: "#FFA726" },
+  { icon: Smile, label: "Smile" },
+  { icon: ThumbsUp, label: "Thumbs Up" },
+  { icon: Heart, label: "Heart" },
+  { icon: Star, label: "Star" },
+  { icon: Trophy, label: "Trophy" },
 ];
 
 export function BlueprintCard({ name, instrument, winRate = 0, id, emoji: initialEmoji }: BlueprintCardProps) {
@@ -33,7 +33,7 @@ export function BlueprintCard({ name, instrument, winRate = 0, id, emoji: initia
   const [selectedEmoji, setSelectedEmoji] = useState(initialEmoji || "Smile");
 
   const handleEmojiSelect = async (emojiLabel: string, e: React.MouseEvent) => {
-    e.stopPropagation();
+    e.stopPropagation(); // Prevent card click when selecting emoji
     setSelectedEmoji(emojiLabel);
     
     const { error } = await supabase
@@ -47,35 +47,28 @@ export function BlueprintCard({ name, instrument, winRate = 0, id, emoji: initia
   };
 
   const EmojiIcon = emojis.find(e => e.label === selectedEmoji)?.icon || Smile;
-  const emojiColor = emojis.find(e => e.label === selectedEmoji)?.color || "#FFD93D";
 
   return (
     <Card 
-      className="bg-[#403E43]/90 backdrop-blur-sm hover:bg-[#403E43] transition-all duration-300 cursor-pointer relative hover:shadow-lg hover:-translate-y-1 animate-fade-in border-primary/20"
+      className="bg-card/50 backdrop-blur-sm hover:bg-card/70 transition-colors cursor-pointer relative"
       onClick={() => navigate(`/blueprint/${id}`)}
     >
       <CardHeader className="pb-2 flex flex-row items-center justify-between">
-        <CardTitle className="text-lg font-semibold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
-          {name}
-        </CardTitle>
+        <CardTitle className="text-lg font-semibold">{name}</CardTitle>
         <DropdownMenu>
           <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="h-8 w-8 hover:bg-primary/20 transition-colors"
-            >
-              <EmojiIcon className="h-5 w-5" style={{ color: emojiColor }} />
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <EmojiIcon className="h-5 w-5" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="bg-[#1A1F2C]/95 backdrop-blur-sm border-primary/20">
-            {emojis.map(({ icon: Icon, label, color }) => (
+          <DropdownMenuContent align="end" className="bg-white">
+            {emojis.map(({ icon: Icon, label }) => (
               <DropdownMenuItem
                 key={label}
                 onClick={(e) => handleEmojiSelect(label, e)}
-                className="cursor-pointer hover:bg-primary/20 transition-colors text-primary-light"
+                className="cursor-pointer"
               >
-                <Icon className="mr-2 h-4 w-4" style={{ color }} />
+                <Icon className="mr-2 h-4 w-4" />
                 <span>{label}</span>
               </DropdownMenuItem>
             ))}
@@ -84,10 +77,10 @@ export function BlueprintCard({ name, instrument, winRate = 0, id, emoji: initia
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex items-center justify-between">
-          <Badge variant="outline" className="bg-[#1A1F2C]/80 hover:bg-primary/20 transition-colors border-primary/20 text-primary-light font-medium">
+          <Badge variant="outline" className="bg-primary/10">
             {instrument}
           </Badge>
-          <span className="text-sm font-medium text-primary-light/90">
+          <span className="text-sm text-muted-foreground">
             Win Rate: {winRate}%
           </span>
         </div>

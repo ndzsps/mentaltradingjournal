@@ -1,19 +1,23 @@
 import {
-  ScatterChart,
-  Scatter,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  ZAxis,
+  ReferenceLine,
+  Scatter,
 } from "recharts";
+import { format } from "date-fns";
 
 interface RiskRewardData {
-  risk: number;
-  reward: number;
-  size: number;
-  direction: 'buy' | 'sell';
+  date: Date;
+  cumulativeRR: number;
+  avgRR: number;
+  isSignificant: boolean;
+  riskRewardRatio: number;
+  pnl: number;
 }
 
 interface RiskRewardChartProps {
@@ -29,29 +33,37 @@ const CustomTooltip = ({ active, payload }: any) => {
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-sm">
             <div className="w-2 h-2 rounded-full bg-primary" />
-            <span className="text-muted-foreground">Direction:</span>
-            <span className="font-medium text-foreground capitalize">{data.direction}</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm">
-            <div className="w-2 h-2 rounded-full bg-primary" />
-            <span className="text-muted-foreground">Risk:</span>
-            <span className="font-medium text-foreground">${data.risk.toFixed(2)}</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm">
-            <div className="w-2 h-2 rounded-full bg-primary" />
-            <span className="text-muted-foreground">Reward:</span>
-            <span className="font-medium text-foreground">${data.reward.toFixed(2)}</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm">
-            <div className="w-2 h-2 rounded-full bg-primary" />
-            <span className="text-muted-foreground">Position Size:</span>
-            <span className="font-medium text-foreground">{data.size}</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm">
-            <div className="w-2 h-2 rounded-full bg-primary" />
-            <span className="text-muted-foreground">R:R Ratio:</span>
+            <span className="text-muted-foreground">Date:</span>
             <span className="font-medium text-foreground">
-              {Math.round(data.reward / data.risk)}:1
+              {format(data.date, 'MMM d, yyyy')}
+            </span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <div className="w-2 h-2 rounded-full bg-primary" />
+            <span className="text-muted-foreground">Trade R:R:</span>
+            <span className="font-medium text-foreground">
+              {data.riskRewardRatio.toFixed(2)}:1
+            </span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <div className="w-2 h-2 rounded-full bg-primary" />
+            <span className="text-muted-foreground">Cumulative R:R:</span>
+            <span className="font-medium text-foreground">
+              {data.cumulativeRR.toFixed(2)}
+            </span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <div className="w-2 h-2 rounded-full bg-primary" />
+            <span className="text-muted-foreground">Average R:R:</span>
+            <span className="font-medium text-foreground">
+              {data.avgRR.toFixed(2)}:1
+            </span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <div className="w-2 h-2 rounded-full bg-primary" />
+            <span className="text-muted-foreground">P&L:</span>
+            <span className={`font-medium ${data.pnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+              ${data.pnl.toFixed(2)}
             </span>
           </div>
         </div>
@@ -65,35 +77,44 @@ export const RiskRewardChart = ({ data }: RiskRewardChartProps) => {
   return (
     <div className="h-[250px] md:h-[300px] w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <ScatterChart margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
+        <LineChart data={data} margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis 
-            dataKey="risk" 
-            name="Risk ($)" 
-            unit="$"
+          <XAxis
+            dataKey="date"
+            tickFormatter={(date) => format(date, 'MMM d')}
             tick={{ fontSize: 12 }}
-            label={{ 
-              value: 'Risk ($)', 
+            label={{
+              value: 'Trading Days',
               position: 'bottom',
               style: { fontSize: '12px' }
             }}
           />
-          <YAxis 
-            dataKey="reward" 
-            name="Reward ($)" 
-            unit="$"
+          <YAxis
             tick={{ fontSize: 12 }}
-            label={{ 
-              value: 'Reward ($)', 
-              angle: -90, 
+            label={{
+              value: 'Cumulative R:R',
+              angle: -90,
               position: 'insideLeft',
               style: { fontSize: '12px' }
             }}
           />
-          <ZAxis dataKey="size" range={[50, 400]} />
           <Tooltip content={<CustomTooltip />} />
-          <Scatter name="Trades" data={data} fill="#6E59A5" />
-        </ScatterChart>
+          <ReferenceLine y={0} stroke="#666" />
+          <Line
+            type="monotone"
+            dataKey="cumulativeRR"
+            stroke="#6E59A5"
+            strokeWidth={2}
+            dot={false}
+          />
+          <Scatter
+            data={data.filter(d => d.isSignificant)}
+            dataKey="cumulativeRR"
+            fill="#FF6B6B"
+            shape="star"
+            size={100}
+          />
+        </LineChart>
       </ResponsiveContainer>
     </div>
   );

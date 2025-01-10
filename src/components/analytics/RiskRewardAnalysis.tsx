@@ -21,57 +21,68 @@ export const RiskRewardAnalysis = () => {
     );
   }
 
-  // Process trades to calculate risk/reward data
+  // Process trades to calculate cumulative R:R data
   const data = analytics.journalEntries
     .flatMap(entry => entry.trades || [])
     .map(trade => {
       const entryPrice = Number(trade.entryPrice);
       const stopLoss = Number(trade.stopLoss);
       const takeProfit = Number(trade.takeProfit);
-      const size = Number(trade.quantity);
+      const date = new Date(trade.entryDate || entry.created_at);
       
       // Calculate risk and reward based on trade direction
       let risk, reward;
       
       if (trade.direction === 'buy') {
-        // For long positions
         risk = Math.abs(entryPrice - stopLoss);
         reward = Math.abs(takeProfit - entryPrice);
       } else {
-        // For short positions
         risk = Math.abs(stopLoss - entryPrice);
         reward = Math.abs(entryPrice - takeProfit);
       }
 
       return {
-        risk,
-        reward,
-        size,
-        direction: trade.direction,
+        date,
+        riskRewardRatio: risk > 0 ? reward / risk : 0,
+        isSignificant: (reward / risk) > 3 || (reward / risk) < 0.5,
+        pnl: Number(trade.pnl) || 0,
       };
     })
-    .filter(d => d.risk > 0 && d.reward > 0); // Filter out invalid data
+    .filter(d => d.riskRewardRatio > 0)
+    .sort((a, b) => a.date.getTime() - b.date.getTime());
 
-  // Calculate average risk:reward ratio
+  // Calculate cumulative R:R
+  let cumulativeRR = 0;
+  const cumulativeData = data.map((item, index) => {
+    cumulativeRR += item.riskRewardRatio;
+    return {
+      date: item.date,
+      cumulativeRR,
+      avgRR: cumulativeRR / (index + 1),
+      isSignificant: item.isSignificant,
+      riskRewardRatio: item.riskRewardRatio,
+      pnl: item.pnl,
+    };
+  });
+
+  // Calculate average R:R ratio
   const avgRiskReward = Math.round(
-    data.reduce((sum, item) => sum + (item.reward / item.risk), 0) / (data.length || 1)
+    cumulativeRR / (data.length || 1)
   );
 
   // Calculate percentage of trades with favorable ratio
-  const favorableRatioPercentage = data.filter(d => 
-    Math.round(d.reward / d.risk) >= 2
-  ).length / data.length;
+  const favorableRatioPercentage = data.filter(d => d.riskRewardRatio >= 2).length / data.length;
 
   return (
     <Card className="p-4 md:p-6 space-y-4">
       <div className="space-y-2">
         <h3 className="text-xl md:text-2xl font-bold">Risk/Reward Analysis</h3>
         <p className="text-sm text-muted-foreground">
-          Visualization of risk vs reward ratios in your trades
+          Cumulative risk-reward ratio over time
         </p>
       </div>
 
-      <RiskRewardChart data={data} />
+      <RiskRewardChart data={cumulativeData} />
 
       <RiskRewardInsight 
         avgRiskReward={avgRiskReward}

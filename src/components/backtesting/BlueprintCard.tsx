@@ -21,11 +21,11 @@ interface BlueprintCardProps {
 }
 
 const emojis = [
-  { icon: Smile, label: "Smile" },
-  { icon: ThumbsUp, label: "Thumbs Up" },
-  { icon: Heart, label: "Heart" },
-  { icon: Star, label: "Star" },
-  { icon: Trophy, label: "Trophy" },
+  { icon: Smile, label: "Smile", color: "#F2FCE2" },
+  { icon: ThumbsUp, label: "Thumbs Up", color: "#D3E4FD" },
+  { icon: Heart, label: "Heart", color: "#FFDEE2" },
+  { icon: Star, label: "Star", color: "#FEF7CD" },
+  { icon: Trophy, label: "Trophy", color: "#FEC6A1" },
 ];
 
 export function BlueprintCard({ name, instrument, winRate = 0, id, emoji: initialEmoji }: BlueprintCardProps) {
@@ -33,7 +33,7 @@ export function BlueprintCard({ name, instrument, winRate = 0, id, emoji: initia
   const [selectedEmoji, setSelectedEmoji] = useState(initialEmoji || "Smile");
 
   const handleEmojiSelect = async (emojiLabel: string, e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent card click when selecting emoji
+    e.stopPropagation();
     setSelectedEmoji(emojiLabel);
     
     const { error } = await supabase
@@ -46,7 +46,8 @@ export function BlueprintCard({ name, instrument, winRate = 0, id, emoji: initia
     }
   };
 
-  const EmojiIcon = emojis.find(e => e.label === selectedEmoji)?.icon || Smile;
+  const selectedEmojiConfig = emojis.find(e => e.label === selectedEmoji);
+  const EmojiIcon = selectedEmojiConfig?.icon || Smile;
 
   return (
     <Card 
@@ -58,17 +59,20 @@ export function BlueprintCard({ name, instrument, winRate = 0, id, emoji: initia
         <DropdownMenu>
           <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
             <Button variant="ghost" size="icon" className="h-8 w-8">
-              <EmojiIcon className="h-5 w-5" />
+              <EmojiIcon 
+                className="h-5 w-5" 
+                style={{ color: selectedEmojiConfig?.color }}
+              />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="bg-white">
-            {emojis.map(({ icon: Icon, label }) => (
+          <DropdownMenuContent align="end" className="bg-background/95 backdrop-blur-sm">
+            {emojis.map(({ icon: Icon, label, color }) => (
               <DropdownMenuItem
                 key={label}
                 onClick={(e) => handleEmojiSelect(label, e)}
-                className="cursor-pointer"
+                className="cursor-pointer hover:bg-accent/10"
               >
-                <Icon className="mr-2 h-4 w-4" />
+                <Icon className="mr-2 h-4 w-4" style={{ color }} />
                 <span>{label}</span>
               </DropdownMenuItem>
             ))}

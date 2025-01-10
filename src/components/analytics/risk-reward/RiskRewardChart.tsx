@@ -112,7 +112,7 @@ export const RiskRewardChart = ({ data }: RiskRewardChartProps) => {
             dataKey="cumulativeRR"
             fill="#FF6B6B"
             shape="star"
-            size={100}
+            r={6}
           />
         </LineChart>
       </ResponsiveContainer>

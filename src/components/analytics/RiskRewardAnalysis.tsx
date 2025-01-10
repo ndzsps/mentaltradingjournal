@@ -23,12 +23,15 @@ export const RiskRewardAnalysis = () => {
 
   // Process trades to calculate cumulative R:R data
   const data = analytics.journalEntries
-    .flatMap(entry => entry.trades || [])
-    .map(trade => {
+    .flatMap(entry => (entry.trades || []).map(trade => ({
+      trade,
+      entryDate: trade.entryDate || entry.created_at
+    })))
+    .map(({ trade, entryDate }) => {
       const entryPrice = Number(trade.entryPrice);
       const stopLoss = Number(trade.stopLoss);
       const takeProfit = Number(trade.takeProfit);
-      const date = new Date(trade.entryDate || entry.created_at);
+      const date = new Date(entryDate);
       
       // Calculate risk and reward based on trade direction
       let risk, reward;

@@ -72,6 +72,7 @@ export function PlaybookSection() {
                 id={blueprint.id}
                 name={blueprint.name}
                 instrument={blueprint.rules[0]?.replace("Instrument: ", "") || "N/A"}
+                emoji={blueprint.emoji}
               />
             ))}
           </div>

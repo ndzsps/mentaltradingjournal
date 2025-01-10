@@ -34,7 +34,7 @@ export function PlaybookSection() {
   };
 
   return (
-    <Card className="w-full bg-primary/5 backdrop-blur-sm shadow-lg animate-fade-in border-primary/20">
+    <Card className="w-full bg-white/95 backdrop-blur-sm shadow-lg animate-fade-in border-primary/20">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
         <CardTitle className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
           Playbook
@@ -63,7 +63,7 @@ export function PlaybookSection() {
       </CardHeader>
       <CardContent className="space-y-4">
         {blueprints.length === 0 ? (
-          <p className="text-muted-foreground text-center py-8 animate-fade-in">
+          <p className="text-primary/80 text-center py-8 animate-fade-in font-medium">
             Select or create a playbook to view trading rules and strategies for your backtesting session.
           </p>
         ) : (

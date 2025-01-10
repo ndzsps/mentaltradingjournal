@@ -51,7 +51,7 @@ export function BlueprintCard({ name, instrument, winRate = 0, id, emoji: initia
 
   return (
     <Card 
-      className="bg-white/50 backdrop-blur-sm hover:bg-white/70 transition-all duration-300 cursor-pointer relative hover:shadow-lg hover:-translate-y-1 animate-fade-in border-primary/10"
+      className="bg-white/90 backdrop-blur-sm hover:bg-white transition-all duration-300 cursor-pointer relative hover:shadow-lg hover:-translate-y-1 animate-fade-in border-primary/10"
       onClick={() => navigate(`/blueprint/${id}`)}
     >
       <CardHeader className="pb-2 flex flex-row items-center justify-between">
@@ -84,10 +84,10 @@ export function BlueprintCard({ name, instrument, winRate = 0, id, emoji: initia
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex items-center justify-between">
-          <Badge variant="outline" className="bg-primary/10 hover:bg-primary/20 transition-colors border-primary/20">
+          <Badge variant="outline" className="bg-white hover:bg-primary/20 transition-colors border-primary/20 text-primary font-medium">
             {instrument}
           </Badge>
-          <span className="text-sm text-muted-foreground">
+          <span className="text-sm font-medium text-primary/80">
             Win Rate: {winRate}%
           </span>
         </div>

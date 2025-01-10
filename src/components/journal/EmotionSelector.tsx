@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { emotions } from "./emotionConfig";
+import { SmilePlus, Meh, Frown } from "lucide-react";
 
 interface EmotionSelectorProps {
   selectedEmotion: string;
@@ -10,6 +10,12 @@ export const EmotionSelector = ({
   selectedEmotion,
   onEmotionSelect,
 }: EmotionSelectorProps) => {
+  const emotions = [
+    { icon: SmilePlus, label: "Positive", value: "positive" },
+    { icon: Meh, label: "Neutral", value: "neutral" },
+    { icon: Frown, label: "Negative", value: "negative" },
+  ];
+
   return (
     <div className="grid grid-cols-3 gap-4">
       {emotions.map(({ icon: Icon, label, value }) => (

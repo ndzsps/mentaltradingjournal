@@ -74,7 +74,12 @@ export const EmotionLogger = () => {
 
   const handleEmotionSelect = (value: string) => {
     setSelectedEmotion(value);
-    setIsDetailDialogOpen(true);
+    if (sessionType === "post") {
+      setIsDetailDialogOpen(true);
+    } else {
+      // For pre-session, we'll just use the main emotion as the detail
+      setSelectedEmotionDetail(value);
+    }
   };
 
   const handleDetailSelect = (detail: string) => {
@@ -154,18 +159,18 @@ export const EmotionLogger = () => {
             onEmotionSelect={handleEmotionSelect}
           />
 
-          <EmotionDetailDialog
-            isOpen={isDetailDialogOpen}
-            onOpenChange={setIsDetailDialogOpen}
-            details={selectedEmotion ? emotions.find(e => e.value === selectedEmotion)?.details || [] : []}
-            onDetailSelect={handleDetailSelect}
-            selectedDetail={selectedEmotionDetail}
-            customDetails={customDetails}
-            onCustomDetailAdd={handleCustomDetailAdd}
-          />
-
           {sessionType === "post" && (
             <>
+              <EmotionDetailDialog
+                isOpen={isDetailDialogOpen}
+                onOpenChange={setIsDetailDialogOpen}
+                details={selectedEmotion ? emotions.find(e => e.value === selectedEmotion)?.details || [] : []}
+                onDetailSelect={handleDetailSelect}
+                selectedDetail={selectedEmotionDetail}
+                customDetails={customDetails}
+                onCustomDetailAdd={handleCustomDetailAdd}
+              />
+
               <PostSessionSection
                 selectedOutcome={selectedOutcome}
                 setSelectedOutcome={setSelectedOutcome}

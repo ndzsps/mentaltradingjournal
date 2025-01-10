@@ -2,12 +2,19 @@ import { Separator } from "@/components/ui/separator";
 import { TradesList } from "./TradesList";
 import { TradingRules } from "./TradingRules";
 import { Trade } from "@/types/trade";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { Textarea } from "@/components/ui/textarea";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface EntryContentProps {
+  id?: string;
   marketConditions?: string;
   notes?: string;
   followedRules?: string[];
   trades?: Trade[];
+  postSubmissionNotes?: string;
 }
 
 const capitalizeWords = (str: string) => {
@@ -18,11 +25,39 @@ const capitalizeWords = (str: string) => {
 };
 
 export const EntryContent = ({ 
+  id,
   marketConditions, 
   notes, 
   followedRules, 
-  trades 
+  trades,
+  postSubmissionNotes: initialPostSubmissionNotes
 }: EntryContentProps) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [postSubmissionNotes, setPostSubmissionNotes] = useState(initialPostSubmissionNotes || "");
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSaveNotes = async () => {
+    if (!id) return;
+    
+    setIsSaving(true);
+    try {
+      const { error } = await supabase
+        .from('journal_entries')
+        .update({ post_submission_notes: postSubmissionNotes })
+        .eq('id', id);
+
+      if (error) throw error;
+      
+      toast.success("Notes saved successfully!");
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error saving notes:', error);
+      toast.error("Failed to save notes");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {marketConditions && (
@@ -48,6 +83,57 @@ export const EntryContent = ({
           </div>
         </div>
       )}
+
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h4 className="text-sm font-medium text-muted-foreground">Additional Notes</h4>
+          {!isEditing && (
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setIsEditing(true)}
+            >
+              Add Notes
+            </Button>
+          )}
+        </div>
+
+        {isEditing ? (
+          <div className="space-y-4">
+            <Textarea
+              value={postSubmissionNotes}
+              onChange={(e) => setPostSubmissionNotes(e.target.value)}
+              placeholder="Add your notes here..."
+              className="min-h-[100px]"
+            />
+            <div className="flex gap-2 justify-end">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setIsEditing(false);
+                  setPostSubmissionNotes(initialPostSubmissionNotes || "");
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                size="sm"
+                onClick={handleSaveNotes}
+                disabled={isSaving}
+              >
+                Save Notes
+              </Button>
+            </div>
+          </div>
+        ) : (
+          postSubmissionNotes && (
+            <p className="text-sm text-foreground/90 p-4 bg-muted/50 rounded-lg">
+              {postSubmissionNotes}
+            </p>
+          )
+        )}
+      </div>
     </div>
   );
 };

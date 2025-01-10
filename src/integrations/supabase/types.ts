@@ -122,6 +122,7 @@ export type Database = {
           mistakes: string[] | null
           notes: string
           outcome: string | null
+          post_submission_notes: string | null
           pre_trading_activities: string[] | null
           session_type: string
           trades: Json[] | null
@@ -138,6 +139,7 @@ export type Database = {
           mistakes?: string[] | null
           notes: string
           outcome?: string | null
+          post_submission_notes?: string | null
           pre_trading_activities?: string[] | null
           session_type: string
           trades?: Json[] | null
@@ -154,6 +156,7 @@ export type Database = {
           mistakes?: string[] | null
           notes?: string
           outcome?: string | null
+          post_submission_notes?: string | null
           pre_trading_activities?: string[] | null
           session_type?: string
           trades?: Json[] | null

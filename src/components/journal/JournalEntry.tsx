@@ -14,6 +14,7 @@ interface JournalEntry {
   market_conditions?: string;
   trades?: Trade[];
   followed_rules?: string[];
+  post_submission_notes?: string;
 }
 
 interface JournalEntryProps {
@@ -40,10 +41,12 @@ export const JournalEntry = ({ entry }: JournalEntryProps) => {
         />
 
         <EntryContent
+          id={entry.id}
           marketConditions={entry.market_conditions}
           notes={entry.notes}
           followedRules={entry.followed_rules}
           trades={entry.trades}
+          postSubmissionNotes={entry.post_submission_notes}
         />
       </div>
     </Card>

@@ -55,7 +55,7 @@ export function AppHeader() {
     <header className="border-b border-border/40 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 max-w-screen-2xl items-center justify-between">
         <Link to="/" className="flex items-center space-x-2">
-          <span className="font-bold">TradingMind</span>
+          <span className="font-bold">Mental</span>
         </Link>
 
         {/* Desktop Navigation */}

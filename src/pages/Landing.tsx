@@ -24,7 +24,7 @@ const Landing = () => {
           <div className="container mx-auto px-4 h-16 flex items-center justify-between">
             <div className="flex items-center">
               <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                TradingMind
+                Mental
               </span>
             </div>
             <div className="flex items-center gap-4">

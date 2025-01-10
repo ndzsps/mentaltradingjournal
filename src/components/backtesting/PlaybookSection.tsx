@@ -34,9 +34,9 @@ export function PlaybookSection() {
   };
 
   return (
-    <Card className="w-full bg-white/95 backdrop-blur-sm shadow-lg animate-fade-in border-primary/20">
+    <Card className="w-full bg-[#1A1F2C]/95 backdrop-blur-sm shadow-lg animate-fade-in border-primary/20">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-        <CardTitle className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+        <CardTitle className="bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
           Playbook
         </CardTitle>
         <Dialog open={open} onOpenChange={setOpen}>
@@ -44,13 +44,13 @@ export function PlaybookSection() {
             <Button 
               variant="outline" 
               size="sm" 
-              className="flex items-center gap-2 hover:bg-primary/10 transition-colors border-primary/20"
+              className="flex items-center gap-2 hover:bg-primary/20 transition-colors border-primary/20 text-primary-light"
             >
               <Plus className="h-4 w-4" />
               Add Blueprint
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[500px]">
+          <DialogContent className="sm:max-w-[500px] dark">
             <DialogHeader>
               <DialogTitle>Add New Trading Blueprint</DialogTitle>
             </DialogHeader>
@@ -63,7 +63,7 @@ export function PlaybookSection() {
       </CardHeader>
       <CardContent className="space-y-4">
         {blueprints.length === 0 ? (
-          <p className="text-primary/80 text-center py-8 animate-fade-in font-medium">
+          <p className="text-primary-light/90 text-center py-8 animate-fade-in font-medium">
             Select or create a playbook to view trading rules and strategies for your backtesting session.
           </p>
         ) : (

@@ -51,11 +51,11 @@ export function BlueprintCard({ name, instrument, winRate = 0, id, emoji: initia
 
   return (
     <Card 
-      className="bg-white/90 backdrop-blur-sm hover:bg-white transition-all duration-300 cursor-pointer relative hover:shadow-lg hover:-translate-y-1 animate-fade-in border-primary/10"
+      className="bg-[#403E43]/90 backdrop-blur-sm hover:bg-[#403E43] transition-all duration-300 cursor-pointer relative hover:shadow-lg hover:-translate-y-1 animate-fade-in border-primary/20"
       onClick={() => navigate(`/blueprint/${id}`)}
     >
       <CardHeader className="pb-2 flex flex-row items-center justify-between">
-        <CardTitle className="text-lg font-semibold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+        <CardTitle className="text-lg font-semibold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
           {name}
         </CardTitle>
         <DropdownMenu>
@@ -63,17 +63,17 @@ export function BlueprintCard({ name, instrument, winRate = 0, id, emoji: initia
             <Button 
               variant="ghost" 
               size="icon" 
-              className="h-8 w-8 hover:bg-primary/10 transition-colors"
+              className="h-8 w-8 hover:bg-primary/20 transition-colors"
             >
               <EmojiIcon className="h-5 w-5" style={{ color: emojiColor }} />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="bg-white/95 backdrop-blur-sm">
+          <DropdownMenuContent align="end" className="bg-[#1A1F2C]/95 backdrop-blur-sm border-primary/20">
             {emojis.map(({ icon: Icon, label, color }) => (
               <DropdownMenuItem
                 key={label}
                 onClick={(e) => handleEmojiSelect(label, e)}
-                className="cursor-pointer hover:bg-primary/10 transition-colors"
+                className="cursor-pointer hover:bg-primary/20 transition-colors text-primary-light"
               >
                 <Icon className="mr-2 h-4 w-4" style={{ color }} />
                 <span>{label}</span>
@@ -84,10 +84,10 @@ export function BlueprintCard({ name, instrument, winRate = 0, id, emoji: initia
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex items-center justify-between">
-          <Badge variant="outline" className="bg-white hover:bg-primary/20 transition-colors border-primary/20 text-primary font-medium">
+          <Badge variant="outline" className="bg-[#1A1F2C]/80 hover:bg-primary/20 transition-colors border-primary/20 text-primary-light font-medium">
             {instrument}
           </Badge>
-          <span className="text-sm font-medium text-primary/80">
+          <span className="text-sm font-medium text-primary-light/90">
             Win Rate: {winRate}%
           </span>
         </div>

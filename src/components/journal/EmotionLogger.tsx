@@ -14,7 +14,6 @@ import { ProgressStats } from "./ProgressStats";
 const PRE_TRADING_ACTIVITIES = [
   "Meditation",
   "Exercise",
-  "News Reading",
   "Market Analysis",
   "Trading Plan Review"
 ];

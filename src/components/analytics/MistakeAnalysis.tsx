@@ -84,7 +84,7 @@ export const MistakeAnalysis = () => {
   return (
     <Card className="p-4 md:p-6 space-y-4">
       <div className="space-y-2">
-        <h3 className="text-xl md:text-2xl font-bold">Mistake Frequency vs. Outcome</h3>
+        <h3 className="text-xl md:text-2xl font-bold">Behavioral Slippage</h3>
         <p className="text-sm text-muted-foreground">
           Analysis of trading mistakes and their impact
         </p>

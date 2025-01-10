@@ -4,7 +4,6 @@ import { EmotionalTendencies } from "./EmotionalTendencies";
 import { PerformanceBreakdown } from "./PerformanceBreakdown";
 import { EmotionTrend } from "./EmotionTrend";
 import { RuleAdherence } from "./RuleAdherence";
-import { MarketVolatility } from "./MarketVolatility";
 import { EmotionRecovery } from "./EmotionRecovery";
 import { PreTradingEvents } from "./PreTradingEvents";
 import { TradeDuration } from "./TradeDuration";
@@ -37,7 +36,6 @@ export const AnalyticsDashboard = () => {
     AssetPairPerformance,
     PerformanceBreakdown,
     RuleAdherence,
-    MarketVolatility,
     TradeDuration,
     CumulativeImpact,
     MistakeAnalysis,

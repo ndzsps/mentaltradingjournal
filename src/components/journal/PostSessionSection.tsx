@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus } from "lucide-react";
 import { Trade } from "@/types/trade";
 import { TradingOutcome, MistakeCategory, TradingRule } from "./types";
@@ -11,8 +10,6 @@ import { HelpCircle } from "lucide-react";
 interface PostSessionSectionProps {
   selectedOutcome: string;
   setSelectedOutcome: (value: string) => void;
-  marketConditions: string;
-  setMarketConditions: (value: string) => void;
   followedRules: string[];
   setFollowedRules: (value: string[]) => void;
   selectedMistakes: string[];
@@ -34,8 +31,6 @@ const capitalizeWords = (str: string) => {
 export const PostSessionSection = ({
   selectedOutcome,
   setSelectedOutcome,
-  marketConditions,
-  setMarketConditions,
   followedRules,
   setFollowedRules,
   selectedMistakes,
@@ -46,15 +41,6 @@ export const PostSessionSection = ({
   onAddTrade,
   trades,
 }: PostSessionSectionProps) => {
-  const marketConditionOptions = [
-    { value: "low_volatility", label: "Low Volatility" },
-    { value: "medium_volatility", label: "Medium Volatility" },
-    { value: "high_volatility", label: "High Volatility" },
-    { value: "trending", label: "Trending" },
-    { value: "ranging", label: "Ranging" },
-    { value: "news_driven", label: "News Driven" },
-  ];
-
   return (
     <>
       <div className="grid grid-cols-4 gap-4">
@@ -109,22 +95,6 @@ export const PostSessionSection = ({
             </div>
           </Button>
         ))}
-      </div>
-
-      <div className="space-y-4">
-        <Label className="text-lg font-medium">Market Conditions</Label>
-        <Select value={marketConditions} onValueChange={setMarketConditions}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select market conditions" />
-          </SelectTrigger>
-          <SelectContent>
-            {marketConditionOptions.map(option => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
       </div>
 
       <div className="space-y-6">

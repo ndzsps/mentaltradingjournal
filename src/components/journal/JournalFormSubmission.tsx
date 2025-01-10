@@ -11,7 +11,6 @@ interface JournalFormSubmissionProps {
   selectedEmotionDetail: string;
   notes: string;
   selectedOutcome?: string;
-  marketConditions?: string;
   followedRules?: string[];
   selectedMistakes?: string[];
   preTradingActivities: string[];
@@ -26,7 +25,6 @@ export const useJournalFormSubmission = ({
   selectedEmotionDetail,
   notes,
   selectedOutcome,
-  marketConditions,
   followedRules,
   selectedMistakes,
   preTradingActivities,
@@ -68,7 +66,7 @@ export const useJournalFormSubmission = ({
         return;
       }
 
-      if (!selectedEmotion || !selectedEmotionDetail || !notes || !selectedOutcome || !marketConditions || followedRules?.length === 0) {
+      if (!selectedEmotion || !selectedEmotionDetail || !notes || !selectedOutcome || followedRules?.length === 0) {
         toast.error("Missing Information", {
           description: "Please fill in all required fields for post-session.",
           duration: 5000,
@@ -104,7 +102,6 @@ export const useJournalFormSubmission = ({
         emotion_detail: selectedEmotionDetail,
         notes,
         outcome: sessionType === "pre" ? null : selectedOutcome,
-        market_conditions: marketConditions,
         followed_rules: followedRules,
         mistakes: selectedMistakes,
         pre_trading_activities: preTradingActivities,

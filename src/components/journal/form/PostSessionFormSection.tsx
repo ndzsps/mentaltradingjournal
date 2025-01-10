@@ -1,13 +1,11 @@
 import { PostSessionSection } from "../PostSessionSection";
 import { AddTradeDialog } from "../../analytics/AddTradeDialog";
 import { Trade } from "@/types/trade";
-import { tradingOutcome, mistakeCategories, tradingRules } from "../emotionConfig"; // Added this import
+import { tradingOutcome, mistakeCategories, tradingRules } from "../emotionConfig";
 
 interface PostSessionFormSectionProps {
   selectedOutcome: string;
   setSelectedOutcome: (outcome: string) => void;
-  marketConditions: string;
-  setMarketConditions: (conditions: string) => void;
   followedRules: string[];
   setFollowedRules: (rules: string[]) => void;
   selectedMistakes: string[];
@@ -21,8 +19,6 @@ interface PostSessionFormSectionProps {
 export const PostSessionFormSection = ({
   selectedOutcome,
   setSelectedOutcome,
-  marketConditions,
-  setMarketConditions,
   followedRules,
   setFollowedRules,
   selectedMistakes,
@@ -37,8 +33,6 @@ export const PostSessionFormSection = ({
       <PostSessionSection
         selectedOutcome={selectedOutcome}
         setSelectedOutcome={setSelectedOutcome}
-        marketConditions={marketConditions}
-        setMarketConditions={setMarketConditions}
         followedRules={followedRules}
         setFollowedRules={setFollowedRules}
         selectedMistakes={selectedMistakes}

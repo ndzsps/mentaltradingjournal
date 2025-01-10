@@ -13,32 +13,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { CustomTooltip } from "./shared/CustomTooltip";
 
-const emotionToNumber = (emotion: string) => {
-  switch (emotion.toLowerCase()) {
-    case 'positive':
-      return 2;
-    case 'neutral':
-      return 1;
-    case 'negative':
-      return 0;
-    default:
-      return 1;
-  }
-};
-
-const numberToEmotion = (value: number) => {
-  switch (value) {
-    case 2:
-      return 'Positive';
-    case 1:
-      return 'Neutral';
-    case 0:
-      return 'Negative';
-    default:
-      return 'Neutral';
-  }
-};
-
 export const EmotionalTendencies = () => {
   const { data: analytics, isLoading } = useQuery({
     queryKey: ['analytics'],
@@ -56,19 +30,13 @@ export const EmotionalTendencies = () => {
     );
   }
 
-  const data = analytics.emotionTrend.map(item => ({
-    ...item,
-    emotionalScore: emotionToNumber(item.emotional || 'neutral'),
-  }));
+  const data = analytics.emotionTrend;
 
   const formatValue = (value: number) => {
-    if (typeof value === 'number') {
-      if (Number.isInteger(value)) {
-        return numberToEmotion(value);
-      }
-      return `$${value.toFixed(2)}`;
+    if (value >= 1000) {
+      return `$${(value / 1000).toFixed(1)}K`;
     }
-    return value;
+    return `$${value.toFixed(2)}`;
   };
 
   return (
@@ -87,12 +55,10 @@ export const EmotionalTendencies = () => {
             <XAxis dataKey="date" tick={{ fontSize: 12 }} />
             <YAxis 
               yAxisId="emotion"
-              domain={[0, 2]}
-              ticks={[0, 1, 2]}
-              tickFormatter={formatValue}
+              domain={[0, 100]}
               tick={{ fontSize: 12 }}
               label={{ 
-                value: 'Emotional State', 
+                value: 'Emotional Score', 
                 angle: -90, 
                 position: 'insideLeft',
                 style: { fontSize: '12px' }
@@ -115,12 +81,12 @@ export const EmotionalTendencies = () => {
             <Legend />
             <Line
               yAxisId="emotion"
-              type="stepAfter"
+              type="monotone"
               dataKey="emotionalScore"
               stroke="#6E59A5"
               strokeWidth={2}
               dot={{ fill: "#6E59A5" }}
-              name="Emotional State"
+              name="Emotional Score"
             />
             <Line
               yAxisId="pnl"

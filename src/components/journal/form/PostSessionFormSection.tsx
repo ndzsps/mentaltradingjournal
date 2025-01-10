@@ -1,6 +1,7 @@
 import { PostSessionSection } from "../PostSessionSection";
 import { AddTradeDialog } from "../../analytics/AddTradeDialog";
 import { Trade } from "@/types/trade";
+import { tradingOutcome, mistakeCategories, tradingRules } from "../emotionConfig"; // Added this import
 
 interface PostSessionFormSectionProps {
   selectedOutcome: string;

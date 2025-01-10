@@ -9,6 +9,7 @@ import { FormSubmissionSection } from "./FormSubmissionSection";
 import { FormHeader } from "./form/FormHeader";
 import { EmotionSection } from "./form/EmotionSection";
 import { PostSessionFormSection } from "./form/PostSessionFormSection";
+import { ProgressStats } from "./ProgressStats"; // Added this import
 
 const PRE_TRADING_ACTIVITIES = [
   "Meditation",

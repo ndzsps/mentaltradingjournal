@@ -1,5 +1,6 @@
 import { EmotionDetailDialog } from "../EmotionDetailDialog";
 import { EmotionSelector } from "../EmotionSelector";
+import { emotions } from "../emotionConfig"; // Added this import
 
 interface EmotionSectionProps {
   sessionType: "pre" | "post";

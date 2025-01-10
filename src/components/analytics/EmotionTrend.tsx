@@ -15,7 +15,7 @@ import { useQuery } from "@tanstack/react-query";
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-background border border-border rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95">
+      <div className="bg-background/95 backdrop-blur-sm border border-border rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95">
         <p className="font-medium text-sm text-foreground mb-2">{label}</p>
         {payload.map((entry: any, index: number) => (
           <div key={index} className="flex items-center gap-2 text-sm">
@@ -68,17 +68,27 @@ export const EmotionTrend = () => {
       <div className="h-[250px] md:h-[300px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" tick={{ fontSize: 12 }} />
-            <YAxis tick={{ fontSize: 12 }} />
-            <Tooltip />
+            <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+            <XAxis 
+              dataKey="date" 
+              tick={{ fontSize: 12 }}
+              stroke="currentColor"
+              tickLine={{ stroke: 'currentColor' }}
+            />
+            <YAxis 
+              tick={{ fontSize: 12 }}
+              stroke="currentColor"
+              tickLine={{ stroke: 'currentColor' }}
+            />
+            <Tooltip content={<CustomTooltip />} />
             <Legend />
             <Line
               type="monotone"
               dataKey="emotionalScore"
               stroke="#6E59A5"
               strokeWidth={2}
-              dot={{ fill: "#6E59A5" }}
+              dot={{ fill: "#6E59A5", strokeWidth: 0 }}
+              activeDot={{ r: 6, fill: "#9b87f5" }}
               name="Emotional Score"
             />
             <Line
@@ -86,7 +96,8 @@ export const EmotionTrend = () => {
               dataKey="tradingResult"
               stroke="#0EA5E9"
               strokeWidth={2}
-              dot={{ fill: "#0EA5E9" }}
+              dot={{ fill: "#0EA5E9", strokeWidth: 0 }}
+              activeDot={{ r: 6, fill: "#38BDF8" }}
               name="Trading Result"
             />
           </LineChart>

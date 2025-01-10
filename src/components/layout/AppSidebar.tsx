@@ -1,4 +1,4 @@
-import { Home, BookOpen, BarChart2, Settings, UserCog, FlaskConical } from "lucide-react";
+import { Home, BookOpen, BarChart2, Settings, UserCog, FlaskConical, BrainCircuit } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
   Sidebar,
@@ -35,7 +35,12 @@ export function AppSidebar() {
       <Sidebar>
         <SidebarContent>
           <div className="p-4">
-            <h1 className="text-2xl font-bold text-primary">Mental</h1>
+            <Link to="/" className="flex items-center gap-2 group">
+              <BrainCircuit className="w-6 h-6 text-primary transition-all duration-300 group-hover:text-accent" />
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent transition-all duration-300">
+                Mental
+              </h1>
+            </Link>
           </div>
           <SidebarGroup>
             <SidebarGroupLabel>Menu</SidebarGroupLabel>

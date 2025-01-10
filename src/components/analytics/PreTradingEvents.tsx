@@ -11,6 +11,26 @@ import {
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
 
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (!active || !payload || !payload.length) return null;
+
+  return (
+    <div className="bg-background/95 backdrop-blur-sm border border-border rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95">
+      <p className="font-medium text-sm text-foreground mb-2">{label}</p>
+      <div className="flex items-center gap-2 text-sm">
+        <div
+          className="w-2 h-2 rounded-full"
+          style={{ backgroundColor: payload[0].color || payload[0].fill }}
+        />
+        <span className="text-muted-foreground">Impact:</span>
+        <span className="font-medium text-foreground">
+          {payload[0].value > 0 ? '+' : ''}{payload[0].value}%
+        </span>
+      </div>
+    </div>
+  );
+};
+
 export const PreTradingEvents = () => {
   const { data: analytics, isLoading } = useQuery({
     queryKey: ['analytics'],
@@ -51,15 +71,26 @@ export const PreTradingEvents = () => {
       <div className="h-[250px] md:h-[300px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="event" tick={{ fontSize: 12 }} />
-            <YAxis tick={{ fontSize: 12 }} />
-            <Tooltip />
+            <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+            <XAxis 
+              dataKey="event" 
+              tick={{ fontSize: 12 }}
+              stroke="currentColor"
+              tickLine={{ stroke: 'currentColor' }}
+            />
+            <YAxis 
+              tick={{ fontSize: 12 }}
+              stroke="currentColor"
+              tickLine={{ stroke: 'currentColor' }}
+            />
+            <Tooltip 
+              content={<CustomTooltip />}
+              cursor={{ fill: 'currentColor', opacity: 0.1 }}
+            />
             <Bar 
               dataKey="impact"
               fill="#6E59A5"
-              fillOpacity={1}
-              stroke="none"
+              radius={[4, 4, 0, 0]}
             />
           </BarChart>
         </ResponsiveContainer>

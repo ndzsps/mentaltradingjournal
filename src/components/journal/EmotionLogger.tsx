@@ -1,20 +1,14 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
-import { EmotionDetailDialog } from "./EmotionDetailDialog";
 import { SessionProgress } from "./SessionProgress";
-import { PostSessionSection } from "./PostSessionSection";
-import { ProgressStats } from "./ProgressStats";
+import { PreTradingActivities } from "./PreTradingActivities";
 import { useJournalFormSubmission } from "./JournalFormSubmission";
 import { useProgressTracking } from "@/hooks/useProgressTracking";
-import { SessionTypeSelector } from "./SessionTypeSelector";
-import { PreTradingActivities } from "./PreTradingActivities";
-import { EmotionSelector } from "./EmotionSelector";
-import { emotions, tradingOutcome, mistakeCategories, tradingRules } from "./emotionConfig";
-import { AddTradeDialog } from "../analytics/AddTradeDialog";
 import { Trade } from "@/types/trade";
 import { FormSubmissionSection } from "./FormSubmissionSection";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { HelpCircle } from "lucide-react";
+import { FormHeader } from "./form/FormHeader";
+import { EmotionSection } from "./form/EmotionSection";
+import { PostSessionFormSection } from "./form/PostSessionFormSection";
 
 const PRE_TRADING_ACTIVITIES = [
   "Meditation",
@@ -77,7 +71,6 @@ export const EmotionLogger = () => {
     if (sessionType === "post") {
       setIsDetailDialogOpen(true);
     } else {
-      // For pre-session, we'll just use the main emotion as the detail
       setSelectedEmotionDetail(value);
     }
   };
@@ -93,11 +86,6 @@ export const EmotionLogger = () => {
     }
   };
 
-  const handleSessionTypeChange = (value: "pre" | "post") => {
-    setSessionType(value);
-    setShowCelebration(false);
-  };
-
   const handleTradeSubmit = (tradeData: Trade) => {
     setTrades([...trades, tradeData]);
     setShowAddTradeDialog(false);
@@ -106,44 +94,24 @@ export const EmotionLogger = () => {
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr,300px]">
       <Card className="p-8 space-y-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
-        <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
-              {sessionType === "pre" ? "Pre-Session Check-in" : "Post-Session Review"}
-            </h2>
-            {sessionType === "pre" && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger>
-                    <HelpCircle className="w-5 h-5 text-muted-foreground" />
-                  </TooltipTrigger>
-                  <TooltipContent className="max-w-[300px] p-4">
-                    <p>Pre-sessions are designed to be completed daily before your post-session entry to help you track your mood. Many traders overlook this step, but it plays a significant role in improving your performance and decision-making over time.</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
-          </div>
-          
-          <SessionTypeSelector
-            sessionType={sessionType}
-            onSessionTypeChange={handleSessionTypeChange}
-          />
+        <FormHeader 
+          sessionType={sessionType}
+          onSessionTypeChange={setSessionType}
+        />
 
-          <SessionProgress 
-            emotionSelected={!!selectedEmotion}
-            emotionDetailSelected={!!selectedEmotionDetail}
-            activitiesSelected={preTradingActivities.length > 0}
-            notesEntered={notes.length > 0}
-            outcomeSelected={!!selectedOutcome}
-            marketConditionsSelected={!!marketConditions}
-            rulesSelected={followedRules.length > 0}
-            mistakesReviewed={selectedMistakes.length > 0 || selectedOutcome !== "loss"}
-            tradesAdded={trades.length > 0 || selectedOutcome === "no_trades"}
-            isPostSession={sessionType === "post"}
-            showCelebration={showCelebration}
-          />
-        </div>
+        <SessionProgress 
+          emotionSelected={!!selectedEmotion}
+          emotionDetailSelected={!!selectedEmotionDetail}
+          activitiesSelected={preTradingActivities.length > 0}
+          notesEntered={notes.length > 0}
+          outcomeSelected={!!selectedOutcome}
+          marketConditionsSelected={!!marketConditions}
+          rulesSelected={followedRules.length > 0}
+          mistakesReviewed={selectedMistakes.length > 0 || selectedOutcome !== "loss"}
+          tradesAdded={trades.length > 0 || selectedOutcome === "no_trades"}
+          isPostSession={sessionType === "post"}
+          showCelebration={showCelebration}
+        />
 
         {sessionType === "pre" && (
           <PreTradingActivities
@@ -154,45 +122,33 @@ export const EmotionLogger = () => {
         )}
         
         <div className="space-y-6">
-          <EmotionSelector
+          <EmotionSection
+            sessionType={sessionType}
             selectedEmotion={selectedEmotion}
+            selectedEmotionDetail={selectedEmotionDetail}
+            isDetailDialogOpen={isDetailDialogOpen}
+            customDetails={customDetails}
             onEmotionSelect={handleEmotionSelect}
+            onDetailSelect={handleDetailSelect}
+            onDetailDialogOpenChange={setIsDetailDialogOpen}
+            onCustomDetailAdd={handleCustomDetailAdd}
           />
 
           {sessionType === "post" && (
-            <>
-              <EmotionDetailDialog
-                isOpen={isDetailDialogOpen}
-                onOpenChange={setIsDetailDialogOpen}
-                details={selectedEmotion ? emotions.find(e => e.value === selectedEmotion)?.details || [] : []}
-                onDetailSelect={handleDetailSelect}
-                selectedDetail={selectedEmotionDetail}
-                customDetails={customDetails}
-                onCustomDetailAdd={handleCustomDetailAdd}
-              />
-
-              <PostSessionSection
-                selectedOutcome={selectedOutcome}
-                setSelectedOutcome={setSelectedOutcome}
-                marketConditions={marketConditions}
-                setMarketConditions={setMarketConditions}
-                followedRules={followedRules}
-                setFollowedRules={setFollowedRules}
-                selectedMistakes={selectedMistakes}
-                setSelectedMistakes={setSelectedMistakes}
-                tradingOutcome={tradingOutcome}
-                mistakeCategories={mistakeCategories}
-                tradingRules={tradingRules}
-                onAddTrade={() => setShowAddTradeDialog(true)}
-                trades={trades}
-              />
-
-              <AddTradeDialog
-                open={showAddTradeDialog}
-                onOpenChange={setShowAddTradeDialog}
-                onSubmit={handleTradeSubmit}
-              />
-            </>
+            <PostSessionFormSection
+              selectedOutcome={selectedOutcome}
+              setSelectedOutcome={setSelectedOutcome}
+              marketConditions={marketConditions}
+              setMarketConditions={setMarketConditions}
+              followedRules={followedRules}
+              setFollowedRules={setFollowedRules}
+              selectedMistakes={selectedMistakes}
+              setSelectedMistakes={setSelectedMistakes}
+              showAddTradeDialog={showAddTradeDialog}
+              setShowAddTradeDialog={setShowAddTradeDialog}
+              trades={trades}
+              onTradeSubmit={handleTradeSubmit}
+            />
           )}
 
           <FormSubmissionSection

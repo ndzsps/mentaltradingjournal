@@ -14,6 +14,8 @@ interface PostSessionFormSectionProps {
   setShowAddTradeDialog: (show: boolean) => void;
   trades: Trade[];
   onTradeSubmit: (trade: Trade) => void;
+  tradingRulesNotes: string;
+  setTradingRulesNotes: (notes: string) => void;
 }
 
 export const PostSessionFormSection = ({
@@ -27,6 +29,8 @@ export const PostSessionFormSection = ({
   setShowAddTradeDialog,
   trades,
   onTradeSubmit,
+  tradingRulesNotes,
+  setTradingRulesNotes,
 }: PostSessionFormSectionProps) => {
   return (
     <>
@@ -42,6 +46,8 @@ export const PostSessionFormSection = ({
         tradingRules={tradingRules}
         onAddTrade={() => setShowAddTradeDialog(true)}
         trades={trades}
+        tradingRulesNotes={tradingRulesNotes}
+        setTradingRulesNotes={setTradingRulesNotes}
       />
 
       <AddTradeDialog

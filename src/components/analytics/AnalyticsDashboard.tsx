@@ -7,7 +7,6 @@ import { RuleAdherence } from "./RuleAdherence";
 import { EmotionRecovery } from "./EmotionRecovery";
 import { PreTradingEvents } from "./PreTradingEvents";
 import { TradeDuration } from "./TradeDuration";
-import { CumulativeImpact } from "./CumulativeImpact";
 import { MistakeAnalysis } from "./MistakeAnalysis";
 import { PersonalityPatterns } from "./PersonalityPatterns";
 import { ProfitLossDistribution } from "./ProfitLossDistribution";
@@ -37,7 +36,6 @@ export const AnalyticsDashboard = () => {
     PerformanceBreakdown,
     RuleAdherence,
     TradeDuration,
-    CumulativeImpact,
     MistakeAnalysis,
     ProfitLossDistribution,
     TradeFrequency,

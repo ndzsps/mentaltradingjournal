@@ -8,7 +8,11 @@ import { BlueprintCard } from "./BlueprintCard";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
-export function PlaybookSection() {
+interface PlaybookSectionProps {
+  onBlueprintAdded?: () => void;
+}
+
+export function PlaybookSection({ onBlueprintAdded }: PlaybookSectionProps) {
   const [open, setOpen] = useState(false);
   const [blueprints, setBlueprints] = useState<any[]>([]);
   const { user } = useAuth();
@@ -33,6 +37,14 @@ export function PlaybookSection() {
     }
   };
 
+  const handleSuccess = () => {
+    setOpen(false);
+    fetchBlueprints();
+    if (onBlueprintAdded) {
+      onBlueprintAdded();
+    }
+  };
+
   return (
     <Card className="w-full">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
@@ -52,10 +64,7 @@ export function PlaybookSection() {
             <DialogHeader>
               <DialogTitle>Add New Trading Blueprint</DialogTitle>
             </DialogHeader>
-            <AddBlueprintForm onSuccess={() => {
-              setOpen(false);
-              fetchBlueprints();
-            }} />
+            <AddBlueprintForm onSuccess={handleSuccess} />
           </DialogContent>
         </Dialog>
       </CardHeader>

@@ -23,9 +23,9 @@ export const AnalyticsDashboard = () => {
   const [activeView, setActiveView] = useState<'all' | 'psychological' | 'trading'>('all');
 
   const psychologicalComponents = [
+    EmotionTrend,
     EmotionalTendencies,
     EmotionRecovery,
-    EmotionTrend,
     PreTradingEvents,
     PersonalityPatterns,
   ];

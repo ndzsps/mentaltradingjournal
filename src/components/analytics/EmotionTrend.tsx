@@ -116,7 +116,7 @@ export const EmotionTrend = () => {
 
       <div className="h-[400px] w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <ScatterChart margin={{ top: 20, right: 40, bottom: 60, left: 60 }}>
+          <ScatterChart margin={{ top: 20, right: 20, bottom: 40, left: 0 }}>
             <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
             <XAxis
               dataKey="date"
@@ -130,7 +130,7 @@ export const EmotionTrend = () => {
               label={{ 
                 value: 'Emotional State', 
                 position: 'bottom',
-                offset: 45,
+                offset: 20,
                 style: { textAnchor: 'middle' }
               }}
             />
@@ -142,7 +142,7 @@ export const EmotionTrend = () => {
                 value: 'P&L', 
                 angle: -90, 
                 position: 'insideLeft',
-                offset: 40,
+                offset: 10,
                 style: { textAnchor: 'middle' }
               }}
             />
@@ -150,7 +150,6 @@ export const EmotionTrend = () => {
             <Legend 
               verticalAlign="bottom"
               height={36}
-              offset={20}
               formatter={(value) => value}
             />
             <Scatter

@@ -106,6 +106,9 @@ export const EmotionTrend = () => {
     <Card className="p-4 md:p-6 space-y-4 col-span-2">
       <div className="space-y-2">
         <h3 className="text-xl md:text-2xl font-bold">Emotional State vs. Trading Performance</h3>
+        <p className="text-sm text-muted-foreground">
+          Scatter plot showing the relationship between emotional states and trading results
+        </p>
       </div>
 
       <div className="h-[400px] w-full">
@@ -133,7 +136,7 @@ export const EmotionTrend = () => {
                 offset: -5,
                 style: { 
                   fontSize: '12px',
-                  fill: 'var(--muted-foreground)',
+                  fill: 'currentColor',
                   textAnchor: 'middle'
                 }
               }}

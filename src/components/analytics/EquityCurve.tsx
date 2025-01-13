@@ -11,8 +11,27 @@ import {
   ResponsiveContainer,
   ReferenceLine 
 } from "recharts";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useState } from "react";
+
+const INITIAL_BALANCE_OPTIONS = [
+  { value: 5000, label: "$5,000" },
+  { value: 10000, label: "$10,000" },
+  { value: 25000, label: "$25,000" },
+  { value: 50000, label: "$50,000" },
+  { value: 100000, label: "$100,000" },
+  { value: 200000, label: "$200,000" },
+];
 
 export const EquityCurve = () => {
+  const [selectedBalance, setSelectedBalance] = useState(10000);
+  
   const { data: analytics, isLoading } = useQuery({
     queryKey: ['analytics'],
     queryFn: generateAnalytics,
@@ -30,8 +49,7 @@ export const EquityCurve = () => {
   }
 
   // Process journal entries to calculate equity curve data
-  const initialBalance = 10000; // Starting with $10,000
-  let runningBalance = initialBalance;
+  let runningBalance = selectedBalance;
   
   const equityData = analytics.journalEntries
     .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
@@ -50,12 +68,12 @@ export const EquityCurve = () => {
 
   // Calculate performance metrics
   const maxBalance = Math.max(...equityData.map(d => d.balance));
-  const currentBalance = equityData[equityData.length - 1]?.balance || initialBalance;
-  const totalReturn = ((currentBalance - initialBalance) / initialBalance) * 100;
+  const currentBalance = equityData[equityData.length - 1]?.balance || selectedBalance;
+  const totalReturn = ((currentBalance - selectedBalance) / selectedBalance) * 100;
   
   // Calculate maximum drawdown
   let maxDrawdown = 0;
-  let peak = initialBalance;
+  let peak = selectedBalance;
   
   equityData.forEach(point => {
     if (point.balance > peak) {
@@ -68,7 +86,27 @@ export const EquityCurve = () => {
   return (
     <Card className="p-4 md:p-6 space-y-4 col-span-2">
       <div className="space-y-2">
-        <h3 className="text-xl md:text-2xl font-bold">Equity Curve</h3>
+        <div className="flex items-center justify-between">
+          <h3 className="text-xl md:text-2xl font-bold">Equity Curve</h3>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">Initial Balance:</span>
+            <Select
+              value={selectedBalance.toString()}
+              onValueChange={(value) => setSelectedBalance(Number(value))}
+            >
+              <SelectTrigger className="w-[140px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {INITIAL_BALANCE_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value.toString()}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
         <p className="text-sm text-muted-foreground">
           Track your account balance progression over time
         </p>
@@ -113,7 +151,7 @@ export const EquityCurve = () => {
               }}
               formatter={(value: number) => [`$${value.toLocaleString()}`, 'Balance']}
             />
-            <ReferenceLine y={initialBalance} stroke="hsl(var(--muted-foreground))" strokeDasharray="3 3" />
+            <ReferenceLine y={selectedBalance} stroke="hsl(var(--muted-foreground))" strokeDasharray="3 3" />
             <Line
               type="monotone"
               dataKey="balance"
@@ -128,7 +166,7 @@ export const EquityCurve = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="p-4 rounded-lg border border-border/50">
           <p className="text-sm text-muted-foreground">Initial Balance</p>
-          <p className="text-lg font-bold">${initialBalance.toLocaleString()}</p>
+          <p className="text-lg font-bold">${selectedBalance.toLocaleString()}</p>
         </div>
         <div className="p-4 rounded-lg border border-border/50">
           <p className="text-sm text-muted-foreground">Current Balance</p>

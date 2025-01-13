@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useState } from "react";
+import { CustomTooltip } from "./shared/CustomTooltip";
 
 const INITIAL_BALANCE_OPTIONS = [
   { value: 5000, label: "$5,000" },
@@ -144,12 +145,9 @@ export const EquityCurve = () => {
               }}
             />
             <Tooltip
-              contentStyle={{
-                backgroundColor: 'hsl(var(--background))',
-                border: '1px solid hsl(var(--border))',
-                borderRadius: '6px'
-              }}
-              formatter={(value: number) => [`$${value.toLocaleString()}`, 'Balance']}
+              content={<CustomTooltip 
+                valueFormatter={(value) => `$${value.toLocaleString()}`}
+              />}
             />
             <ReferenceLine y={selectedBalance} stroke="hsl(var(--muted-foreground))" strokeDasharray="3 3" />
             <Line
@@ -158,6 +156,7 @@ export const EquityCurve = () => {
               stroke="hsl(var(--primary))"
               dot={false}
               strokeWidth={2}
+              name="Balance"
             />
           </LineChart>
         </ResponsiveContainer>

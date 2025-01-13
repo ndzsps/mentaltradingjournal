@@ -15,6 +15,7 @@ import { RiskRewardAnalysis } from "./RiskRewardAnalysis";
 import { WinLossRatio } from "./WinLossRatio";
 import { AssetPairPerformance } from "./AssetPairPerformance";
 import { TimeBasedPerformance } from "./TimeBasedPerformance";
+import { EquityCurve } from "./EquityCurve";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
@@ -31,6 +32,7 @@ export const AnalyticsDashboard = () => {
   ];
 
   const tradingComponents = [
+    EquityCurve,
     TimeBasedPerformance,
     AssetPairPerformance,
     PerformanceBreakdown,

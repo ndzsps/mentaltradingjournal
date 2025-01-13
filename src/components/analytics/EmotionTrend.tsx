@@ -104,6 +104,10 @@ export const EmotionTrend = () => {
 
   return (
     <Card className="p-4 md:p-6 space-y-4 col-span-2">
+      <div className="space-y-2">
+        <h3 className="text-xl md:text-2xl font-bold">Emotional State vs. Trading Performance</h3>
+      </div>
+
       <div className="h-[400px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <ScatterChart margin={{ top: 40, right: 40, bottom: 40, left: 40 }}>
@@ -122,6 +126,17 @@ export const EmotionTrend = () => {
               dataKey="pnl"
               name="P&L"
               tickFormatter={formatValue}
+              label={{ 
+                value: 'P&L',
+                angle: -90,
+                position: 'insideLeft',
+                offset: -5,
+                style: { 
+                  fontSize: '12px',
+                  fill: 'var(--muted-foreground)',
+                  textAnchor: 'middle'
+                }
+              }}
             />
             <Tooltip content={<CustomTooltip />} />
             <Legend 

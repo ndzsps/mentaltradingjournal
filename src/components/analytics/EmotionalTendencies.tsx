@@ -56,10 +56,8 @@ export const EmotionalTendencies = () => {
     );
   }
 
-  const data = analytics.emotionTrend.map(item => ({
-    ...item,
-    emotionalScore: emotionToNumber(item.emotional || 'neutral'),
-  }));
+  // The data already contains emotionalScore, so we don't need to transform it
+  const data = analytics.emotionTrend;
 
   const formatValue = (value: number) => {
     if (typeof value === 'number') {

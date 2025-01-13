@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu";
-import { Smile, ThumbsUp, Heart, Star, Trophy, Trash2 } from "lucide-react";
+import { Smile, ThumbsUp, Heart, Star, Trophy, Trash2, MoreVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -102,13 +102,18 @@ export function BlueprintCard({ name, instrument, winRate = 0, id, emoji: initia
         <CardHeader className="pb-2 flex flex-row items-center justify-between">
           <CardTitle className="text-lg font-semibold">{name}</CardTitle>
           <div className="flex items-center gap-2">
+            <Button
+              variant="destructive"
+              size="icon"
+              className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={handleDelete}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                 <Button variant="ghost" size="icon" className="h-8 w-8">
-                  <EmojiIcon 
-                    className="h-5 w-5" 
-                    style={{ color: selectedEmojiConfig?.color }}
-                  />
+                  <MoreVertical className="h-5 w-5" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="bg-background/95 backdrop-blur-sm">
@@ -122,14 +127,6 @@ export function BlueprintCard({ name, instrument, winRate = 0, id, emoji: initia
                     <span>{label}</span>
                   </DropdownMenuItem>
                 ))}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={handleDelete}
-                  className="cursor-pointer hover:bg-destructive/10 text-destructive"
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  <span>Delete</span>
-                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

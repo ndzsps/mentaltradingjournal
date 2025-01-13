@@ -12,6 +12,35 @@ import {
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
 
+const formatValue = (value: number) => {
+  if (Math.abs(value) >= 1000) {
+    return `${(value / 1000).toFixed(0)}K`;
+  }
+  return value;
+};
+
+const emotionToScore = (emotion: string): number => {
+  switch (emotion.toLowerCase()) {
+    case 'positive':
+      return 500;
+    case 'negative':
+      return -500;
+    default:
+      return 0;
+  }
+};
+
+const scoreToEmotion = (score: number): string => {
+  switch (score) {
+    case 500:
+      return 'Positive';
+    case -500:
+      return 'Negative';
+    default:
+      return 'Neutral';
+  }
+};
+
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
@@ -27,7 +56,9 @@ const CustomTooltip = ({ active, payload, label }: any) => {
               {entry.name}:
             </span>
             <span className="font-medium text-foreground">
-              {entry.name === "Emotional Score" ? entry.value : `$${entry.value}`}
+              {entry.name === "Emotional State" 
+                ? scoreToEmotion(entry.value)
+                : `$${formatValue(entry.value)}`}
             </span>
           </div>
         ))}
@@ -54,7 +85,11 @@ export const EmotionTrend = () => {
     );
   }
 
-  const data = analytics.emotionTrend;
+  // Transform the emotional scores
+  const data = analytics.emotionTrend.map(item => ({
+    ...item,
+    emotionalScore: emotionToScore(item.emotion || 'neutral'),
+  }));
 
   return (
     <Card className="p-4 md:p-6 space-y-4">
@@ -76,22 +111,56 @@ export const EmotionTrend = () => {
               tickLine={{ stroke: 'currentColor' }}
             />
             <YAxis 
+              yAxisId="emotion"
+              domain={[-500, 500]}
+              ticks={[-500, 0, 500]}
+              tickFormatter={(value) => scoreToEmotion(value)}
               tick={{ fontSize: 12 }}
               stroke="currentColor"
               tickLine={{ stroke: 'currentColor' }}
+              label={{ 
+                value: 'Emotional State', 
+                angle: -90, 
+                position: 'insideLeft',
+                style: { textAnchor: 'middle', fontSize: '12px' }
+              }}
+            />
+            <YAxis
+              yAxisId="pnl"
+              orientation="right"
+              tickFormatter={formatValue}
+              tick={{ fontSize: 12 }}
+              stroke="currentColor"
+              tickLine={{ stroke: 'currentColor' }}
+              label={{ 
+                value: 'P&L ($)', 
+                angle: 90, 
+                position: 'insideRight',
+                style: { textAnchor: 'middle', fontSize: '12px' }
+              }}
             />
             <Tooltip content={<CustomTooltip />} />
-            <Legend />
+            <Legend 
+              verticalAlign="bottom" 
+              height={36}
+              formatter={(value) => {
+                return value === "Emotional State" 
+                  ? "Emotional State (Positive: +500, Neutral: 0, Negative: -500)"
+                  : "Trading Result (P&L)";
+              }}
+            />
             <Line
+              yAxisId="emotion"
               type="monotone"
               dataKey="emotionalScore"
               stroke="#6E59A5"
               strokeWidth={2}
               dot={{ fill: "#6E59A5", strokeWidth: 0 }}
               activeDot={{ r: 6, fill: "#9b87f5" }}
-              name="Emotional Score"
+              name="Emotional State"
             />
             <Line
+              yAxisId="pnl"
               type="monotone"
               dataKey="tradingResult"
               stroke="#0EA5E9"

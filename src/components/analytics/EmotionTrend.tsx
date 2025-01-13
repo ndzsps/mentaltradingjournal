@@ -12,7 +12,7 @@ import {
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
 
-const formatValue = (value: number) => {
+const formatValue = (value: number): string => {
   if (Math.abs(value) >= 1000) {
     return `${(value / 1000).toFixed(1)}K`;
   }
@@ -83,7 +83,6 @@ export const EmotionTrend = () => {
     );
   }
 
-  // Transform the data for the scatter plot
   const scatterData = analytics.journalEntries
     .flatMap(entry => 
       entry.trades?.map(trade => ({
@@ -95,28 +94,19 @@ export const EmotionTrend = () => {
     .filter(item => !isNaN(item.pnl))
     .reverse();
 
-  // Separate data by emotion
   const positiveData = scatterData.filter(d => d.emotion === 'positive');
   const neutralData = scatterData.filter(d => d.emotion === 'neutral');
   const negativeData = scatterData.filter(d => d.emotion === 'negative');
 
-  // Calculate best and worst performances
   const allPnls = scatterData.map(d => d.pnl);
   const bestPerformance = Math.max(...allPnls);
   const worstPerformance = Math.min(...allPnls);
 
   return (
     <Card className="p-4 md:p-6 space-y-4 col-span-2">
-      <div className="space-y-2">
-        <h3 className="text-xl md:text-2xl font-bold">Emotion vs Trading Performance</h3>
-        <p className="text-sm text-muted-foreground">
-          Scatter plot showing the relationship between emotional states and trading results
-        </p>
-      </div>
-
       <div className="h-[400px] w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <ScatterChart margin={{ top: 20, right: 20, bottom: 40, left: 0 }}>
+          <ScatterChart margin={{ top: 40, right: 40, bottom: 40, left: 40 }}>
             <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
             <XAxis
               dataKey="date"
@@ -127,30 +117,18 @@ export const EmotionTrend = () => {
                 day: 'numeric' 
               })}
               type="number"
-              label={{ 
-                value: 'Emotional State', 
-                position: 'bottom',
-                offset: 20,
-                style: { textAnchor: 'middle' }
-              }}
             />
             <YAxis
               dataKey="pnl"
               name="P&L"
               tickFormatter={formatValue}
-              label={{ 
-                value: 'P&L', 
-                angle: -90, 
-                position: 'insideLeft',
-                offset: 10,
-                style: { textAnchor: 'middle' }
-              }}
             />
             <Tooltip content={<CustomTooltip />} />
             <Legend 
               verticalAlign="bottom"
               height={36}
               formatter={(value) => value}
+              wrapperStyle={{ paddingTop: "20px" }}
             />
             <Scatter
               name="Positive"

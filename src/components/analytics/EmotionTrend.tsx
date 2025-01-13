@@ -30,6 +30,45 @@ const getEmotionColor = (emotion: string): string => {
   }
 };
 
+// Calculate correlation coefficient (R)
+const calculateCorrelation = (data: any[]) => {
+  const n = data.length;
+  if (n === 0) return 0;
+
+  // Convert emotions to numeric values
+  const emotionToNumber = (emotion: string) => {
+    switch (emotion.toLowerCase()) {
+      case 'positive': return 1;
+      case 'negative': return -1;
+      default: return 0;
+    }
+  };
+
+  // Calculate means
+  const emotionValues = data.map(d => emotionToNumber(d.emotion));
+  const pnlValues = data.map(d => d.pnl);
+  
+  const meanEmotion = emotionValues.reduce((a, b) => a + b, 0) / n;
+  const meanPnL = pnlValues.reduce((a, b) => a + b, 0) / n;
+
+  // Calculate correlation coefficient
+  let numerator = 0;
+  let denomEmotionSquared = 0;
+  let denomPnLSquared = 0;
+
+  for (let i = 0; i < n; i++) {
+    const emotionDiff = emotionValues[i] - meanEmotion;
+    const pnlDiff = pnlValues[i] - meanPnL;
+    
+    numerator += emotionDiff * pnlDiff;
+    denomEmotionSquared += emotionDiff * emotionDiff;
+    denomPnLSquared += pnlDiff * pnlDiff;
+  }
+
+  const r = numerator / Math.sqrt(denomEmotionSquared * denomPnLSquared);
+  return isNaN(r) ? 0 : r;
+};
+
 const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
@@ -102,12 +141,25 @@ export const EmotionTrend = () => {
   const bestPerformance = Math.max(...allPnls);
   const worstPerformance = Math.min(...allPnls);
 
+  // Calculate correlation coefficient
+  const correlationCoefficient = calculateCorrelation(scatterData);
+  const correlationStrength = Math.abs(correlationCoefficient);
+  const correlationDescription = correlationStrength >= 0.7 ? 'strong' :
+    correlationStrength >= 0.5 ? 'moderate' :
+    correlationStrength >= 0.3 ? 'weak' : 'very weak';
+
   return (
     <Card className="p-4 md:p-6 space-y-4 col-span-2">
       <div className="space-y-2">
         <h3 className="text-xl md:text-2xl font-bold">Emotional State vs. Trading Performance</h3>
         <p className="text-sm text-muted-foreground">
           Scatter plot showing the relationship between emotional states and trading results
+        </p>
+        <p className="text-sm font-medium">
+          Correlation (R): {correlationCoefficient.toFixed(2)} 
+          <span className="text-muted-foreground ml-2">
+            ({correlationDescription} {correlationCoefficient >= 0 ? 'positive' : 'negative'} correlation)
+          </span>
         </p>
       </div>
 
@@ -170,7 +222,7 @@ export const EmotionTrend = () => {
       <div className="space-y-2 bg-accent/10 p-3 md:p-4 rounded-lg">
         <h4 className="font-semibold text-sm md:text-base">AI Insight</h4>
         <div className="space-y-2 text-xs md:text-sm text-muted-foreground">
-          <p>Your journal entries reveal a strong connection between your emotional state and trading performance. Staying emotionally balanced during trading sessions has proven crucial.</p>
+          <p>Your journal entries reveal a {correlationDescription} {correlationCoefficient >= 0 ? 'positive' : 'negative'} correlation (R={correlationCoefficient.toFixed(2)}) between emotional state and trading performance.</p>
           <p>Best Performance: When you maintained emotional stability, your best trading result was ${formatValue(bestPerformance)}.</p>
           <p>Worst Performance: On the other hand, trading during heightened emotional states resulted in a low of ${formatValue(worstPerformance)}.</p>
           <p>Focus on cultivating emotional resilience to consistently achieve better outcomes. Remember, balance is your edge!</p>

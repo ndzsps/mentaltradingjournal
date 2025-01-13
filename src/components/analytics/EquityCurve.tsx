@@ -1,34 +1,10 @@
 import { Card } from "@/components/ui/card";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
-import { 
-  LineChart, 
-  Line, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer,
-  ReferenceLine 
-} from "recharts";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useState } from "react";
-import { CustomTooltip } from "./shared/CustomTooltip";
-
-const INITIAL_BALANCE_OPTIONS = [
-  { value: 5000, label: "$5,000" },
-  { value: 10000, label: "$10,000" },
-  { value: 25000, label: "$25,000" },
-  { value: 50000, label: "$50,000" },
-  { value: 100000, label: "$100,000" },
-  { value: 200000, label: "$200,000" },
-];
+import { BalanceSelector } from "./equity-curve/BalanceSelector";
+import { EquityCurveChart } from "./equity-curve/EquityCurveChart";
+import { EquityMetrics } from "./equity-curve/EquityMetrics";
 
 export const EquityCurve = () => {
   const [selectedBalance, setSelectedBalance] = useState(10000);
@@ -68,7 +44,6 @@ export const EquityCurve = () => {
     }, []);
 
   // Calculate performance metrics
-  const maxBalance = Math.max(...equityData.map(d => d.balance));
   const currentBalance = equityData[equityData.length - 1]?.balance || selectedBalance;
   const totalReturn = ((currentBalance - selectedBalance) / selectedBalance) * 100;
   
@@ -89,102 +64,27 @@ export const EquityCurve = () => {
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <h3 className="text-xl md:text-2xl font-bold">Equity Curve</h3>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">Initial Balance:</span>
-            <Select
-              value={selectedBalance.toString()}
-              onValueChange={(value) => setSelectedBalance(Number(value))}
-            >
-              <SelectTrigger className="w-[140px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {INITIAL_BALANCE_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value.toString()}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <BalanceSelector
+            selectedBalance={selectedBalance}
+            onBalanceChange={setSelectedBalance}
+          />
         </div>
         <p className="text-sm text-muted-foreground">
           Track your account balance progression over time
         </p>
       </div>
 
-      <div className="h-[400px] w-full">
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart
-            data={equityData}
-            margin={{
-              top: 20,
-              right: 30,
-              left: 60,
-              bottom: 5
-            }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis 
-              dataKey="date" 
-              tick={{ fontSize: 12 }}
-              interval="preserveStartEnd"
-            />
-            <YAxis
-              tick={{ fontSize: 12 }}
-              tickFormatter={(value) => `$${value.toLocaleString()}`}
-              label={{ 
-                value: 'Account Balance ($)', 
-                angle: -90, 
-                position: 'insideLeft',
-                style: { 
-                  fontSize: '12px',
-                  textAnchor: 'middle',
-                  fill: 'currentColor'
-                },
-                dx: -45
-              }}
-            />
-            <Tooltip
-              content={<CustomTooltip 
-                valueFormatter={(value) => `$${value.toLocaleString()}`}
-              />}
-            />
-            <ReferenceLine y={selectedBalance} stroke="hsl(var(--muted-foreground))" strokeDasharray="3 3" />
-            <Line
-              type="monotone"
-              dataKey="balance"
-              stroke="hsl(var(--primary))"
-              dot={false}
-              strokeWidth={2}
-              name="Balance"
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
+      <EquityCurveChart
+        data={equityData}
+        initialBalance={selectedBalance}
+      />
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="p-4 rounded-lg border border-border/50">
-          <p className="text-sm text-muted-foreground">Initial Balance</p>
-          <p className="text-lg font-bold">${selectedBalance.toLocaleString()}</p>
-        </div>
-        <div className="p-4 rounded-lg border border-border/50">
-          <p className="text-sm text-muted-foreground">Current Balance</p>
-          <p className="text-lg font-bold">${currentBalance.toLocaleString()}</p>
-        </div>
-        <div className="p-4 rounded-lg border border-border/50">
-          <p className="text-sm text-muted-foreground">Total Return</p>
-          <p className={`text-lg font-bold ${totalReturn >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
-            {totalReturn >= 0 ? '+' : ''}{totalReturn.toFixed(2)}%
-          </p>
-        </div>
-        <div className="p-4 rounded-lg border border-border/50">
-          <p className="text-sm text-muted-foreground">Max Drawdown</p>
-          <p className="text-lg font-bold text-red-500">
-            -{maxDrawdown.toFixed(2)}%
-          </p>
-        </div>
-      </div>
+      <EquityMetrics
+        initialBalance={selectedBalance}
+        currentBalance={currentBalance}
+        totalReturn={totalReturn}
+        maxDrawdown={maxDrawdown}
+      />
     </Card>
   );
 };

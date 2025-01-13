@@ -10,9 +10,6 @@ import { TradeExitSection } from "./form-sections/TradeExitSection";
 import { PlaybookSelector } from "./form-sections/PlaybookSelector";
 import { ScreenshotLinksSection } from "./form-sections/ScreenshotLinksSection";
 import { useBacktestingForm } from "@/hooks/useBacktestingForm";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { AddBlueprintForm } from "./AddBlueprintForm";
-import { Plus } from "lucide-react";
 
 interface Blueprint {
   id: string;
@@ -21,7 +18,6 @@ interface Blueprint {
 
 export function BacktestingForm() {
   const [blueprints, setBlueprints] = useState<Blueprint[]>([]);
-  const [open, setOpen] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
   
@@ -35,6 +31,12 @@ export function BacktestingForm() {
     handleDirectionSelect,
     handleSubmit
   } = useBacktestingForm(user?.id, navigate);
+
+  useEffect(() => {
+    if (user) {
+      fetchBlueprints();
+    }
+  }, [user]);
 
   const fetchBlueprints = async () => {
     if (!user) return;
@@ -50,48 +52,17 @@ export function BacktestingForm() {
     }
   };
 
-  useEffect(() => {
-    if (user) {
-      fetchBlueprints();
-    }
-  }, [user]);
-
   return (
     <Card className="w-full">
       <CardHeader>
         <CardTitle>Create new session</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="flex items-center gap-4 mb-6">
-          <div className="flex-1">
-            <PlaybookSelector 
-              blueprints={blueprints}
-              selectedBlueprint={selectedBlueprint}
-              onBlueprintSelect={setSelectedBlueprint}
-            />
-          </div>
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="flex items-center gap-2 whitespace-nowrap"
-              >
-                <Plus className="h-4 w-4" />
-                Add Blueprint
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px]">
-              <DialogHeader>
-                <DialogTitle>Add New Trading Blueprint</DialogTitle>
-              </DialogHeader>
-              <AddBlueprintForm onSuccess={() => {
-                setOpen(false);
-                fetchBlueprints();
-              }} />
-            </DialogContent>
-          </Dialog>
-        </div>
+        <PlaybookSelector 
+          blueprints={blueprints}
+          selectedBlueprint={selectedBlueprint}
+          onBlueprintSelect={setSelectedBlueprint}
+        />
 
         {validationError && (
           <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">

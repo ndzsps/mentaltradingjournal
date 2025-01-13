@@ -116,44 +116,15 @@ export const EmotionLogger = () => {
             onActivityChange={setPreTradingActivities}
           />
         )}
-        
-        <div className="space-y-6">
-          <EmotionSection
-            sessionType={sessionType}
-            selectedEmotion={selectedEmotion}
-            selectedEmotionDetail={selectedEmotionDetail}
-            isDetailDialogOpen={isDetailDialogOpen}
-            customDetails={customDetails}
-            onEmotionSelect={handleEmotionSelect}
-            onDetailSelect={handleDetailSelect}
-            onDetailDialogOpenChange={setIsDetailDialogOpen}
-            onCustomDetailAdd={handleCustomDetailAdd}
-          />
 
-          {sessionType === "post" && (
-            <PostSessionFormSection
-              selectedOutcome={selectedOutcome}
-              setSelectedOutcome={setSelectedOutcome}
-              followedRules={followedRules}
-              setFollowedRules={setFollowedRules}
-              selectedMistakes={selectedMistakes}
-              setSelectedMistakes={setSelectedMistakes}
-              showAddTradeDialog={showAddTradeDialog}
-              setShowAddTradeDialog={setShowAddTradeDialog}
-              trades={trades}
-              onTradeSubmit={handleTradeSubmit}
-            />
-          )}
-
-          <FormSubmissionSection
-            sessionType={sessionType}
-            notes={notes}
-            setNotes={setNotes}
-            trades={trades}
-            handleSubmit={handleSubmit}
-            selectedOutcome={selectedOutcome}
-          />
-        </div>
+        <FormSubmissionSection
+          sessionType={sessionType}
+          notes={notes}
+          setNotes={setNotes}
+          trades={trades}
+          handleSubmit={handleSubmit}
+          selectedOutcome={selectedOutcome}
+        />
       </Card>
 
       <ProgressStats 

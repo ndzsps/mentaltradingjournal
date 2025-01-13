@@ -98,10 +98,6 @@ export const EmotionTrend = () => {
   const neutralData = scatterData.filter(d => d.emotion === 'neutral');
   const negativeData = scatterData.filter(d => d.emotion === 'negative');
 
-  const allPnls = scatterData.map(d => d.pnl);
-  const bestPerformance = Math.max(...allPnls);
-  const worstPerformance = Math.min(...allPnls);
-
   return (
     <Card className="p-4 md:p-6 space-y-4 col-span-2">
       <div className="space-y-2">
@@ -170,10 +166,7 @@ export const EmotionTrend = () => {
       <div className="space-y-2 bg-accent/10 p-3 md:p-4 rounded-lg">
         <h4 className="font-semibold text-sm md:text-base">AI Insight</h4>
         <div className="space-y-2 text-xs md:text-sm text-muted-foreground">
-          <p>Your journal entries reveal a strong connection between your emotional state and trading performance. Staying emotionally balanced during trading sessions has proven crucial.</p>
-          <p>Best Performance: When you maintained emotional stability, your best trading result was ${formatValue(bestPerformance)}.</p>
-          <p>Worst Performance: On the other hand, trading during heightened emotional states resulted in a low of ${formatValue(worstPerformance)}.</p>
-          <p>Focus on cultivating emotional resilience to consistently achieve better outcomes. Remember, balance is your edge!</p>
+          <p>Based on your journal entries, there's a strong correlation between emotional state and trading performance. Focus on maintaining emotional balance during trading sessions.</p>
         </div>
       </div>
     </Card>

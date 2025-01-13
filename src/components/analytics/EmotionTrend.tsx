@@ -16,7 +16,7 @@ const formatValue = (value: number) => {
   if (Math.abs(value) >= 1000) {
     return `${(value / 1000).toFixed(1)}K`;
   }
-  return value;
+  return value.toString();
 };
 
 const getEmotionColor = (emotion: string): string => {
@@ -74,10 +74,10 @@ export const EmotionTrend = () => {
   
   if (isLoading || !analytics) {
     return (
-      <Card className="p-4 md:p-6 space-y-4">
+      <Card className="p-4 md:p-6 space-y-4 col-span-2">
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-accent/10 rounded w-3/4"></div>
-          <div className="h-[250px] md:h-[300px] bg-accent/10 rounded"></div>
+          <div className="h-[400px] bg-accent/10 rounded"></div>
         </div>
       </Card>
     );
@@ -101,7 +101,7 @@ export const EmotionTrend = () => {
   const negativeData = scatterData.filter(d => d.emotion === 'negative');
 
   return (
-    <Card className="p-4 md:p-6 space-y-4">
+    <Card className="p-4 md:p-6 space-y-4 col-span-2">
       <div className="space-y-2">
         <h3 className="text-xl md:text-2xl font-bold">Emotion vs Trading Performance</h3>
         <p className="text-sm text-muted-foreground">
@@ -109,9 +109,9 @@ export const EmotionTrend = () => {
         </p>
       </div>
 
-      <div className="h-[250px] md:h-[300px] w-full">
+      <div className="h-[400px] w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 0 }}>
+          <ScatterChart margin={{ top: 20, right: 20, bottom: 40, left: 0 }}>
             <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
             <XAxis
               dataKey="date"
@@ -123,9 +123,9 @@ export const EmotionTrend = () => {
               })}
               type="number"
               label={{ 
-                value: 'Time', 
+                value: 'Emotional State', 
                 position: 'bottom',
-                offset: 0,
+                offset: 20,
                 style: { textAnchor: 'middle' }
               }}
             />
@@ -134,9 +134,10 @@ export const EmotionTrend = () => {
               name="P&L"
               tickFormatter={formatValue}
               label={{ 
-                value: 'Trading Performance (P&L)', 
+                value: 'P&L', 
                 angle: -90, 
                 position: 'insideLeft',
+                offset: 10,
                 style: { textAnchor: 'middle' }
               }}
             />
@@ -144,25 +145,22 @@ export const EmotionTrend = () => {
             <Legend 
               verticalAlign="top"
               height={36}
-              formatter={(value) => `${value} Emotional State`}
+              formatter={(value) => value}
             />
             <Scatter
               name="Positive"
               data={positiveData}
               fill={getEmotionColor('positive')}
-              line={{ stroke: getEmotionColor('positive'), strokeWidth: 1 }}
             />
             <Scatter
               name="Neutral"
               data={neutralData}
               fill={getEmotionColor('neutral')}
-              line={{ stroke: getEmotionColor('neutral'), strokeWidth: 1 }}
             />
             <Scatter
               name="Negative"
               data={negativeData}
               fill={getEmotionColor('negative')}
-              line={{ stroke: getEmotionColor('negative'), strokeWidth: 1 }}
             />
           </ScatterChart>
         </ResponsiveContainer>

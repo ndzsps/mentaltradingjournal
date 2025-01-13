@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import {
-  LineChart,
-  Line,
+  ScatterChart,
+  Scatter,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -14,54 +14,52 @@ import { useQuery } from "@tanstack/react-query";
 
 const formatValue = (value: number) => {
   if (Math.abs(value) >= 1000) {
-    return `${(value / 1000).toFixed(0)}K`;
+    return `${(value / 1000).toFixed(1)}K`;
   }
   return value;
 };
 
-const emotionToScore = (emotion: string): number => {
+const getEmotionColor = (emotion: string): string => {
   switch (emotion.toLowerCase()) {
     case 'positive':
-      return 500;
+      return '#22c55e';
     case 'negative':
-      return -500;
+      return '#ef4444';
     default:
-      return 0;
+      return '#eab308';
   }
 };
 
-const scoreToEmotion = (score: number): string => {
-  switch (score) {
-    case 500:
-      return 'Positive';
-    case -500:
-      return 'Negative';
-    default:
-      return 'Neutral';
-  }
-};
-
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
+    const data = payload[0].payload;
     return (
       <div className="bg-background/95 backdrop-blur-sm border border-border rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95">
-        <p className="font-medium text-sm text-foreground mb-2">{label}</p>
-        {payload.map((entry: any, index: number) => (
-          <div key={index} className="flex items-center gap-2 text-sm">
+        <p className="font-medium text-sm text-foreground mb-2">
+          {new Date(data.date).toLocaleDateString('en-US', { 
+            month: 'short', 
+            day: 'numeric',
+            year: 'numeric'
+          })}
+        </p>
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 text-sm">
             <div
               className="w-2 h-2 rounded-full"
-              style={{ backgroundColor: entry.color }}
+              style={{ backgroundColor: getEmotionColor(data.emotion) }}
             />
-            <span className="text-muted-foreground">
-              {entry.name}:
-            </span>
-            <span className="font-medium text-foreground">
-              {entry.name === "Emotional State" 
-                ? scoreToEmotion(entry.value)
-                : `$${formatValue(entry.value)}`}
+            <span className="text-muted-foreground">Emotional State:</span>
+            <span className="font-medium text-foreground capitalize">
+              {data.emotion}
             </span>
           </div>
-        ))}
+          <div className="flex items-center gap-2 text-sm">
+            <span className="text-muted-foreground">P&L:</span>
+            <span className="font-medium text-foreground">
+              ${formatValue(data.pnl)}
+            </span>
+          </div>
+        </div>
       </div>
     );
   }
@@ -85,92 +83,88 @@ export const EmotionTrend = () => {
     );
   }
 
-  // Transform the emotional scores from the journal entries
-  const data = analytics.journalEntries.map(entry => ({
-    date: new Date(entry.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-    emotionalScore: emotionToScore(entry.emotion),
-    tradingResult: entry.trades?.reduce((sum, trade) => sum + (Number(trade.pnl) || 0), 0) || 0,
-  })).reverse();
+  // Transform the data for the scatter plot
+  const scatterData = analytics.journalEntries
+    .flatMap(entry => 
+      entry.trades?.map(trade => ({
+        date: new Date(entry.created_at).getTime(),
+        pnl: Number(trade.pnl) || 0,
+        emotion: entry.emotion,
+      })) || []
+    )
+    .filter(item => !isNaN(item.pnl))
+    .reverse();
+
+  // Separate data by emotion
+  const positiveData = scatterData.filter(d => d.emotion === 'positive');
+  const neutralData = scatterData.filter(d => d.emotion === 'neutral');
+  const negativeData = scatterData.filter(d => d.emotion === 'negative');
 
   return (
     <Card className="p-4 md:p-6 space-y-4">
       <div className="space-y-2">
-        <h3 className="text-xl md:text-2xl font-bold">Emotion Trend Over Time</h3>
+        <h3 className="text-xl md:text-2xl font-bold">Emotion vs Trading Performance</h3>
         <p className="text-sm text-muted-foreground">
-          Track emotional states and trading results over time
+          Scatter plot showing the relationship between emotional states and trading results
         </p>
       </div>
 
       <div className="h-[250px] md:h-[300px] w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data} margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
+          <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 0 }}>
             <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-            <XAxis 
-              dataKey="date" 
-              tick={{ fontSize: 12 }}
-              stroke="currentColor"
-              tickLine={{ stroke: 'currentColor' }}
-            />
-            <YAxis 
-              yAxisId="emotion"
-              domain={[-500, 500]}
-              ticks={[-500, 0, 500]}
-              tickFormatter={(value) => scoreToEmotion(value)}
-              tick={{ fontSize: 12 }}
-              stroke="currentColor"
-              tickLine={{ stroke: 'currentColor' }}
+            <XAxis
+              dataKey="date"
+              domain={['auto', 'auto']}
+              name="Time"
+              tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric' 
+              })}
+              type="number"
               label={{ 
-                value: 'Emotional State', 
-                angle: -90, 
-                position: 'insideLeft',
-                style: { textAnchor: 'middle', fontSize: '12px' }
+                value: 'Time', 
+                position: 'bottom',
+                offset: 0,
+                style: { textAnchor: 'middle' }
               }}
             />
             <YAxis
-              yAxisId="pnl"
-              orientation="right"
-              tickFormatter={(value) => formatValue(value)}
-              tick={{ fontSize: 12 }}
-              stroke="currentColor"
-              tickLine={{ stroke: 'currentColor' }}
+              dataKey="pnl"
+              name="P&L"
+              tickFormatter={formatValue}
               label={{ 
-                value: 'P&L ($)', 
-                angle: 90, 
-                position: 'insideRight',
-                style: { textAnchor: 'middle', fontSize: '12px' }
+                value: 'Trading Performance (P&L)', 
+                angle: -90, 
+                position: 'insideLeft',
+                style: { textAnchor: 'middle' }
               }}
             />
             <Tooltip content={<CustomTooltip />} />
             <Legend 
-              verticalAlign="bottom" 
+              verticalAlign="top"
               height={36}
-              formatter={(value) => {
-                return value === "Emotional State" 
-                  ? "Emotional State (Positive: +500, Neutral: 0, Negative: -500)"
-                  : "Trading Result (P&L)";
-              }}
+              formatter={(value) => `${value} Emotional State`}
             />
-            <Line
-              yAxisId="emotion"
-              type="monotone"
-              dataKey="emotionalScore"
-              stroke="#6E59A5"
-              strokeWidth={2}
-              dot={{ fill: "#6E59A5", strokeWidth: 0 }}
-              activeDot={{ r: 6, fill: "#9b87f5" }}
-              name="Emotional State"
+            <Scatter
+              name="Positive"
+              data={positiveData}
+              fill={getEmotionColor('positive')}
+              line={{ stroke: getEmotionColor('positive'), strokeWidth: 1 }}
             />
-            <Line
-              yAxisId="pnl"
-              type="monotone"
-              dataKey="tradingResult"
-              stroke="#0EA5E9"
-              strokeWidth={2}
-              dot={{ fill: "#0EA5E9", strokeWidth: 0 }}
-              activeDot={{ r: 6, fill: "#38BDF8" }}
-              name="Trading Result"
+            <Scatter
+              name="Neutral"
+              data={neutralData}
+              fill={getEmotionColor('neutral')}
+              line={{ stroke: getEmotionColor('neutral'), strokeWidth: 1 }}
             />
-          </LineChart>
+            <Scatter
+              name="Negative"
+              data={negativeData}
+              fill={getEmotionColor('negative')}
+              line={{ stroke: getEmotionColor('negative'), strokeWidth: 1 }}
+            />
+          </ScatterChart>
         </ResponsiveContainer>
       </div>
 

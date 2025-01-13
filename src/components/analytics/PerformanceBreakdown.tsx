@@ -61,7 +61,7 @@ export const PerformanceBreakdown = () => {
   return (
     <Card className="p-4 md:p-6 space-y-4">
       <div className="space-y-2">
-        <h3 className="text-xl md:text-2xl font-bold">Performance by Emotion</h3>
+        <h3 className="text-xl md:text-2xl font-bold">Net Performance By Emotion</h3>
         <p className="text-sm text-muted-foreground">
           Average P&L per trade based on emotional state
         </p>

@@ -24,8 +24,8 @@ export const AnalyticsDashboard = () => {
 
   const psychologicalComponents = [
     EmotionalTendencies,
-    EmotionTrend,
     EmotionRecovery,
+    EmotionTrend,
     PreTradingEvents,
     PersonalityPatterns,
   ];

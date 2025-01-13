@@ -1,4 +1,4 @@
-import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,7 +16,7 @@ interface Blueprint {
   name: string;
 }
 
-export const BacktestingForm = forwardRef((_, ref) => {
+export function BacktestingForm() {
   const [blueprints, setBlueprints] = useState<Blueprint[]>([]);
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -32,6 +32,12 @@ export const BacktestingForm = forwardRef((_, ref) => {
     handleSubmit
   } = useBacktestingForm(user?.id, navigate);
 
+  useEffect(() => {
+    if (user) {
+      fetchBlueprints();
+    }
+  }, [user]);
+
   const fetchBlueprints = async () => {
     if (!user) return;
     
@@ -45,16 +51,6 @@ export const BacktestingForm = forwardRef((_, ref) => {
       setBlueprints(data);
     }
   };
-
-  useEffect(() => {
-    if (user) {
-      fetchBlueprints();
-    }
-  }, [user]);
-
-  useImperativeHandle(ref, () => ({
-    fetchBlueprints
-  }));
 
   return (
     <Card className="w-full">
@@ -103,6 +99,4 @@ export const BacktestingForm = forwardRef((_, ref) => {
       </CardContent>
     </Card>
   );
-});
-
-BacktestingForm.displayName = "BacktestingForm";
+}

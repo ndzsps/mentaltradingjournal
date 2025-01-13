@@ -132,6 +132,7 @@ export const EquityCurve = () => {
             />
             <YAxis
               tick={{ fontSize: 12 }}
+              tickFormatter={(value) => `$${value.toLocaleString()}`}
               label={{ 
                 value: 'Account Balance ($)', 
                 angle: -90, 

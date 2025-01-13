@@ -17,12 +17,6 @@ export function PlaybookSection({ onBlueprintAdded }: PlaybookSectionProps) {
   const [blueprints, setBlueprints] = useState<any[]>([]);
   const { user } = useAuth();
 
-  useEffect(() => {
-    if (user) {
-      fetchBlueprints();
-    }
-  }, [user]);
-
   const fetchBlueprints = async () => {
     if (!user) return;
     
@@ -37,8 +31,21 @@ export function PlaybookSection({ onBlueprintAdded }: PlaybookSectionProps) {
     }
   };
 
+  useEffect(() => {
+    if (user) {
+      fetchBlueprints();
+    }
+  }, [user]);
+
   const handleSuccess = () => {
     setOpen(false);
+    fetchBlueprints();
+    if (onBlueprintAdded) {
+      onBlueprintAdded();
+    }
+  };
+
+  const handleDelete = () => {
     fetchBlueprints();
     if (onBlueprintAdded) {
       onBlueprintAdded();
@@ -82,6 +89,7 @@ export function PlaybookSection({ onBlueprintAdded }: PlaybookSectionProps) {
                 name={blueprint.name}
                 instrument={blueprint.rules[0]?.replace("Instrument: ", "") || "N/A"}
                 emoji={blueprint.emoji}
+                onDelete={handleDelete}
               />
             ))}
           </div>

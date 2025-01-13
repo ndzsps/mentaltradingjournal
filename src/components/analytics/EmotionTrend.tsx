@@ -85,11 +85,12 @@ export const EmotionTrend = () => {
     );
   }
 
-  // Transform the emotional scores
-  const data = analytics.emotionTrend.map(item => ({
-    ...item,
-    emotionalScore: emotionToScore(item.emotion || 'neutral'),
-  }));
+  // Transform the emotional scores from the journal entries
+  const data = analytics.journalEntries.map(entry => ({
+    date: new Date(entry.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+    emotionalScore: emotionToScore(entry.emotion),
+    tradingResult: entry.trades?.reduce((sum, trade) => sum + (Number(trade.pnl) || 0), 0) || 0,
+  })).reverse();
 
   return (
     <Card className="p-4 md:p-6 space-y-4">
@@ -128,7 +129,7 @@ export const EmotionTrend = () => {
             <YAxis
               yAxisId="pnl"
               orientation="right"
-              tickFormatter={formatValue}
+              tickFormatter={(value) => formatValue(value)}
               tick={{ fontSize: 12 }}
               stroke="currentColor"
               tickLine={{ stroke: 'currentColor' }}

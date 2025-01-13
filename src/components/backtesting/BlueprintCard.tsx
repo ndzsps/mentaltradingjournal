@@ -104,7 +104,7 @@ export function BlueprintCard({ name, instrument, winRate = 0, id, emoji: initia
             <Button
               variant="destructive"
               size="icon"
-              className="h-8 w-8 group-hover:opacity-100 transition-opacity bg-destructive/90 hover:bg-destructive"
+              className="h-8 w-8 bg-destructive hover:bg-destructive/90"
               onClick={handleDelete}
             >
               <Trash2 className="h-4 w-4" />
@@ -116,13 +116,13 @@ export function BlueprintCard({ name, instrument, winRate = 0, id, emoji: initia
                   size="icon" 
                   className="h-8 w-8 rounded-lg transition-all hover:scale-105"
                   style={{ 
-                    backgroundColor: selectedEmojiConfig?.color + '40',
+                    backgroundColor: selectedEmojiConfig?.color,
                     border: `1px solid ${selectedEmojiConfig?.color}`,
                   }}
                 >
                   <EmojiIcon 
                     className="h-5 w-5" 
-                    style={{ color: selectedEmojiConfig?.color }}
+                    style={{ color: "#1A1F2C" }}
                   />
                 </Button>
               </DropdownMenuTrigger>
@@ -133,7 +133,7 @@ export function BlueprintCard({ name, instrument, winRate = 0, id, emoji: initia
                     onClick={(e) => handleEmojiSelect(label, e)}
                     className="cursor-pointer hover:bg-accent/10"
                   >
-                    <Icon className="mr-2 h-4 w-4" style={{ color }} />
+                    <Icon className="mr-2 h-4 w-4" style={{ color: "#1A1F2C" }} />
                     <span>{label}</span>
                   </DropdownMenuItem>
                 ))}

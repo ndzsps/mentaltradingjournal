@@ -4,7 +4,6 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Trade } from "@/types/trade";
-import { useState } from "react";
 
 interface JournalFormSubmissionProps {
   sessionType: "pre" | "post";
@@ -126,38 +125,4 @@ export const useJournalFormSubmission = ({
   };
 
   return { handleSubmit };
-};
-
-// Add the actual component that uses the hook
-export const JournalFormSubmission = () => {
-  const [sessionType] = useState<"pre" | "post">("pre");
-  const [selectedEmotion] = useState("");
-  const [selectedEmotionDetail] = useState("");
-  const [notes] = useState("");
-  const [preTradingActivities] = useState<string[]>([]);
-  const [trades] = useState<Trade[]>([]);
-
-  const { handleSubmit } = useJournalFormSubmission({
-    sessionType,
-    selectedEmotion,
-    selectedEmotionDetail,
-    notes,
-    preTradingActivities,
-    trades,
-    resetForm: () => {
-      // Add reset logic here
-    },
-  });
-
-  return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-bold">Journal Entry</h1>
-      <button 
-        onClick={handleSubmit}
-        className="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90"
-      >
-        Submit Entry
-      </button>
-    </div>
-  );
 };

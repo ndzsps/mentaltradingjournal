@@ -6,7 +6,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu";
 import { Smile, ThumbsUp, Heart, Star, Trophy, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -115,7 +114,11 @@ export function BlueprintCard({ name, instrument, winRate = 0, id, emoji: initia
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="h-8 w-8 hover:bg-accent/10"
+                  className="h-8 w-8 rounded-lg transition-all hover:scale-105"
+                  style={{ 
+                    backgroundColor: selectedEmojiConfig?.color + '40',
+                    border: `1px solid ${selectedEmojiConfig?.color}`,
+                  }}
                 >
                   <EmojiIcon 
                     className="h-5 w-5" 

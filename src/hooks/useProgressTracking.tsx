@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import { differenceInDays } from 'date-fns';
+import { differenceInDays, isWeekend } from 'date-fns';
 
 interface ProgressStats {
   preSessionStreak: number;
@@ -39,12 +39,27 @@ export const useProgressTracking = () => {
       }
 
       if (data) {
-        // Check if user has missed a day
+        // Check if user has missed a day (excluding weekends)
         const lastActivity = new Date(data.last_activity);
-        const daysSinceLastActivity = differenceInDays(new Date(), lastActivity);
+        const today = new Date();
+        const daysSinceLastActivity = differenceInDays(today, lastActivity);
+        
+        // Only reset streaks if user missed a weekday
+        let shouldResetStreak = false;
+        
+        // Check each day between last activity and today
+        for (let i = 1; i <= daysSinceLastActivity; i++) {
+          const checkDate = new Date(lastActivity);
+          checkDate.setDate(checkDate.getDate() + i);
+          
+          // If we find a missed weekday, we should reset the streak
+          if (!isWeekend(checkDate) && daysSinceLastActivity > 1) {
+            shouldResetStreak = true;
+            break;
+          }
+        }
 
-        if (daysSinceLastActivity > 1) {
-          // Reset streaks if user missed a day
+        if (shouldResetStreak) {
           await resetStreaks();
           return;
         }
@@ -85,7 +100,7 @@ export const useProgressTracking = () => {
         dailyStreak: 0,
       }));
 
-      console.log('Streaks reset due to inactivity');
+      console.log('Streaks reset due to missed weekday activity');
     } catch (error) {
       console.error('Error resetting streaks:', error);
       toast.error('Failed to reset streaks');
@@ -122,7 +137,6 @@ export const useProgressTracking = () => {
       }
 
       // Check if both sessions are completed for the day
-      // Changed to use AND instead of OR for proper streak calculation
       const hasPreSession = sessionType === 'pre' || currentStats.pre_session_streak === 1;
       const hasPostSession = sessionType === 'post' || currentStats.post_session_streak === 1;
 

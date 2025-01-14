@@ -61,7 +61,7 @@ const Landing = () => {
           </div>
         </header>
 
-      {/* Hero Section */}
+        {/* Hero Section */}
         <section className="relative pt-40 min-h-[90vh] flex items-center">
           <div className="container mx-auto px-4 md:px-6 flex flex-col md:flex-row items-center gap-12">
             {/* Left Content */}
@@ -124,10 +124,10 @@ const Landing = () => {
           </div>
         </section>
 
-      <section className="relative min-h-screen flex items-center py-24">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="flex flex-col-reverse md:flex-row items-center gap-12">
-            {/* Left Side - App Preview */}
+        <section className="relative min-h-screen flex items-center py-24">
+          <div className="container mx-auto px-4 md:px-6">
+            <div className="flex flex-col-reverse md:flex-row items-center gap-12">
+              {/* Left Side - App Preview */}
               <div className="flex-1 relative w-full max-w-2xl">
                 <div className="relative aspect-[4/3] rounded-2xl overflow-hidden backdrop-blur-xl bg-gradient-to-br from-primary/10 to-accent/10 border border-white/10">
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20" />
@@ -155,35 +155,36 @@ const Landing = () => {
                 <div className="absolute -inset-4 bg-gradient-to-r from-primary/30 to-accent/30 blur-3xl -z-10" />
               </div>
 
-            {/* Right Side - Content */}
-            <div className="flex-1 space-y-8 md:pl-8">
-              <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
-                You've been focused on the
-                <span className="bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent"> wrong thing </span>
-                all this time.
-              </h2>
-              <div className="space-y-6">
-                <p className="text-lg md:text-xl text-gray-300 leading-relaxed">
-                  Are you aware of how your emotions are affecting your trading? Or are you still thinking that a good strategy is all you need to become profitable?
-                </p>
-                <p className="text-lg md:text-xl text-gray-300 leading-relaxed">
-                  Our journal shows you exactly how your emotions can either make or break your trading performance, in a way no other journal has ever done before.
-                </p>
+              {/* Right Side - Content */}
+              <div className="flex-1 space-y-8 md:pl-8">
+                <h2 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
+                  You've been focused on the
+                  <span className="bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent"> wrong thing </span>
+                  all this time.
+                </h2>
+                <div className="space-y-6">
+                  <p className="text-lg md:text-xl text-gray-300 leading-relaxed">
+                    Are you aware of how your emotions are affecting your trading? Or are you still thinking that a good strategy is all you need to become profitable?
+                  </p>
+                  <p className="text-lg md:text-xl text-gray-300 leading-relaxed">
+                    Our journal shows you exactly how your emotions can either make or break your trading performance, in a way no other journal has ever done before.
+                  </p>
+                </div>
+                <Button
+                  size="lg"
+                  className="text-lg px-8 py-6 bg-white/10 hover:bg-white/20 backdrop-blur-lg border border-white/10 transition-all duration-300"
+                  onClick={() => navigate("/login")}
+                >
+                  Focus on what matters →
+                </Button>
               </div>
-              <Button
-                size="lg"
-                className="text-lg px-8 py-6 bg-white/10 hover:bg-white/20 backdrop-blur-lg border border-white/10 transition-all duration-300"
-                onClick={() => navigate("/login")}
-              >
-                Focus on what matters →
-              </Button>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <AnalyticsSection />
-      <CommunitySection />
+        <AnalyticsSection />
+        <CommunitySection />
+      </div>
     </div>
   );
 };

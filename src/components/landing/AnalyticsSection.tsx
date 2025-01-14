@@ -80,21 +80,22 @@ export const AnalyticsSection = () => {
     <section className="relative py-24">
       {/* Enhanced Background Effects */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-b from-background/5 via-background to-background/95" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-accent/5 to-transparent opacity-30" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,_var(--tw-gradient-stops))] from-secondary/10 via-background/80 to-background" />
+        <div className="absolute inset-0 bg-[#1A1F2C]/95" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/20 via-accent/5 to-transparent opacity-30" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center_bottom,_var(--tw-gradient-stops))] from-[#7E69AB]/20 via-background/80 to-transparent" />
+        <div className="absolute inset-0 backdrop-blur-[100px]" />
       </div>
       
       <div className="relative container mx-auto px-4">
         <div className="text-center mb-16 space-y-4">
           <div className="relative">
-            {/* Glow Effect */}
-            <div className="absolute -inset-1 bg-gradient-to-r from-primary/30 via-accent/30 to-secondary/30 rounded-lg blur-2xl opacity-75" />
-            <h2 className="relative text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary-light via-accent to-primary bg-clip-text text-transparent">
+            {/* Enhanced Glow Effect */}
+            <div className="absolute -inset-2 bg-gradient-to-r from-primary/40 via-[#9b87f5]/30 to-[#7E69AB]/40 rounded-lg blur-3xl opacity-75" />
+            <h2 className="relative text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#9b87f5] via-[#D6BCFA] to-[#7E69AB] bg-clip-text text-transparent">
               Trading Psychology Analytics
             </h2>
           </div>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          <p className="text-xl text-gray-300/90 max-w-3xl mx-auto">
             Transform your trading mindset with our comprehensive suite of psychological analysis tools
           </p>
         </div>
@@ -103,18 +104,18 @@ export const AnalyticsSection = () => {
           {analyticsTools.map((tool, index) => (
             <Card 
               key={index} 
-              className={`group relative overflow-hidden transition-all duration-500 hover:shadow-lg hover:shadow-primary/5 border-none bg-gradient-to-br ${tool.gradient} backdrop-blur-sm animate-fade-in`}
+              className={`group relative overflow-hidden transition-all duration-500 hover:shadow-lg hover:shadow-primary/5 border-none bg-[#1A1F2C]/40 backdrop-blur-xl animate-fade-in`}
               style={{ animationDelay: `${index * 150}ms` }}
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-background/40 to-background/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-br from-[#7E69AB]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <CardHeader className="relative space-y-4">
                 <div className="flex items-center space-x-4">
-                  <div className="p-2.5 rounded-xl bg-background/80 backdrop-blur-sm border border-primary/10 group-hover:border-primary/20 transition-colors duration-300">
-                    <tool.icon className="h-6 w-6 text-primary group-hover:text-primary-light transition-colors duration-300" />
+                  <div className="p-2.5 rounded-xl bg-[#1A1F2C]/60 backdrop-blur-sm border border-white/5 group-hover:border-primary/20 transition-colors duration-300">
+                    <tool.icon className="h-6 w-6 text-[#9b87f5] group-hover:text-primary-light transition-colors duration-300" />
                   </div>
-                  <CardTitle className="text-xl font-semibold">{tool.title}</CardTitle>
+                  <CardTitle className="text-xl font-semibold text-gray-200">{tool.title}</CardTitle>
                 </div>
-                <CardDescription className="text-base text-muted-foreground group-hover:text-foreground/80 transition-colors duration-300">
+                <CardDescription className="text-base text-gray-400 group-hover:text-gray-300 transition-colors duration-300">
                   {tool.description}
                 </CardDescription>
               </CardHeader>
@@ -123,9 +124,9 @@ export const AnalyticsSection = () => {
                   {tool.features.map((feature, featureIndex) => (
                     <li 
                       key={featureIndex}
-                      className="flex items-center space-x-3 text-sm text-muted-foreground group-hover:text-foreground/80 transition-colors duration-300"
+                      className="flex items-center space-x-3 text-sm text-gray-400 group-hover:text-gray-300 transition-colors duration-300"
                     >
-                      <div className="h-1.5 w-1.5 rounded-full bg-primary/70 group-hover:bg-primary transition-colors duration-300" />
+                      <div className="h-1.5 w-1.5 rounded-full bg-[#9b87f5]/70 group-hover:bg-[#9b87f5] transition-colors duration-300" />
                       <span>{feature}</span>
                     </li>
                   ))}
@@ -136,13 +137,13 @@ export const AnalyticsSection = () => {
         </div>
 
         <div className="mt-16 text-center">
-          <div className="relative inline-block">
-            {/* Button Glow Effect */}
-            <div className="absolute -inset-1 bg-gradient-to-r from-primary/30 via-accent/20 to-primary/30 rounded-lg blur-xl opacity-75 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="relative inline-block group">
+            {/* Enhanced Button Glow Effect */}
+            <div className="absolute -inset-1 bg-gradient-to-r from-[#9b87f5]/30 via-[#7E69AB]/20 to-[#9b87f5]/30 rounded-lg blur-xl opacity-75 group-hover:opacity-100 transition-all duration-300 group-hover:scale-105" />
             <Button 
               onClick={() => navigate("/login")} 
               size="lg"
-              className="relative bg-primary hover:bg-primary-light text-primary-foreground px-8 py-6 text-lg shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 group"
+              className="relative bg-[#1A1F2C] hover:bg-[#1A1F2C]/80 text-gray-200 px-8 py-6 text-lg border border-white/10 hover:border-primary/20 shadow-lg shadow-primary/10 hover:shadow-xl hover:shadow-primary/20 transition-all duration-300"
             >
               Start Your Psychology Journey
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />

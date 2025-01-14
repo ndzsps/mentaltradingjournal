@@ -17,7 +17,7 @@ export const AnalyticsSection = () => {
         "Track mood-performance correlation",
         "Build emotional resilience"
       ],
-      gradient: "from-violet-500/20 to-purple-500/20"
+      gradient: "from-primary/10 via-primary/5 to-transparent"
     },
     {
       title: "Psychological Pattern Recognition",
@@ -28,7 +28,7 @@ export const AnalyticsSection = () => {
         "Decision-making insights",
         "Stress response tracking"
       ],
-      gradient: "from-pink-500/20 to-rose-500/20"
+      gradient: "from-secondary/10 via-secondary/5 to-transparent"
     },
     {
       title: "Mental Balance Metrics",
@@ -39,7 +39,7 @@ export const AnalyticsSection = () => {
         "Recovery time analysis",
         "Mindset optimization"
       ],
-      gradient: "from-blue-500/20 to-cyan-500/20"
+      gradient: "from-accent/10 via-accent/5 to-transparent"
     },
     {
       title: "Performance Analytics",
@@ -50,7 +50,7 @@ export const AnalyticsSection = () => {
         "Risk management tracking",
         "Performance metrics"
       ],
-      gradient: "from-emerald-500/20 to-teal-500/20"
+      gradient: "from-primary/10 via-primary/5 to-transparent"
     },
     {
       title: "Risk Psychology Profile",
@@ -61,7 +61,7 @@ export const AnalyticsSection = () => {
         "Emotional risk assessment",
         "Decision confidence tracking"
       ],
-      gradient: "from-orange-500/20 to-amber-500/20"
+      gradient: "from-secondary/10 via-secondary/5 to-transparent"
     },
     {
       title: "Behavioral Pattern Analysis",
@@ -72,64 +72,72 @@ export const AnalyticsSection = () => {
         "Psychological biases detection",
         "Behavior optimization tips"
       ],
-      gradient: "from-indigo-500/20 to-blue-500/20"
+      gradient: "from-accent/10 via-accent/5 to-transparent"
     }
   ];
 
   return (
-    <section className="container mx-auto px-4 py-16 bg-accent/5">
-      <div className="text-center mb-12">
-        <h2 className="text-3xl md:text-4xl font-bold mb-4">
-          Trading Psychology Analytics
-        </h2>
-        <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-          Transform your trading mindset with our comprehensive suite of psychological analysis tools
-        </p>
-      </div>
+    <section className="relative py-24 overflow-hidden">
+      {/* Background Effects */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-background/95 to-background/90" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent opacity-40" />
+      
+      <div className="relative container mx-auto px-4">
+        <div className="text-center mb-16 space-y-4">
+          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary-light via-accent to-primary bg-clip-text text-transparent">
+            Trading Psychology Analytics
+          </h2>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            Transform your trading mindset with our comprehensive suite of psychological analysis tools
+          </p>
+        </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {analyticsTools.map((tool, index) => (
-          <Card 
-            key={index} 
-            className={`relative overflow-hidden transition-all duration-300 hover:shadow-lg border-none bg-gradient-to-br ${tool.gradient} h-full`}
-          >
-            <CardHeader className="space-y-4">
-              <div className="flex items-center space-x-4">
-                <div className="p-2 rounded-lg bg-background/80 backdrop-blur-sm">
-                  <tool.icon className="h-6 w-6 text-primary" />
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {analyticsTools.map((tool, index) => (
+            <Card 
+              key={index} 
+              className={`group relative overflow-hidden transition-all duration-500 hover:shadow-lg hover:shadow-primary/5 border-none bg-gradient-to-br ${tool.gradient} backdrop-blur-sm animate-fade-in`}
+              style={{ animationDelay: `${index * 150}ms` }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-background/40 to-background/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <CardHeader className="relative space-y-4">
+                <div className="flex items-center space-x-4">
+                  <div className="p-2.5 rounded-xl bg-background/80 backdrop-blur-sm border border-primary/10 group-hover:border-primary/20 transition-colors duration-300">
+                    <tool.icon className="h-6 w-6 text-primary group-hover:text-primary-light transition-colors duration-300" />
+                  </div>
+                  <CardTitle className="text-xl font-semibold">{tool.title}</CardTitle>
                 </div>
-                <CardTitle className="text-xl">{tool.title}</CardTitle>
-              </div>
-              <CardDescription className="text-base">
-                {tool.description}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2">
-                {tool.features.map((feature, featureIndex) => (
-                  <li 
-                    key={featureIndex}
-                    className="flex items-center space-x-2 text-sm text-muted-foreground"
-                  >
-                    <div className="h-1.5 w-1.5 rounded-full bg-primary" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+                <CardDescription className="text-base text-muted-foreground group-hover:text-foreground/80 transition-colors duration-300">
+                  {tool.description}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="relative">
+                <ul className="space-y-3">
+                  {tool.features.map((feature, featureIndex) => (
+                    <li 
+                      key={featureIndex}
+                      className="flex items-center space-x-3 text-sm text-muted-foreground group-hover:text-foreground/80 transition-colors duration-300"
+                    >
+                      <div className="h-1.5 w-1.5 rounded-full bg-primary/70 group-hover:bg-primary transition-colors duration-300" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
 
-      <div className="mt-12 text-center">
-        <Button 
-          onClick={() => navigate("/login")} 
-          size="lg"
-          className="bg-primary hover:bg-primary/90"
-        >
-          Start Your Psychology Journey
-          <ArrowRight className="ml-2 h-5 w-5" />
-        </Button>
+        <div className="mt-16 text-center">
+          <Button 
+            onClick={() => navigate("/login")} 
+            size="lg"
+            className="bg-primary hover:bg-primary-light text-primary-foreground px-8 py-6 text-lg shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 group"
+          >
+            Start Your Psychology Journey
+            <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
+          </Button>
+        </div>
       </div>
     </section>
   );

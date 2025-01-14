@@ -107,9 +107,11 @@ const Pricing = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-background/80 flex items-center justify-center">
-      <div className="container px-4 py-16 md:py-24 max-w-7xl mx-auto">
-        <div className="text-center mb-16 space-y-4">
+    <div className="relative min-h-screen bg-gradient-to-b from-background to-background/80 flex flex-col items-center justify-center overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(120,119,198,0.1),rgba(255,255,255,0))]" />
+      
+      <div className="container relative px-4 py-16 md:py-24 mx-auto">
+        <div className="text-center mb-16 space-y-4 animate-fade-in">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary-light to-accent">
             Simple, transparent pricing
           </h1>
@@ -154,13 +156,14 @@ const Pricing = () => {
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto px-4">
           {plans?.map((plan) => (
             <Card 
               key={plan.id}
               className="relative flex flex-col border-2 hover:border-primary/50 transition-all duration-300 backdrop-blur-sm bg-card/95 hover:shadow-xl hover:-translate-y-1"
             >
-              <CardHeader className="text-center pb-8">
+              <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent rounded-lg" />
+              <CardHeader className="text-center pb-8 relative">
                 <CardTitle className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
                   {plan.name}
                 </CardTitle>
@@ -168,7 +171,7 @@ const Pricing = () => {
                   {plan.description}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="flex-grow space-y-6">
+              <CardContent className="flex-grow space-y-6 relative">
                 <div className="text-center">
                   <span className="text-4xl font-bold">
                     {formatPrice(calculatePrice(plan.price))}
@@ -186,7 +189,7 @@ const Pricing = () => {
                   ))}
                 </ul>
               </CardContent>
-              <CardFooter className="pt-6">
+              <CardFooter className="pt-6 relative">
                 <Button 
                   className="w-full bg-gradient-to-r from-primary via-primary-light to-accent hover:opacity-90 transition-opacity"
                   onClick={() => handleSelectPlan(plan)}

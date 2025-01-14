@@ -68,10 +68,10 @@ const Landing = () => {
             {/* Left Content */}
             <div className="flex-1 space-y-8 md:pr-8">
               <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-tight">
-                Trading Psychology
+                You've never seen a
                 <br />
                 <span className="bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
-                  Mastered
+                  Trading journal like this Before
                 </span>
               </h1>
               <p className="text-xl md:text-2xl text-gray-300 max-w-2xl leading-relaxed">

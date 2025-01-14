@@ -29,7 +29,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
       setLoading(false);
     });
@@ -86,32 +86,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
-      // First clear the user state
-      setUser(null);
-      
-      // Then attempt to sign out
-      const { error } = await supabase.auth.signOut({
-        scope: 'local' // Changed from 'global' to 'local'
-      });
-      
+      const { error } = await supabase.auth.signOut();
       if (error) {
-        console.error("Sign out error:", error);
-        // Even if there's an error, we don't throw it since the user is already signed out locally
         toast({
           variant: "destructive",
-          title: "Warning",
-          description: "You were signed out locally, but there was an issue with the server.",
+          title: "Error signing out",
+          description: error.message,
         });
-        return;
+        throw error;
       }
     } catch (error) {
       console.error("Sign out error:", error);
-      // Don't throw the error, just notify the user
-      toast({
-        variant: "destructive",
-        title: "Warning",
-        description: "You were signed out locally, but there was an issue with the server.",
-      });
+      throw error;
     }
   };
 

@@ -67,12 +67,12 @@ const Landing = () => {
           <div className="container mx-auto px-4 md:px-6 flex flex-col md:flex-row items-center gap-12">
             {/* Left Content */}
             <div className="flex-1 space-y-8 md:pr-8">
-              <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-tight">
-                You've never seen a
-                <br />
+              <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-tight text-white">
+                You've never seen a{" "}
                 <span className="bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
-                  Trading journal like this Before
+                  trading journal
                 </span>
+                {" "}like this before
               </h1>
               <p className="text-xl md:text-2xl text-gray-300 max-w-2xl leading-relaxed">
                 Elevate your trading performance with data-driven insights and emotional intelligence tools designed for success.

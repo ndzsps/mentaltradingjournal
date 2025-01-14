@@ -107,33 +107,39 @@ const Pricing = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center">
-      <div className="container mx-auto px-4 py-24 max-w-7xl">
-        <div className="text-center mb-16">
-          <h1 className="text-4xl font-bold mb-4">Simple, transparent pricing</h1>
-          <p className="text-xl text-muted-foreground mb-8">
+    <div className="min-h-screen bg-gradient-to-b from-background to-background/80 flex items-center justify-center">
+      <div className="container px-4 py-16 md:py-24 max-w-7xl mx-auto">
+        <div className="text-center mb-16 space-y-4">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary-light to-accent">
+            Simple, transparent pricing
+          </h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Choose the plan that's right for you
           </p>
           
-          <div className="flex flex-col items-center gap-4">
+          <div className="flex flex-col items-center gap-4 mt-8">
             <ToggleGroup
               type="single"
               value={billingInterval}
               onValueChange={(value) => value && setBillingInterval(value)}
-              className="inline-flex bg-muted rounded-full p-1"
+              className="inline-flex bg-muted/50 backdrop-blur-sm rounded-full p-1.5 shadow-lg"
             >
               <ToggleGroupItem
                 value="annually"
-                className={`rounded-full px-6 py-2 text-sm font-medium transition-colors ${
-                  billingInterval === "annually" ? "bg-primary text-white" : ""
+                className={`rounded-full px-6 py-2.5 text-sm font-medium transition-all duration-300 ${
+                  billingInterval === "annually" 
+                    ? "bg-primary text-white shadow-md" 
+                    : "hover:bg-muted"
                 }`}
               >
                 Billed annually
               </ToggleGroupItem>
               <ToggleGroupItem
                 value="monthly"
-                className={`rounded-full px-6 py-2 text-sm font-medium transition-colors ${
-                  billingInterval === "monthly" ? "bg-primary text-white" : ""
+                className={`rounded-full px-6 py-2.5 text-sm font-medium transition-all duration-300 ${
+                  billingInterval === "monthly" 
+                    ? "bg-primary text-white shadow-md" 
+                    : "hover:bg-muted"
                 }`}
               >
                 Billed monthly
@@ -141,8 +147,8 @@ const Pricing = () => {
             </ToggleGroup>
             
             {billingInterval === "annually" && (
-              <p className="text-sm text-muted-foreground">
-                Pay annually and save up to 25% 🎉
+              <p className="text-sm text-primary animate-fade-in">
+                Save 25% with annual billing 🎉
               </p>
             )}
           </div>
@@ -152,33 +158,37 @@ const Pricing = () => {
           {plans?.map((plan) => (
             <Card 
               key={plan.id}
-              className="relative flex flex-col border-2 hover:border-primary/50 transition-colors"
+              className="relative flex flex-col border-2 hover:border-primary/50 transition-all duration-300 backdrop-blur-sm bg-card/95 hover:shadow-xl hover:-translate-y-1"
             >
-              <CardHeader>
-                <CardTitle className="text-2xl">{plan.name}</CardTitle>
-                <CardDescription>{plan.description}</CardDescription>
+              <CardHeader className="text-center pb-8">
+                <CardTitle className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
+                  {plan.name}
+                </CardTitle>
+                <CardDescription className="text-base">
+                  {plan.description}
+                </CardDescription>
               </CardHeader>
-              <CardContent className="flex-grow">
-                <div className="mb-6">
+              <CardContent className="flex-grow space-y-6">
+                <div className="text-center">
                   <span className="text-4xl font-bold">
                     {formatPrice(calculatePrice(plan.price))}
                   </span>
-                  <span className="text-muted-foreground">
+                  <span className="text-muted-foreground ml-2">
                     /{billingInterval === "annually" ? "year" : "month"}
                   </span>
                 </div>
                 <ul className="space-y-3">
                   {plan.features.map((feature, index) => (
-                    <li key={index} className="flex items-center gap-2">
-                      <Check className="h-4 w-4 text-primary" />
-                      <span>{feature.feature}</span>
+                    <li key={index} className="flex items-center gap-3">
+                      <Check className="h-5 w-5 text-primary shrink-0" />
+                      <span className="text-sm">{feature.feature}</span>
                     </li>
                   ))}
                 </ul>
               </CardContent>
-              <CardFooter>
+              <CardFooter className="pt-6">
                 <Button 
-                  className="w-full"
+                  className="w-full bg-gradient-to-r from-primary via-primary-light to-accent hover:opacity-90 transition-opacity"
                   onClick={() => handleSelectPlan(plan)}
                 >
                   <CreditCard className="mr-2 h-4 w-4" />

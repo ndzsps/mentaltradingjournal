@@ -24,6 +24,7 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_ANON_KEY') ?? ''
     )
 
+    // Verify authentication
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) {
       throw new Error('Missing Authorization header')
@@ -43,6 +44,8 @@ serve(async (req) => {
     if (!xenditApiKey) {
       throw new Error('Xendit API key not configured')
     }
+
+    console.log('Creating Xendit invoice for user:', user.id)
 
     // Create Xendit invoice
     const response = await fetch('https://api.xendit.co/v2/invoices', {
@@ -66,7 +69,14 @@ serve(async (req) => {
       }),
     })
 
+    if (!response.ok) {
+      const errorData = await response.json()
+      console.error('Xendit API error:', errorData)
+      throw new Error(`Xendit API error: ${errorData.message || 'Unknown error'}`)
+    }
+
     const xenditInvoice = await response.json()
+    console.log('Xendit invoice created:', xenditInvoice.id)
 
     // Create payment record in database
     const { data: payment, error: paymentError } = await supabaseClient
@@ -102,6 +112,7 @@ serve(async (req) => {
       }
     )
   } catch (error) {
+    console.error('Payment creation error:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
       {

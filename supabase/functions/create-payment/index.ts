@@ -19,6 +19,8 @@ serve(async (req) => {
   }
 
   try {
+    console.log('Starting payment creation process...')
+    
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? ''
@@ -35,17 +37,21 @@ serve(async (req) => {
     )
 
     if (userError || !user) {
+      console.error('User authentication error:', userError)
       throw new Error('Invalid user token')
     }
+
+    console.log('User authenticated:', user.id)
 
     const { planId, amount, currency, interval } = await req.json() as CreatePaymentBody
 
     const xenditApiKey = Deno.env.get('XENDIT_SECRET_KEY')
     if (!xenditApiKey) {
+      console.error('Xendit API key not configured')
       throw new Error('Xendit API key not configured')
     }
 
-    console.log('Creating Xendit invoice for user:', user.id)
+    console.log('Creating Xendit invoice for user:', user.id, 'with amount:', amount, currency)
 
     // Create Xendit invoice
     const response = await fetch('https://api.xendit.co/v2/invoices', {

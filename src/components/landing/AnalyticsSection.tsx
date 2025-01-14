@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowRight, Brain, Heart, Scale, LineChart, Gauge, Activity } from "lucide-react";
+import { ArrowRight, Brain, Heart, Scale, LineChart, Activity } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export const AnalyticsSection = () => {
@@ -18,17 +18,6 @@ export const AnalyticsSection = () => {
         "Build emotional resilience"
       ],
       gradient: "from-primary/10 via-primary/5 to-transparent"
-    },
-    {
-      title: "Psychological Pattern Recognition",
-      description: "Understand and improve your trading psychology patterns",
-      icon: Heart,
-      features: [
-        "Behavioral pattern analysis",
-        "Decision-making insights",
-        "Stress response tracking"
-      ],
-      gradient: "from-secondary/10 via-secondary/5 to-transparent"
     },
     {
       title: "Mental Balance Metrics",
@@ -51,17 +40,6 @@ export const AnalyticsSection = () => {
         "Performance metrics"
       ],
       gradient: "from-primary/10 via-primary/5 to-transparent"
-    },
-    {
-      title: "Risk Psychology Profile",
-      description: "Understand your risk tolerance and decision patterns",
-      icon: Gauge,
-      features: [
-        "Risk behavior analysis",
-        "Emotional risk assessment",
-        "Decision confidence tracking"
-      ],
-      gradient: "from-secondary/10 via-secondary/5 to-transparent"
     },
     {
       title: "Behavioral Pattern Analysis",
@@ -100,7 +78,7 @@ export const AnalyticsSection = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-6">
           {analyticsTools.map((tool, index) => (
             <Card 
               key={index} 

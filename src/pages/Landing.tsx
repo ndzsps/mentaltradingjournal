@@ -31,7 +31,6 @@ const Landing = () => {
         <div className="absolute inset-0 backdrop-blur-[100px]" />
       </div>
       
-      {/* Content */}
       <div className="relative z-10">
         {/* Header */}
         <header className="fixed top-0 left-0 right-0 z-50 bg-background/5 backdrop-blur-md border-b border-white/5">
@@ -42,6 +41,13 @@ const Landing = () => {
               </span>
             </div>
             <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                className="flex items-center gap-2 text-white/70 hover:text-white hover:bg-white/5"
+                onClick={() => navigate("/pricing")}
+              >
+                Pricing
+              </Button>
               <Button
                 variant="ghost"
                 className="flex items-center gap-2 text-white/70 hover:text-white hover:bg-white/5"

@@ -53,73 +53,82 @@ serve(async (req) => {
 
     console.log('Creating Xendit invoice for user:', user.id, 'with amount:', amount, currency)
 
-    // Create Xendit invoice
-    const response = await fetch('https://api.xendit.co/v2/invoices', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Basic ${btoa(xenditApiKey + ':')}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        external_id: `plan_${planId}_${Date.now()}`,
-        amount: amount,
-        currency: currency,
-        payment_methods: ['CREDIT_CARD', 'BCA', 'BNI', 'BSI', 'BRI', 'MANDIRI', 'PERMATA', 'ALFAMART', 'INDOMARET'],
-        should_send_email: true,
-        invoice_duration: 86400,
-        customer: {
-          email: user.email,
+    // Create Xendit invoice with more detailed error logging
+    try {
+      const response = await fetch('https://api.xendit.co/v2/invoices', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Basic ${btoa(xenditApiKey + ':')}`,
+          'Content-Type': 'application/json',
         },
-        success_redirect_url: `${req.headers.get('origin')}/payment/success`,
-        failure_redirect_url: `${req.headers.get('origin')}/payment/failed`,
-      }),
-    })
-
-    const responseData = await response.json()
-    console.log('Xendit API response:', responseData)
-
-    if (!response.ok) {
-      console.error('Xendit API error:', responseData)
-      throw new Error(`Xendit API error: ${responseData.message || 'Unknown error'}`)
-    }
-
-    // Create payment record in database
-    const { data: payment, error: paymentError } = await supabaseClient
-      .from('payments')
-      .insert({
-        user_id: user.id,
-        amount: amount,
-        currency: currency,
-        status: 'pending',
-        xendit_payment_id: responseData.id,
-        invoice_id: responseData.external_id,
-        invoice_url: responseData.invoice_url,
-        payment_method_info: {},
-        metadata: {
-          plan_id: planId,
-          interval: interval,
-        },
+        body: JSON.stringify({
+          external_id: `plan_${planId}_${Date.now()}`,
+          amount: amount,
+          currency: currency,
+          payment_methods: ['CREDIT_CARD', 'BCA', 'BNI', 'BSI', 'BRI', 'MANDIRI', 'PERMATA', 'ALFAMART', 'INDOMARET'],
+          should_send_email: true,
+          invoice_duration: 86400,
+          customer: {
+            email: user.email,
+          },
+          success_redirect_url: `${req.headers.get('origin')}/payment/success`,
+          failure_redirect_url: `${req.headers.get('origin')}/payment/failed`,
+        }),
       })
-      .select()
-      .single()
 
-    if (paymentError) {
-      console.error('Payment record creation error:', paymentError)
-      throw paymentError
-    }
+      const responseData = await response.json()
+      console.log('Xendit API response:', responseData)
 
-    console.log('Payment record created:', payment)
-    console.log('Invoice URL:', responseData.invoice_url)
-
-    return new Response(
-      JSON.stringify({
-        payment: payment,
-        invoiceUrl: responseData.invoice_url,
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      if (!response.ok) {
+        console.error('Xendit API error details:', {
+          status: response.status,
+          statusText: response.statusText,
+          body: responseData
+        })
+        throw new Error(`Xendit API error: ${responseData.message || 'Unknown error'}`)
       }
-    )
+
+      // Create payment record in database
+      const { data: payment, error: paymentError } = await supabaseClient
+        .from('payments')
+        .insert({
+          user_id: user.id,
+          amount: amount,
+          currency: currency,
+          status: 'pending',
+          xendit_payment_id: responseData.id,
+          invoice_id: responseData.external_id,
+          invoice_url: responseData.invoice_url,
+          payment_method_info: {},
+          metadata: {
+            plan_id: planId,
+            interval: interval,
+          },
+        })
+        .select()
+        .single()
+
+      if (paymentError) {
+        console.error('Payment record creation error:', paymentError)
+        throw paymentError
+      }
+
+      console.log('Payment record created:', payment)
+      console.log('Invoice URL:', responseData.invoice_url)
+
+      return new Response(
+        JSON.stringify({
+          payment: payment,
+          invoiceUrl: responseData.invoice_url,
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      )
+    } catch (xenditError) {
+      console.error('Xendit API call failed:', xenditError)
+      throw xenditError
+    }
   } catch (error) {
     console.error('Payment creation error:', error)
     return new Response(

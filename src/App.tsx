@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import Landing from "./pages/Landing";
-import Index from "./pages/Index";
+import JournalEntry from "./pages/JournalEntry";
 import Journal from "./pages/Journal";
 import Analytics from "./pages/Analytics";
 import Backtesting from "./pages/Backtesting";
@@ -52,13 +52,13 @@ const App = () => {
               <Sonner />
               <BrowserRouter>
                 <Routes>
-                  <Route path="/" element={<Landing />} />
+                  <Route path="/index" element={<Landing />} />
                   <Route path="/login" element={<Login />} />
                   <Route
-                    path="/journal-entry"
+                    path="/"
                     element={
                       <ProtectedRoute>
-                        <Index />
+                        <JournalEntry />
                       </ProtectedRoute>
                     }
                   />

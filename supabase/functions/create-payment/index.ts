@@ -69,14 +69,13 @@ serve(async (req) => {
       }),
     })
 
-    if (!response.ok) {
-      const errorData = await response.json()
-      console.error('Xendit API error:', errorData)
-      throw new Error(`Xendit API error: ${errorData.message || 'Unknown error'}`)
-    }
+    const responseData = await response.json()
+    console.log('Xendit API response:', responseData)
 
-    const xenditInvoice = await response.json()
-    console.log('Xendit invoice created:', xenditInvoice.id)
+    if (!response.ok) {
+      console.error('Xendit API error:', responseData)
+      throw new Error(`Xendit API error: ${responseData.message || 'Unknown error'}`)
+    }
 
     // Create payment record in database
     const { data: payment, error: paymentError } = await supabaseClient
@@ -86,9 +85,9 @@ serve(async (req) => {
         amount: amount,
         currency: currency,
         status: 'pending',
-        xendit_payment_id: xenditInvoice.id,
-        invoice_id: xenditInvoice.external_id,
-        invoice_url: xenditInvoice.invoice_url,
+        xendit_payment_id: responseData.id,
+        invoice_id: responseData.external_id,
+        invoice_url: responseData.invoice_url,
         payment_method_info: {},
         metadata: {
           plan_id: planId,
@@ -99,13 +98,17 @@ serve(async (req) => {
       .single()
 
     if (paymentError) {
+      console.error('Payment record creation error:', paymentError)
       throw paymentError
     }
+
+    console.log('Payment record created:', payment)
+    console.log('Invoice URL:', responseData.invoice_url)
 
     return new Response(
       JSON.stringify({
         payment: payment,
-        invoiceUrl: xenditInvoice.invoice_url,
+        invoiceUrl: responseData.invoice_url,
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

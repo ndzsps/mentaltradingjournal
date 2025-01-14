@@ -45,6 +45,7 @@ export const PricingCard = ({ plan, billingInterval, onSelectPlan }: PricingCard
     }
 
     try {
+      console.log('Creating payment for plan:', plan.id);
       const finalPrice = calculatePrice(plan.price);
       
       const { data, error } = await supabase.functions.invoke('create-payment', {
@@ -56,9 +57,15 @@ export const PricingCard = ({ plan, billingInterval, onSelectPlan }: PricingCard
         },
       });
 
-      if (error) throw error;
+      console.log('Payment creation response:', { data, error });
+
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw error;
+      }
       
       if (!data?.invoiceUrl) {
+        console.error('No invoice URL in response:', data);
         throw new Error('No invoice URL received from payment creation');
       }
 
@@ -70,7 +77,7 @@ export const PricingCard = ({ plan, billingInterval, onSelectPlan }: PricingCard
       toast({
         variant: "destructive",
         title: "Error creating payment",
-        description: "There was an error processing your payment. Please try again.",
+        description: error instanceof Error ? error.message : "There was an error processing your payment. Please try again.",
       });
     }
   };

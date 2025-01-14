@@ -20,9 +20,9 @@ export const WeeklyPerformance = () => {
           schema: 'public',
           table: 'journal_entries',
         },
-        () => {
-          // Invalidate and refetch weekly stats when journal entries change
-          queryClient.invalidateQueries({ queryKey: ['weekly-performance'] });
+        async () => {
+          // Immediately refetch the data when changes occur
+          await queryClient.invalidateQueries({ queryKey: ['weekly-performance'] });
         }
       )
       .subscribe();

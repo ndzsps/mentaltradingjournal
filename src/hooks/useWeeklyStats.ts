@@ -59,5 +59,9 @@ export const useWeeklyStats = () => {
 
       return weeks;
     },
+    // Enable automatic background refetching
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+    staleTime: 0,
   });
 };

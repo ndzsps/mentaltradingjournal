@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import mapboxgl, { LngLatLike } from 'mapbox-gl';
+import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 export const GlobalMap = () => {
@@ -24,7 +24,7 @@ export const GlobalMap = () => {
         style: 'mapbox://styles/mapbox/light-v11',
         projection: 'globe',
         zoom: 1.5,
-        center: [30, 15] as LngLatLike,
+        center: [30, 15],
         pitch: 45,
       });
 

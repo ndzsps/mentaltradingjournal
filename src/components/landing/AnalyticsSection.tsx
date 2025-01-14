@@ -77,16 +77,23 @@ export const AnalyticsSection = () => {
   ];
 
   return (
-    <section className="relative py-24 overflow-hidden">
-      {/* Background Effects */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-background/95 to-background/90" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent opacity-40" />
+    <section className="relative py-24">
+      {/* Enhanced Background Effects */}
+      <div className="absolute inset-0">
+        <div className="absolute inset-0 bg-gradient-to-b from-background/5 via-background to-background/95" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-accent/5 to-transparent opacity-30" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,_var(--tw-gradient-stops))] from-secondary/10 via-background/80 to-background" />
+      </div>
       
       <div className="relative container mx-auto px-4">
         <div className="text-center mb-16 space-y-4">
-          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary-light via-accent to-primary bg-clip-text text-transparent">
-            Trading Psychology Analytics
-          </h2>
+          <div className="relative">
+            {/* Glow Effect */}
+            <div className="absolute -inset-1 bg-gradient-to-r from-primary/30 via-accent/30 to-secondary/30 rounded-lg blur-2xl opacity-75" />
+            <h2 className="relative text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary-light via-accent to-primary bg-clip-text text-transparent">
+              Trading Psychology Analytics
+            </h2>
+          </div>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Transform your trading mindset with our comprehensive suite of psychological analysis tools
           </p>
@@ -129,14 +136,18 @@ export const AnalyticsSection = () => {
         </div>
 
         <div className="mt-16 text-center">
-          <Button 
-            onClick={() => navigate("/login")} 
-            size="lg"
-            className="bg-primary hover:bg-primary-light text-primary-foreground px-8 py-6 text-lg shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 group"
-          >
-            Start Your Psychology Journey
-            <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
-          </Button>
+          <div className="relative inline-block">
+            {/* Button Glow Effect */}
+            <div className="absolute -inset-1 bg-gradient-to-r from-primary/30 via-accent/20 to-primary/30 rounded-lg blur-xl opacity-75 group-hover:opacity-100 transition-opacity duration-300" />
+            <Button 
+              onClick={() => navigate("/login")} 
+              size="lg"
+              className="relative bg-primary hover:bg-primary-light text-primary-foreground px-8 py-6 text-lg shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 group"
+            >
+              Start Your Psychology Journey
+              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
+            </Button>
+          </div>
         </div>
       </div>
     </section>

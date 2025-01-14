@@ -2,6 +2,10 @@ import { Check, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { PricingPlan } from "./types";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 interface PricingCardProps {
   plan: PricingPlan;
@@ -10,6 +14,10 @@ interface PricingCardProps {
 }
 
 export const PricingCard = ({ plan, billingInterval, onSelectPlan }: PricingCardProps) => {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
   const calculatePrice = (price: number) => {
     if (billingInterval === "annually") {
       return (price * 12) * 0.75;
@@ -24,6 +32,42 @@ export const PricingCard = ({ plan, billingInterval, onSelectPlan }: PricingCard
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(price);
+  };
+
+  const handleSelectPlan = async () => {
+    if (!user) {
+      navigate("/login");
+      toast({
+        title: "Please sign in first",
+        description: "You need to be signed in to subscribe to a plan.",
+      });
+      return;
+    }
+
+    try {
+      const finalPrice = calculatePrice(plan.price);
+      
+      const { data, error } = await supabase.functions.invoke('create-payment', {
+        body: {
+          planId: plan.id,
+          amount: finalPrice,
+          currency: plan.currency,
+          interval: billingInterval,
+        },
+      });
+
+      if (error) throw error;
+
+      // Redirect to Xendit invoice URL
+      window.location.href = data.invoiceUrl;
+    } catch (error) {
+      console.error('Payment creation error:', error);
+      toast({
+        variant: "destructive",
+        title: "Error creating payment",
+        description: "There was an error processing your payment. Please try again.",
+      });
+    }
   };
 
   return (
@@ -58,7 +102,7 @@ export const PricingCard = ({ plan, billingInterval, onSelectPlan }: PricingCard
       <CardFooter className="pt-6 relative">
         <Button 
           className="w-full bg-gradient-to-r from-primary via-primary-light to-accent hover:opacity-90 transition-opacity"
-          onClick={() => onSelectPlan(plan)}
+          onClick={handleSelectPlan}
         >
           <CreditCard className="mr-2 h-4 w-4" />
           Get Started

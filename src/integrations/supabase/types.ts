@@ -171,7 +171,11 @@ export type Database = {
           created_at: string
           currency: string
           id: string
+          invoice_id: string | null
+          invoice_url: string | null
+          metadata: Json | null
           payment_method: string | null
+          payment_method_info: Json | null
           status: string
           updated_at: string
           user_id: string
@@ -182,7 +186,11 @@ export type Database = {
           created_at?: string
           currency?: string
           id?: string
+          invoice_id?: string | null
+          invoice_url?: string | null
+          metadata?: Json | null
           payment_method?: string | null
+          payment_method_info?: Json | null
           status: string
           updated_at?: string
           user_id: string
@@ -193,7 +201,11 @@ export type Database = {
           created_at?: string
           currency?: string
           id?: string
+          invoice_id?: string | null
+          invoice_url?: string | null
+          metadata?: Json | null
           payment_method?: string | null
+          payment_method_info?: Json | null
           status?: string
           updated_at?: string
           user_id?: string

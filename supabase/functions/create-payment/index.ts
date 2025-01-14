@@ -53,12 +53,15 @@ serve(async (req) => {
 
     console.log('Creating Xendit invoice for user:', user.id, 'with amount:', amount, currency)
 
-    // Create Xendit invoice with more detailed error logging
+    // Create Xendit invoice with proper Base64 encoding of API key
     try {
+      const base64ApiKey = btoa(xenditApiKey + ':');
+      console.log('Making request to Xendit API...');
+      
       const response = await fetch('https://api.xendit.co/v2/invoices', {
         method: 'POST',
         headers: {
-          'Authorization': `Basic ${btoa(xenditApiKey + ':')}`,
+          'Authorization': `Basic ${base64ApiKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({

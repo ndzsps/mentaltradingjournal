@@ -6,6 +6,18 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check, CreditCard } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { Json } from "@/integrations/supabase/types";
+
+interface RawPricingPlan {
+  id: string;
+  name: string;
+  description: string | null;
+  price: number;
+  currency: string;
+  interval: string;
+  features: Json[];
+  is_active: boolean | null;
+}
 
 interface PricingPlan {
   id: string;
@@ -16,6 +28,23 @@ interface PricingPlan {
   interval: string;
   features: { feature: string }[];
 }
+
+const transformPricingPlan = (raw: RawPricingPlan): PricingPlan => {
+  return {
+    id: raw.id,
+    name: raw.name,
+    description: raw.description || "",
+    price: raw.price,
+    currency: raw.currency,
+    interval: raw.interval,
+    features: raw.features.map(f => {
+      if (typeof f === 'object' && f !== null && 'feature' in f) {
+        return { feature: String(f.feature) };
+      }
+      return { feature: String(f) };
+    })
+  };
+};
 
 const Pricing = () => {
   const navigate = useNavigate();
@@ -30,7 +59,7 @@ const Pricing = () => {
         .order("price");
       
       if (error) throw error;
-      return data as PricingPlan[];
+      return (data as RawPricingPlan[]).map(transformPricingPlan);
     }
   });
 

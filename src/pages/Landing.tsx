@@ -9,35 +9,50 @@ const Landing = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen relative bg-background overflow-hidden">
-      {/* Enhanced Gradient Background */}
+    <div className="min-h-screen relative bg-[#1A1F2C] overflow-hidden">
+      {/* Enhanced Unified Background */}
       <div className="fixed inset-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-background to-accent/20" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent" />
+        {/* Dark base layer */}
+        <div className="absolute inset-0 bg-[#1A1F2C]" />
+        
+        {/* Subtle gradient overlays */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10 opacity-40" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent opacity-30" />
+        
+        {/* Animated glow effects */}
+        <div className="absolute inset-0">
+          <div className="absolute top-0 -left-40 w-80 h-80 bg-primary/30 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" />
+          <div className="absolute top-0 -right-40 w-80 h-80 bg-accent/30 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-1000" />
+        </div>
+        
+        {/* Noise texture overlay */}
+        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.02]" />
+        
+        {/* Glass effect base */}
         <div className="absolute inset-0 backdrop-blur-[100px]" />
       </div>
       
       {/* Content */}
       <div className="relative z-10">
         {/* Header */}
-        <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-b border-border/40">
+        <header className="fixed top-0 left-0 right-0 z-50 bg-background/5 backdrop-blur-md border-b border-white/5">
           <div className="container mx-auto px-4 h-16 flex items-center justify-between">
             <div className="flex items-center">
-              <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              <span className="text-xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
                 Mental
               </span>
             </div>
             <div className="flex items-center gap-4">
               <Button
                 variant="ghost"
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 text-white/70 hover:text-white hover:bg-white/5"
                 onClick={() => navigate("/login")}
               >
                 <User className="h-4 w-4" />
                 Sign In
               </Button>
               <Button
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 bg-primary/20 hover:bg-primary/30 text-primary-light border border-primary/20 backdrop-blur-sm"
                 onClick={() => navigate("/login")}
               >
                 <span>Get Started</span>
@@ -47,7 +62,7 @@ const Landing = () => {
           </div>
         </header>
 
-        {/* Hero Section - Updated with better spacing */}
+        {/* Hero Section */}
         <section className="relative pt-40 min-h-[90vh] flex items-center">
           <div className="container mx-auto px-4 md:px-6 flex flex-col md:flex-row items-center gap-12">
             {/* Left Content */}

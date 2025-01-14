@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Check, CreditCard } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Json } from "@/integrations/supabase/types";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 interface RawPricingPlan {
   id: string;
@@ -49,6 +50,7 @@ const transformPricingPlan = (raw: RawPricingPlan): PricingPlan => {
 const Pricing = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [billingInterval, setBillingInterval] = useState<string>("monthly");
 
   const { data: plans, isLoading, error } = useQuery({
     queryKey: ["pricing-plans"],
@@ -69,6 +71,15 @@ const Pricing = () => {
       title: "Please sign in first",
       description: "You need to be signed in to subscribe to a plan.",
     });
+  };
+
+  const calculatePrice = (price: number) => {
+    if (billingInterval === "annually") {
+      // Apply 25% discount for annual billing
+      const annualPrice = (price * 12) * 0.75;
+      return annualPrice;
+    }
+    return price;
   };
 
   if (isLoading) {
@@ -101,9 +112,41 @@ const Pricing = () => {
       <div className="container mx-auto px-4 py-24">
         <div className="text-center mb-16">
           <h1 className="text-4xl font-bold mb-4">Simple, transparent pricing</h1>
-          <p className="text-xl text-muted-foreground">
+          <p className="text-xl text-muted-foreground mb-8">
             Choose the plan that's right for you
           </p>
+          
+          <div className="flex flex-col items-center gap-4">
+            <ToggleGroup
+              type="single"
+              value={billingInterval}
+              onValueChange={(value) => value && setBillingInterval(value)}
+              className="inline-flex bg-muted rounded-full p-1"
+            >
+              <ToggleGroupItem
+                value="annually"
+                className={`rounded-full px-6 py-2 text-sm font-medium transition-colors ${
+                  billingInterval === "annually" ? "bg-primary text-white" : ""
+                }`}
+              >
+                Billed annually
+              </ToggleGroupItem>
+              <ToggleGroupItem
+                value="monthly"
+                className={`rounded-full px-6 py-2 text-sm font-medium transition-colors ${
+                  billingInterval === "monthly" ? "bg-primary text-white" : ""
+                }`}
+              >
+                Billed monthly
+              </ToggleGroupItem>
+            </ToggleGroup>
+            
+            {billingInterval === "annually" && (
+              <p className="text-sm text-muted-foreground">
+                Pay annually and save up to 25% 🎉
+              </p>
+            )}
+          </div>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
@@ -118,8 +161,12 @@ const Pricing = () => {
               </CardHeader>
               <CardContent className="flex-grow">
                 <div className="mb-6">
-                  <span className="text-4xl font-bold">{formatPrice(plan.price)}</span>
-                  <span className="text-muted-foreground">/{plan.interval}</span>
+                  <span className="text-4xl font-bold">
+                    {formatPrice(calculatePrice(plan.price))}
+                  </span>
+                  <span className="text-muted-foreground">
+                    /{billingInterval === "annually" ? "year" : "month"}
+                  </span>
                 </div>
                 <ul className="space-y-3">
                   {plan.features.map((feature, index) => (

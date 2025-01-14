@@ -140,7 +140,7 @@ const Pricing = () => {
                 value="monthly"
                 className={`rounded-full px-6 py-2.5 text-sm font-medium transition-all duration-300 ${
                   billingInterval === "monthly" 
-                    ? "bg-primary text-white shadow-md" 
+                    ? "bg-accent text-accent-foreground shadow-md" 
                     : "hover:bg-muted"
                 }`}
               >
@@ -156,18 +156,18 @@ const Pricing = () => {
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto px-4">
+        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
           {plans?.map((plan) => (
             <Card 
               key={plan.id}
-              className="relative flex flex-col border-2 hover:border-primary/50 transition-all duration-300 backdrop-blur-sm bg-card/95 hover:shadow-xl hover:-translate-y-1"
+              className="relative flex flex-col border border-primary/20 hover:border-primary/50 transition-all duration-300 backdrop-blur-sm bg-card/95 hover:shadow-xl hover:-translate-y-1"
             >
               <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent rounded-lg" />
               <CardHeader className="text-center pb-8 relative">
                 <CardTitle className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
                   {plan.name}
                 </CardTitle>
-                <CardDescription className="text-base">
+                <CardDescription className="text-base text-muted-foreground">
                   {plan.description}
                 </CardDescription>
               </CardHeader>

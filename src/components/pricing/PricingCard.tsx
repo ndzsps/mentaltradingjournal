@@ -57,9 +57,14 @@ export const PricingCard = ({ plan, billingInterval, onSelectPlan }: PricingCard
       });
 
       if (error) throw error;
+      
+      if (!data?.invoiceUrl) {
+        throw new Error('No invoice URL received from payment creation');
+      }
 
-      // Redirect to Xendit invoice URL
+      console.log('Redirecting to invoice URL:', data.invoiceUrl);
       window.location.href = data.invoiceUrl;
+      
     } catch (error) {
       console.error('Payment creation error:', error);
       toast({

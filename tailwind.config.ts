@@ -29,7 +29,7 @@ export default {
           light: "#9b87f5",
           dark: "#4A3B80",
           foreground: "#ffffff",
-          hover: "#F5F3FF", // Lighter purple for hover state
+          hover: "#F5F3FF",
         },
         secondary: {
           DEFAULT: "#0EA5E9",

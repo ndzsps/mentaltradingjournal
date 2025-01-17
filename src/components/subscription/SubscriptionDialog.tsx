@@ -2,6 +2,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { SubscribeButton } from "./SubscribeButton";
 
 interface SubscriptionDialogProps {
   open: boolean;
@@ -68,7 +69,7 @@ export const SubscriptionDialog = ({ open, onOpenChange }: SubscriptionDialogPro
                 </ul>
               </div>
 
-              <Button className="w-full">Subscribe now</Button>
+              <SubscribeButton />
             </div>
           </div>
 

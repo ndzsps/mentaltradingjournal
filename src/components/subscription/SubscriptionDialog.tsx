@@ -17,7 +17,7 @@ export const SubscriptionDialog = ({ open, onOpenChange }: SubscriptionDialogPro
       <DialogContent className="sm:max-w-[900px] p-0 bg-gradient-to-b from-background to-background/80">
         <div className="p-8 space-y-8">
           <div className="text-center space-y-2">
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-secondary to-accent bg-clip-text text-transparent">
+            <h2 className="text-3xl font-bold text-gradient">
               Start your subscription
             </h2>
             <p className="text-muted-foreground">
@@ -26,9 +26,9 @@ export const SubscriptionDialog = ({ open, onOpenChange }: SubscriptionDialogPro
           </div>
           
           <div className="flex justify-center gap-4 mb-6">
-            <Button variant="outline" className="rounded-full bg-secondary-hover">Monthly</Button>
-            <Button variant="outline" className="rounded-full bg-accent-hover text-secondary">
-              Yearly • Save 32%
+            <Button variant="outline" className="rounded-full bg-primary-hover">Monthly</Button>
+            <Button variant="outline" className="rounded-full bg-accent-hover">
+              Yearly
             </Button>
           </div>
 
@@ -39,7 +39,7 @@ export const SubscriptionDialog = ({ open, onOpenChange }: SubscriptionDialogPro
               </div>
 
               <div className="flex items-baseline">
-                <span className="text-4xl font-bold text-secondary">$33.25</span>
+                <span className="text-4xl font-bold text-secondary">$9.99</span>
                 <span className="text-muted-foreground ml-2">/month</span>
               </div>
 
@@ -47,38 +47,38 @@ export const SubscriptionDialog = ({ open, onOpenChange }: SubscriptionDialogPro
                 <h4 className="font-semibold text-lg">Plan includes</h4>
                 <ul className="space-y-4">
                   <li className="flex items-center gap-3">
-                    <div className="h-5 w-5 rounded-full bg-secondary/10 flex items-center justify-center">
-                      <Check className="text-secondary h-3 w-3" />
+                    <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Check className="text-primary h-3 w-3" />
                     </div>
                     <span>Can add up to 20 accounts</span>
                   </li>
                   <li className="flex items-center gap-3">
-                    <div className="h-5 w-5 rounded-full bg-secondary/10 flex items-center justify-center">
-                      <Check className="text-secondary h-3 w-3" />
+                    <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Check className="text-primary h-3 w-3" />
                     </div>
                     <span>Data storage allowed up to 6Gb</span>
                   </li>
                   <li className="flex items-center gap-3">
-                    <div className="h-5 w-5 rounded-full bg-secondary/10 flex items-center justify-center">
-                      <Check className="text-secondary h-3 w-3" />
+                    <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Check className="text-primary h-3 w-3" />
                     </div>
                     <span>Can add unlimited playbooks</span>
                   </li>
                   <li className="flex items-center gap-3">
-                    <div className="h-5 w-5 rounded-full bg-secondary/10 flex items-center justify-center">
-                      <Check className="text-secondary h-3 w-3" />
+                    <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Check className="text-primary h-3 w-3" />
                     </div>
                     <span>Can add unlimited mentees</span>
                   </li>
                   <li className="flex items-center gap-3">
-                    <div className="h-5 w-5 rounded-full bg-secondary/10 flex items-center justify-center">
-                      <Check className="text-secondary h-3 w-3" />
+                    <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Check className="text-primary h-3 w-3" />
                     </div>
                     <span>Trade Replay</span>
                   </li>
                   <li className="flex items-center gap-3">
-                    <div className="h-5 w-5 rounded-full bg-secondary/10 flex items-center justify-center">
-                      <Check className="text-secondary h-3 w-3" />
+                    <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Check className="text-primary h-3 w-3" />
                     </div>
                     <span>Backtesting</span>
                   </li>
@@ -93,7 +93,7 @@ export const SubscriptionDialog = ({ open, onOpenChange }: SubscriptionDialogPro
             <Button 
               variant="ghost" 
               onClick={() => signOut()} 
-              className="text-muted-foreground hover:text-secondary"
+              className="text-muted-foreground hover:text-primary"
             >
               Logout
             </Button>

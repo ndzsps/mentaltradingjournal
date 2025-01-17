@@ -18,15 +18,19 @@ export const useSubscription = () => {
   const createCheckoutSession = async () => {
     try {
       const { data, error } = await supabase.functions.invoke("create-checkout-session");
-      if (error) throw error;
+      if (error) {
+        console.error("Checkout session error:", error);
+        toast.error(error.message || "Failed to start checkout process");
+        throw error;
+      }
       
       // Redirect to Stripe Checkout
       if (data?.url) {
         window.location.href = data.url;
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating checkout session:", error);
-      toast.error("Failed to start checkout process");
+      toast.error(error.message || "Failed to start checkout process");
     }
   };
 

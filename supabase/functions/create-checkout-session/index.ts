@@ -61,7 +61,7 @@ serve(async (req) => {
       customer_email: customerId ? undefined : user.email,
       line_items: [
         {
-          price: 'price_1OvRUmIQJZOZPxVXxvOVWGzP', // Your Stripe price ID
+          price: 'prod_RbXCXBaZmHt1aw', // Updated Stripe price ID
           quantity: 1,
         },
       ],

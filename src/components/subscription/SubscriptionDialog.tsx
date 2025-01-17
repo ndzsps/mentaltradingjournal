@@ -1,6 +1,6 @@
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Check, X } from "lucide-react";
+import { Check } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface SubscriptionDialogProps {
@@ -24,55 +24,7 @@ export const SubscriptionDialog = ({ open, onOpenChange }: SubscriptionDialogPro
             </Button>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Basic Plan */}
-            <div className="border rounded-lg p-6 space-y-6">
-              <div>
-                <h3 className="text-xl font-bold">Basic</h3>
-                <p className="text-sm text-muted-foreground">
-                  You <span className="text-primary">Saved $60</span> if paid $288 annually.
-                </p>
-              </div>
-
-              <div className="flex items-baseline">
-                <span className="text-4xl font-bold text-primary">$24</span>
-                <span className="text-muted-foreground">/month</span>
-              </div>
-
-              <div className="space-y-4">
-                <h4 className="font-semibold">Plan includes</h4>
-                <ul className="space-y-3">
-                  <li className="flex items-center gap-2">
-                    <Check className="text-green-500" size={20} />
-                    <span>Can add up to 1 account</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="text-green-500" size={20} />
-                    <span>Data storage allowed up to 1Gb</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="text-green-500" size={20} />
-                    <span>Can add up to 3 playbooks</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="text-green-500" size={20} />
-                    <span>Can invite up to 5 mentees</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <X className="text-red-500" size={20} />
-                    <span>Trade Replay</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <X className="text-red-500" size={20} />
-                    <span>Backtesting</span>
-                  </li>
-                </ul>
-              </div>
-
-              <Button className="w-full">Subscribe now</Button>
-            </div>
-
-            {/* Pro Plan */}
+          <div className="max-w-lg mx-auto">
             <div className="border rounded-lg p-6 space-y-6">
               <div>
                 <h3 className="text-xl font-bold">Pro</h3>

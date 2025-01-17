@@ -27,16 +27,16 @@ const queryClient = new QueryClient({
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
-  const { isSubscribed, isLoading: subscriptionLoading } = useSubscription();
+  const { isSubscribed, checkingSubscription } = useSubscription();
   const [showSubscriptionDialog, setShowSubscriptionDialog] = React.useState(false);
 
   React.useEffect(() => {
-    if (user && !subscriptionLoading && !isSubscribed) {
+    if (user && !checkingSubscription && !isSubscribed) {
       setShowSubscriptionDialog(true);
     }
-  }, [user, subscriptionLoading, isSubscribed]);
+  }, [user, checkingSubscription, isSubscribed]);
 
-  if (loading || subscriptionLoading) {
+  if (loading || checkingSubscription) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>

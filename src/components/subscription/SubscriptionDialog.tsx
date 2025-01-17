@@ -26,8 +26,8 @@ export const SubscriptionDialog = ({ open, onOpenChange }: SubscriptionDialogPro
           </div>
           
           <div className="flex justify-center gap-4 mb-6">
-            <Button variant="outline" className="rounded-full bg-primary-hover">Monthly</Button>
-            <Button variant="outline" className="rounded-full bg-accent-hover">
+            <Button variant="outline" className="rounded-full bg-primary/10 text-primary hover:bg-primary/20">Monthly</Button>
+            <Button variant="outline" className="rounded-full bg-primary/10 text-primary hover:bg-primary/20">
               Yearly
             </Button>
           </div>
@@ -35,11 +35,11 @@ export const SubscriptionDialog = ({ open, onOpenChange }: SubscriptionDialogPro
           <div className="max-w-lg mx-auto">
             <div className="border rounded-xl p-8 space-y-6 bg-card shadow-lg">
               <div>
-                <h3 className="text-2xl font-bold text-secondary">Pro Plan</h3>
+                <h3 className="text-2xl font-bold text-white">Pro Plan</h3>
               </div>
 
               <div className="flex items-baseline">
-                <span className="text-4xl font-bold text-secondary">$9.99</span>
+                <span className="text-4xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">$9.99</span>
                 <span className="text-muted-foreground ml-2">/month</span>
               </div>
 

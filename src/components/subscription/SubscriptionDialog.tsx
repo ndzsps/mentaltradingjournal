@@ -13,7 +13,7 @@ export const SubscriptionDialog = ({ open, onOpenChange }: SubscriptionDialogPro
   const { signOut } = useAuth();
   
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange} modal={true}>
       <DialogContent className="sm:max-w-[900px] p-0 bg-gradient-to-b from-background to-background/80" hideCloseButton>
         <div className="p-8 space-y-8">
           <div className="text-center space-y-2">

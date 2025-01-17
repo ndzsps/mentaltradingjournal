@@ -31,7 +31,8 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const [showSubscribeDialog, setShowSubscribeDialog] = useState(false);
 
   useEffect(() => {
-    if (user && !checkingSubscription && !isSubscribed) {
+    // Only show subscription dialog when accessing protected routes
+    if (user && !checkingSubscription && !isSubscribed && window.location.pathname !== '/login' && window.location.pathname !== '/') {
       setShowSubscribeDialog(true);
     }
   }, [user, checkingSubscription, isSubscribed]);
@@ -48,7 +49,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <Navigate to="/login" replace />;
   }
 
-  if (!isSubscribed) {
+  if (!isSubscribed && window.location.pathname !== '/login' && window.location.pathname !== '/') {
     return (
       <>
         <Navigate to="/login" replace />
@@ -96,7 +97,7 @@ const App = () => {
                     path="/analytics"
                     element={
                       <ProtectedRoute>
-                        <Journal />
+                        <Analytics />
                       </ProtectedRoute>
                     }
                   />

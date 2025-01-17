@@ -15,7 +15,6 @@ const Login = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Add useEffect to check authentication state and redirect
   useEffect(() => {
     if (user) {
       navigate("/dashboard");

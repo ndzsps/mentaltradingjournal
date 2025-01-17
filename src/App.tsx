@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,8 +13,6 @@ import Backtesting from "./pages/Backtesting";
 import BlueprintSessions from "./pages/BlueprintSessions";
 import Login from "./pages/Login";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
-import { useSubscription } from "@/hooks/useSubscription";
-import { SubscriptionDialog } from "@/components/subscription/SubscriptionDialog";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -27,17 +25,8 @@ const queryClient = new QueryClient({
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
-  const { isSubscribed, checkingSubscription } = useSubscription();
-  const [showSubscribeDialog, setShowSubscribeDialog] = useState(false);
 
-  useEffect(() => {
-    // Only show subscription dialog when accessing protected routes
-    if (user && !checkingSubscription && !isSubscribed && window.location.pathname !== '/login' && window.location.pathname !== '/') {
-      setShowSubscribeDialog(true);
-    }
-  }, [user, checkingSubscription, isSubscribed]);
-
-  if (loading || checkingSubscription) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -47,18 +36,6 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
   if (!user) {
     return <Navigate to="/login" replace />;
-  }
-
-  if (!isSubscribed && window.location.pathname !== '/login' && window.location.pathname !== '/') {
-    return (
-      <>
-        <Navigate to="/login" replace />
-        <SubscriptionDialog 
-          open={showSubscribeDialog} 
-          onOpenChange={setShowSubscribeDialog} 
-        />
-      </>
-    );
   }
 
   return <>{children}</>;

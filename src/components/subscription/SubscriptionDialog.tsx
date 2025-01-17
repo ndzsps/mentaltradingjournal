@@ -14,7 +14,7 @@ export const SubscriptionDialog = ({ open, onOpenChange }: SubscriptionDialogPro
   
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[900px] p-0 bg-gradient-to-b from-background to-background/80">
+      <DialogContent className="sm:max-w-[900px] p-0 bg-gradient-to-b from-background to-background/80" hideCloseButton>
         <div className="p-8 space-y-8">
           <div className="text-center space-y-2">
             <h2 className="text-3xl font-bold text-gradient">

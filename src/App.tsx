@@ -13,6 +13,8 @@ import Backtesting from "./pages/Backtesting";
 import BlueprintSessions from "./pages/BlueprintSessions";
 import Login from "./pages/Login";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { useSubscription } from "@/hooks/useSubscription";
+import { SubscriptionDialog } from "@/components/subscription/SubscriptionDialog";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -25,8 +27,16 @@ const queryClient = new QueryClient({
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
+  const { isSubscribed, isLoading: subscriptionLoading } = useSubscription();
+  const [showSubscriptionDialog, setShowSubscriptionDialog] = React.useState(false);
 
-  if (loading) {
+  React.useEffect(() => {
+    if (user && !subscriptionLoading && !isSubscribed) {
+      setShowSubscriptionDialog(true);
+    }
+  }, [user, subscriptionLoading, isSubscribed]);
+
+  if (loading || subscriptionLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -36,6 +46,18 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
   if (!user) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (!isSubscribed) {
+    return (
+      <div className="filter blur-sm">
+        {children}
+        <SubscriptionDialog 
+          open={showSubscriptionDialog} 
+          onOpenChange={setShowSubscriptionDialog} 
+        />
+      </div>
+    );
   }
 
   return <>{children}</>;

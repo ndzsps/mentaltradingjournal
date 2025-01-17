@@ -14,56 +14,72 @@ export const SubscriptionDialog = ({ open, onOpenChange }: SubscriptionDialogPro
   
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[900px] p-0">
-        <div className="p-6 space-y-6">
-          <h2 className="text-2xl font-bold text-center">Start your subscription</h2>
+      <DialogContent className="sm:max-w-[900px] p-0 bg-gradient-to-b from-background to-background/80">
+        <div className="p-8 space-y-8">
+          <div className="text-center space-y-2">
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-secondary to-accent bg-clip-text text-transparent">
+              Start your subscription
+            </h2>
+            <p className="text-muted-foreground">
+              Unlock all features and take your trading to the next level
+            </p>
+          </div>
           
           <div className="flex justify-center gap-4 mb-6">
-            <Button variant="outline" className="rounded-full">Monthly</Button>
-            <Button variant="outline" className="rounded-full text-primary">
+            <Button variant="outline" className="rounded-full bg-secondary-hover">Monthly</Button>
+            <Button variant="outline" className="rounded-full bg-accent-hover text-secondary">
               Yearly • Save 32%
             </Button>
           </div>
 
           <div className="max-w-lg mx-auto">
-            <div className="border rounded-lg p-6 space-y-6">
+            <div className="border rounded-xl p-8 space-y-6 bg-card shadow-lg">
               <div>
-                <h3 className="text-xl font-bold">Pro</h3>
-                <p className="text-sm text-muted-foreground">
-                  You <span className="text-primary">Saved $189</span> if paid $399 annually.
-                </p>
+                <h3 className="text-2xl font-bold text-secondary">Pro Plan</h3>
               </div>
 
               <div className="flex items-baseline">
-                <span className="text-4xl font-bold text-primary">$33.25</span>
-                <span className="text-muted-foreground">/month</span>
+                <span className="text-4xl font-bold text-secondary">$33.25</span>
+                <span className="text-muted-foreground ml-2">/month</span>
               </div>
 
               <div className="space-y-4">
-                <h4 className="font-semibold">Plan includes</h4>
-                <ul className="space-y-3">
-                  <li className="flex items-center gap-2">
-                    <Check className="text-green-500" size={20} />
+                <h4 className="font-semibold text-lg">Plan includes</h4>
+                <ul className="space-y-4">
+                  <li className="flex items-center gap-3">
+                    <div className="h-5 w-5 rounded-full bg-secondary/10 flex items-center justify-center">
+                      <Check className="text-secondary h-3 w-3" />
+                    </div>
                     <span>Can add up to 20 accounts</span>
                   </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="text-green-500" size={20} />
+                  <li className="flex items-center gap-3">
+                    <div className="h-5 w-5 rounded-full bg-secondary/10 flex items-center justify-center">
+                      <Check className="text-secondary h-3 w-3" />
+                    </div>
                     <span>Data storage allowed up to 6Gb</span>
                   </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="text-green-500" size={20} />
+                  <li className="flex items-center gap-3">
+                    <div className="h-5 w-5 rounded-full bg-secondary/10 flex items-center justify-center">
+                      <Check className="text-secondary h-3 w-3" />
+                    </div>
                     <span>Can add unlimited playbooks</span>
                   </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="text-green-500" size={20} />
+                  <li className="flex items-center gap-3">
+                    <div className="h-5 w-5 rounded-full bg-secondary/10 flex items-center justify-center">
+                      <Check className="text-secondary h-3 w-3" />
+                    </div>
                     <span>Can add unlimited mentees</span>
                   </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="text-green-500" size={20} />
+                  <li className="flex items-center gap-3">
+                    <div className="h-5 w-5 rounded-full bg-secondary/10 flex items-center justify-center">
+                      <Check className="text-secondary h-3 w-3" />
+                    </div>
                     <span>Trade Replay</span>
                   </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="text-green-500" size={20} />
+                  <li className="flex items-center gap-3">
+                    <div className="h-5 w-5 rounded-full bg-secondary/10 flex items-center justify-center">
+                      <Check className="text-secondary h-3 w-3" />
+                    </div>
                     <span>Backtesting</span>
                   </li>
                 </ul>
@@ -74,7 +90,11 @@ export const SubscriptionDialog = ({ open, onOpenChange }: SubscriptionDialogPro
           </div>
 
           <div className="flex justify-center pt-4">
-            <Button variant="link" onClick={() => signOut()} className="text-primary">
+            <Button 
+              variant="ghost" 
+              onClick={() => signOut()} 
+              className="text-muted-foreground hover:text-secondary"
+            >
               Logout
             </Button>
           </div>

@@ -8,7 +8,6 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
@@ -19,7 +18,6 @@ serve(async (req) => {
   )
 
   try {
-    // Get the session or user object
     const authHeader = req.headers.get('Authorization')!
     const token = authHeader.replace('Bearer ', '')
     const { data } = await supabaseClient.auth.getUser(token)
@@ -34,16 +32,12 @@ serve(async (req) => {
       apiVersion: '2023-10-16',
     })
 
-    console.log('Checking subscription for email:', email)
-
-    // Get customer by email
     const customers = await stripe.customers.list({
       email: email,
       limit: 1
     })
 
     if (customers.data.length === 0) {
-      console.log('No customer found for email:', email)
       return new Response(
         JSON.stringify({ subscribed: false }),
         {
@@ -59,8 +53,6 @@ serve(async (req) => {
       price: 'price_1QiK8SI2A6O6E8LHKlfvakdi',
       limit: 1
     })
-
-    console.log('Found subscriptions:', subscriptions.data.length)
 
     return new Response(
       JSON.stringify({ 

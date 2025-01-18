@@ -34,8 +34,6 @@ serve(async (req) => {
       apiVersion: '2023-10-16',
     })
 
-    console.log('Looking up customer for email:', email)
-
     const customers = await stripe.customers.list({
       email: email,
       limit: 1
@@ -53,11 +51,11 @@ serve(async (req) => {
       })
 
       if (subscriptions.data.length > 0) {
-        throw new Error("Customer already has an active subscription")
+        throw new Error("You already have an active subscription")
       }
     }
 
-    console.log('Creating checkout session...')
+    console.log('Creating subscription checkout session...')
     const session = await stripe.checkout.sessions.create({
       customer: customer_id,
       customer_email: customer_id ? undefined : email,
@@ -68,8 +66,7 @@ serve(async (req) => {
         },
       ],
       mode: 'subscription',
-      allow_promotion_codes: true,
-      success_url: `${req.headers.get('origin')}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${req.headers.get('origin')}/journal-entry`,
       cancel_url: `${req.headers.get('origin')}/`,
     })
 

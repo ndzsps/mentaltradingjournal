@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import type { User } from "@supabase/supabase-js";
+import type { User, AuthError } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
 
 interface AuthContextType {
@@ -39,6 +39,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
+  const getErrorMessage = (error: AuthError) => {
+    switch (error.message) {
+      case "Invalid login credentials":
+        return "Invalid email or password. Please check your credentials and try again.";
+      case "Email not confirmed":
+        return "Please verify your email address before signing in.";
+      case "User not found":
+        return "No account found with this email address.";
+      default:
+        return error.message;
+    }
+  };
+
   const signIn = async (email: string, password: string) => {
     try {
       const { error } = await supabase.auth.signInWithPassword({
@@ -49,7 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         toast({
           variant: "destructive",
           title: "Error signing in",
-          description: error.message,
+          description: getErrorMessage(error),
         });
         throw error;
       }
@@ -65,6 +78,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         email,
         password,
         options: {
+          emailRedirectTo: `${window.location.origin}/login`,
           data: {
             username: email.split("@")[0],
           },
@@ -74,9 +88,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         toast({
           variant: "destructive",
           title: "Error signing up",
-          description: error.message,
+          description: getErrorMessage(error),
         });
         throw error;
+      } else {
+        toast({
+          title: "Check your email",
+          description: "We've sent you a verification link to complete your registration.",
+        });
       }
     } catch (error) {
       console.error("Sign up error:", error);
@@ -86,27 +105,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
-      // First, get the current session
       const { data: { session } } = await supabase.auth.getSession();
       
-      // Only attempt to sign out if there's an active session
       if (session) {
         const { error } = await supabase.auth.signOut();
         if (error) {
           toast({
             variant: "destructive",
             title: "Error signing out",
-            description: error.message,
+            description: getErrorMessage(error),
           });
           throw error;
         }
       } else {
-        // If no session exists, just clear the local state
         setUser(null);
       }
     } catch (error) {
       console.error("Sign out error:", error);
-      // Even if there's an error, we should clear the local state
       setUser(null);
       throw error;
     }
@@ -122,7 +137,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         toast({
           variant: "destructive",
           title: "Error updating username",
-          description: error.message,
+          description: getErrorMessage(error),
         });
         throw error;
       }

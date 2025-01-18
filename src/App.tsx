@@ -13,8 +13,6 @@ import Backtesting from "./pages/Backtesting";
 import BlueprintSessions from "./pages/BlueprintSessions";
 import Login from "./pages/Login";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
-import { useSubscription } from "./hooks/useSubscription";
-import { SubscriptionWall } from "./components/SubscriptionWall";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -26,11 +24,9 @@ const queryClient = new QueryClient({
 });
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, loading: authLoading } = useAuth();
-  const { data: subscriptionData, isLoading: subscriptionLoading } = useSubscription();
+  const { user, loading } = useAuth();
 
-  // Show loading spinner while checking auth or subscription
-  if (authLoading || (user && subscriptionLoading)) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -38,95 +34,72 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  // If not logged in, redirect to login
   if (!user) {
     return <Navigate to="/login" replace />;
-  }
-
-  // If logged in but not subscribed, show subscription wall
-  if (!subscriptionData?.subscribed) {
-    return <SubscriptionWall />;
   }
 
   return <>{children}</>;
 };
 
-const AppRoutes = () => {
-  const { user } = useAuth();
-
-  return (
-    <BrowserRouter>
-      <Routes>
-        {/* Public routes */}
-        <Route path="/" element={<Landing />} />
-        <Route 
-          path="/login" 
-          element={user ? <Navigate to="/dashboard" replace /> : <Login />} 
-        />
-
-        {/* Protected routes */}
-        <Route
-          path="/journal-entry"
-          element={
-            <ProtectedRoute>
-              <Index />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Journal />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/analytics"
-          element={
-            <ProtectedRoute>
-              <Analytics />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/backtesting"
-          element={
-            <ProtectedRoute>
-              <Backtesting />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/blueprint/:blueprintId"
-          element={
-            <ProtectedRoute>
-              <BlueprintSessions />
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Catch all redirect to login */}
-        <Route path="*" element={<Navigate to="/login" replace />} />
-      </Routes>
-    </BrowserRouter>
-  );
-};
-
 const App = () => {
   return (
     <React.StrictMode>
-      <AuthProvider>
-        <QueryClientProvider client={queryClient}>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <AuthProvider>
             <TooltipProvider>
               <Toaster />
               <Sonner />
-              <AppRoutes />
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/" element={<Landing />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route
+                    path="/journal-entry"
+                    element={
+                      <ProtectedRoute>
+                        <Index />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard"
+                    element={
+                      <ProtectedRoute>
+                        <Journal />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/analytics"
+                    element={
+                      <ProtectedRoute>
+                        <Analytics />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/backtesting"
+                    element={
+                      <ProtectedRoute>
+                        <Backtesting />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/blueprint/:blueprintId"
+                    element={
+                      <ProtectedRoute>
+                        <BlueprintSessions />
+                      </ProtectedRoute>
+                    }
+                  />
+                </Routes>
+              </BrowserRouter>
             </TooltipProvider>
-          </ThemeProvider>
-        </QueryClientProvider>
-      </AuthProvider>
+          </AuthProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
     </React.StrictMode>
   );
 };

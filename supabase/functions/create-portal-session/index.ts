@@ -8,23 +8,24 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
-  const supabaseClient = createClient(
-    Deno.env.get('SUPABASE_URL') ?? '',
-    Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-  );
-
   try {
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+    );
+
+    // Get the session or user object
     const authHeader = req.headers.get('Authorization')!;
     const token = authHeader.replace('Bearer ', '');
     const { data } = await supabaseClient.auth.getUser(token);
     const user = data.user;
-    const email = user?.email;
 
-    if (!email) {
+    if (!user?.email) {
       throw new Error('No email found');
     }
 
@@ -32,24 +33,27 @@ serve(async (req) => {
       apiVersion: '2023-10-16',
     });
 
-    // Find the customer
+    // Get customer by email
     const customers = await stripe.customers.list({
-      email: email,
+      email: user.email,
       limit: 1,
     });
 
     if (customers.data.length === 0) {
-      throw new Error('No subscription found');
+      throw new Error('No customer found');
     }
 
+    // Create the portal session
     const session = await stripe.billingPortal.sessions.create({
       customer: customers.data[0].id,
       return_url: `${req.headers.get('origin')}/dashboard`,
     });
 
+    console.log('Portal session created:', session.id);
+
     return new Response(
       JSON.stringify({ url: session.url }),
-      { 
+      {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
       }
@@ -58,7 +62,7 @@ serve(async (req) => {
     console.error('Error creating portal session:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
-      { 
+      {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,
       }

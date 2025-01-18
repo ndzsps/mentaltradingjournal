@@ -13,6 +13,7 @@ import Backtesting from "./pages/Backtesting";
 import BlueprintSessions from "./pages/BlueprintSessions";
 import Login from "./pages/Login";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { SubscriptionDialog } from "./components/SubscriptionDialog";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -25,8 +26,32 @@ const queryClient = new QueryClient({
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
+  const [isSubscribed, setIsSubscribed] = React.useState<boolean | null>(null);
+  const [checkingSubscription, setCheckingSubscription] = React.useState(true);
 
-  if (loading) {
+  React.useEffect(() => {
+    const checkSubscription = async () => {
+      if (!user) return;
+      try {
+        const response = await fetch("/api/check-subscription", {
+          headers: {
+            Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+          },
+        });
+        const { subscribed } = await response.json();
+        setIsSubscribed(subscribed);
+      } catch (error) {
+        console.error("Error checking subscription:", error);
+        setIsSubscribed(false);
+      } finally {
+        setCheckingSubscription(false);
+      }
+    };
+
+    checkSubscription();
+  }, [user]);
+
+  if (loading || checkingSubscription) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -36,6 +61,10 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
   if (!user) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (!isSubscribed) {
+    return <SubscriptionDialog />;
   }
 
   return <>{children}</>;

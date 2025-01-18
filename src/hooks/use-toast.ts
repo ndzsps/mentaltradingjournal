@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Toast, ToasterToast } from "@/types/toast"
+import { Toast, ToasterToast, State } from "@/types/toast"
 import { dispatch, genId, listeners, memoryState } from "./toast/utils"
 
 function toast({ ...props }: Toast) {

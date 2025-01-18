@@ -18,20 +18,28 @@ export const SubscriptionWall = () => {
         return;
       }
 
-      const response = await fetch("/api/create-checkout-session", {
+      console.log('Making request to create-checkout-session with token:', session.access_token);
+      
+      const response = await supabase.functions.invoke('create-checkout-session', {
         headers: {
           Authorization: `Bearer ${session.access_token}`,
         },
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to create checkout session");
+      console.log('Checkout session response:', response);
+
+      if (response.error) {
+        throw new Error(response.error.message || "Failed to create checkout session");
       }
 
-      const { url } = await response.json();
-      window.location.href = url;
+      const { data } = response;
+      if (!data?.url) {
+        throw new Error("No checkout URL received");
+      }
+
+      window.location.href = data.url;
     } catch (error) {
+      console.error('Subscription error:', error);
       toast({
         variant: "destructive",
         title: "Error",

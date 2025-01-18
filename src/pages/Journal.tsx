@@ -13,6 +13,7 @@ import { JournalEntryType } from "@/types/journal";
 import { StatsHeader } from "@/components/journal/stats/StatsHeader";
 import { TimeFilterProvider } from "@/contexts/TimeFilterContext";
 import { startOfDay, endOfDay, parseISO } from "date-fns";
+import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";
 
 const Journal = () => {
   const [entries, setEntries] = useState<JournalEntryType[]>([]);
@@ -91,68 +92,70 @@ const Journal = () => {
 
   return (
     <AppLayout>
-      <TimeFilterProvider>
-        <div className="max-w-7xl mx-auto space-y-8 px-4">
-          <StatsHeader />
+      <SubscriptionGate>
+        <TimeFilterProvider>
+          <div className="max-w-7xl mx-auto space-y-8 px-4">
+            <StatsHeader />
 
-          <div className="flex gap-6">
-            <div className="flex-1">
-              <JournalCalendar 
-                date={selectedDate}
-                onDateSelect={setSelectedDate}
-                entries={calendarEntries}
-              />
+            <div className="flex gap-6">
+              <div className="flex-1">
+                <JournalCalendar 
+                  date={selectedDate}
+                  onDateSelect={setSelectedDate}
+                  entries={calendarEntries}
+                />
+              </div>
+              <div className="w-64">
+                <WeeklyPerformance />
+              </div>
             </div>
-            <div className="w-64">
-              <WeeklyPerformance />
-            </div>
-          </div>
 
-          <Card className="p-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
-                {selectedDate 
-                  ? `Journal Entries for ${selectedDate.toLocaleDateString('en-US', { 
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}`
-                  : 'Journal Entries'
-                }
-              </h2>
-              <JournalFilters
-                emotionFilter={emotionFilter}
-                setEmotionFilter={setEmotionFilter}
-                detailFilter={detailFilter}
-                setDetailFilter={setDetailFilter}
-                timeFilter={timeFilter}
-                setTimeFilter={setTimeFilter}
-                outcomeFilter={outcomeFilter}
-                setOutcomeFilter={setOutcomeFilter}
-                allDetails={Array.from(new Set(entries.map(entry => entry.emotion_detail)))}
-              />
-            </div>
-            
-            <ScrollArea className="h-[600px] pr-4">
-              {displayedEntries.length > 0 ? (
-                <div className="space-y-4">
-                  {displayedEntries.map((entry) => (
-                    <JournalEntry key={entry.id} entry={entry} />
-                  ))}
-                </div>
-              ) : (
-                <p className="text-muted-foreground text-center py-8">
+            <Card className="p-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
                   {selectedDate 
-                    ? `No entries found for ${selectedDate.toLocaleDateString()}`
-                    : 'No entries found for the selected filters'
+                    ? `Journal Entries for ${selectedDate.toLocaleDateString('en-US', { 
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}`
+                    : 'Journal Entries'
                   }
-                </p>
-              )}
-            </ScrollArea>
-          </Card>
-        </div>
-      </TimeFilterProvider>
+                </h2>
+                <JournalFilters
+                  emotionFilter={emotionFilter}
+                  setEmotionFilter={setEmotionFilter}
+                  detailFilter={detailFilter}
+                  setDetailFilter={setDetailFilter}
+                  timeFilter={timeFilter}
+                  setTimeFilter={setTimeFilter}
+                  outcomeFilter={outcomeFilter}
+                  setOutcomeFilter={setOutcomeFilter}
+                  allDetails={Array.from(new Set(entries.map(entry => entry.emotion_detail)))}
+                />
+              </div>
+              
+              <ScrollArea className="h-[600px] pr-4">
+                {displayedEntries.length > 0 ? (
+                  <div className="space-y-4">
+                    {displayedEntries.map((entry) => (
+                      <JournalEntry key={entry.id} entry={entry} />
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground text-center py-8">
+                    {selectedDate 
+                      ? `No entries found for ${selectedDate.toLocaleDateString()}`
+                      : 'No entries found for the selected filters'
+                    }
+                  </p>
+                )}
+              </ScrollArea>
+            </Card>
+          </div>
+        </TimeFilterProvider>
+      </SubscriptionGate>
     </AppLayout>
   );
 };

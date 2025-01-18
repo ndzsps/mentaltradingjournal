@@ -30,7 +30,7 @@ const Login = () => {
     try {
       if (isForgotPassword) {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/login`,
+          redirectTo: `${window.location.origin}/login?type=recovery`,
         });
         if (error) throw error;
         toast({
@@ -49,6 +49,7 @@ const Login = () => {
         navigate("/dashboard");
       }
     } catch (error) {
+      console.error('Auth error:', error);
       toast({
         variant: "destructive",
         title: "Error",
@@ -58,6 +59,20 @@ const Login = () => {
       setLoading(false);
     }
   };
+
+  // Check if we're in a password reset flow
+  useEffect(() => {
+    const hash = window.location.hash;
+    const query = new URLSearchParams(window.location.search);
+    
+    if (hash && hash.includes('type=recovery') || query.get('type') === 'recovery') {
+      // Handle password reset flow
+      toast({
+        title: "Reset Password",
+        description: "Please enter your new password below.",
+      });
+    }
+  }, [toast]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">

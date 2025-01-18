@@ -29,15 +29,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
       setUser(session?.user ?? null);
       setLoading(false);
+
+      if (event === 'PASSWORD_RECOVERY') {
+        const newPassword = prompt('What would you like your new password to be?');
+        if (newPassword) {
+          const { error } = await supabase.auth.updateUser({
+            password: newPassword,
+          });
+
+          if (error) {
+            toast({
+              variant: "destructive",
+              title: "Error resetting password",
+              description: error.message,
+            });
+          } else {
+            toast({
+              title: "Password updated successfully",
+              description: "You can now sign in with your new password.",
+            });
+          }
+        }
+      }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [toast]);
 
   const getErrorMessage = (error: AuthError) => {
     switch (error.message) {

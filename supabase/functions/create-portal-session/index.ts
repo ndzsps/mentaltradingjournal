@@ -29,9 +29,28 @@ serve(async (req) => {
       throw new Error('No email found');
     }
 
-    // Instead of creating a Stripe portal session, return the direct billing portal URL
+    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
+      apiVersion: '2023-10-16',
+    });
+
+    // Get customer by email
+    const customers = await stripe.customers.list({
+      email: user.email,
+      limit: 1,
+    });
+
+    if (customers.data.length === 0) {
+      throw new Error('No Stripe customer found');
+    }
+
+    // Create a portal session
+    const session = await stripe.billingPortal.sessions.create({
+      customer: customers.data[0].id,
+      return_url: `${req.headers.get('origin')}/dashboard`,
+    });
+
     return new Response(
-      JSON.stringify({ url: 'https://billing.stripe.com/p/login/dR617i4AUaWldbibII' }),
+      JSON.stringify({ url: session.url }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,

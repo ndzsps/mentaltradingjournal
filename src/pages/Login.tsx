@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const Login = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -15,12 +16,38 @@ const Login = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Add useEffect to check authentication state and redirect
   useEffect(() => {
-    if (user) {
-      navigate("/dashboard");
-    }
-  }, [user, navigate]);
+    const checkSubscriptionAndRedirect = async () => {
+      if (user) {
+        try {
+          const { data, error } = await supabase.functions.invoke('check-subscription');
+          
+          if (error) throw error;
+
+          if (data.subscribed) {
+            navigate("/dashboard");
+          } else {
+            // Create checkout session for non-subscribed users
+            const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke('create-checkout-session');
+            
+            if (checkoutError) throw checkoutError;
+
+            if (checkoutData?.url) {
+              window.location.href = checkoutData.url;
+            }
+          }
+        } catch (error) {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: error instanceof Error ? error.message : "An error occurred",
+          });
+        }
+      }
+    };
+
+    checkSubscriptionAndRedirect();
+  }, [user, navigate, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,7 +62,7 @@ const Login = () => {
         });
       } else {
         await signIn(email, password);
-        navigate("/dashboard");
+        // Redirect will be handled by the useEffect hook
       }
     } catch (error) {
       toast({

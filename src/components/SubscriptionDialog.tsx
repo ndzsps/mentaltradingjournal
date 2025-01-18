@@ -12,12 +12,17 @@ export function SubscriptionDialog() {
 
   const handleSubscribe = async () => {
     try {
-      const { data, error } = await supabase.functions.invoke('create-checkout-session', {
-        method: 'POST'
+      const response = await fetch("/api/create-checkout-session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+        },
       });
 
-      if (error) throw error;
-      if (data?.url) window.location.href = data.url;
+      const { url, error } = await response.json();
+      if (error) throw new Error(error);
+      if (url) window.location.href = url;
     } catch (error) {
       toast({
         variant: "destructive",

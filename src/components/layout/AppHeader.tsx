@@ -17,14 +17,13 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 
 export function AppHeader() {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [username, setUsername] = useState("");
-  const { user, signOut } = useAuth();
+  const { user, signOut, updateUsername } = useAuth();
   const { toast } = useToast();
   
   const navigationItems = [
@@ -35,10 +34,7 @@ export function AppHeader() {
 
   const handleUpdateUsername = async () => {
     try {
-      const { error } = await supabase.auth.updateUser({
-        data: { username },
-      });
-      if (error) throw error;
+      await updateUsername(username);
       setIsEditing(false);
       toast({
         title: "Username updated",
@@ -50,34 +46,6 @@ export function AppHeader() {
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to update username",
       });
-    }
-  };
-
-  const handleDeleteAccount = async () => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete your account? This action cannot be undone."
-    );
-    
-    if (confirmDelete) {
-      try {
-        // Call the Edge Function to delete the user
-        const { error: deleteError } = await supabase.functions.invoke('delete-user');
-        if (deleteError) throw deleteError;
-        
-        // Then sign out the user
-        await signOut();
-        
-        toast({
-          title: "Account deleted",
-          description: "Your account has been successfully deleted.",
-        });
-      } catch (error) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: error instanceof Error ? error.message : "Failed to delete account",
-        });
-      }
     }
   };
 
@@ -152,13 +120,6 @@ export function AppHeader() {
                 >
                   Sign Out
                 </Button>
-                <Button
-                  variant="destructive"
-                  className="w-full"
-                  onClick={handleDeleteAccount}
-                >
-                  Delete Account
-                </Button>
               </div>
             </PopoverContent>
           </Popover>
@@ -223,13 +184,6 @@ export function AppHeader() {
                   onClick={() => signOut()}
                 >
                   Sign Out
-                </Button>
-                <Button
-                  variant="destructive"
-                  className="w-full"
-                  onClick={handleDeleteAccount}
-                >
-                  Delete Account
                 </Button>
               </div>
             </nav>

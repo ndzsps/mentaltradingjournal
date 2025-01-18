@@ -20,16 +20,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check active session
+    // Initialize the session from local storage if it exists
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       setLoading(false);
     });
 
-    // Listen for auth changes
+    // Listen for auth state changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       setLoading(false);
     });
@@ -65,6 +65,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         email,
         password,
         options: {
+          emailRedirectTo: window.location.origin,
           data: {
             username: email.split("@")[0],
           },
@@ -86,28 +87,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
-      // First, get the current session
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      // Only attempt to sign out if there's an active session
-      if (session) {
-        const { error } = await supabase.auth.signOut();
-        if (error) {
-          toast({
-            variant: "destructive",
-            title: "Error signing out",
-            description: error.message,
-          });
-          throw error;
-        }
-      } else {
-        // If no session exists, just clear the local state
-        setUser(null);
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Error signing out",
+          description: error.message,
+        });
+        throw error;
       }
+      // Clear the user state after successful sign out
+      setUser(null);
     } catch (error) {
       console.error("Sign out error:", error);
-      // Even if there's an error, we should clear the local state
-      setUser(null);
       throw error;
     }
   };

@@ -29,7 +29,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       setLoading(false);
     });
@@ -86,18 +86,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
+      // First check if we have a session
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        // If no session, just clear the local state
+        setUser(null);
+        return;
+      }
+
       const { error } = await supabase.auth.signOut();
       if (error) {
+        console.error("Sign out error:", error);
+        // Even if there's an error, we should clear the local state
+        setUser(null);
         toast({
           variant: "destructive",
           title: "Error signing out",
-          description: error.message,
+          description: "You have been signed out locally.",
         });
-        throw error;
       }
     } catch (error) {
       console.error("Sign out error:", error);
-      throw error;
+      // Ensure user is signed out locally even if the API call fails
+      setUser(null);
     }
   };
 

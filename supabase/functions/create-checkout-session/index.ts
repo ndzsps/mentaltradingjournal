@@ -17,6 +17,7 @@ serve(async (req) => {
     // Get the authorization header
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) {
+      console.error('No authorization header')
       throw new Error('No authorization header')
     }
 
@@ -37,12 +38,14 @@ serve(async (req) => {
 
     const email = user.email
     if (!email) {
+      console.error('No email found')
       throw new Error('No email found')
     }
 
     // Initialize Stripe
     const stripeKey = Deno.env.get('STRIPE_SECRET_KEY')
     if (!stripeKey) {
+      console.error('Stripe key not configured')
       throw new Error('Stripe key not configured')
     }
 

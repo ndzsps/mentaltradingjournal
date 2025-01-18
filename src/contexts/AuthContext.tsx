@@ -86,27 +86,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
-      // Clear local state first to prevent UI issues
-      setUser(null);
+      // First check if we have a session
+      const { data: { session } } = await supabase.auth.getSession();
       
-      // Attempt to sign out from Supabase
+      if (!session) {
+        // If no session, just clear the local state
+        setUser(null);
+        return;
+      }
+
       const { error } = await supabase.auth.signOut();
-      
       if (error) {
         console.error("Sign out error:", error);
+        // Even if there's an error, we should clear the local state
+        setUser(null);
         toast({
           variant: "destructive",
           title: "Error signing out",
-          description: "You have been signed out locally, but there was an error with the server.",
+          description: "You have been signed out locally.",
         });
       }
     } catch (error) {
       console.error("Sign out error:", error);
-      toast({
-        variant: "destructive",
-        title: "Error signing out",
-        description: "You have been signed out locally, but there was an error with the server.",
-      });
+      // Ensure user is signed out locally even if the API call fails
+      setUser(null);
     }
   };
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -35,6 +35,8 @@ export function SubscriptionDialog() {
 
   const handleClose = () => {
     setOpen(false);
+    // Sign out when user clicks "Maybe Later" since they can't access the app without subscription
+    supabase.auth.signOut();
     navigate("/");
   };
 
@@ -44,7 +46,7 @@ export function SubscriptionDialog() {
         <DialogHeader>
           <DialogTitle>Subscribe to Access Features</DialogTitle>
           <DialogDescription>
-            Get access to all features by subscribing to our service. Start your journey today!
+            A subscription is required to access the trading journal features. Subscribe now to start your journey!
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-4 py-4">

@@ -28,11 +28,12 @@ const queryClient = new QueryClient({
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
   const [isSubscribed, setIsSubscribed] = React.useState<boolean | null>(null);
-  const [checkingSubscription, setCheckingSubscription] = React.useState(true);
+  const [checkingSubscription, setCheckingSubscription] = React.useState(false);
 
   React.useEffect(() => {
     const checkSubscription = async () => {
       if (!user) return;
+      setCheckingSubscription(true);
       try {
         const response = await fetch("/api/check-subscription", {
           headers: {
@@ -49,10 +50,13 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
       }
     };
 
-    checkSubscription();
+    if (user) {
+      checkSubscription();
+    }
   }, [user]);
 
-  if (loading || checkingSubscription) {
+  // Show loading spinner while checking auth
+  if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -60,14 +64,26 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
+  // Redirect to login if not authenticated
   if (!user) {
     return <Navigate to="/login" replace />;
   }
 
+  // Show loading spinner while checking subscription
+  if (checkingSubscription) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  // Show subscription dialog if not subscribed
   if (!isSubscribed) {
     return <SubscriptionDialog />;
   }
 
+  // If authenticated and subscribed, show the protected content
   return <>{children}</>;
 };
 

@@ -85,6 +85,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
+    if (!user) {
+      toast({
+        variant: "destructive",
+        title: "Error signing out",
+        description: "No active session found. Please try refreshing the page.",
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase.auth.signOut();
       if (error) {
@@ -95,8 +104,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         });
         throw error;
       }
+      toast({
+        title: "Signed out successfully",
+        description: "You have been logged out of your account.",
+      });
     } catch (error) {
       console.error("Sign out error:", error);
+      toast({
+        variant: "destructive",
+        title: "Error signing out",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
+      });
       throw error;
     }
   };

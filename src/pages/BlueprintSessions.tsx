@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SessionsTable } from "@/components/backtesting/sessions/SessionsTable";
 import { SessionHeader } from "@/components/backtesting/sessions/SessionHeader";
 import { Session } from "@/components/backtesting/sessions/types";
+import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";
 
 export default function BlueprintSessions() {
   const { blueprintId } = useParams();
@@ -62,16 +63,18 @@ export default function BlueprintSessions() {
 
   return (
     <AppLayout>
-      <div className="container mx-auto px-4 py-8">
-        <SessionHeader blueprintName={blueprint?.name || ""} />
-        {sessions.length > 0 ? (
-          <SessionsTable sessions={sessions} />
-        ) : (
-          <p className="text-center text-muted-foreground">
-            No sessions found for this blueprint
-          </p>
-        )}
-      </div>
+      <SubscriptionGate>
+        <div className="container mx-auto px-4 py-8">
+          <SessionHeader blueprintName={blueprint?.name || ""} />
+          {sessions.length > 0 ? (
+            <SessionsTable sessions={sessions} />
+          ) : (
+            <p className="text-center text-muted-foreground">
+              No sessions found for this blueprint
+            </p>
+          )}
+        </div>
+      </SubscriptionGate>
     </AppLayout>
   );
 }

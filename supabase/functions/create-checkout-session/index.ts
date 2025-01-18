@@ -67,7 +67,7 @@ serve(async (req) => {
       ],
       mode: 'subscription',
       allow_promotion_codes: true, // Enable promotion codes in checkout
-      success_url: `${req.headers.get('origin')}/journal-entry`,
+      success_url: `${req.headers.get('origin')}/dashboard`,
       cancel_url: `${req.headers.get('origin')}/`,
     })
 

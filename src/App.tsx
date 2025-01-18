@@ -27,12 +27,10 @@ const queryClient = new QueryClient({
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading: authLoading } = useAuth();
-  const { data: subscriptionData, isLoading: subscriptionLoading, isError } = useSubscription();
+  const { data: subscriptionData, isLoading: subscriptionLoading } = useSubscription();
 
-  // Only show loading state if we're checking auth or subscription for a logged-in user
-  const isLoading = authLoading || (user && subscriptionLoading);
-
-  if (isLoading) {
+  // Show loading spinner while checking auth or subscription
+  if (authLoading || (user && subscriptionLoading)) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -40,12 +38,13 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
+  // If not logged in, redirect to login
   if (!user) {
     return <Navigate to="/login" replace />;
   }
 
-  // Only check subscription if there's no error and we have subscription data
-  if (!isError && subscriptionData && !subscriptionData.subscribed) {
+  // If logged in but not subscribed, show subscription wall
+  if (!subscriptionData?.subscribed) {
     return <SubscriptionWall />;
   }
 

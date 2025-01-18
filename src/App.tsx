@@ -51,76 +51,82 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-const App = () => {
+const AppRoutes = () => {
   const { user } = useAuth();
 
   return (
+    <BrowserRouter>
+      <Routes>
+        {/* Public routes */}
+        <Route path="/" element={<Landing />} />
+        <Route 
+          path="/login" 
+          element={user ? <Navigate to="/dashboard" replace /> : <Login />} 
+        />
+
+        {/* Protected routes */}
+        <Route
+          path="/journal-entry"
+          element={
+            <ProtectedRoute>
+              <Index />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Journal />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/analytics"
+          element={
+            <ProtectedRoute>
+              <Analytics />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/backtesting"
+          element={
+            <ProtectedRoute>
+              <Backtesting />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/blueprint/:blueprintId"
+          element={
+            <ProtectedRoute>
+              <BlueprintSessions />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Catch all redirect to login */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    </BrowserRouter>
+  );
+};
+
+const App = () => {
+  return (
     <React.StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <AuthProvider>
+      <AuthProvider>
+        <QueryClientProvider client={queryClient}>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <TooltipProvider>
               <Toaster />
               <Sonner />
-              <BrowserRouter>
-                <Routes>
-                  {/* Public routes */}
-                  <Route path="/" element={<Landing />} />
-                  <Route 
-                    path="/login" 
-                    element={user ? <Navigate to="/dashboard" replace /> : <Login />} 
-                  />
-
-                  {/* Protected routes */}
-                  <Route
-                    path="/journal-entry"
-                    element={
-                      <ProtectedRoute>
-                        <Index />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/dashboard"
-                    element={
-                      <ProtectedRoute>
-                        <Journal />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/analytics"
-                    element={
-                      <ProtectedRoute>
-                        <Analytics />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/backtesting"
-                    element={
-                      <ProtectedRoute>
-                        <Backtesting />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/blueprint/:blueprintId"
-                    element={
-                      <ProtectedRoute>
-                        <BlueprintSessions />
-                      </ProtectedRoute>
-                    }
-                  />
-
-                  {/* Catch all redirect to login */}
-                  <Route path="*" element={<Navigate to="/login" replace />} />
-                </Routes>
-              </BrowserRouter>
+              <AppRoutes />
             </TooltipProvider>
-          </AuthProvider>
-        </ThemeProvider>
-      </QueryClientProvider>
+          </ThemeProvider>
+        </QueryClientProvider>
+      </AuthProvider>
     </React.StrictMode>
   );
 };

@@ -60,8 +60,8 @@ export function AppHeader() {
     
     if (confirmDelete) {
       try {
-        // First delete the user from the auth.users table (this will cascade to profiles)
-        const { error: deleteError } = await supabase.rpc('delete_user');
+        // Call the Edge Function to delete the user
+        const { error: deleteError } = await supabase.functions.invoke('delete-user');
         if (deleteError) throw deleteError;
         
         // Then sign out the user

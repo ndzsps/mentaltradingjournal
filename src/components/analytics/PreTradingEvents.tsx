@@ -47,17 +47,47 @@ export const PreTradingEvents = () => {
       </Card>
     );
   }
-  
-  const data = [
-    { event: "Financial Discussions", impact: -70 },
-    { event: "Meditation", impact: 40 },
-    { event: "Exercise", impact: 30 },
-    { event: "News Reading", impact: -20 },
-    { event: "Planning Session", impact: 50 },
-  ].map(item => ({
-    ...item,
-    fill: item.impact > 0 ? "#6E59A5" : "#FEC6A1"
-  }));
+
+  // Process journal entries to calculate impact of pre-trading activities
+  const activityImpact = analytics.journalEntries.reduce((acc: { [key: string]: { totalPnL: number; count: number } }, entry) => {
+    if (!entry.pre_trading_activities || entry.trades?.length === 0) return acc;
+
+    const dailyPnL = entry.trades.reduce((sum, trade) => {
+      const pnlValue = trade.pnl || trade.profit_loss || 0;
+      const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
+      return sum + (isNaN(numericPnL) ? 0 : numericPnL);
+    }, 0);
+
+    entry.pre_trading_activities.forEach(activity => {
+      if (!acc[activity]) {
+        acc[activity] = { totalPnL: 0, count: 0 };
+      }
+      acc[activity].totalPnL += dailyPnL;
+      acc[activity].count += 1;
+    });
+
+    return acc;
+  }, {});
+
+  // Calculate average impact percentage for each activity
+  const data = Object.entries(activityImpact)
+    .filter(([_, stats]) => stats.count >= 3) // Only include activities with at least 3 occurrences
+    .map(([activity, stats]) => {
+      const averageImpact = (stats.totalPnL / stats.count) * 100 / 1000; // Convert to percentage and normalize
+      return {
+        event: activity,
+        impact: parseFloat(averageImpact.toFixed(2)),
+        fill: averageImpact > 0 ? "#6E59A5" : "#FEC6A1"
+      };
+    })
+    .sort((a, b) => Math.abs(b.impact) - Math.abs(a.impact)) // Sort by absolute impact
+    .slice(0, 5); // Take top 5 most impactful activities
+
+  // Find most positive and negative impacts for insights
+  const mostPositive = data.reduce((prev, current) => 
+    current.impact > prev.impact ? current : prev, { impact: -Infinity, event: '' });
+  const mostNegative = data.reduce((prev, current) => 
+    current.impact < prev.impact ? current : prev, { impact: Infinity, event: '' });
 
   return (
     <Card className="p-4 md:p-6 space-y-4">
@@ -99,8 +129,18 @@ export const PreTradingEvents = () => {
       <div className="space-y-2 bg-accent/10 p-3 md:p-4 rounded-lg">
         <h4 className="font-semibold text-sm md:text-base">AI Insight</h4>
         <div className="space-y-2 text-xs md:text-sm text-muted-foreground">
-          <p>Conversations about finances before trading resulted in a 70% drop in performance. Consider avoiding such discussions.</p>
-          <p>Meditation or positive affirmations before trading increased win rates by 40%.</p>
+          {data.length > 0 ? (
+            <>
+              {mostNegative.event && (
+                <p>{mostNegative.event} activities resulted in a {Math.abs(mostNegative.impact).toFixed(1)}% drop in performance. Consider limiting these sessions.</p>
+              )}
+              {mostPositive.event && (
+                <p>{mostPositive.event} before trading increased performance by {mostPositive.impact.toFixed(1)}%.</p>
+              )}
+            </>
+          ) : (
+            <p>Add more journal entries with pre-trading activities to see their impact on your performance.</p>
+          )}
         </div>
       </div>
     </Card>

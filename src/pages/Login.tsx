@@ -13,7 +13,11 @@ const Login = () => {
     }
   }, [user, navigate]);
 
-  return <AuthForm />;
+  return (
+    <div className="min-h-screen bg-background">
+      <AuthForm />
+    </div>
+  );
 };
 
 export default Login;

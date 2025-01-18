@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import Landing from "./pages/Landing";
 import Index from "./pages/Index";
@@ -50,52 +50,50 @@ const App = () => {
             <TooltipProvider>
               <Toaster />
               <Sonner />
-              <BrowserRouter>
-                <Routes>
-                  <Route path="/" element={<Landing />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route
-                    path="/journal-entry"
-                    element={
-                      <ProtectedRoute>
-                        <Index />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/dashboard"
-                    element={
-                      <ProtectedRoute>
-                        <Journal />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/analytics"
-                    element={
-                      <ProtectedRoute>
-                        <Analytics />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/backtesting"
-                    element={
-                      <ProtectedRoute>
-                        <Backtesting />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/blueprint/:blueprintId"
-                    element={
-                      <ProtectedRoute>
-                        <BlueprintSessions />
-                      </ProtectedRoute>
-                    }
-                  />
-                </Routes>
-              </BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Landing />} />
+                <Route path="/login" element={<Login />} />
+                <Route
+                  path="/journal-entry"
+                  element={
+                    <ProtectedRoute>
+                      <Index />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard"
+                  element={
+                    <ProtectedRoute>
+                      <Journal />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/analytics"
+                  element={
+                    <ProtectedRoute>
+                      <Analytics />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/backtesting"
+                  element={
+                    <ProtectedRoute>
+                      <Backtesting />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/blueprint/:blueprintId"
+                  element={
+                    <ProtectedRoute>
+                      <BlueprintSessions />
+                    </ProtectedRoute>
+                  }
+                />
+              </Routes>
             </TooltipProvider>
           </AuthProvider>
         </ThemeProvider>

@@ -52,6 +52,8 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 const App = () => {
+  const { user } = useAuth();
+
   return (
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
@@ -62,8 +64,14 @@ const App = () => {
               <Sonner />
               <BrowserRouter>
                 <Routes>
+                  {/* Public routes */}
                   <Route path="/" element={<Landing />} />
-                  <Route path="/login" element={<Login />} />
+                  <Route 
+                    path="/login" 
+                    element={user ? <Navigate to="/dashboard" replace /> : <Login />} 
+                  />
+
+                  {/* Protected routes */}
                   <Route
                     path="/journal-entry"
                     element={
@@ -104,6 +112,9 @@ const App = () => {
                       </ProtectedRoute>
                     }
                   />
+
+                  {/* Catch all redirect to login */}
+                  <Route path="*" element={<Navigate to="/login" replace />} />
                 </Routes>
               </BrowserRouter>
             </TooltipProvider>

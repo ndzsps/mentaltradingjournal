@@ -14,6 +14,7 @@ import BlueprintSessions from "./pages/BlueprintSessions";
 import Login from "./pages/Login";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { SubscriptionDialog } from "./components/SubscriptionDialog";
+import { supabase } from "@/integrations/supabase/client";
 
 const queryClient = new QueryClient({
   defaultOptions: {

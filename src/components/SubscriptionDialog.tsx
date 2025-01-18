@@ -35,7 +35,7 @@ export function SubscriptionDialog() {
 
   const handleClose = () => {
     setOpen(false);
-    navigate("/login");
+    navigate("/");
   };
 
   return (

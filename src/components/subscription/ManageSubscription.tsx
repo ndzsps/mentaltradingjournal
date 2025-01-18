@@ -1,33 +1,12 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 
 export const ManageSubscription = () => {
   const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
 
-  const handleManageSubscription = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase.functions.invoke('create-portal-session');
-      
-      if (error) throw error;
-      
-      if (data.url) {
-        window.location.href = data.url;
-      }
-    } catch (error) {
-      console.error('Error creating portal session:', error);
-      toast({
-        variant: "destructive",
-        title: "Error accessing subscription portal",
-        description: "Please try again later",
-      });
-    } finally {
-      setLoading(false);
-    }
+  const handleManageSubscription = () => {
+    window.location.href = "https://billing.stripe.com/p/login/dR617i4AUaWldbibII";
   };
 
   return (

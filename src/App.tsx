@@ -32,7 +32,10 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
   React.useEffect(() => {
     const checkSubscription = async () => {
-      if (!user) return;
+      if (!user) {
+        setCheckingSubscription(false);
+        return;
+      }
       try {
         const response = await fetch("/api/check-subscription", {
           headers: {
@@ -52,7 +55,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     checkSubscription();
   }, [user]);
 
-  if (loading || checkingSubscription) {
+  if (loading || (user && checkingSubscription)) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -64,7 +67,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <Navigate to="/login" replace />;
   }
 
-  if (!isSubscribed) {
+  if (!isSubscribed && !checkingSubscription) {
     return <SubscriptionDialog />;
   }
 

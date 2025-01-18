@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 interface AuthContextType {
   user: User | null;
@@ -18,6 +19,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Check active session
@@ -68,6 +70,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           data: {
             username: email.split("@")[0],
           },
+          emailRedirectTo: `${window.location.origin}/login`,
         },
       });
       if (error) {
@@ -78,6 +81,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         });
         throw error;
       }
+      
+      // Redirect to login page with success message
+      navigate("/login");
+      toast({
+        title: "Check your email",
+        description: "We've sent you a confirmation email. Please verify your email address to continue.",
+      });
     } catch (error) {
       console.error("Sign up error:", error);
       throw error;

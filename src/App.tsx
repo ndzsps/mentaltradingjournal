@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import Landing from "./pages/Landing";
 import Index from "./pages/Index";
@@ -29,6 +29,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
   const { isSubscribed, checkingSubscription } = useSubscription();
   const [showSubscriptionDialog, setShowSubscriptionDialog] = React.useState(false);
+  const location = useLocation();
 
   React.useEffect(() => {
     if (user && !checkingSubscription && !isSubscribed) {
@@ -45,18 +46,20 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
   if (!isSubscribed) {
     return (
-      <div className="filter blur-sm">
-        {children}
+      <>
+        <div className="filter blur-sm">
+          {children}
+        </div>
         <SubscriptionDialog 
           open={showSubscriptionDialog} 
-          onOpenChange={setShowSubscriptionDialog} 
+          onOpenChange={setShowSubscriptionDialog}
         />
-      </div>
+      </>
     );
   }
 

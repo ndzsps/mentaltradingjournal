@@ -17,7 +17,6 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 
 export function AppHeader() {
   const location = useLocation();
@@ -46,25 +45,6 @@ export function AppHeader() {
         variant: "destructive",
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to update username",
-      });
-    }
-  };
-
-  const handleManageSubscription = async () => {
-    try {
-      const { data, error } = await supabase.functions.invoke('create-portal-session');
-      
-      if (error) throw error;
-      
-      if (data.url) {
-        window.location.href = data.url;
-      }
-    } catch (error) {
-      console.error('Error creating portal session:', error);
-      toast({
-        variant: "destructive",
-        title: "Error accessing subscription portal",
-        description: "Please try again later",
       });
     }
   };
@@ -134,13 +114,6 @@ export function AppHeader() {
                   )}
                 </div>
                 <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={handleManageSubscription}
-                >
-                  Manage Subscription
-                </Button>
-                <Button
                   variant="destructive"
                   className="w-full"
                   onClick={() => signOut()}
@@ -205,13 +178,6 @@ export function AppHeader() {
                     Edit Username
                   </Button>
                 )}
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={handleManageSubscription}
-                >
-                  Manage Subscription
-                </Button>
                 <Button
                   variant="destructive"
                   className="w-full"

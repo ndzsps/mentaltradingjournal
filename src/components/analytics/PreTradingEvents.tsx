@@ -48,15 +48,31 @@ export const PreTradingEvents = () => {
     );
   }
 
+  console.log('Raw journal entries:', analytics.journalEntries);
+
   // Process journal entries to calculate impact of pre-trading activities
   const activityImpact = analytics.journalEntries.reduce((acc: { [key: string]: { totalPnL: number; count: number } }, entry) => {
-    if (!entry.pre_trading_activities || entry.trades?.length === 0) return acc;
+    // Log each entry being processed
+    console.log('Processing entry:', {
+      pre_trading_activities: entry.pre_trading_activities,
+      trades: entry.trades,
+      hasActivities: Boolean(entry.pre_trading_activities),
+      hasTrades: Boolean(entry.trades?.length)
+    });
+
+    if (!entry.pre_trading_activities || !entry.trades?.length) {
+      console.log('Skipping entry - missing activities or trades');
+      return acc;
+    }
 
     const dailyPnL = entry.trades.reduce((sum, trade) => {
       const pnlValue = trade.pnl || trade.profit_loss || 0;
       const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
+      console.log('Trade PnL:', { raw: pnlValue, numeric: numericPnL });
       return sum + (isNaN(numericPnL) ? 0 : numericPnL);
     }, 0);
+
+    console.log('Daily PnL:', dailyPnL);
 
     entry.pre_trading_activities.forEach(activity => {
       if (!acc[activity]) {
@@ -64,24 +80,33 @@ export const PreTradingEvents = () => {
       }
       acc[activity].totalPnL += dailyPnL;
       acc[activity].count += 1;
+      console.log(`Activity "${activity}" stats:`, acc[activity]);
     });
 
     return acc;
   }, {});
 
+  console.log('Activity impact data:', activityImpact);
+
   // Calculate average impact percentage for each activity
   const data = Object.entries(activityImpact)
-    .filter(([_, stats]) => stats.count >= 3) // Only include activities with at least 3 occurrences
+    .filter(([_, stats]) => {
+      const hasEnoughData = stats.count >= 3;
+      console.log('Activity stats:', { stats, hasEnoughData });
+      return hasEnoughData;
+    })
     .map(([activity, stats]) => {
-      const averageImpact = (stats.totalPnL / stats.count) * 100 / 1000; // Convert to percentage and normalize
+      const averageImpact = (stats.totalPnL / stats.count) * 100 / 1000;
       return {
         event: activity,
         impact: parseFloat(averageImpact.toFixed(2)),
         fill: averageImpact > 0 ? "#6E59A5" : "#FEC6A1"
       };
     })
-    .sort((a, b) => Math.abs(b.impact) - Math.abs(a.impact)) // Sort by absolute impact
-    .slice(0, 5); // Take top 5 most impactful activities
+    .sort((a, b) => Math.abs(b.impact) - Math.abs(a.impact))
+    .slice(0, 5);
+
+  console.log('Final chart data:', data);
 
   // Find most positive and negative impacts for insights
   const mostPositive = data.reduce((prev, current) => 

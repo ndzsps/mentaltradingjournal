@@ -85,8 +85,8 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
           >
             {loading ? "Loading..." : "Subscribe Now"}
           </Button>
-        </div>
-      </Card>
+        </Card>
+      </div>
     );
   }
 

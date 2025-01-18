@@ -2,47 +2,57 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function SubscriptionDialog() {
   const [open, setOpen] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { signOut } = useAuth(); // Use the signOut method from AuthContext
 
   const handleSubscribe = async () => {
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
       const response = await fetch("/api/create-checkout-session", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+          Authorization: `Bearer ${session?.access_token}`,
         },
       });
 
-      const { url, error } = await response.json();
-      if (error) throw new Error(error);
-      if (url) window.location.href = url;
+      const { url } = await response.json();
+      if (url) {
+        window.location.href = url;
+      }
     } catch (error) {
+      console.error("Error creating checkout session:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to start subscription process. Please try again.",
+        description: "Failed to initiate subscription process. Please try again.",
       });
-      console.error("Subscription error:", error);
     }
   };
 
-  const handleClose = () => {
+  const handleClose = async () => {
     setOpen(false);
-    // Sign out when user clicks "Maybe Later" since they can't access the app without subscription
-    supabase.auth.signOut();
-    navigate("/");
+    try {
+      await signOut(); // Use the signOut method from AuthContext
+      navigate("/");
+    } catch (error) {
+      console.error("Error signing out:", error);
+      // Still navigate to home page even if sign out fails
+      navigate("/");
+    }
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md">
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>Subscribe to Access Features</DialogTitle>
           <DialogDescription>
@@ -50,10 +60,8 @@ export function SubscriptionDialog() {
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-4 py-4">
-          <Button onClick={handleSubscribe} className="w-full">
-            Subscribe Now
-          </Button>
-          <Button variant="outline" onClick={handleClose} className="w-full">
+          <Button onClick={handleSubscribe}>Subscribe Now</Button>
+          <Button variant="outline" onClick={handleClose}>
             Maybe Later
           </Button>
         </div>

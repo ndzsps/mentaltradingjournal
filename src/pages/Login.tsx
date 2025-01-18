@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { SubscriptionDialog } from "@/components/SubscriptionDialog";
+import { AuthError } from "@supabase/supabase-js";
 
 const Login = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -22,6 +23,16 @@ const Login = () => {
       navigate("/dashboard");
     }
   }, [user, navigate]);
+
+  const getErrorMessage = (error: AuthError) => {
+    if (error.message.includes("Invalid login credentials")) {
+      return "Invalid email or password. Please check your credentials and try again.";
+    }
+    if (error.message.includes("Email not confirmed")) {
+      return "Please verify your email address before signing in.";
+    }
+    return error.message;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,10 +51,14 @@ const Login = () => {
         navigate("/dashboard");
       }
     } catch (error) {
+      const errorMessage = error instanceof AuthError 
+        ? getErrorMessage(error)
+        : "An unexpected error occurred";
+        
       toast({
         variant: "destructive",
-        title: "Error",
-        description: error instanceof Error ? error.message : "An error occurred",
+        title: "Authentication Error",
+        description: errorMessage,
       });
     } finally {
       setLoading(false);

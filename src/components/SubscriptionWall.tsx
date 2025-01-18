@@ -2,9 +2,20 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { useEffect } from "react";
 
 export const SubscriptionWall = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user) {
+      navigate("/login");
+    }
+  }, [user, navigate]);
 
   const handleSubscribe = async () => {
     try {
@@ -15,6 +26,7 @@ export const SubscriptionWall = () => {
           title: "Error",
           description: "Please sign in to subscribe",
         });
+        navigate("/login");
         return;
       }
 
@@ -47,6 +59,8 @@ export const SubscriptionWall = () => {
       });
     }
   };
+
+  if (!user) return null;
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-background to-secondary/10 p-4">

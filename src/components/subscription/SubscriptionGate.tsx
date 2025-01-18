@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
-import { ManageSubscription } from "./ManageSubscription";
 
 interface SubscriptionGateProps {
   children: React.ReactNode;
@@ -91,10 +90,5 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
     );
   }
 
-  return (
-    <div className="space-y-8">
-      <ManageSubscription />
-      {children}
-    </div>
-  );
+  return children;
 };

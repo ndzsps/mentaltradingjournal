@@ -60,9 +60,11 @@ export function AppHeader() {
     
     if (confirmDelete) {
       try {
-        const { error } = await supabase.auth.admin.deleteUser(user?.id || '');
-        if (error) throw error;
+        // First delete the user from the auth.users table (this will cascade to profiles)
+        const { error: deleteError } = await supabase.rpc('delete_user');
+        if (deleteError) throw deleteError;
         
+        // Then sign out the user
         await signOut();
         
         toast({

@@ -1,9 +1,14 @@
-import { StorageUsage } from "@/components/storage/StorageUsage";
+import { AppLayout } from "@/components/layout/AppLayout";
+import { EmotionLogger } from "@/components/journal/EmotionLogger";
 
-export const Index = () => {
+const Index = () => {
   return (
-    <div className="container mx-auto p-4">
-      <StorageUsage userEmail="edwardhong.bk@gmail.com" />
-    </div>
+    <AppLayout>
+      <div className="container mx-auto py-6 space-y-8">
+        <EmotionLogger />
+      </div>
+    </AppLayout>
   );
 };
+
+export default Index;

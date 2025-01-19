@@ -63,6 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [toast]);
 
   const getErrorMessage = (error: AuthError | AuthApiError) => {
+    // First check if it's an AuthApiError
     if ('code' in error) {
       switch (error.code) {
         case 'invalid_credentials':
@@ -74,10 +75,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         case 'invalid_grant':
           return "Invalid login credentials. Please check your email and password.";
         default:
-          return error.message;
+          return error.message || "An authentication error occurred";
       }
     }
-    return error.message;
+    // If it's not an AuthApiError, return the message or a default
+    return error.message || "An unexpected error occurred";
   };
 
   const signIn = async (email: string, password: string) => {

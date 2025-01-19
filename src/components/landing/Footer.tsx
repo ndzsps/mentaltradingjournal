@@ -18,7 +18,10 @@ export const Footer = () => {
           <div className="space-y-4">
             <Link to="/login" className="block hover:text-white transition-colors">Log In</Link>
             <Link to="/features" className="block hover:text-white transition-colors">Features</Link>
+            <Link to="/blog" className="block hover:text-white transition-colors">Blog</Link>
             <Link to="/pricing" className="block hover:text-white transition-colors">Pricing</Link>
+            <Link to="/broker-support" className="block hover:text-white transition-colors">Broker Support</Link>
+            <Link to="/partner" className="block hover:text-white transition-colors">Become A Partner</Link>
           </div>
 
           {/* Navigation Links - Column 2 */}

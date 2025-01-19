@@ -1,69 +1,107 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { Toaster } from "sonner";
-import { AppLayout } from "@/components/layout/AppLayout";
-import Features from "@/pages/Features";
-import Landing from "@/pages/Landing";
-import Login from "@/pages/Login";
-import Journal from "@/pages/Journal";
-import Backtesting from "@/pages/Backtesting";
-import { AuthProvider } from "@/contexts/AuthContext";
+import React from "react";
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { ThemeProvider } from "next-themes";
+import Landing from "./pages/Landing";
+import Index from "./pages/Index";
+import Journal from "./pages/Journal";
+import Analytics from "./pages/Analytics";
+import Backtesting from "./pages/Backtesting";
+import BlueprintSessions from "./pages/BlueprintSessions";
+import Login from "./pages/Login";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 
-// Create basic components for missing pages
-const Register = () => (
-  <div className="min-h-screen flex items-center justify-center">
-    <div className="max-w-md w-full space-y-8 p-6">
-      <h1 className="text-2xl font-bold text-center">Register</h1>
-      <p className="text-center text-muted-foreground">Coming soon...</p>
-    </div>
-  </div>
-);
-
-const Dashboard = () => (
-  <div className="p-6">
-    <h1 className="text-2xl font-bold">Dashboard</h1>
-    <p className="text-muted-foreground">Coming soon...</p>
-  </div>
-);
-
-const Blueprint = () => (
-  <div className="p-6">
-    <h1 className="text-2xl font-bold">Blueprint</h1>
-    <p className="text-muted-foreground">Coming soon...</p>
-  </div>
-);
-
-const Settings = () => (
-  <div className="p-6">
-    <h1 className="text-2xl font-bold">Settings</h1>
-    <p className="text-muted-foreground">Coming soon...</p>
-  </div>
-);
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      staleTime: 5 * 60 * 1000,
+    },
+  },
+});
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
   return <>{children}</>;
 };
 
-function App() {
+const App = () => {
   return (
-    <AuthProvider>
-      <Router>
-        <Toaster position="top-right" />
-        <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/features" element={<Features />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/journal" element={<Journal />} />
-            <Route path="/backtesting" element={<Backtesting />} />
-            <Route path="/blueprint/:id" element={<Blueprint />} />
-            <Route path="/settings" element={<Settings />} />
-          </Route>
-        </Routes>
-      </Router>
-    </AuthProvider>
+    <React.StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <AuthProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/" element={<Landing />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route
+                    path="/journal-entry"
+                    element={
+                      <ProtectedRoute>
+                        <Index />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard"
+                    element={
+                      <ProtectedRoute>
+                        <Journal />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/analytics"
+                    element={
+                      <ProtectedRoute>
+                        <Analytics />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/backtesting"
+                    element={
+                      <ProtectedRoute>
+                        <Backtesting />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/blueprint/:blueprintId"
+                    element={
+                      <ProtectedRoute>
+                        <BlueprintSessions />
+                      </ProtectedRoute>
+                    }
+                  />
+                </Routes>
+              </BrowserRouter>
+            </TooltipProvider>
+          </AuthProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </React.StrictMode>
   );
-}
+};
 
 export default App;

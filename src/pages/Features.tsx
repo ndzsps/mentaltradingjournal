@@ -29,17 +29,6 @@ const Features = () => {
         </div>
       </section>
 
-      {/* Dashboard Preview Section */}
-      <section className="container mx-auto px-4 py-16">
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-          <img 
-            src="/lovable-uploads/b2b8599e-bcad-46cc-8d7b-ade2aa6b06ee.png" 
-            alt="Trading Dashboard Preview" 
-            className="w-full h-auto"
-          />
-        </div>
-      </section>
-
       {/* Detailed Reports Section */}
       <section className="container mx-auto px-4 py-16">
         <div className="grid md:grid-cols-2 gap-16 items-center">

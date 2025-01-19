@@ -101,6 +101,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (error) {
       console.error("Sign in error:", error);
+      if (error instanceof Error) {
+        toast({
+          variant: "destructive",
+          title: "Error signing in",
+          description: error.message || "An unexpected error occurred",
+        });
+      }
       throw error;
     }
   };
@@ -135,6 +142,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (error) {
       console.error("Sign up error:", error);
+      if (error instanceof Error) {
+        toast({
+          variant: "destructive",
+          title: "Error signing up",
+          description: error.message || "An unexpected error occurred",
+        });
+      }
       throw error;
     }
   };
@@ -159,6 +173,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (error) {
       console.error("Sign out error:", error);
+      if (error instanceof Error) {
+        toast({
+          variant: "destructive",
+          title: "Error signing out",
+          description: error.message || "An unexpected error occurred",
+        });
+      }
       setUser(null);
       throw error;
     }
@@ -182,6 +203,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (error) {
       console.error("Update username error:", error);
+      if (error instanceof Error) {
+        toast({
+          variant: "destructive",
+          title: "Error updating username",
+          description: error.message || "An unexpected error occurred",
+        });
+      }
       throw error;
     }
   };

@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { AnalyticsSection } from "@/components/landing/AnalyticsSection";
 import { CommunitySection } from "@/components/landing/CommunitySection";
-import { Footer } from "@/components/landing/Footer";
 import { User, ArrowRightCircle } from "lucide-react";
 
 const Landing = () => {
@@ -32,7 +31,9 @@ const Landing = () => {
         <div className="absolute inset-0 backdrop-blur-[100px]" />
       </div>
       
+      {/* Content */}
       <div className="relative z-10">
+        {/* Header */}
         <header className="fixed top-0 left-0 right-0 z-50 bg-background/5 backdrop-blur-md border-b border-white/5">
           <div className="container mx-auto px-4 h-16 flex items-center justify-between">
             <div className="flex items-center">
@@ -183,7 +184,6 @@ const Landing = () => {
 
         <AnalyticsSection />
         <CommunitySection />
-        <Footer />
       </div>
     </div>
   );

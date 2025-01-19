@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import type { User, AuthError, AuthApiError } from "@supabase/supabase-js";
+import type { User, AuthError } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
 
 interface AuthContextType {
@@ -30,7 +30,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event);
       setUser(session?.user ?? null);
       setLoading(false);
 
@@ -45,7 +44,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             toast({
               variant: "destructive",
               title: "Error resetting password",
-              description: getErrorMessage(error),
+              description: error.message,
             });
           } else {
             toast({
@@ -62,36 +61,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, [toast]);
 
-  const getErrorMessage = (error: AuthError | AuthApiError): string => {
-    // First check if it's an AuthApiError
-    if ('code' in error) {
-      switch (error.code) {
-        case 'invalid_credentials':
-          return "Invalid email or password. Please check your credentials and try again.";
-        case 'email_not_confirmed':
-          return "Please verify your email address before signing in.";
-        case 'user_not_found':
-          return "No account found with this email address.";
-        case 'invalid_grant':
-          return "Invalid login credentials. Please check your email and password.";
-        default:
-          return error.message || "An authentication error occurred";
-      }
+  const getErrorMessage = (error: AuthError) => {
+    switch (error.message) {
+      case "Invalid login credentials":
+        return "Invalid email or password. Please check your credentials and try again.";
+      case "Email not confirmed":
+        return "Please verify your email address before signing in.";
+      case "User not found":
+        return "No account found with this email address.";
+      default:
+        return error.message;
     }
-    // If it's not an AuthApiError, return the message or a default
-    return error.message || "An unexpected error occurred";
   };
 
   const signIn = async (email: string, password: string) => {
     try {
-      console.log("Attempting to sign in with email:", email);
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-      
       if (error) {
-        console.error("Sign in error:", error);
         toast({
           variant: "destructive",
           title: "Error signing in",
@@ -101,20 +90,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (error) {
       console.error("Sign in error:", error);
-      if (error instanceof Error) {
-        toast({
-          variant: "destructive",
-          title: "Error signing in",
-          description: error.message || "An unexpected error occurred",
-        });
-      }
       throw error;
     }
   };
 
   const signUp = async (email: string, password: string) => {
     try {
-      console.log("Attempting to sign up with email:", email);
       const { error } = await supabase.auth.signUp({
         email,
         password,
@@ -125,9 +106,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           },
         },
       });
-      
       if (error) {
-        console.error("Sign up error:", error);
         toast({
           variant: "destructive",
           title: "Error signing up",
@@ -142,13 +121,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (error) {
       console.error("Sign up error:", error);
-      if (error instanceof Error) {
-        toast({
-          variant: "destructive",
-          title: "Error signing up",
-          description: error.message || "An unexpected error occurred",
-        });
-      }
       throw error;
     }
   };
@@ -160,7 +132,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (session) {
         const { error } = await supabase.auth.signOut();
         if (error) {
-          console.error("Sign out error:", error);
           toast({
             variant: "destructive",
             title: "Error signing out",
@@ -173,13 +144,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (error) {
       console.error("Sign out error:", error);
-      if (error instanceof Error) {
-        toast({
-          variant: "destructive",
-          title: "Error signing out",
-          description: error.message || "An unexpected error occurred",
-        });
-      }
       setUser(null);
       throw error;
     }
@@ -191,9 +155,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { error } = await supabase.auth.updateUser({
         data: { username },
       });
-      
       if (error) {
-        console.error("Update username error:", error);
         toast({
           variant: "destructive",
           title: "Error updating username",
@@ -203,13 +165,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (error) {
       console.error("Update username error:", error);
-      if (error instanceof Error) {
-        toast({
-          variant: "destructive",
-          title: "Error updating username",
-          description: error.message || "An unexpected error occurred",
-        });
-      }
       throw error;
     }
   };

@@ -56,7 +56,7 @@ export const PerformanceBreakdown = () => {
   const ticks = Array.from(
     { length: Math.floor((2 * roundedMax) / interval) + 1 },
     (_, i) => -roundedMax + (i * interval)
-  );
+  ).map(value => `$${value}`); // Add dollar sign to tick values
 
   return (
     <Card className="p-4 md:p-6 space-y-4">
@@ -68,7 +68,11 @@ export const PerformanceBreakdown = () => {
       </div>
 
       <PerformanceChart 
-        data={data}
+        data={data.map(item => ({
+          ...item,
+          averagePnL: item.averagePnL,
+          formattedPnL: `$${item.averagePnL.toFixed(2)}` // Add formatted value with dollar sign
+        }))}
         domain={domain}
         ticks={ticks}
       />

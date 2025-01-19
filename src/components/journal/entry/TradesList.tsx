@@ -34,6 +34,9 @@ export const TradesList = ({ trades }: TradesListProps) => {
           result: trade.resultScreenshot
         });
         
+        const pnlValue = Number(trade.pnl);
+        const formattedPnL = `${pnlValue >= 0 ? '+' : ''}$${Math.abs(pnlValue).toFixed(2)}`;
+        
         return (
           <AccordionItem key={trade.id || index} value={`trade-${index}`} className="border rounded-lg px-4">
             <AccordionTrigger className="hover:no-underline py-3">
@@ -47,9 +50,9 @@ export const TradesList = ({ trades }: TradesListProps) => {
                     {trade.direction}
                   </Badge>
                   <span className={`font-medium ${
-                    Number(trade.pnl) >= 0 ? 'text-green-500' : 'text-red-500'
+                    pnlValue >= 0 ? 'text-green-500' : 'text-red-500'
                   }`}>
-                    {Number(trade.pnl) >= 0 ? '+' : ''}{trade.pnl}
+                    {formattedPnL}
                   </span>
                 </div>
               </div>
@@ -61,18 +64,18 @@ export const TradesList = ({ trades }: TradesListProps) => {
                     <h4 className="text-sm font-medium text-muted-foreground">Entry Details</h4>
                     <div className="space-y-2">
                       <p className="text-sm">Date: {formatDate(trade.entryDate || '')}</p>
-                      <p className="text-sm">Price: {trade.entryPrice}</p>
-                      <p className="text-sm">Stop Loss: {trade.stopLoss}</p>
-                      <p className="text-sm">Take Profit: {trade.takeProfit}</p>
+                      <p className="text-sm">Price: ${trade.entryPrice?.toFixed(2)}</p>
+                      <p className="text-sm">Stop Loss: ${trade.stopLoss?.toFixed(2)}</p>
+                      <p className="text-sm">Take Profit: ${trade.takeProfit?.toFixed(2)}</p>
                     </div>
                   </div>
                   <div className="space-y-3">
                     <h4 className="text-sm font-medium text-muted-foreground">Exit Details</h4>
                     <div className="space-y-2">
                       <p className="text-sm">Date: {formatDate(trade.exitDate || '')}</p>
-                      <p className="text-sm">Price: {trade.exitPrice}</p>
+                      <p className="text-sm">Price: ${trade.exitPrice?.toFixed(2)}</p>
                       <p className="text-sm">Quantity: {trade.quantity}</p>
-                      <p className="text-sm">Fees: {trade.fees}</p>
+                      <p className="text-sm">Fees: ${trade.fees?.toFixed(2)}</p>
                     </div>
                   </div>
                 </div>

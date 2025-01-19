@@ -15,6 +15,7 @@ interface PlaybookSectionProps {
 export function PlaybookSection({ onBlueprintAdded }: PlaybookSectionProps) {
   const [open, setOpen] = useState(false);
   const [blueprints, setBlueprints] = useState<any[]>([]);
+  const [winRates, setWinRates] = useState<{[key: string]: number}>({});
   const { user } = useAuth();
 
   const fetchBlueprints = async () => {
@@ -28,6 +29,31 @@ export function PlaybookSection({ onBlueprintAdded }: PlaybookSectionProps) {
 
     if (!error && data) {
       setBlueprints(data);
+      // Fetch win rates for each blueprint
+      data.forEach(blueprint => {
+        calculateWinRate(blueprint.id);
+      });
+    }
+  };
+
+  const calculateWinRate = async (blueprintId: string) => {
+    const { data: sessions, error } = await supabase
+      .from("backtesting_sessions")
+      .select("pnl")
+      .eq("playbook_id", blueprintId);
+
+    if (!error && sessions && sessions.length > 0) {
+      const winningTrades = sessions.filter(session => (session.pnl || 0) > 0).length;
+      const winRate = (winningTrades / sessions.length) * 100;
+      setWinRates(prev => ({
+        ...prev,
+        [blueprintId]: Number(winRate.toFixed(2))
+      }));
+    } else {
+      setWinRates(prev => ({
+        ...prev,
+        [blueprintId]: 0
+      }));
     }
   };
 
@@ -89,6 +115,7 @@ export function PlaybookSection({ onBlueprintAdded }: PlaybookSectionProps) {
                 name={blueprint.name}
                 instrument={blueprint.rules[0]?.replace("Instrument: ", "") || "N/A"}
                 emoji={blueprint.emoji}
+                winRate={winRates[blueprint.id] || 0}
                 onDelete={handleDelete}
               />
             ))}

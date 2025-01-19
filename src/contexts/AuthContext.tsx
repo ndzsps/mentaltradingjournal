@@ -45,7 +45,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             toast({
               variant: "destructive",
               title: "Error resetting password",
-              description: error.message,
+              description: getErrorMessage(error),
             });
           } else {
             toast({
@@ -62,7 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, [toast]);
 
-  const getErrorMessage = (error: AuthError | AuthApiError) => {
+  const getErrorMessage = (error: AuthError | AuthApiError): string => {
     // First check if it's an AuthApiError
     if ('code' in error) {
       switch (error.code) {

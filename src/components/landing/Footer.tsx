@@ -10,7 +10,7 @@ export const Footer = () => {
           {/* Disclaimer */}
           <div className="col-span-1 md:col-span-2">
             <p className="text-sm leading-relaxed">
-              Tools for futures, currency & options involves substantial risk & is not appropriate for everyone. Only risk capital should be used for trading. Testimonials appearing on this website may not be representative of other clients or customers and is not a guarantee of future performance or success.
+              Tools for futures, currency & options involves substantial risk & is not appropriate for everyone. Only risk capital should be used for trading. Results are not guaranteed and may vary from person to person. There are inherent risks involved with trading, including the loss of your investment. Past performance in the market is not indicative of future results. Any investment is solely at your own risk, you assume full responsibility.
             </p>
           </div>
 

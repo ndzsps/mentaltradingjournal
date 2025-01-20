@@ -19,12 +19,16 @@ export const EmotionBadge = ({ emotion, detail }: EmotionBadgeProps) => {
     }
   };
 
+  const displayText = emotion.toLowerCase() === detail.toLowerCase() 
+    ? emotion 
+    : `${emotion} - ${detail}`;
+
   return (
     <Badge 
       variant="outline" 
       className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${getEmotionStyles(emotion)}`}
     >
-      {emotion.charAt(0).toUpperCase() + emotion.slice(1)} - {detail.charAt(0).toUpperCase() + detail.slice(1)}
+      {displayText.charAt(0).toUpperCase() + displayText.slice(1)}
     </Badge>
   );
 };

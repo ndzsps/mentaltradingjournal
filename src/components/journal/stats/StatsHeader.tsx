@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { DollarSign, Percent, Smile, Flame } from "lucide-react";
+import { DollarSign, Percent, Smile, Flame, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useProgressTracking } from "@/hooks/useProgressTracking";
@@ -10,9 +10,11 @@ import { startOfMonth, subMonths, startOfQuarter, isWithinInterval, endOfMonth }
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { useSidebar } from "@/components/ui/sidebar";
 
 export const StatsHeader = () => {
   const queryClient = useQueryClient();
+  const { state, toggleSidebar } = useSidebar();
   const { data: analytics, isLoading: isAnalyticsLoading } = useQuery({
     queryKey: ['analytics'],
     queryFn: generateAnalytics,
@@ -144,7 +146,20 @@ export const StatsHeader = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-start gap-2">
+      <div className="flex justify-start gap-2 items-center">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleSidebar}
+          className="hover:bg-primary/10"
+          title={state === "expanded" ? "Collapse Sidebar" : "Expand Sidebar"}
+        >
+          {state === "expanded" ? (
+            <PanelLeftClose className="h-4 w-4" />
+          ) : (
+            <PanelLeftOpen className="h-4 w-4" />
+          )}
+        </Button>
         <Button 
           variant={timeFilter === "this-month" ? "default" : "outline"}
           onClick={() => setTimeFilter("this-month")}

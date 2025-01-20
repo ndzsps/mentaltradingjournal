@@ -1,4 +1,4 @@
-import { Home, BookOpen, BarChart2, Settings, UserCog, FlaskConical, BrainCircuit, PanelLeftClose } from "lucide-react";
+import { Home, BookOpen, BarChart2, Settings, UserCog, FlaskConical, BrainCircuit, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
   Sidebar,
@@ -31,7 +31,7 @@ const menuItems = [
 
 export function AppSidebar() {
   const [showMentorDialog, setShowMentorDialog] = useState(false);
-  const { toggleSidebar } = useSidebar();
+  const { toggleSidebar, state } = useSidebar();
 
   return (
     <>
@@ -50,9 +50,13 @@ export function AppSidebar() {
                 size="icon"
                 onClick={toggleSidebar}
                 className="ml-2"
-                title="Toggle Sidebar"
+                title={state === "expanded" ? "Collapse Sidebar" : "Expand Sidebar"}
               >
-                <PanelLeftClose className="h-4 w-4" />
+                {state === "expanded" ? (
+                  <PanelLeftClose className="h-4 w-4" />
+                ) : (
+                  <PanelLeftOpen className="h-4 w-4" />
+                )}
               </Button>
             </div>
           </div>

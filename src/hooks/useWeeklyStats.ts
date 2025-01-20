@@ -9,6 +9,7 @@ interface WeekSummary {
   weekNumber: number;
   totalPnL: number;
   tradingDays: number;
+  trades: { trades?: any[] }[];
 }
 
 export const useWeeklyStats = () => {
@@ -35,6 +36,7 @@ export const useWeeklyStats = () => {
         weekNumber: i + 1,
         totalPnL: 0,
         tradingDays: 0,
+        trades: [],
       }));
 
       (entries as JournalEntryType[])?.forEach(entry => {
@@ -54,12 +56,12 @@ export const useWeeklyStats = () => {
           if (dailyPnL !== 0) {
             weeks[weekNumber - 1].tradingDays += 1;
           }
+          weeks[weekNumber - 1].trades.push(entry);
         }
       });
 
       return weeks;
     },
-    // Enable automatic background refetching
     refetchOnWindowFocus: true,
     refetchOnMount: true,
     staleTime: 0,

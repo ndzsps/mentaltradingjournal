@@ -5,14 +5,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useState } from "react";
 
 const INITIAL_BALANCE_OPTIONS = [
   { value: 5000, label: "$5,000" },
@@ -29,40 +21,15 @@ interface BalanceSelectorProps {
 }
 
 export const BalanceSelector = ({ selectedBalance, onBalanceChange }: BalanceSelectorProps) => {
-  const [customBalance, setCustomBalance] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
-
-  const handleCustomBalanceSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const value = Number(customBalance);
-    if (!isNaN(value) && value > 0) {
-      onBalanceChange(value);
-      setIsOpen(false);
-      setCustomBalance("");
-    }
-  };
-
-  const isCustomValue = !INITIAL_BALANCE_OPTIONS.some(option => option.value === selectedBalance);
-
-  const handleValueChange = (value: string) => {
-    if (value === "custom") {
-      setIsOpen(true);
-    } else {
-      onBalanceChange(Number(value));
-    }
-  };
-
   return (
     <div className="flex items-center gap-2">
       <span className="text-sm text-muted-foreground">Initial Balance:</span>
       <Select
-        value={isCustomValue ? "custom" : selectedBalance.toString()}
-        onValueChange={handleValueChange}
+        value={selectedBalance.toString()}
+        onValueChange={(value) => onBalanceChange(Number(value))}
       >
         <SelectTrigger className="w-[140px]">
-          <SelectValue>
-            {isCustomValue ? `$${selectedBalance.toLocaleString()}` : undefined}
-          </SelectValue>
+          <SelectValue />
         </SelectTrigger>
         <SelectContent>
           {INITIAL_BALANCE_OPTIONS.map((option) => (
@@ -70,38 +37,8 @@ export const BalanceSelector = ({ selectedBalance, onBalanceChange }: BalanceSel
               {option.label}
             </SelectItem>
           ))}
-          <SelectItem value="custom">Add custom</SelectItem>
         </SelectContent>
       </Select>
-
-      <Popover open={isOpen} onOpenChange={setIsOpen}>
-        <PopoverTrigger asChild>
-          <Button variant="ghost" className="h-0 w-0 p-0 overflow-hidden">
-            Custom
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-[200px] p-4">
-          <form onSubmit={handleCustomBalanceSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <h4 className="font-medium leading-none">Custom Balance</h4>
-              <p className="text-sm text-muted-foreground">
-                Enter your initial balance
-              </p>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Input
-                type="number"
-                min="1"
-                value={customBalance}
-                onChange={(e) => setCustomBalance(e.target.value)}
-                placeholder="Enter amount"
-                className="flex-1"
-              />
-              <Button type="submit">Set</Button>
-            </div>
-          </form>
-        </PopoverContent>
-      </Popover>
     </div>
   );
 };

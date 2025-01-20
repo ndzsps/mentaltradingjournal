@@ -37,11 +37,16 @@ export const TradesList = ({ trades }: TradesListProps) => {
 
   const handleTradeUpdate = async (updatedTrade: Trade) => {
     try {
-      // Get the journal entry containing this trade using contains operator
+      // Get all journal entries for the day of the trade
+      const entryDate = new Date(updatedTrade.entryDate || new Date());
+      const startOfDay = new Date(entryDate.setHours(0, 0, 0, 0));
+      const endOfDay = new Date(entryDate.setHours(23, 59, 59, 999));
+
       const { data: entries, error: fetchError } = await supabase
         .from('journal_entries')
         .select()
-        .contains('trades', [{ id: updatedTrade.id }]);
+        .gte('created_at', startOfDay.toISOString())
+        .lte('created_at', endOfDay.toISOString());
 
       if (fetchError) throw fetchError;
       if (!entries || entries.length === 0) {
@@ -71,7 +76,7 @@ export const TradesList = ({ trades }: TradesListProps) => {
         htfBias: updatedTrade.htfBias
       };
 
-      // Update the trades array by mapping over it
+      // Update the trades array
       const updatedTrades = currentTrades.map((trade: any) => 
         trade.id === updatedTrade.id ? updatedTradeObject : trade
       );
@@ -85,6 +90,7 @@ export const TradesList = ({ trades }: TradesListProps) => {
       if (updateError) throw updateError;
 
       toast.success('Trade updated successfully');
+      setIsEditDialogOpen(false);
       window.location.reload(); // Refresh to show updated data
     } catch (error) {
       console.error('Error updating trade:', error);

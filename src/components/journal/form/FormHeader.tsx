@@ -5,9 +5,14 @@ import { SessionTypeSelector } from "../SessionTypeSelector";
 interface FormHeaderProps {
   sessionType: "pre" | "post";
   onSessionTypeChange: (value: "pre" | "post") => void;
+  disableTypeChange?: boolean;
 }
 
-export const FormHeader = ({ sessionType, onSessionTypeChange }: FormHeaderProps) => {
+export const FormHeader = ({ 
+  sessionType, 
+  onSessionTypeChange,
+  disableTypeChange 
+}: FormHeaderProps) => {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
@@ -28,10 +33,12 @@ export const FormHeader = ({ sessionType, onSessionTypeChange }: FormHeaderProps
         )}
       </div>
       
-      <SessionTypeSelector
-        sessionType={sessionType}
-        onSessionTypeChange={onSessionTypeChange}
-      />
+      {!disableTypeChange && (
+        <SessionTypeSelector
+          sessionType={sessionType}
+          onSessionTypeChange={onSessionTypeChange}
+        />
+      )}
     </div>
   );
 };

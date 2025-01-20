@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { SessionProgress } from "./SessionProgress";
 import { PreTradingActivities } from "./PreTradingActivities";
@@ -18,14 +18,22 @@ const PRE_TRADING_ACTIVITIES = [
   "Trading Plan Review"
 ];
 
-export const EmotionLogger = () => {
+interface EmotionLoggerProps {
+  initialSessionType?: "pre" | "post";
+  onSubmitSuccess?: () => void;
+}
+
+export const EmotionLogger = ({ 
+  initialSessionType,
+  onSubmitSuccess 
+}: EmotionLoggerProps) => {
   const [selectedEmotion, setSelectedEmotion] = useState("");
   const [selectedEmotionDetail, setSelectedEmotionDetail] = useState("");
   const [selectedOutcome, setSelectedOutcome] = useState("");
   const [notes, setNotes] = useState("");
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
   const [customDetails, setCustomDetails] = useState<string[]>([]);
-  const [sessionType, setSessionType] = useState<"pre" | "post">("pre");
+  const [sessionType, setSessionType] = useState<"pre" | "post">(initialSessionType || "pre");
   const [selectedMistakes, setSelectedMistakes] = useState<string[]>([]);
   const [followedRules, setFollowedRules] = useState<string[]>([]);
   const [preTradingActivities, setPreTradingActivities] = useState<string[]>([]);
@@ -34,6 +42,13 @@ export const EmotionLogger = () => {
   const [trades, setTrades] = useState<Trade[]>([]);
   
   const { stats } = useProgressTracking();
+
+  // Set initial session type when provided
+  useEffect(() => {
+    if (initialSessionType) {
+      setSessionType(initialSessionType);
+    }
+  }, [initialSessionType]);
 
   const resetForm = () => {
     setSelectedEmotion("");
@@ -59,7 +74,10 @@ export const EmotionLogger = () => {
     resetForm,
     onSubmitSuccess: () => {
       setShowCelebration(true);
-      setTimeout(() => setShowCelebration(false), 5000);
+      setTimeout(() => {
+        setShowCelebration(false);
+        onSubmitSuccess?.();
+      }, 5000);
     },
   });
 
@@ -94,6 +112,7 @@ export const EmotionLogger = () => {
         <FormHeader 
           sessionType={sessionType}
           onSessionTypeChange={setSessionType}
+          disableTypeChange={!!initialSessionType}
         />
 
         <SessionProgress 

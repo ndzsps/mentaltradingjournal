@@ -3,7 +3,6 @@ import { Card } from "@/components/ui/card";
 interface WeekCardProps {
   weekNumber: number;
   totalPnL: number;
-  trades?: { trades?: any[] }[];
 }
 
 const formatCurrency = (value: number) => {
@@ -15,16 +14,11 @@ const formatCurrency = (value: number) => {
   }).format(value);
 };
 
-export const WeekCard = ({ weekNumber, totalPnL, trades = [] }: WeekCardProps) => {
-  // Calculate total number of trades
-  const tradeCount = trades.reduce((total, entry) => {
-    return total + (entry.trades?.length || 0);
-  }, 0);
-
+export const WeekCard = ({ weekNumber, totalPnL }: WeekCardProps) => {
   return (
     <div className="px-2 mb-6">
       <Card
-        className="p-4 bg-card/30 backdrop-blur-xl border-primary/10 hover:border-primary/20 transition-colors w-full h-auto flex flex-col justify-center"
+        className="p-4 bg-card/30 backdrop-blur-xl border-primary/10 hover:border-primary/20 transition-colors w-full h-[4.5rem] flex flex-col justify-center"
       >
         <p className={`text-sm font-medium ${totalPnL === 0 ? 'text-muted-foreground' : ''}`}>
           Week {weekNumber}
@@ -37,9 +31,6 @@ export const WeekCard = ({ weekNumber, totalPnL, trades = [] }: WeekCardProps) =
               : 'text-muted-foreground'
         }`}>
           {formatCurrency(totalPnL)}
-        </p>
-        <p className="text-xs text-muted-foreground mt-1">
-          {tradeCount} {tradeCount === 1 ? 'trade' : 'trades'}
         </p>
       </Card>
     </div>

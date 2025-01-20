@@ -50,32 +50,50 @@ export const TradesList = ({ trades }: TradesListProps) => {
       }
 
       const entry = entries[0];
-      // Cast the trades array to Trade[] before mapping
       const currentTrades = (entry.trades as Json[] || []).map(t => t as unknown as Trade);
-      
-      // Create a serializable trade object
-      const serializableTrade = {
-        id: updatedTrade.id,
-        instrument: updatedTrade.instrument,
-        direction: updatedTrade.direction,
-        entryDate: updatedTrade.entryDate,
-        exitDate: updatedTrade.exitDate,
-        entryPrice: updatedTrade.entryPrice,
-        exitPrice: updatedTrade.exitPrice,
-        stopLoss: updatedTrade.stopLoss,
-        takeProfit: updatedTrade.takeProfit,
-        quantity: updatedTrade.quantity,
-        fees: updatedTrade.fees,
-        setup: updatedTrade.setup,
-        pnl: updatedTrade.pnl,
-        forecastScreenshot: updatedTrade.forecastScreenshot,
-        resultScreenshot: updatedTrade.resultScreenshot,
-        htfBias: updatedTrade.htfBias
-      };
 
-      const updatedTrades = currentTrades.map(t => 
-        t.id === updatedTrade.id ? serializableTrade : t
-      );
+      // Convert trade data to plain objects to ensure proper serialization
+      const updatedTrades = currentTrades.map(t => {
+        if (t.id === updatedTrade.id) {
+          return {
+            id: updatedTrade.id,
+            instrument: updatedTrade.instrument,
+            direction: updatedTrade.direction,
+            entryDate: updatedTrade.entryDate,
+            exitDate: updatedTrade.exitDate,
+            entryPrice: updatedTrade.entryPrice,
+            exitPrice: updatedTrade.exitPrice,
+            stopLoss: updatedTrade.stopLoss,
+            takeProfit: updatedTrade.takeProfit,
+            quantity: updatedTrade.quantity,
+            fees: updatedTrade.fees,
+            setup: updatedTrade.setup,
+            pnl: updatedTrade.pnl,
+            forecastScreenshot: updatedTrade.forecastScreenshot,
+            resultScreenshot: updatedTrade.resultScreenshot,
+            htfBias: updatedTrade.htfBias
+          };
+        }
+        // Convert existing trades to plain objects as well
+        return {
+          id: t.id,
+          instrument: t.instrument,
+          direction: t.direction,
+          entryDate: t.entryDate,
+          exitDate: t.exitDate,
+          entryPrice: t.entryPrice,
+          exitPrice: t.exitPrice,
+          stopLoss: t.stopLoss,
+          takeProfit: t.takeProfit,
+          quantity: t.quantity,
+          fees: t.fees,
+          setup: t.setup,
+          pnl: t.pnl,
+          forecastScreenshot: t.forecastScreenshot,
+          resultScreenshot: t.resultScreenshot,
+          htfBias: t.htfBias
+        };
+      });
 
       // Update the journal entry with the modified trades array
       const { error: updateError } = await supabase
@@ -93,7 +111,7 @@ export const TradesList = ({ trades }: TradesListProps) => {
       toast.error('Failed to update trade');
     }
   };
-  
+
   return (
     <>
       <Accordion type="single" collapsible className="w-full space-y-2">

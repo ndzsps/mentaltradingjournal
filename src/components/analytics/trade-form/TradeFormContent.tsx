@@ -24,6 +24,29 @@ export const TradeFormContent = ({
 }: TradeFormContentProps) => {
   const { user } = useAuth();
 
+  const createJournalEntry = async (tradeData: Trade) => {
+    if (!user) return;
+
+    try {
+      const { error: journalError } = await supabase
+        .from('journal_entries')
+        .insert({
+          user_id: user.id,
+          session_type: 'trade',
+          emotion: 'neutral',
+          emotion_detail: 'neutral',
+          notes: `Trade entry for ${tradeData.instrument}`,
+          trades: [tradeData],
+          created_at: tradeData.entryDate || new Date().toISOString()
+        });
+
+      if (journalError) throw journalError;
+    } catch (error) {
+      console.error('Error creating journal entry:', error);
+      throw error;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -53,6 +76,11 @@ export const TradeFormContent = ({
     });
 
     try {
+      if (!editTrade) {
+        // Only create journal entry for new trades, not edits
+        await createJournalEntry(tradeData);
+      }
+      
       onSubmit(tradeData, !!editTrade);
       onOpenChange(false);
       toast.success(editTrade ? "Trade updated successfully!" : "Trade added successfully!");

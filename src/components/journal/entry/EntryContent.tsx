@@ -7,6 +7,8 @@ import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Card } from "@/components/ui/card";
+import { Check } from "lucide-react";
 
 interface EntryContentProps {
   id?: string;
@@ -15,6 +17,7 @@ interface EntryContentProps {
   followedRules?: string[];
   trades?: Trade[];
   postSubmissionNotes?: string;
+  preTradingActivities?: string[];
 }
 
 const capitalizeWords = (str: string) => {
@@ -30,7 +33,8 @@ export const EntryContent = ({
   notes, 
   followedRules, 
   trades,
-  postSubmissionNotes: initialPostSubmissionNotes
+  postSubmissionNotes: initialPostSubmissionNotes,
+  preTradingActivities
 }: EntryContentProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [postSubmissionNotes, setPostSubmissionNotes] = useState(initialPostSubmissionNotes || "");
@@ -60,6 +64,20 @@ export const EntryContent = ({
 
   return (
     <div className="space-y-6">
+      {preTradingActivities && preTradingActivities.length > 0 && (
+        <Card className="p-4 bg-background/50 border border-primary/10">
+          <h4 className="text-sm font-medium text-muted-foreground mb-3">Pre-Trading Activities</h4>
+          <div className="grid grid-cols-2 gap-2">
+            {preTradingActivities.map((activity, index) => (
+              <div key={index} className="flex items-center gap-2 text-sm">
+                <Check className="h-4 w-4 text-primary" />
+                <span>{activity}</span>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
       {marketConditions && (
         <p className="text-sm text-muted-foreground">
           Market Conditions: {capitalizeWords(marketConditions)}

@@ -15,6 +15,7 @@ interface JournalEntry {
   trades?: Trade[];
   followed_rules?: string[];
   post_submission_notes?: string;
+  pre_trading_activities?: string[];
 }
 
 interface JournalEntryProps {
@@ -47,6 +48,7 @@ export const JournalEntry = ({ entry }: JournalEntryProps) => {
           followedRules={entry.followed_rules}
           trades={entry.trades}
           postSubmissionNotes={entry.post_submission_notes}
+          preTradingActivities={entry.pre_trading_activities}
         />
       </div>
     </Card>

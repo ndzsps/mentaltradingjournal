@@ -56,41 +56,41 @@ export const PostSessionSection = ({
                     ? "bg-gradient-to-br from-[#40C057] to-[#69DB7C] text-white shadow-lg shadow-green-500/20"
                     : value === "breakeven"
                       ? "bg-gradient-to-br from-[#868E96] to-[#ADB5BD] text-white shadow-lg shadow-gray-500/20"
-                      : "bg-gradient-to-br from-accent to-accent-light text-accent-foreground shadow-lg shadow-accent/20"
+                      : "bg-gradient-to-br from-[#0EA5E9] to-[#38BDF8] text-white shadow-lg shadow-blue-500/20"
                 : value === "loss"
                   ? "hover:bg-gradient-to-br hover:from-[#FFF5F5] hover:to-[#FFE3E3] hover:border-[#FF8787]/50 group-hover:text-[#FA5252]"
                   : value === "win"
                     ? "hover:bg-gradient-to-br hover:from-[#EBFBEE] hover:to-[#D3F9D8] hover:border-[#69DB7C]/50 group-hover:text-[#37B24D]"
                     : value === "breakeven"
                       ? "hover:bg-gradient-to-br hover:from-[#F1F3F5] hover:to-[#DEE2E6] hover:border-[#ADB5BD]/50 group-hover:text-[#495057]"
-                      : "hover:bg-gradient-to-br hover:from-accent-hover hover:to-accent-light hover:border-accent/50 group-hover:text-accent-foreground"
+                      : "hover:bg-gradient-to-br hover:from-[#E7F5FE] hover:to-[#D3E4FD] hover:border-[#38BDF8]/50 group-hover:text-[#0EA5E9]"
             }`}
             onClick={() => setSelectedOutcome(value)}
           >
             <div className="flex items-center gap-3">
               <Icon className={`w-6 h-6 transition-transform duration-300 group-hover:scale-110 ${
                 selectedOutcome === value 
-                  ? value === "no_trades" ? "text-accent-foreground" : "text-white"
+                  ? "text-white" 
                   : value === "loss"
                     ? "text-[#FA5252] group-hover:text-[#FA5252]"
                     : value === "win"
                       ? "text-[#37B24D] group-hover:text-[#37B24D]"
                       : value === "breakeven"
                         ? "text-[#495057] group-hover:text-[#495057]"
-                        : "text-accent-foreground group-hover:text-accent-foreground"
+                        : "text-[#0EA5E9] group-hover:text-[#0EA5E9]"
               }`} />
               <span className={`font-medium ${
                 selectedOutcome === value 
-                  ? value === "no_trades" ? "text-accent-foreground" : "text-white"
+                  ? "text-white" 
                   : value === "loss"
                     ? "text-[#FA5252] group-hover:text-[#FA5252]"
                     : value === "win"
                       ? "text-[#37B24D] group-hover:text-[#37B24D]"
                       : value === "breakeven"
                         ? "text-[#495057] group-hover:text-[#495057]"
-                        : "text-accent-foreground group-hover:text-accent-foreground"
+                        : "text-[#0EA5E9] group-hover:text-[#0EA5E9]"
               }`}>
-                {label}
+                {capitalizeWords(label)}
               </span>
             </div>
           </Button>

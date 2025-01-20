@@ -16,6 +16,7 @@ export const CalendarDay = ({
   date: dayDate,
   entries,
   onSelect,
+  displayMonth,
   ...props 
 }: CalendarDayProps) => {
   const stats = calculateDayStats(
@@ -30,7 +31,6 @@ export const CalendarDay = ({
 
   const dayButton = (
     <button 
-      {...props} 
       onClick={() => onSelect(dayDate)}
       className={`
         ${props.className || ''} 

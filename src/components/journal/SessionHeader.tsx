@@ -18,6 +18,11 @@ export const SessionHeader = ({
 }: SessionHeaderProps) => {
   const isPreSession = sessionType === 'pre';
 
+  const formatOutcome = (outcome: string) => {
+    if (outcome === 'no_trades') return 'No Trades';
+    return outcome.charAt(0).toUpperCase() + outcome.slice(1);
+  };
+
   return (
     <div className="space-y-4">
       <div className="text-sm text-muted-foreground">
@@ -35,12 +40,14 @@ export const SessionHeader = ({
           <Badge 
             variant="outline" 
             className={`capitalize px-4 py-1.5 rounded-full text-sm font-medium ${
-              outcome === 'loss' 
-                ? 'border-red-500/50 text-red-500 bg-red-500/5 hover:bg-red-500/10' 
-                : 'border-green-500/50 text-green-500 bg-green-500/5 hover:bg-green-500/10'
+              outcome === 'no_trades' 
+                ? 'border-muted-foreground/30 text-muted-foreground bg-muted/20 hover:bg-muted/30'
+                : outcome === 'loss' 
+                  ? 'border-red-500/50 text-red-500 bg-red-500/5 hover:bg-red-500/10' 
+                  : 'border-green-500/50 text-green-500 bg-green-500/5 hover:bg-green-500/10'
             }`}
           >
-            {outcome.charAt(0).toUpperCase() + outcome.slice(1)}
+            {formatOutcome(outcome)}
           </Badge>
         )}
       </div>

@@ -21,14 +21,6 @@ const Journal = () => {
   const {
     selectedDate,
     setSelectedDate,
-    emotionFilter,
-    setEmotionFilter,
-    detailFilter,
-    setDetailFilter,
-    timeFilter,
-    setTimeFilter,
-    outcomeFilter,
-    setOutcomeFilter,
     filteredEntries
   } = useJournalFilters(entries);
 
@@ -123,17 +115,7 @@ const Journal = () => {
                     : 'Journal Entries'
                   }
                 </h2>
-                <JournalFilters
-                  emotionFilter={emotionFilter}
-                  setEmotionFilter={setEmotionFilter}
-                  detailFilter={detailFilter}
-                  setDetailFilter={setDetailFilter}
-                  timeFilter={timeFilter}
-                  setTimeFilter={setTimeFilter}
-                  outcomeFilter={outcomeFilter}
-                  setOutcomeFilter={setOutcomeFilter}
-                  allDetails={Array.from(new Set(entries.map(entry => entry.emotion_detail)))}
-                />
+                <JournalFilters />
               </div>
               
               <ScrollArea className="h-[600px] pr-4">

@@ -74,7 +74,9 @@ export const BalanceSelector = ({ selectedBalance, onBalanceChange }: BalanceSel
 
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
-          <div /> {/* Empty div as we don't need a visible trigger */}
+          <Button variant="ghost" className="h-0 w-0 p-0 overflow-hidden">
+            Custom
+          </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[200px] p-4">
           <form onSubmit={handleCustomBalanceSubmit} className="space-y-4">

@@ -44,18 +44,20 @@ export const BalanceSelector = ({ selectedBalance, onBalanceChange }: BalanceSel
 
   const isCustomValue = !INITIAL_BALANCE_OPTIONS.some(option => option.value === selectedBalance);
 
+  const handleValueChange = (value: string) => {
+    if (value === "custom") {
+      setIsOpen(true);
+    } else {
+      onBalanceChange(Number(value));
+    }
+  };
+
   return (
     <div className="flex items-center gap-2">
       <span className="text-sm text-muted-foreground">Initial Balance:</span>
       <Select
         value={isCustomValue ? "custom" : selectedBalance.toString()}
-        onValueChange={(value) => {
-          if (value === "custom") {
-            setIsOpen(true);
-          } else {
-            onBalanceChange(Number(value));
-          }
-        }}
+        onValueChange={handleValueChange}
       >
         <SelectTrigger className="w-[140px]">
           <SelectValue>

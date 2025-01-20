@@ -48,6 +48,9 @@ export const TradeFormContent = ({
     };
 
     try {
+      // Parse the entry date to ensure it's in the correct format
+      const entryDate = tradeData.entryDate ? new Date(tradeData.entryDate) : new Date();
+      
       const { error: journalError } = await supabase
         .from('journal_entries')
         .insert({
@@ -57,7 +60,8 @@ export const TradeFormContent = ({
           emotion_detail: 'neutral',
           notes: `Trade entry for ${tradeData.instrument || 'Unknown Instrument'}`,
           trades: [tradeObject],
-          created_at: tradeData.entryDate || new Date().toISOString()
+          // Use the entry date for both created_at and the actual entry timestamp
+          created_at: entryDate.toISOString()
         });
 
       if (journalError) {

@@ -8,7 +8,6 @@ import { useState } from "react";
 import { AddTradeDialog } from "@/components/analytics/AddTradeDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
 
 interface TradesListProps {
   trades: Trade[];
@@ -30,7 +29,6 @@ const formatDate = (dateString: string) => {
 export const TradesList = ({ trades }: TradesListProps) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedTrade, setSelectedTrade] = useState<Trade | null>(null);
-  const queryClient = useQueryClient();
 
   const handleEditClick = (trade: Trade) => {
     setSelectedTrade(trade);
@@ -65,14 +63,14 @@ export const TradesList = ({ trades }: TradesListProps) => {
         direction: updatedTrade.direction,
         entryDate: updatedTrade.entryDate,
         exitDate: updatedTrade.exitDate,
-        entryPrice: Number(updatedTrade.entryPrice),
-        exitPrice: Number(updatedTrade.exitPrice),
-        stopLoss: Number(updatedTrade.stopLoss),
-        takeProfit: Number(updatedTrade.takeProfit),
-        quantity: Number(updatedTrade.quantity),
-        fees: Number(updatedTrade.fees),
+        entryPrice: updatedTrade.entryPrice,
+        exitPrice: updatedTrade.exitPrice,
+        stopLoss: updatedTrade.stopLoss,
+        takeProfit: updatedTrade.takeProfit,
+        quantity: updatedTrade.quantity,
+        fees: updatedTrade.fees,
         setup: updatedTrade.setup,
-        pnl: Number(updatedTrade.pnl),
+        pnl: updatedTrade.pnl,
         forecastScreenshot: updatedTrade.forecastScreenshot,
         resultScreenshot: updatedTrade.resultScreenshot,
         htfBias: updatedTrade.htfBias
@@ -91,12 +89,9 @@ export const TradesList = ({ trades }: TradesListProps) => {
 
       if (updateError) throw updateError;
 
-      // Invalidate and refetch queries
-      await queryClient.invalidateQueries({ queryKey: ['analytics'] });
-      await queryClient.invalidateQueries({ queryKey: ['weekly-performance'] });
-
       toast.success('Trade updated successfully');
       setIsEditDialogOpen(false);
+      window.location.reload(); // Refresh to show updated data
     } catch (error) {
       console.error('Error updating trade:', error);
       toast.error('Failed to update trade');

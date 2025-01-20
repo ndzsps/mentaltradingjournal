@@ -11,8 +11,6 @@ import {
 } from "recharts";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
-import { format } from "date-fns";
 
 const formatValue = (value: number): string => {
   if (Math.abs(value) >= 1000) {
@@ -101,7 +99,6 @@ const CustomTooltip = ({ active, payload }: any) => {
             </span>
           </div>
         </div>
-        <p className="text-xs text-muted-foreground mt-2">Click to view journal entry</p>
       </div>
     );
   }
@@ -109,7 +106,6 @@ const CustomTooltip = ({ active, payload }: any) => {
 };
 
 export const EmotionTrend = () => {
-  const navigate = useNavigate();
   const { data: analytics, isLoading } = useQuery({
     queryKey: ['analytics'],
     queryFn: generateAnalytics,
@@ -132,7 +128,6 @@ export const EmotionTrend = () => {
         date: new Date(entry.created_at).getTime(),
         pnl: Number(trade.pnl) || 0,
         emotion: entry.emotion,
-        entryId: entry.id,
       })) || []
     )
     .filter(item => !isNaN(item.pnl))
@@ -152,13 +147,6 @@ export const EmotionTrend = () => {
   const correlationDescription = correlationStrength >= 0.7 ? 'strong' :
     correlationStrength >= 0.5 ? 'moderate' :
     correlationStrength >= 0.3 ? 'weak' : 'very weak';
-
-  const handleDataPointClick = (data: any) => {
-    if (data && data.entryId) {
-      const date = format(new Date(data.date), 'yyyy-MM-dd');
-      navigate(`/journal?date=${date}`);
-    }
-  };
 
   return (
     <Card className="p-4 md:p-6 space-y-4 col-span-2">
@@ -216,22 +204,16 @@ export const EmotionTrend = () => {
               name="Positive"
               data={positiveData}
               fill={getEmotionColor('positive')}
-              onClick={handleDataPointClick}
-              cursor="pointer"
             />
             <Scatter
               name="Neutral"
               data={neutralData}
               fill={getEmotionColor('neutral')}
-              onClick={handleDataPointClick}
-              cursor="pointer"
             />
             <Scatter
               name="Negative"
               data={negativeData}
               fill={getEmotionColor('negative')}
-              onClick={handleDataPointClick}
-              cursor="pointer"
             />
           </ScatterChart>
         </ResponsiveContainer>

@@ -8,6 +8,7 @@ import { useState } from "react";
 import { AddTradeDialog } from "@/components/analytics/AddTradeDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Json } from "@/integrations/supabase/types";
 
 interface TradesListProps {
   trades: Trade[];
@@ -49,14 +50,16 @@ export const TradesList = ({ trades }: TradesListProps) => {
       }
 
       const entry = entries[0];
-      const updatedTrades = entry.trades.map((t: Trade) => 
+      // Cast the trades array to Trade[] before mapping
+      const currentTrades = (entry.trades as Json[] || []).map(t => t as unknown as Trade);
+      const updatedTrades = currentTrades.map(t => 
         t.id === updatedTrade.id ? updatedTrade : t
       );
 
       // Update the journal entry with the modified trades array
       const { error: updateError } = await supabase
         .from('journal_entries')
-        .update({ trades: updatedTrades })
+        .update({ trades: updatedTrades as Json[] })
         .eq('id', entry.id);
 
       if (updateError) throw updateError;

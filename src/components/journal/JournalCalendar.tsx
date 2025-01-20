@@ -4,6 +4,9 @@ import { DayProps } from "react-day-picker";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Trade } from "@/types/trade";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface JournalCalendarProps {
   date: Date | undefined;
@@ -16,6 +19,33 @@ interface JournalCalendarProps {
 }
 
 export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendarProps) => {
+  const queryClient = useQueryClient();
+
+  // Subscribe to real-time updates
+  useEffect(() => {
+    const channel = supabase
+      .channel('journal_entries_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'journal_entries',
+        },
+        () => {
+          // Invalidate and refetch data when changes occur
+          queryClient.invalidateQueries({ queryKey: ['journal-entries'] });
+          queryClient.invalidateQueries({ queryKey: ['analytics'] });
+          queryClient.invalidateQueries({ queryKey: ['weekly-performance'] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -27,7 +57,7 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
 
   const calculateDayStats = (date: Date) => {
     const dayEntries = entries.filter(entry => 
-      entry.date.toDateString() === date.toDateString()
+      new Date(entry.date).toDateString() === date.toDateString()
     );
 
     if (dayEntries.length === 0) return null;
@@ -45,6 +75,7 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
             processedTradeIds.add(trade.id);
             totalTrades++;
             const pnlValue = trade.pnl || trade.profit_loss || 0;
+            // Ensure proper number conversion
             const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
             totalPL += isNaN(numericPnL) ? 0 : numericPnL;
           }

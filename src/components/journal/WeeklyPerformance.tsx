@@ -43,6 +43,7 @@ export const WeeklyPerformance = () => {
           key={week.weekNumber}
           weekNumber={week.weekNumber}
           totalPnL={week.totalPnL}
+          tradeCount={week.tradeCount}
         />
       ))}
     </div>

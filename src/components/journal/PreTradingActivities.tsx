@@ -82,7 +82,8 @@ export const PreTradingActivities = ({
                 </TooltipTrigger>
                 <TooltipContent 
                   side="right"
-                  className="max-w-[300px]"
+                  className="max-w-[300px] whitespace-normal break-words p-3"
+                  sideOffset={10}
                 >
                   <p>{ACTIVITY_TOOLTIPS[activity]?.text}</p>
                 </TooltipContent>

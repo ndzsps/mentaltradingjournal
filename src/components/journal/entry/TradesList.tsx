@@ -52,14 +52,35 @@ export const TradesList = ({ trades }: TradesListProps) => {
       const entry = entries[0];
       // Cast the trades array to Trade[] before mapping
       const currentTrades = (entry.trades as Json[] || []).map(t => t as unknown as Trade);
+      
+      // Create a serializable trade object
+      const serializableTrade = {
+        id: updatedTrade.id,
+        instrument: updatedTrade.instrument,
+        direction: updatedTrade.direction,
+        entryDate: updatedTrade.entryDate,
+        exitDate: updatedTrade.exitDate,
+        entryPrice: updatedTrade.entryPrice,
+        exitPrice: updatedTrade.exitPrice,
+        stopLoss: updatedTrade.stopLoss,
+        takeProfit: updatedTrade.takeProfit,
+        quantity: updatedTrade.quantity,
+        fees: updatedTrade.fees,
+        setup: updatedTrade.setup,
+        pnl: updatedTrade.pnl,
+        forecastScreenshot: updatedTrade.forecastScreenshot,
+        resultScreenshot: updatedTrade.resultScreenshot,
+        htfBias: updatedTrade.htfBias
+      };
+
       const updatedTrades = currentTrades.map(t => 
-        t.id === updatedTrade.id ? updatedTrade : t
+        t.id === updatedTrade.id ? serializableTrade : t
       );
 
       // Update the journal entry with the modified trades array
       const { error: updateError } = await supabase
         .from('journal_entries')
-        .update({ trades: updatedTrades as Json[] })
+        .update({ trades: updatedTrades })
         .eq('id', entry.id);
 
       if (updateError) throw updateError;

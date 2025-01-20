@@ -22,19 +22,43 @@ export const JournalFilters = () => {
     if (!user) return;
 
     try {
-      const { data, error } = await supabase
+      // First, check for an existing post-session entry for the trade's date
+      const tradeDate = tradeData.entryDate ? new Date(tradeData.entryDate) : new Date();
+      const startOfDay = new Date(tradeDate.setHours(0, 0, 0, 0)).toISOString();
+      const endOfDay = new Date(tradeDate.setHours(23, 59, 59, 999)).toISOString();
+
+      const { data: existingEntry, error: fetchError } = await supabase
         .from('journal_entries')
         .select('id, trades')
         .eq('user_id', user.id)
         .eq('session_type', 'post')
-        .order('created_at', { ascending: false })
-        .limit(1)
+        .gte('created_at', startOfDay)
+        .lte('created_at', endOfDay)
         .maybeSingle();
 
-      if (error) throw error;
-      if (!data) {
-        toast.error("No post-session entry found. Please create one first.");
-        return;
+      if (fetchError) throw fetchError;
+
+      let entryId;
+
+      if (!existingEntry) {
+        // Create a new post-session entry if none exists
+        const { data: newEntry, error: createError } = await supabase
+          .from('journal_entries')
+          .insert({
+            user_id: user.id,
+            session_type: 'post',
+            emotion: 'neutral',
+            emotion_detail: 'neutral',
+            notes: 'Auto-generated for trade entry',
+            trades: []
+          })
+          .select('id')
+          .single();
+
+        if (createError) throw createError;
+        entryId = newEntry.id;
+      } else {
+        entryId = existingEntry.id;
       }
 
       // Convert trade data to JSON-compatible format
@@ -56,12 +80,22 @@ export const JournalFilters = () => {
         resultScreenshot: tradeData.resultScreenshot || '',
       };
 
-      const updatedTrades = [...(data.trades || []), jsonTrade];
+      // Get current trades and append new trade
+      const { data: currentEntry, error: getError } = await supabase
+        .from('journal_entries')
+        .select('trades')
+        .eq('id', entryId)
+        .single();
 
+      if (getError) throw getError;
+
+      const updatedTrades = [...(currentEntry.trades || []), jsonTrade];
+
+      // Update the entry with the new trades array
       const { error: updateError } = await supabase
         .from('journal_entries')
         .update({ trades: updatedTrades })
-        .eq('id', data.id);
+        .eq('id', entryId);
 
       if (updateError) throw updateError;
       

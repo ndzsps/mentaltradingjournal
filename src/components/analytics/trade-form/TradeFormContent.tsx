@@ -48,28 +48,49 @@ export const TradeFormContent = ({
     };
 
     try {
-      // Parse the entry date to ensure it's in the correct format
+      // Check if an entry already exists for this trade's date
       const entryDate = tradeData.entryDate ? new Date(tradeData.entryDate) : new Date();
-      
-      const { error: journalError } = await supabase
-        .from('journal_entries')
-        .insert({
-          user_id: user.id,
-          session_type: 'trade',
-          emotion: 'neutral',
-          emotion_detail: 'neutral',
-          notes: `Trade entry for ${tradeData.instrument || 'Unknown Instrument'}`,
-          trades: [tradeObject],
-          // Use the entry date for both created_at and the actual entry timestamp
-          created_at: entryDate.toISOString()
-        });
+      const startOfDay = new Date(entryDate);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(entryDate);
+      endOfDay.setHours(23, 59, 59, 999);
 
-      if (journalError) {
-        console.error('Journal entry error:', journalError);
-        throw journalError;
+      const { data: existingEntries } = await supabase
+        .from('journal_entries')
+        .select('*')
+        .eq('user_id', user.id)
+        .gte('created_at', startOfDay.toISOString())
+        .lte('created_at', endOfDay.toISOString());
+
+      if (existingEntries && existingEntries.length > 0) {
+        // Update existing entry with new trade
+        const existingEntry = existingEntries[0];
+        const updatedTrades = [...(existingEntry.trades || []), tradeObject];
+        
+        const { error: updateError } = await supabase
+          .from('journal_entries')
+          .update({ trades: updatedTrades })
+          .eq('id', existingEntry.id);
+
+        if (updateError) throw updateError;
+      } else {
+        // Create new entry if none exists for this date
+        const { error: journalError } = await supabase
+          .from('journal_entries')
+          .insert({
+            user_id: user.id,
+            session_type: 'trade',
+            emotion: 'neutral',
+            emotion_detail: 'neutral',
+            notes: `Trade entry for ${tradeData.instrument || 'Unknown Instrument'}`,
+            trades: [tradeObject],
+            created_at: entryDate.toISOString()
+          });
+
+        if (journalError) throw journalError;
       }
     } catch (error) {
-      console.error('Error creating journal entry:', error);
+      console.error('Error managing journal entry:', error);
       throw error;
     }
   };
@@ -78,13 +99,11 @@ export const TradeFormContent = ({
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     
-    // Only include fields that have values
     const tradeData: Trade = {
       id: editTrade?.id || crypto.randomUUID(),
       direction: direction as 'buy' | 'sell',
     };
 
-    // Only add fields that have values
     const fields = [
       'entryDate', 'instrument', 'setup', 'entryPrice', 'quantity', 
       'stopLoss', 'takeProfit', 'exitDate', 'exitPrice', 'pnl', 
@@ -104,7 +123,6 @@ export const TradeFormContent = ({
 
     try {
       if (!editTrade) {
-        // Only create journal entry for new trades, not edits
         await createJournalEntry(tradeData);
       }
       

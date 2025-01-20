@@ -8,7 +8,6 @@ import { useState } from "react";
 import { AddTradeDialog } from "@/components/analytics/AddTradeDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Json } from "@/integrations/supabase/types";
 
 interface TradesListProps {
   trades: Trade[];
@@ -42,7 +41,7 @@ export const TradesList = ({ trades }: TradesListProps) => {
       const { data: entries, error: fetchError } = await supabase
         .from('journal_entries')
         .select('*')
-        .contains('trades', [{ id: updatedTrade.id }]);
+        .eq('trades', updatedTrade.id, { foreignTable: 'trades' });
 
       if (fetchError) throw fetchError;
       if (!entries || entries.length === 0) {
@@ -50,52 +49,34 @@ export const TradesList = ({ trades }: TradesListProps) => {
       }
 
       const entry = entries[0];
-      const currentTrades = (entry.trades as Json[] || []).map(t => t as unknown as Trade);
+      const currentTrades = entry.trades || [];
 
-      // Convert trade data to plain objects to ensure proper serialization
-      const updatedTrades = currentTrades.map(t => {
-        if (t.id === updatedTrade.id) {
-          return {
-            id: updatedTrade.id,
-            instrument: updatedTrade.instrument,
-            direction: updatedTrade.direction,
-            entryDate: updatedTrade.entryDate,
-            exitDate: updatedTrade.exitDate,
-            entryPrice: updatedTrade.entryPrice,
-            exitPrice: updatedTrade.exitPrice,
-            stopLoss: updatedTrade.stopLoss,
-            takeProfit: updatedTrade.takeProfit,
-            quantity: updatedTrade.quantity,
-            fees: updatedTrade.fees,
-            setup: updatedTrade.setup,
-            pnl: updatedTrade.pnl,
-            forecastScreenshot: updatedTrade.forecastScreenshot,
-            resultScreenshot: updatedTrade.resultScreenshot,
-            htfBias: updatedTrade.htfBias
-          };
-        }
-        // Convert existing trades to plain objects as well
-        return {
-          id: t.id,
-          instrument: t.instrument,
-          direction: t.direction,
-          entryDate: t.entryDate,
-          exitDate: t.exitDate,
-          entryPrice: t.entryPrice,
-          exitPrice: t.exitPrice,
-          stopLoss: t.stopLoss,
-          takeProfit: t.takeProfit,
-          quantity: t.quantity,
-          fees: t.fees,
-          setup: t.setup,
-          pnl: t.pnl,
-          forecastScreenshot: t.forecastScreenshot,
-          resultScreenshot: t.resultScreenshot,
-          htfBias: t.htfBias
-        };
-      });
+      // Create a plain object for the updated trade
+      const updatedTradeObject = {
+        id: updatedTrade.id,
+        instrument: updatedTrade.instrument,
+        direction: updatedTrade.direction,
+        entryDate: updatedTrade.entryDate,
+        exitDate: updatedTrade.exitDate,
+        entryPrice: updatedTrade.entryPrice,
+        exitPrice: updatedTrade.exitPrice,
+        stopLoss: updatedTrade.stopLoss,
+        takeProfit: updatedTrade.takeProfit,
+        quantity: updatedTrade.quantity,
+        fees: updatedTrade.fees,
+        setup: updatedTrade.setup,
+        pnl: updatedTrade.pnl,
+        forecastScreenshot: updatedTrade.forecastScreenshot,
+        resultScreenshot: updatedTrade.resultScreenshot,
+        htfBias: updatedTrade.htfBias
+      };
 
-      // Update the journal entry with the modified trades array
+      // Update the trades array
+      const updatedTrades = currentTrades.map(trade => 
+        trade.id === updatedTrade.id ? updatedTradeObject : trade
+      );
+
+      // Update the journal entry
       const { error: updateError } = await supabase
         .from('journal_entries')
         .update({ trades: updatedTrades })
@@ -104,8 +85,7 @@ export const TradesList = ({ trades }: TradesListProps) => {
       if (updateError) throw updateError;
 
       toast.success('Trade updated successfully');
-      // Force a page refresh to show the updated data
-      window.location.reload();
+      window.location.reload(); // Refresh to show updated data
     } catch (error) {
       console.error('Error updating trade:', error);
       toast.error('Failed to update trade');

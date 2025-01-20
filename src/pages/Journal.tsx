@@ -45,6 +45,7 @@ const Journal = () => {
 
     fetchEntries();
 
+    // Subscribe to real-time updates
     const subscription = supabase
       .channel('journal_entries_changes')
       .on(
@@ -66,18 +67,29 @@ const Journal = () => {
     };
   }, [user]);
 
-  // Filter entries based on selected date
+  // Filter entries based on selected date, including trades
   const displayedEntries = selectedDate
     ? filteredEntries.filter(entry => {
         const entryDate = parseISO(entry.created_at);
         const start = startOfDay(selectedDate);
         const end = endOfDay(selectedDate);
+        
+        // For trade entries, also check the trade dates
+        if (entry.session_type === 'trade' && entry.trades && entry.trades.length > 0) {
+          return entry.trades.some(trade => {
+            const tradeDate = parseISO(trade.entryDate);
+            return tradeDate >= start && tradeDate <= end;
+          });
+        }
+        
         return entryDate >= start && entryDate <= end;
       })
     : filteredEntries;
 
   const calendarEntries = entries.map(entry => ({
-    date: parseISO(entry.created_at),
+    date: entry.session_type === 'trade' && entry.trades && entry.trades.length > 0
+      ? parseISO(entry.trades[0].entryDate)  // Use trade date for trade entries
+      : parseISO(entry.created_at),
     emotion: entry.emotion,
     trades: entry.trades
   }));

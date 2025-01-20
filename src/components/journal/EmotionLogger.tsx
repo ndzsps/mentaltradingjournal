@@ -14,8 +14,10 @@ import { ProgressStats } from "./ProgressStats";
 const PRE_TRADING_ACTIVITIES = [
   "Meditation",
   "Exercise",
-  "Market Analysis",
-  "Trading Plan Review"
+  "Review Daily Goals",
+  "Cold Shower",
+  "Good Sleep",
+  "Affirmations"
 ];
 
 interface EmotionLoggerProps {

@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { useLocation } from "react-router-dom";
+import { useEffect } from "react";
 
 interface TradeFormContentProps {
   direction: 'buy' | 'sell' | null;
@@ -27,10 +28,39 @@ export const TradeFormContent = ({
   const location = useLocation();
   const isPostSessionEntry = location.pathname === "/journal-entry";
 
-  const createJournalEntry = async (tradeData: Trade) => {
-    if (!user || isPostSessionEntry) return; // Skip if this is part of a post-session entry
+  // Populate form with edit trade data
+  useEffect(() => {
+    if (editTrade) {
+      // Set form values for editing
+      const fields = [
+        { id: 'entryDate', value: editTrade.entryDate },
+        { id: 'instrument', value: editTrade.instrument },
+        { id: 'setup', value: editTrade.setup },
+        { id: 'entryPrice', value: editTrade.entryPrice },
+        { id: 'quantity', value: editTrade.quantity },
+        { id: 'stopLoss', value: editTrade.stopLoss },
+        { id: 'takeProfit', value: editTrade.takeProfit },
+        { id: 'exitDate', value: editTrade.exitDate },
+        { id: 'exitPrice', value: editTrade.exitPrice },
+        { id: 'pnl', value: editTrade.pnl },
+        { id: 'fees', value: editTrade.fees },
+        { id: 'forecastScreenshot', value: editTrade.forecastScreenshot },
+        { id: 'resultUrl', value: editTrade.resultScreenshot },
+        { id: 'htfBias', value: editTrade.htfBias }
+      ];
 
-    // Convert trade data to a plain object to ensure it matches the expected JSON type
+      fields.forEach(({ id, value }) => {
+        const element = document.getElementById(id) as HTMLInputElement;
+        if (element && value !== undefined && value !== null) {
+          element.value = value.toString();
+        }
+      });
+    }
+  }, [editTrade]);
+
+  const createJournalEntry = async (tradeData: Trade) => {
+    if (!user || isPostSessionEntry) return;
+
     const tradeObject = {
       id: tradeData.id,
       instrument: tradeData.instrument,
@@ -51,7 +81,6 @@ export const TradeFormContent = ({
     };
 
     try {
-      // Check if an entry already exists for this trade's date
       const entryDate = tradeData.entryDate ? new Date(tradeData.entryDate) : new Date();
       const startOfDay = new Date(entryDate);
       startOfDay.setHours(0, 0, 0, 0);
@@ -66,7 +95,6 @@ export const TradeFormContent = ({
         .lte('created_at', endOfDay.toISOString());
 
       if (existingEntries && existingEntries.length > 0) {
-        // Update existing entry with new trade
         const existingEntry = existingEntries[0];
         const updatedTrades = [...(existingEntry.trades || []), tradeObject];
         
@@ -77,7 +105,6 @@ export const TradeFormContent = ({
 
         if (updateError) throw updateError;
       } else {
-        // Create new entry if none exists for this date
         const { error: journalError } = await supabase
           .from('journal_entries')
           .insert({

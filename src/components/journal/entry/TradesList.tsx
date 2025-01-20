@@ -2,8 +2,12 @@ import { Trade } from "@/types/trade";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Pencil } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { useState } from "react";
+import { AddTradeDialog } from "@/components/analytics/AddTradeDialog";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface TradesListProps {
   trades: Trade[];
@@ -23,18 +27,53 @@ const formatDate = (dateString: string) => {
 };
 
 export const TradesList = ({ trades }: TradesListProps) => {
-  console.log('TradesList - Received trades:', trades);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [selectedTrade, setSelectedTrade] = useState<Trade | null>(null);
+
+  const handleEditClick = (trade: Trade) => {
+    setSelectedTrade(trade);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleTradeUpdate = async (updatedTrade: Trade, isEdit: boolean) => {
+    try {
+      // Get the journal entry containing this trade
+      const { data: entries, error: fetchError } = await supabase
+        .from('journal_entries')
+        .select('*')
+        .contains('trades', [{ id: updatedTrade.id }]);
+
+      if (fetchError) throw fetchError;
+      if (!entries || entries.length === 0) {
+        throw new Error('Journal entry not found');
+      }
+
+      const entry = entries[0];
+      const updatedTrades = entry.trades.map((t: Trade) => 
+        t.id === updatedTrade.id ? updatedTrade : t
+      );
+
+      // Update the journal entry with the modified trades array
+      const { error: updateError } = await supabase
+        .from('journal_entries')
+        .update({ trades: updatedTrades })
+        .eq('id', entry.id);
+
+      if (updateError) throw updateError;
+
+      toast.success('Trade updated successfully');
+      // Force a page refresh to show the updated data
+      window.location.reload();
+    } catch (error) {
+      console.error('Error updating trade:', error);
+      toast.error('Failed to update trade');
+    }
+  };
   
   return (
-    <Accordion type="single" collapsible className="w-full space-y-2">
-      {trades.map((trade, index) => {
-        console.log(`Trade ${index}:`, trade);
-        console.log(`Trade ${index} screenshots:`, {
-          forecast: trade.forecastScreenshot,
-          result: trade.resultScreenshot
-        });
-        
-        return (
+    <>
+      <Accordion type="single" collapsible className="w-full space-y-2">
+        {trades.map((trade, index) => (
           <AccordionItem key={trade.id || index} value={`trade-${index}`} className="border rounded-lg px-4">
             <AccordionTrigger className="hover:no-underline py-3">
               <div className="flex items-center justify-between w-full pr-4">
@@ -56,6 +95,17 @@ export const TradesList = ({ trades }: TradesListProps) => {
             </AccordionTrigger>
             <AccordionContent className="pb-4">
               <div className="space-y-6 pt-2">
+                <div className="flex justify-end">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleEditClick(trade)}
+                    className="flex items-center gap-2"
+                  >
+                    <Pencil className="h-4 w-4" /> Edit Trade
+                  </Button>
+                </div>
+
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-3">
                     <h4 className="text-sm font-medium text-muted-foreground">Entry Details</h4>
@@ -117,8 +167,15 @@ export const TradesList = ({ trades }: TradesListProps) => {
               </div>
             </AccordionContent>
           </AccordionItem>
-        );
-      })}
-    </Accordion>
+        ))}
+      </Accordion>
+
+      <AddTradeDialog
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        onSubmit={handleTradeUpdate}
+        editTrade={selectedTrade}
+      />
+    </>
   );
 };

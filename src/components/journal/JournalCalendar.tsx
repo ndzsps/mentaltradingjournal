@@ -1,12 +1,12 @@
 import { Calendar } from "@/components/ui/calendar";
 import { Card } from "@/components/ui/card";
-import { DayProps } from "react-day-picker";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Trade } from "@/types/trade";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { CalendarDay } from "./calendar/CalendarDay";
+import { CalendarNavigation } from "./calendar/CalendarNavigation";
+import { Trade } from "@/types/trade";
 
 interface JournalCalendarProps {
   date: Date | undefined;
@@ -46,71 +46,6 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
     };
   }, [queryClient]);
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      signDisplay: 'always',
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
-
-  const calculateDayStats = (date: Date) => {
-    const dayEntries = entries.filter(entry => 
-      new Date(entry.date).toDateString() === date.toDateString()
-    );
-
-    if (dayEntries.length === 0) return null;
-
-    // Create a Map to store unique trades with their latest values
-    const tradeMap = new Map<string, Trade>();
-    
-    // Process all trades, keeping only the latest version of each trade
-    dayEntries.forEach(entry => {
-      if (entry.trades && entry.trades.length > 0) {
-        entry.trades.forEach(trade => {
-          if (trade && trade.id) {
-            // Always keep the latest version of the trade
-            tradeMap.set(trade.id, trade);
-          }
-        });
-      }
-    });
-
-    // Calculate totals using only unique trades
-    let totalPL = 0;
-    let totalTrades = 0;
-
-    tradeMap.forEach(trade => {
-      totalTrades++;
-      const pnlValue = trade.pnl || trade.profit_loss || 0;
-      const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
-      totalPL += isNaN(numericPnL) ? 0 : numericPnL;
-    });
-
-    return {
-      totalPL,
-      numTrades: totalTrades,
-    };
-  };
-
-  const getEmotionStyle = (date: Date) => {
-    const stats = calculateDayStats(date);
-    if (!stats) return null;
-
-    return {
-      bg: stats.totalPL >= 0 
-        ? "bg-emerald-50 dark:bg-emerald-950/30" 
-        : "bg-red-50 dark:bg-red-950/30",
-      border: stats.totalPL >= 0 
-        ? "border-emerald-100 dark:border-emerald-800" 
-        : "border-red-100 dark:border-red-800",
-      shadow: stats.totalPL >= 0 
-        ? "shadow-emerald-100/50 dark:shadow-emerald-900/50" 
-        : "shadow-red-100/50 dark:shadow-red-900/50",
-    };
-  };
-
   const handleDateSelect = (newDate: Date | undefined) => {
     console.log('Date selected:', {
       _type: 'Date',
@@ -127,6 +62,8 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
       journalEntriesSection.scrollIntoView({ behavior: 'smooth' });
     }
   };
+
+  const navigation = CalendarNavigation();
 
   return (
     <TooltipProvider>
@@ -155,80 +92,16 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
             nav_button_next: "absolute right-1",
           }}
           components={{
-            IconLeft: () => (
-              <div className="bg-gradient-to-r from-primary-light to-accent bg-clip-text">
-                <ChevronLeft className="h-6 w-6 stroke-primary-light dark:stroke-primary-light" />
-              </div>
+            IconLeft: navigation.IconLeft,
+            IconRight: navigation.IconRight,
+            Day: ({ date: dayDate, ...props }) => (
+              <CalendarDay
+                date={dayDate}
+                entries={entries}
+                onSelect={handleDateSelect}
+                {...props}
+              />
             ),
-            IconRight: () => (
-              <div className="bg-gradient-to-r from-primary-light to-accent bg-clip-text">
-                <ChevronRight className="h-6 w-6 stroke-primary-light dark:stroke-primary-light" />
-              </div>
-            ),
-            Day: ({ date: dayDate, ...props }: DayProps & { className?: string }) => {
-              const stats = calculateDayStats(dayDate);
-              const style = getEmotionStyle(dayDate);
-              const isToday = dayDate.toDateString() === new Date().toDateString();
-              const hasEntries = stats !== null;
-              
-              const dayButton = (
-                <button 
-                  {...props} 
-                  onClick={() => handleDateSelect(dayDate)}
-                  className={`
-                    ${props.className || ''} 
-                    ${style?.bg || 'hover:bg-gray-50 dark:hover:bg-gray-800'}
-                    ${style?.border || ''}
-                    ${style?.shadow || ''}
-                    relative flex flex-col h-full w-full
-                    border-2 border-gray-200 dark:border-gray-700 rounded-lg
-                    hover:border-primary hover:shadow-lg
-                    transition-all duration-200 ease-in-out
-                    overflow-hidden
-                    ${isToday ? 'border-primary-light dark:border-primary-light' : ''}
-                  `}
-                >
-                  <div className="absolute top-2 right-2">
-                    <span className={`
-                      text-sm font-medium
-                      ${isToday ? 'bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent' : 'text-gray-500 dark:text-gray-400'}
-                    `}>
-                      {dayDate.getDate()}
-                    </span>
-                  </div>
-                  
-                  {stats && (
-                    <div className="absolute inset-0 flex flex-col justify-end p-2 bg-gradient-to-t from-white/90 to-transparent dark:from-gray-900/90">
-                      <div className="space-y-1 text-center w-full">
-                        <p className={`text-lg font-semibold ${stats.totalPL >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}`}>
-                          {formatCurrency(stats.totalPL)}
-                        </p>
-                        <p className="text-xs text-gray-600 dark:text-gray-300">
-                          {stats.numTrades} trade{stats.numTrades !== 1 ? 's' : ''}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </button>
-              );
-
-              return (
-                <div className="w-full h-full p-0.5">
-                  {hasEntries ? (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        {dayButton}
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Review your performance</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  ) : (
-                    dayButton
-                  )}
-                </div>
-              );
-            }
           }}
         />
       </Card>

@@ -16,7 +16,7 @@ export const CalendarDay = ({
   date: dayDate,
   entries,
   onSelect,
-  displayMonth,
+  className,
   ...props 
 }: CalendarDayProps) => {
   const stats = calculateDayStats(
@@ -33,7 +33,7 @@ export const CalendarDay = ({
     <button 
       onClick={() => onSelect(dayDate)}
       className={`
-        ${props.className || ''} 
+        ${className || ''} 
         ${style?.bg || 'hover:bg-gray-50 dark:hover:bg-gray-800'}
         ${style?.border || ''}
         ${style?.shadow || ''}
@@ -44,6 +44,7 @@ export const CalendarDay = ({
         overflow-hidden
         ${isToday ? 'border-primary-light dark:border-primary-light' : ''}
       `}
+      {...props}
     >
       <div className="absolute top-2 right-2">
         <span className={`

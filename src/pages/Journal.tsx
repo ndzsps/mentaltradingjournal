@@ -75,19 +75,11 @@ const Journal = () => {
         
         // For entries with trades, check if any trade's entry date falls within the selected date
         if (entry.trades && entry.trades.length > 0) {
-          const hasTrades = entry.trades.some(trade => {
+          return entry.trades.some(trade => {
             if (!trade.entryDate) return false;
             const tradeDate = parseISO(trade.entryDate);
-            console.log('Trade date comparison:', {
-              tradeDate,
-              start,
-              end,
-              isWithin: isWithinInterval(tradeDate, { start, end })
-            });
             return isWithinInterval(tradeDate, { start, end });
           });
-          
-          if (hasTrades) return true;
         }
         
         // For non-trade entries, check the entry creation date

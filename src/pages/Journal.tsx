@@ -110,7 +110,7 @@ const Journal = () => {
               </div>
             </div>
 
-            <Card className="p-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
+            <Card id="journal-entries" className="p-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
                   {selectedDate 

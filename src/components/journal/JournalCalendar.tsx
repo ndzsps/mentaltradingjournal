@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { DayProps } from "react-day-picker";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Trade } from "@/types/trade";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface JournalCalendarProps {
   date: Date | undefined;
@@ -25,7 +26,6 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
   };
 
   const calculateDayStats = (date: Date) => {
-    // Find all entries for this day
     const dayEntries = entries.filter(entry => 
       entry.date.toDateString() === date.toDateString()
     );
@@ -35,13 +35,11 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
     let totalPL = 0;
     let totalTrades = 0;
 
-    // Iterate through all entries for the day
     dayEntries.forEach(entry => {
       if (entry.trades && entry.trades.length > 0) {
         entry.trades.forEach(trade => {
           if (trade) {
             totalTrades++;
-            // Handle both pnl and profit_loss fields
             const pnlValue = trade.pnl || trade.profit_loss || 0;
             const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
             totalPL += isNaN(numericPnL) ? 0 : numericPnL;
@@ -83,51 +81,57 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
       }
     });
     onDateSelect(newDate);
+    
+    const journalEntriesSection = document.querySelector('#journal-entries');
+    if (journalEntriesSection) {
+      journalEntriesSection.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   return (
-    <Card className="p-8 bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800 shadow-xl rounded-2xl">
-      <Calendar
-        mode="single"
-        selected={date}
-        onSelect={handleDateSelect}
-        className="w-full"
-        classNames={{
-          months: "w-full space-y-4",
-          month: "w-full space-y-4",
-          table: "w-full border-collapse h-[calc(100vh-12rem)]",
-          head_row: "flex w-full h-8",
-          head_cell: "text-sm font-medium bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent w-[14.28%] text-center",
-          row: "flex w-full h-24",
-          cell: "w-[14.28%] p-1 relative [&:has([aria-selected])]:bg-accent/50 cursor-pointer",
-          day: "h-full w-full transition-all duration-200 cursor-pointer group",
-          day_today: "relative before:absolute before:inset-0 before:rounded-lg before:bg-gradient-to-br before:from-primary-light before:to-accent before:opacity-10 before:transition-opacity hover:before:opacity-20 dark:before:opacity-20 dark:hover:before:opacity-30",
-          day_selected: "border-primary-light border-2 shadow-lg shadow-primary-light/20 dark:border-primary-light dark:shadow-primary-light/20",
-          caption: "flex justify-center pt-1 relative items-center mb-4",
-          caption_label: "text-2xl font-semibold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent",
-          nav: "space-x-1 flex items-center",
-          nav_button: "h-9 w-9 bg-transparent p-0 hover:opacity-100 hover:bg-primary hover:bg-opacity-10 rounded-full flex items-center justify-center transition-all duration-200",
-          nav_button_previous: "absolute left-1",
-          nav_button_next: "absolute right-1",
-        }}
-        components={{
-          IconLeft: () => (
-            <div className="bg-gradient-to-r from-primary-light to-accent bg-clip-text">
-              <ChevronLeft className="h-6 w-6 stroke-primary-light dark:stroke-primary-light" />
-            </div>
-          ),
-          IconRight: () => (
-            <div className="bg-gradient-to-r from-primary-light to-accent bg-clip-text">
-              <ChevronRight className="h-6 w-6 stroke-primary-light dark:stroke-primary-light" />
-            </div>
-          ),
-          Day: ({ date: dayDate, ...props }: DayProps & { className?: string }) => {
-            const stats = calculateDayStats(dayDate);
-            const style = getEmotionStyle(dayDate);
-            const isToday = dayDate.toDateString() === new Date().toDateString();
-            
-            return (
-              <div className="w-full h-full p-0.5">
+    <TooltipProvider>
+      <Card className="p-8 bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800 shadow-xl rounded-2xl">
+        <Calendar
+          mode="single"
+          selected={date}
+          onSelect={handleDateSelect}
+          className="w-full"
+          classNames={{
+            months: "w-full space-y-4",
+            month: "w-full space-y-4",
+            table: "w-full border-collapse h-[calc(100vh-12rem)]",
+            head_row: "flex w-full h-8",
+            head_cell: "text-sm font-medium bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent w-[14.28%] text-center",
+            row: "flex w-full h-24",
+            cell: "w-[14.28%] p-1 relative [&:has([aria-selected])]:bg-accent/50 cursor-pointer",
+            day: "h-full w-full transition-all duration-200 cursor-pointer group",
+            day_today: "relative before:absolute before:inset-0 before:rounded-lg before:bg-gradient-to-br before:from-primary-light before:to-accent before:opacity-10 before:transition-opacity hover:before:opacity-20 dark:before:opacity-20 dark:hover:before:opacity-30",
+            day_selected: "border-primary-light border-2 shadow-lg shadow-primary-light/20 dark:border-primary-light dark:shadow-primary-light/20",
+            caption: "flex justify-center pt-1 relative items-center mb-4",
+            caption_label: "text-2xl font-semibold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent",
+            nav: "space-x-1 flex items-center",
+            nav_button: "h-9 w-9 bg-transparent p-0 hover:opacity-100 hover:bg-primary hover:bg-opacity-10 rounded-full flex items-center justify-center transition-all duration-200",
+            nav_button_previous: "absolute left-1",
+            nav_button_next: "absolute right-1",
+          }}
+          components={{
+            IconLeft: () => (
+              <div className="bg-gradient-to-r from-primary-light to-accent bg-clip-text">
+                <ChevronLeft className="h-6 w-6 stroke-primary-light dark:stroke-primary-light" />
+              </div>
+            ),
+            IconRight: () => (
+              <div className="bg-gradient-to-r from-primary-light to-accent bg-clip-text">
+                <ChevronRight className="h-6 w-6 stroke-primary-light dark:stroke-primary-light" />
+              </div>
+            ),
+            Day: ({ date: dayDate, ...props }: DayProps & { className?: string }) => {
+              const stats = calculateDayStats(dayDate);
+              const style = getEmotionStyle(dayDate);
+              const isToday = dayDate.toDateString() === new Date().toDateString();
+              const hasEntries = stats !== null;
+              
+              const dayButton = (
                 <button 
                   {...props} 
                   onClick={() => handleDateSelect(dayDate)}
@@ -166,11 +170,28 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
                     </div>
                   )}
                 </button>
-              </div>
-            );
-          }
-        }}
-      />
-    </Card>
+              );
+
+              return (
+                <div className="w-full h-full p-0.5">
+                  {hasEntries ? (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        {dayButton}
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Review your performance</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  ) : (
+                    dayButton
+                  )}
+                </div>
+              );
+            }
+          }}
+        />
+      </Card>
+    </TooltipProvider>
   );
 };

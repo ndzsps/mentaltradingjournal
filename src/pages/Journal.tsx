@@ -12,7 +12,7 @@ import { useJournalFilters } from "@/hooks/useJournalFilters";
 import { JournalEntryType } from "@/types/journal";
 import { StatsHeader } from "@/components/journal/stats/StatsHeader";
 import { TimeFilterProvider } from "@/contexts/TimeFilterContext";
-import { startOfDay, endOfDay, parseISO } from "date-fns";
+import { startOfDay, endOfDay, parseISO, isWithinInterval } from "date-fns";
 import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";
 
 const Journal = () => {
@@ -70,20 +70,21 @@ const Journal = () => {
   // Filter entries based on selected date, including trades
   const displayedEntries = selectedDate
     ? filteredEntries.filter(entry => {
-        const entryDate = parseISO(entry.created_at);
         const start = startOfDay(selectedDate);
         const end = endOfDay(selectedDate);
         
-        // For trade entries, also check the trade dates
+        // For trade entries, check if any trade's entry date falls within the selected date
         if (entry.session_type === 'trade' && entry.trades && entry.trades.length > 0) {
           return entry.trades.some(trade => {
             if (!trade.entryDate) return false;
             const tradeDate = parseISO(trade.entryDate);
-            return tradeDate >= start && tradeDate <= end;
+            return isWithinInterval(tradeDate, { start, end });
           });
         }
         
-        return entryDate >= start && entryDate <= end;
+        // For non-trade entries, check the entry creation date
+        const entryDate = parseISO(entry.created_at);
+        return isWithinInterval(entryDate, { start, end });
       })
     : filteredEntries;
 

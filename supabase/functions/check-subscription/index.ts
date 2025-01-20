@@ -8,34 +8,51 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
 
-  const supabaseClient = createClient(
-    Deno.env.get('SUPABASE_URL') ?? '',
-    Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-  )
-
   try {
-    const authHeader = req.headers.get('Authorization')!
-    const token = authHeader.replace('Bearer ', '')
-    const { data } = await supabaseClient.auth.getUser(token)
-    const user = data.user
-    const email = user?.email
+    // Get auth header
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader) {
+      throw new Error('No authorization header')
+    }
 
+    // Initialize Supabase client
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+    )
+
+    // Get user from token
+    const token = authHeader.replace('Bearer ', '')
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(token)
+    
+    if (userError || !user) {
+      throw new Error('Error getting user: ' + userError?.message)
+    }
+
+    const email = user.email
     if (!email) {
       throw new Error('No email found')
     }
 
+    console.log('Checking subscription for email:', email)
+
+    // Initialize Stripe
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
     })
 
+    // Get customer by email
     const customers = await stripe.customers.list({
       email: email,
       limit: 1
     })
+
+    console.log('Found customers:', customers.data.length)
 
     if (customers.data.length === 0) {
       return new Response(
@@ -47,12 +64,14 @@ serve(async (req) => {
       )
     }
 
+    // Check for active subscription
     const subscriptions = await stripe.subscriptions.list({
       customer: customers.data[0].id,
       status: 'active',
-      price: 'price_1QiK8SI2A6O6E8LHKlfvakdi',
       limit: 1
     })
+
+    console.log('Found active subscriptions:', subscriptions.data.length)
 
     return new Response(
       JSON.stringify({ 
@@ -67,7 +86,10 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error checking subscription:', error)
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        details: error.stack
+      }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,

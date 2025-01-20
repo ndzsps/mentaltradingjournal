@@ -32,13 +32,17 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
 
     if (dayEntries.length === 0) return null;
 
+    // Track unique trades by ID to prevent duplicates
+    const processedTradeIds = new Set<string>();
     let totalPL = 0;
     let totalTrades = 0;
 
     dayEntries.forEach(entry => {
       if (entry.trades && entry.trades.length > 0) {
         entry.trades.forEach(trade => {
-          if (trade) {
+          // Only process each trade once using its ID
+          if (trade && trade.id && !processedTradeIds.has(trade.id)) {
+            processedTradeIds.add(trade.id);
             totalTrades++;
             const pnlValue = trade.pnl || trade.profit_loss || 0;
             const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;

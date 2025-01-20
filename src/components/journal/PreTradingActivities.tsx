@@ -9,7 +9,7 @@ import {
 import { 
   MessageCircle,
   Target,
-  Shower,
+  ShowerHead,
   Sun,
   Award
 } from "lucide-react";
@@ -35,7 +35,7 @@ const ACTIVITY_TOOLTIPS: Record<string, { text: string; icon: JSX.Element }> = {
   },
   "Cold Shower": {
     text: "Increases energy from the beginning of your day, proven to benefit peak performers.",
-    icon: <Shower className="h-4 w-4" />
+    icon: <ShowerHead className="h-4 w-4" />
   },
   "Good Sleep": {
     text: "Foundational requirement to peak performance & health, nonnegotiable 7/8 hours a night.",

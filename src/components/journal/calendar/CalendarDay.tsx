@@ -10,6 +10,7 @@ interface CalendarDayProps extends DayProps {
     trades?: Trade[];
   }>;
   onSelect: (date: Date) => void;
+  className?: string;
 }
 
 export const CalendarDay = ({ 

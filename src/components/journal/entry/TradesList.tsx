@@ -37,11 +37,11 @@ export const TradesList = ({ trades }: TradesListProps) => {
 
   const handleTradeUpdate = async (updatedTrade: Trade, isEdit: boolean) => {
     try {
-      // Get the journal entry containing this trade
+      // Get the journal entry containing this trade using contains operator
       const { data: entries, error: fetchError } = await supabase
         .from('journal_entries')
         .select('*')
-        .eq('trades', updatedTrade.id, { foreignTable: 'trades' });
+        .contains('trades', [{ id: updatedTrade.id }]);
 
       if (fetchError) throw fetchError;
       if (!entries || entries.length === 0) {
@@ -71,8 +71,8 @@ export const TradesList = ({ trades }: TradesListProps) => {
         htfBias: updatedTrade.htfBias
       };
 
-      // Update the trades array
-      const updatedTrades = currentTrades.map(trade => 
+      // Update the trades array by mapping over it
+      const updatedTrades = currentTrades.map((trade: any) => 
         trade.id === updatedTrade.id ? updatedTradeObject : trade
       );
 

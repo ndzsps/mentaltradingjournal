@@ -27,24 +27,30 @@ export const TradeFormContent = ({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
+    
+    // Only include fields that have values
     const tradeData: Trade = {
       id: editTrade?.id || crypto.randomUUID(),
-      entryDate: formData.get('entryDate') as string,
-      instrument: formData.get('instrument') as string,
-      setup: formData.get('setup') as string,
       direction: direction as 'buy' | 'sell',
-      entryPrice: parseFloat(formData.get('entryPrice') as string),
-      quantity: parseFloat(formData.get('quantity') as string),
-      stopLoss: parseFloat(formData.get('stopLoss') as string),
-      takeProfit: parseFloat(formData.get('takeProfit') as string),
-      exitDate: formData.get('exitDate') as string,
-      exitPrice: parseFloat(formData.get('exitPrice') as string),
-      pnl: parseFloat(formData.get('pnl') as string),
-      fees: parseFloat(formData.get('fees') as string),
-      forecastScreenshot: formData.get('forecastScreenshot') as string || null,
-      resultScreenshot: formData.get('resultUrl') as string || null,
-      htfBias: formData.get('htfBias') as string || undefined,
     };
+
+    // Only add fields that have values
+    const fields = [
+      'entryDate', 'instrument', 'setup', 'entryPrice', 'quantity', 
+      'stopLoss', 'takeProfit', 'exitDate', 'exitPrice', 'pnl', 
+      'fees', 'forecastScreenshot', 'resultUrl', 'htfBias'
+    ];
+
+    fields.forEach(field => {
+      const value = formData.get(field);
+      if (value && value !== '') {
+        if (['entryPrice', 'exitPrice', 'stopLoss', 'takeProfit', 'quantity', 'pnl', 'fees'].includes(field)) {
+          tradeData[field] = parseFloat(value as string);
+        } else {
+          tradeData[field] = value as string;
+        }
+      }
+    });
 
     try {
       onSubmit(tradeData, !!editTrade);

@@ -38,7 +38,7 @@ const ACTIVITY_TOOLTIPS: Record<string, { text: string; icon: JSX.Element }> = {
     icon: <ShowerHead className="h-4 w-4" />
   },
   "Good Sleep": {
-    text: "Foundational requirement to peak performance & health, nonnegotiable 7/8 hours a night.",
+    text: "Foundational requirement to peak performance & health, non-negotiable 7/8 hours a night.",
     icon: <Sun className="h-4 w-4" />
   },
   "Affirmations": {

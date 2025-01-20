@@ -61,7 +61,6 @@ export const useWeeklyStats = () => {
               
               if (!isNaN(numericPnL)) {
                 weeks[weekIndex].totalPnL += numericPnL;
-                weeks[weekIndex].tradeCount += 1;
                 hasTrades = true;
               }
             }
@@ -71,6 +70,11 @@ export const useWeeklyStats = () => {
             weeks[weekIndex].tradingDays += 1;
           }
         }
+      });
+
+      // After processing all entries, set the trade count based on unique trade IDs
+      weeks.forEach((week, index) => {
+        week.tradeCount = processedTradeIds[index].size;
       });
 
       return weeks;

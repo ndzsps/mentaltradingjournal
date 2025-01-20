@@ -8,11 +8,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
-interface JournalEntry {
-  id: string;
-  trades: any[];
-}
-
 export const JournalFilters = () => {
   const navigate = useNavigate();
   const [isTradeFormOpen, setIsTradeFormOpen] = useState(false);
@@ -22,45 +17,6 @@ export const JournalFilters = () => {
     if (!user) return;
 
     try {
-      // First, check for an existing post-session entry for the trade's date
-      const tradeDate = tradeData.entryDate ? new Date(tradeData.entryDate) : new Date();
-      const startOfDay = new Date(tradeDate.setHours(0, 0, 0, 0)).toISOString();
-      const endOfDay = new Date(tradeDate.setHours(23, 59, 59, 999)).toISOString();
-
-      const { data: existingEntry, error: fetchError } = await supabase
-        .from('journal_entries')
-        .select('id, trades')
-        .eq('user_id', user.id)
-        .eq('session_type', 'post')
-        .gte('created_at', startOfDay)
-        .lte('created_at', endOfDay)
-        .maybeSingle();
-
-      if (fetchError) throw fetchError;
-
-      let entryId;
-
-      if (!existingEntry) {
-        // Create a new post-session entry if none exists
-        const { data: newEntry, error: createError } = await supabase
-          .from('journal_entries')
-          .insert({
-            user_id: user.id,
-            session_type: 'post',
-            emotion: 'neutral',
-            emotion_detail: 'neutral',
-            notes: 'Auto-generated for trade entry',
-            trades: []
-          })
-          .select('id')
-          .single();
-
-        if (createError) throw createError;
-        entryId = newEntry.id;
-      } else {
-        entryId = existingEntry.id;
-      }
-
       // Convert trade data to JSON-compatible format
       const jsonTrade = {
         id: tradeData.id,
@@ -80,24 +36,19 @@ export const JournalFilters = () => {
         resultScreenshot: tradeData.resultScreenshot || '',
       };
 
-      // Get current trades and append new trade
-      const { data: currentEntry, error: getError } = await supabase
+      // Create a new journal entry for this trade
+      const { error: createError } = await supabase
         .from('journal_entries')
-        .select('trades')
-        .eq('id', entryId)
-        .single();
+        .insert({
+          user_id: user.id,
+          session_type: 'trade',
+          emotion: 'neutral',
+          emotion_detail: 'neutral',
+          notes: 'Trade entry',
+          trades: [jsonTrade]
+        });
 
-      if (getError) throw getError;
-
-      const updatedTrades = [...(currentEntry.trades || []), jsonTrade];
-
-      // Update the entry with the new trades array
-      const { error: updateError } = await supabase
-        .from('journal_entries')
-        .update({ trades: updatedTrades })
-        .eq('id', entryId);
-
-      if (updateError) throw updateError;
+      if (createError) throw createError;
       
       toast.success("Trade added successfully");
       setIsTradeFormOpen(false);

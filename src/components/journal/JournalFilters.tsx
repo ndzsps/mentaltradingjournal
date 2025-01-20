@@ -8,6 +8,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
+interface JournalEntry {
+  id: string;
+  trades: any[];
+}
+
 export const JournalFilters = () => {
   const navigate = useNavigate();
   const [isTradeFormOpen, setIsTradeFormOpen] = useState(false);
@@ -19,24 +24,49 @@ export const JournalFilters = () => {
     try {
       const { data, error } = await supabase
         .from('journal_entries')
-        .select('trades')
+        .select('id, trades')
         .eq('user_id', user.id)
         .eq('session_type', 'post')
         .order('created_at', { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) {
+        toast.error("No post-session entry found. Please create one first.");
+        return;
+      }
 
-      let trades = data?.trades || [];
-      trades = [...trades, tradeData];
+      // Convert trade data to JSON-compatible format
+      const jsonTrade = {
+        id: tradeData.id,
+        instrument: tradeData.instrument,
+        direction: tradeData.direction,
+        entryDate: tradeData.entryDate,
+        exitDate: tradeData.exitDate,
+        entryPrice: tradeData.entryPrice?.toString(),
+        exitPrice: tradeData.exitPrice?.toString(),
+        stopLoss: tradeData.stopLoss?.toString(),
+        takeProfit: tradeData.takeProfit?.toString(),
+        quantity: tradeData.quantity?.toString(),
+        fees: tradeData.fees?.toString(),
+        setup: tradeData.setup,
+        pnl: tradeData.pnl?.toString(),
+        forecastScreenshot: tradeData.forecastScreenshot,
+        resultScreenshot: tradeData.resultScreenshot,
+      };
+
+      const updatedTrades = [...(data.trades || []), jsonTrade];
 
       const { error: updateError } = await supabase
         .from('journal_entries')
-        .update({ trades })
+        .update({ trades: updatedTrades })
         .eq('id', data.id);
 
       if (updateError) throw updateError;
+      
+      toast.success("Trade added successfully");
+      setIsTradeFormOpen(false);
 
     } catch (error) {
       console.error('Error managing trade:', error);

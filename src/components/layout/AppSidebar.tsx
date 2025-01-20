@@ -49,7 +49,7 @@ export function AppSidebar() {
                 variant="ghost"
                 size="icon"
                 onClick={toggleSidebar}
-                className="ml-2"
+                className="ml-2 hover:bg-primary/10"
                 title={state === "expanded" ? "Collapse Sidebar" : "Expand Sidebar"}
               >
                 {state === "expanded" ? (

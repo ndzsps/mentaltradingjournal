@@ -27,6 +27,26 @@ export const TradeFormContent = ({
   const createJournalEntry = async (tradeData: Trade) => {
     if (!user) return;
 
+    // Convert trade data to a plain object to ensure it matches the expected JSON type
+    const tradeObject = {
+      id: tradeData.id,
+      instrument: tradeData.instrument,
+      direction: tradeData.direction,
+      entryDate: tradeData.entryDate,
+      exitDate: tradeData.exitDate,
+      entryPrice: tradeData.entryPrice,
+      exitPrice: tradeData.exitPrice,
+      stopLoss: tradeData.stopLoss,
+      takeProfit: tradeData.takeProfit,
+      quantity: tradeData.quantity,
+      fees: tradeData.fees,
+      setup: tradeData.setup,
+      pnl: tradeData.pnl,
+      forecastScreenshot: tradeData.forecastScreenshot,
+      resultScreenshot: tradeData.resultScreenshot,
+      htfBias: tradeData.htfBias
+    };
+
     try {
       const { error: journalError } = await supabase
         .from('journal_entries')
@@ -35,12 +55,15 @@ export const TradeFormContent = ({
           session_type: 'trade',
           emotion: 'neutral',
           emotion_detail: 'neutral',
-          notes: `Trade entry for ${tradeData.instrument}`,
-          trades: [tradeData],
+          notes: `Trade entry for ${tradeData.instrument || 'Unknown Instrument'}`,
+          trades: [tradeObject],
           created_at: tradeData.entryDate || new Date().toISOString()
         });
 
-      if (journalError) throw journalError;
+      if (journalError) {
+        console.error('Journal entry error:', journalError);
+        throw journalError;
+      }
     } catch (error) {
       console.error('Error creating journal entry:', error);
       throw error;

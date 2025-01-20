@@ -63,7 +63,7 @@ export const JournalFilters = () => {
     <div className="flex gap-2 justify-start">
       <Button 
         variant="outline" 
-        onClick={() => navigate('/journal-entry')}
+        onClick={() => navigate('/add-journal-entry/pre-session')}
       >
         Pre-Session
       </Button>
@@ -76,7 +76,7 @@ export const JournalFilters = () => {
       </Button>
       <Button 
         variant="outline"
-        onClick={() => navigate('/journal-entry')}
+        onClick={() => navigate('/add-journal-entry/post-session')}
       >
         Post-Session
       </Button>

@@ -77,6 +77,7 @@ const Journal = () => {
         // For trade entries, also check the trade dates
         if (entry.session_type === 'trade' && entry.trades && entry.trades.length > 0) {
           return entry.trades.some(trade => {
+            if (!trade.entryDate) return false;
             const tradeDate = parseISO(trade.entryDate);
             return tradeDate >= start && tradeDate <= end;
           });
@@ -87,7 +88,7 @@ const Journal = () => {
     : filteredEntries;
 
   const calendarEntries = entries.map(entry => ({
-    date: entry.session_type === 'trade' && entry.trades && entry.trades.length > 0
+    date: entry.session_type === 'trade' && entry.trades && entry.trades.length > 0 && entry.trades[0].entryDate
       ? parseISO(entry.trades[0].entryDate)  // Use trade date for trade entries
       : parseISO(entry.created_at),
     emotion: entry.emotion,

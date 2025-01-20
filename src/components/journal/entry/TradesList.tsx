@@ -35,12 +35,12 @@ export const TradesList = ({ trades }: TradesListProps) => {
     setIsEditDialogOpen(true);
   };
 
-  const handleTradeUpdate = async (updatedTrade: Trade, isEdit: boolean) => {
+  const handleTradeUpdate = async (updatedTrade: Trade) => {
     try {
       // Get the journal entry containing this trade using contains operator
       const { data: entries, error: fetchError } = await supabase
         .from('journal_entries')
-        .select('*')
+        .select()
         .contains('trades', [{ id: updatedTrade.id }]);
 
       if (fetchError) throw fetchError;

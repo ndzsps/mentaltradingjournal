@@ -6,6 +6,7 @@ import { Trade } from "@/types/trade";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { useLocation } from "react-router-dom";
 
 interface TradeFormContentProps {
   direction: 'buy' | 'sell' | null;
@@ -23,9 +24,11 @@ export const TradeFormContent = ({
   onOpenChange 
 }: TradeFormContentProps) => {
   const { user } = useAuth();
+  const location = useLocation();
+  const isPostSessionEntry = location.pathname === "/journal-entry";
 
   const createJournalEntry = async (tradeData: Trade) => {
-    if (!user) return;
+    if (!user || isPostSessionEntry) return; // Skip if this is part of a post-session entry
 
     // Convert trade data to a plain object to ensure it matches the expected JSON type
     const tradeObject = {

@@ -30,7 +30,6 @@ export const StatsHeader = () => {
           table: 'journal_entries',
         },
         () => {
-          // Invalidate and refetch analytics when journal entries change
           queryClient.invalidateQueries({ queryKey: ['analytics'] });
         }
       )
@@ -79,23 +78,33 @@ export const StatsHeader = () => {
 
   const filteredEntries = analytics ? filterEntriesByTime(analytics.journalEntries) : [];
 
-  // Calculate net P&L from filtered trades with proper numeric conversion
+  // Calculate net P&L from filtered trades with proper numeric conversion and unique trade tracking
+  const processedTradeIds = new Set<string>();
   const netPnL = filteredEntries.reduce((total, entry) => {
     const tradePnL = entry.trades?.reduce((sum: number, trade: any) => {
-      const pnlValue = trade.pnl || trade.profit_loss || 0;
-      const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
-      return sum + (isNaN(numericPnL) ? 0 : numericPnL);
+      // Only process each trade once using its ID
+      if (trade && trade.id && !processedTradeIds.has(trade.id)) {
+        processedTradeIds.add(trade.id);
+        const pnlValue = trade.pnl || trade.profit_loss || 0;
+        const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
+        return sum + (isNaN(numericPnL) ? 0 : numericPnL);
+      }
+      return sum;
     }, 0) || 0;
     return total + tradePnL;
   }, 0);
 
-  // Calculate profit factor from filtered trades
+  // Calculate profit factor from filtered trades with unique trade tracking
   const profitFactor = filteredEntries.reduce((acc, entry) => {
     const trades = entry.trades || [];
     trades.forEach(trade => {
-      const pnl = Number(trade.pnl) || 0;
-      if (pnl > 0) acc.profits += pnl;
-      if (pnl < 0) acc.losses += Math.abs(pnl);
+      // Only process each trade once
+      if (trade && trade.id && !processedTradeIds.has(trade.id)) {
+        processedTradeIds.add(trade.id);
+        const pnl = Number(trade.pnl) || 0;
+        if (pnl > 0) acc.profits += pnl;
+        if (pnl < 0) acc.losses += Math.abs(pnl);
+      }
     });
     return acc;
   }, { profits: 0, losses: 0 });

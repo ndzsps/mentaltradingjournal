@@ -9,6 +9,7 @@ export interface JournalEntry {
   market_conditions?: string;
   trades?: Trade[];
   followed_rules?: string[];
+  mistakes?: string[];
   post_submission_notes?: string;
   pre_trading_activities?: string[];
 }
@@ -33,6 +34,17 @@ export interface Trade {
   htfBias?: string;
 }
 
+export interface AssetPairStats {
+  profit: number;
+  loss: number;
+  total: number;
+}
+
+export interface EmotionStats {
+  count: number;
+  loss: number;
+}
+
 export interface AnalyticsInsight {
   journalEntries: JournalEntry[];
   performanceByEmotion: {
@@ -44,7 +56,13 @@ export interface AnalyticsInsight {
     winRate: number[];
     dates: string[];
   };
-  emotionTrend: any[];
+  emotionTrend: Array<{
+    date: number;
+    pnl: number;
+    emotion: string;
+    emotionalScore?: number;
+    tradingResult?: number;
+  }>;
   emotionTrendInsights: {
     improvement: string;
     impact: string;
@@ -52,9 +70,9 @@ export interface AnalyticsInsight {
   mainInsight: string;
   recommendedAction: string;
   dataRequirements: any;
-  mistakeFrequencies: any;
-  assetPairStats: any;
-  emotionRecovery: any;
+  mistakeFrequencies: Record<string, EmotionStats>;
+  assetPairStats: Record<string, AssetPairStats>;
+  emotionRecovery: Record<string, number>;
   tradeDurations: any;
   volatilityData: any;
   riskRewardData: any;

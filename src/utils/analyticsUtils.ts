@@ -56,6 +56,12 @@ export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
       size: Number(trade.quantity) || 1,
     }));
 
+  const emotionTrendWithScores = emotionTrend.map(trend => ({
+    ...trend,
+    emotionalScore: trend.emotion === 'positive' ? 1 : trend.emotion === 'negative' ? -1 : 0,
+    tradingResult: trend.pnl
+  }));
+
   return {
     journalEntries,
     performanceByEmotion: {
@@ -67,15 +73,15 @@ export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
       winRate: [],
       dates: [],
     },
-    emotionTrend,
+    emotionTrend: emotionTrendWithScores,
     emotionTrendInsights: {
       improvement: `Your emotional resilience has ${
-        emotionTrend[emotionTrend.length - 1]?.emotionalScore > emotionTrend[0]?.emotionalScore 
+        emotionTrendWithScores[emotionTrendWithScores.length - 1]?.emotionalScore > emotionTrendWithScores[0]?.emotionalScore 
           ? 'improved' 
           : 'decreased'
       } over the last month.`,
       impact: `Trading results show ${
-        Math.abs(emotionTrend.reduce((sum, day) => sum + day.tradingResult, 0))
+        Math.abs(emotionTrendWithScores.reduce((sum, day) => sum + (day.tradingResult || 0), 0))
       }$ impact on your P&L.`,
     },
     mainInsight: "Based on your journal entries, there's a strong correlation between emotional state and trading performance.",

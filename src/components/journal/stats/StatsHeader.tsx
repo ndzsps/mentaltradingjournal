@@ -6,7 +6,7 @@ import { useProgressTracking } from "@/hooks/useProgressTracking";
 import { TradeWinPercentage } from "./TradeWinPercentage";
 import { Button } from "@/components/ui/button";
 import { useTimeFilter } from "@/contexts/TimeFilterContext";
-import { startOfMonth, subMonths, startOfQuarter, isWithinInterval, endOfMonth } from "date-fns";
+import { startOfMonth, subMonths, isWithinInterval, endOfMonth } from "date-fns";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -15,12 +15,8 @@ import { useSidebar } from "@/components/ui/sidebar";
 export const StatsHeader = () => {
   const queryClient = useQueryClient();
   const { state, toggleSidebar } = useSidebar();
-  const { data: analytics, isLoading: isAnalyticsLoading } = useQuery({
-    queryKey: ['analytics'],
-    queryFn: generateAnalytics,
-  });
-
-  // Subscribe to real-time updates
+  
+  // Set up real-time subscription for journal entries
   useEffect(() => {
     const channel = supabase
       .channel('journal_entries_changes')
@@ -32,6 +28,7 @@ export const StatsHeader = () => {
           table: 'journal_entries',
         },
         () => {
+          // Invalidate and refetch analytics when journal entries change
           queryClient.invalidateQueries({ queryKey: ['analytics'] });
         }
       )
@@ -41,6 +38,11 @@ export const StatsHeader = () => {
       supabase.removeChannel(channel);
     };
   }, [queryClient]);
+
+  const { data: analytics, isLoading: isAnalyticsLoading } = useQuery({
+    queryKey: ['analytics'],
+    queryFn: generateAnalytics,
+  });
 
   const { stats } = useProgressTracking();
   const { timeFilter, setTimeFilter } = useTimeFilter();
@@ -83,47 +85,18 @@ export const StatsHeader = () => {
   // Calculate net P&L from filtered trades with proper numeric conversion and unique trade tracking
   const processedTradeIds = new Set<string>();
   const netPnL = filteredEntries.reduce((total, entry) => {
-    const tradePnL = entry.trades?.reduce((sum: number, trade: any) => {
-      // Only process each trade once using its ID
-      if (trade && trade.id && !processedTradeIds.has(trade.id)) {
+    if (!entry.trades) return total;
+    
+    return total + entry.trades.reduce((sum: number, trade: any) => {
+      if (trade?.id && !processedTradeIds.has(trade.id)) {
         processedTradeIds.add(trade.id);
-        const pnlValue = trade.pnl || trade.profit_loss || 0;
+        const pnlValue = trade.pnl || 0;
         const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
         return sum + (isNaN(numericPnL) ? 0 : numericPnL);
       }
       return sum;
-    }, 0) || 0;
-    return total + tradePnL;
+    }, 0);
   }, 0);
-
-  // Calculate profit factor from filtered trades with unique trade tracking
-  const profitFactor = filteredEntries.reduce((acc, entry) => {
-    const trades = entry.trades || [];
-    trades.forEach(trade => {
-      // Only process each trade once
-      if (trade && trade.id && !processedTradeIds.has(trade.id)) {
-        processedTradeIds.add(trade.id);
-        const pnl = Number(trade.pnl) || 0;
-        if (pnl > 0) acc.profits += pnl;
-        if (pnl < 0) acc.losses += Math.abs(pnl);
-      }
-    });
-    return acc;
-  }, { profits: 0, losses: 0 });
-
-  const profitFactorValue = profitFactor.losses === 0 ? 
-    profitFactor.profits > 0 ? "∞" : "0" : 
-    (profitFactor.profits / profitFactor.losses).toFixed(2);
-
-  // Calculate emotion meter from filtered entries
-  const emotionStats = filteredEntries.reduce((acc, entry) => {
-    if (entry.emotion?.toLowerCase().includes('positive')) acc.positive++;
-    acc.total++;
-    return acc;
-  }, { positive: 0, total: 0 });
-
-  const emotionScore = emotionStats.total === 0 ? 0 : 
-    (emotionStats.positive / emotionStats.total) * 100;
 
   if (isAnalyticsLoading) {
     return (

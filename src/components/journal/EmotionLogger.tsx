@@ -40,7 +40,6 @@ export const EmotionLogger = ({
   const [followedRules, setFollowedRules] = useState<string[]>([]);
   const [preTradingActivities, setPreTradingActivities] = useState<string[]>([]);
   const [showCelebration, setShowCelebration] = useState(false);
-  const [showAddTradeDialog, setShowAddTradeDialog] = useState(false);
   const [trades, setTrades] = useState<Trade[]>([]);
   
   const { stats } = useProgressTracking();
@@ -105,7 +104,6 @@ export const EmotionLogger = ({
 
   const handleTradeSubmit = (tradeData: Trade) => {
     setTrades([...trades, tradeData]);
-    setShowAddTradeDialog(false);
   };
 
   return (
@@ -124,8 +122,8 @@ export const EmotionLogger = ({
           notesEntered={notes.length > 0}
           outcomeSelected={!!selectedOutcome}
           rulesSelected={followedRules.length > 0}
-          mistakesReviewed={selectedMistakes.length > 0 || selectedOutcome !== "loss"}
-          tradesAdded={trades.length > 0 || selectedOutcome === "no_trades"}
+          mistakesReviewed={selectedMistakes.length > 0}
+          tradesAdded={trades.length > 0}
           isPostSession={sessionType === "post"}
           showCelebration={showCelebration}
         />
@@ -159,8 +157,6 @@ export const EmotionLogger = ({
               setFollowedRules={setFollowedRules}
               selectedMistakes={selectedMistakes}
               setSelectedMistakes={setSelectedMistakes}
-              showAddTradeDialog={showAddTradeDialog}
-              setShowAddTradeDialog={setShowAddTradeDialog}
               trades={trades}
               onTradeSubmit={handleTradeSubmit}
             />

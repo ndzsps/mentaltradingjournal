@@ -37,9 +37,7 @@ export const SessionProgress = ({
           emotionDetailSelected,
           notesEntered,
           outcomeSelected,
-          rulesSelected,
-          mistakesReviewed,
-          tradesAdded,
+          rulesSelected
         ]
       : [emotionSelected, emotionDetailSelected, activitiesSelected, notesEntered];
 

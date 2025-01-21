@@ -1,3 +1,18 @@
+export interface JournalEntry {
+  id: string;
+  created_at: string;
+  session_type: "pre" | "post";
+  emotion: string;
+  emotion_detail: string;
+  notes: string;
+  outcome?: string;
+  market_conditions?: string;
+  trades?: Trade[];
+  followed_rules?: string[];
+  post_submission_notes?: string;
+  pre_trading_activities?: string[];
+}
+
 export interface Trade {
   id?: string;
   instrument?: string;
@@ -18,35 +33,6 @@ export interface Trade {
   htfBias?: string;
 }
 
-export interface JournalEntry {
-  id: string;
-  emotion: string;
-  emotion_detail: string;
-  notes: string;
-  session_type: 'pre' | 'post';
-  trades: Trade[];
-  market_conditions: string | null;
-  followed_rules: string[] | null;
-  mistakes: string[] | null;
-  pre_trading_activities: string[] | null;
-  created_at: string;
-  outcome?: string;
-  trading_rules_notes?: string;
-  post_submission_notes?: string;
-  user_id: string;
-}
-
-interface MistakeFrequency {
-  count: number;
-  loss: number;
-}
-
-interface AssetPairStat {
-  profit: number;
-  loss: number;
-  total: number;
-}
-
 export interface AnalyticsInsight {
   journalEntries: JournalEntry[];
   performanceByEmotion: {
@@ -58,36 +44,18 @@ export interface AnalyticsInsight {
     winRate: number[];
     dates: string[];
   };
-  emotionTrend: Array<{
-    date: string;
-    emotionalScore: number;
-    tradingResult: number;
-  }>;
+  emotionTrend: any[];
   emotionTrendInsights: {
     improvement: string;
     impact: string;
   };
   mainInsight: string;
   recommendedAction: string;
-  dataRequirements: {
-    [key: string]: {
-      hasEnoughData: boolean;
-      requiredFields: string[];
-      description: string;
-    };
-  };
-  mistakeFrequencies: Record<string, MistakeFrequency>;
-  assetPairStats: Record<string, AssetPairStat>;
-  emotionRecovery: Record<string, number>;
-  tradeDurations: Record<string, { count: number; wins: number }>;
-  volatilityData: Array<{
-    volatility: number;
-    performance: number;
-    emotional: string;
-  }>;
-  riskRewardData: Array<{
-    risk: number;
-    reward: number;
-    size: number;
-  }>;
+  dataRequirements: any;
+  mistakeFrequencies: any;
+  assetPairStats: any;
+  emotionRecovery: any;
+  tradeDurations: any;
+  volatilityData: any;
+  riskRewardData: any;
 }

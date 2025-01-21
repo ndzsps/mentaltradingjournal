@@ -20,7 +20,7 @@ export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
   // Cast the entries to the correct type and ensure session_type is 'pre' or 'post'
   const journalEntries = (entries || []).map(entry => ({
     ...entry,
-    session_type: entry.session_type === 'pre' ? 'pre' : 'post'
+    session_type: entry.session_type === 'pre' ? 'pre' as const : 'post' as const
   })) as JournalEntry[];
 
   const dataRequirements = calculateDataRequirements(journalEntries);

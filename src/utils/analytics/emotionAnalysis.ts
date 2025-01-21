@@ -18,17 +18,42 @@ export const calculateEmotionRecovery = (entries: JournalEntry[]) => {
 };
 
 export const calculateEmotionTrend = (entries: JournalEntry[]) => {
-  return entries.slice(0, 30).map(entry => {
-    const emotionalScore = entry.emotion?.toLowerCase().includes('positive') ? 75 :
-      entry.emotion?.toLowerCase().includes('neutral') ? 50 : 25;
-    
-    const tradingResult = entry.trades?.reduce((acc, trade) => 
-      acc + (Number(trade.pnl) || 0), 0) || 0;
+  // Filter pre-session entries to get emotional states
+  const preSessionEmotions = entries
+    .filter(entry => entry.session_type === 'pre')
+    .reduce((acc, entry) => {
+      const date = new Date(entry.created_at).toISOString().split('T')[0];
+      acc[date] = entry.emotion;
+      return acc;
+    }, {} as Record<string, string>);
 
+  // Get all trades with their dates and PnL
+  const tradesByDate = entries.reduce((acc, entry) => {
+    if (!entry.trades) return acc;
+    
+    entry.trades.forEach(trade => {
+      const date = new Date(trade.entryDate || entry.created_at).toISOString().split('T')[0];
+      if (!acc[date]) acc[date] = [];
+      
+      const pnl = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) :
+                 typeof trade.pnl === 'number' ? trade.pnl :
+                 typeof trade.profit_loss === 'string' ? parseFloat(trade.profit_loss) :
+                 typeof trade.profit_loss === 'number' ? trade.profit_loss : 0;
+      
+      acc[date].push(pnl);
+    });
+    return acc;
+  }, {} as Record<string, number[]>);
+
+  // Combine emotions with trade performance
+  return Object.keys(tradesByDate).map(date => {
+    const pnls = tradesByDate[date];
+    const totalPnL = pnls.reduce((sum, pnl) => sum + pnl, 0);
+    
     return {
-      date: new Date(entry.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-      emotionalScore,
-      tradingResult,
+      date: new Date(date).getTime(),
+      pnl: totalPnL,
+      emotion: preSessionEmotions[date] || 'neutral'
     };
-  }).reverse();
+  }).sort((a, b) => a.date - b.date);
 };

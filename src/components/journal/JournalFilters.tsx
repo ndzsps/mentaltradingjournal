@@ -36,7 +36,7 @@ export const JournalFilters = () => {
         resultScreenshot: tradeData.resultScreenshot || '',
       };
 
-      // Create a new journal entry for this trade
+      // Create a standalone trade entry
       const { error: createError } = await supabase
         .from('journal_entries')
         .insert({
@@ -44,7 +44,7 @@ export const JournalFilters = () => {
           session_type: 'trade',
           emotion: 'neutral',
           emotion_detail: 'neutral',
-          notes: 'Trade entry',
+          notes: `Trade entry for ${tradeData.instrument || 'Unknown Instrument'}`,
           trades: [jsonTrade]
         });
 
@@ -85,7 +85,9 @@ export const JournalFilters = () => {
         open={isTradeFormOpen}
         onOpenChange={setIsTradeFormOpen}
         onSubmit={handleTradeSubmit}
-      />
+      >
+        <></>
+      </TradeFormDialog>
     </div>
   );
 };

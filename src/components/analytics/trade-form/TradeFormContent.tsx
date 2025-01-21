@@ -81,44 +81,19 @@ export const TradeFormContent = ({
     };
 
     try {
-      const entryDate = tradeData.entryDate ? new Date(tradeData.entryDate) : new Date();
-      const startOfDay = new Date(entryDate);
-      startOfDay.setHours(0, 0, 0, 0);
-      const endOfDay = new Date(entryDate);
-      endOfDay.setHours(23, 59, 59, 999);
-
-      const { data: existingEntries } = await supabase
+      // Create a new standalone trade entry
+      const { error: journalError } = await supabase
         .from('journal_entries')
-        .select('*')
-        .eq('user_id', user.id)
-        .gte('created_at', startOfDay.toISOString())
-        .lte('created_at', endOfDay.toISOString());
+        .insert({
+          user_id: user.id,
+          session_type: 'trade',
+          emotion: 'neutral',
+          emotion_detail: 'neutral',
+          notes: `Trade entry for ${tradeData.instrument || 'Unknown Instrument'}`,
+          trades: [tradeObject]
+        });
 
-      if (existingEntries && existingEntries.length > 0) {
-        const existingEntry = existingEntries[0];
-        const updatedTrades = [...(existingEntry.trades || []), tradeObject];
-        
-        const { error: updateError } = await supabase
-          .from('journal_entries')
-          .update({ trades: updatedTrades })
-          .eq('id', existingEntry.id);
-
-        if (updateError) throw updateError;
-      } else {
-        const { error: journalError } = await supabase
-          .from('journal_entries')
-          .insert({
-            user_id: user.id,
-            session_type: 'trade',
-            emotion: 'neutral',
-            emotion_detail: 'neutral',
-            notes: `Trade entry for ${tradeData.instrument || 'Unknown Instrument'}`,
-            trades: [tradeObject],
-            created_at: entryDate.toISOString()
-          });
-
-        if (journalError) throw journalError;
-      }
+      if (journalError) throw journalError;
     } catch (error) {
       console.error('Error managing journal entry:', error);
       throw error;

@@ -2,7 +2,6 @@ import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Trade } from "@/types/trade";
 import { TradesList } from "./entry/TradesList";
-import { TradingRules } from "./entry/TradingRules";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { ThumbsUp, Equal, ThumbsDown, XCircle } from "lucide-react";
@@ -34,18 +33,18 @@ export const PostSessionSection = ({
   trades,
 }: PostSessionSectionProps) => {
   return (
-    <div className="space-y-6">
-      <Card className="p-6">
-        <div className="space-y-6">
+    <div className="space-y-4">
+      <Card className="p-4">
+        <div className="space-y-4">
           <div>
-            <h3 className="text-lg font-medium">Trading Outcome</h3>
-            <p className="text-sm text-muted-foreground mb-4">
+            <h3 className="text-lg font-medium mb-2">Trading Outcome</h3>
+            <p className="text-sm text-muted-foreground mb-3">
               Select the outcome of your trading session
             </p>
             <RadioGroup
               value={selectedOutcome}
               onValueChange={setSelectedOutcome}
-              className="grid grid-cols-2 md:grid-cols-4 gap-4"
+              className="grid grid-cols-2 md:grid-cols-4 gap-3"
             >
               <div>
                 <RadioGroupItem
@@ -55,10 +54,10 @@ export const PostSessionSection = ({
                 />
                 <Label
                   htmlFor="win"
-                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-transparent p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
+                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-transparent p-3 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer transition-colors"
                 >
-                  <ThumbsUp className="mb-2 h-6 w-6 text-green-500" />
-                  <span>Win</span>
+                  <ThumbsUp className="mb-1 h-5 w-5 text-green-500" />
+                  <span className="text-sm">Win</span>
                 </Label>
               </div>
 
@@ -70,10 +69,10 @@ export const PostSessionSection = ({
                 />
                 <Label
                   htmlFor="breakeven"
-                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-transparent p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
+                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-transparent p-3 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer transition-colors"
                 >
-                  <Equal className="mb-2 h-6 w-6 text-yellow-500" />
-                  <span>Breakeven</span>
+                  <Equal className="mb-1 h-5 w-5 text-gray-500" />
+                  <span className="text-sm">Breakeven</span>
                 </Label>
               </div>
 
@@ -85,10 +84,10 @@ export const PostSessionSection = ({
                 />
                 <Label
                   htmlFor="loss"
-                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-transparent p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
+                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-transparent p-3 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer transition-colors"
                 >
-                  <ThumbsDown className="mb-2 h-6 w-6 text-red-500" />
-                  <span>Loss</span>
+                  <ThumbsDown className="mb-1 h-5 w-5 text-red-500" />
+                  <span className="text-sm">Loss</span>
                 </Label>
               </div>
 
@@ -100,20 +99,20 @@ export const PostSessionSection = ({
                 />
                 <Label
                   htmlFor="no_trades"
-                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-transparent p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
+                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-transparent p-3 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer transition-colors"
                 >
-                  <XCircle className="mb-2 h-6 w-6 text-blue-500" />
-                  <span>No Trades</span>
+                  <XCircle className="mb-1 h-5 w-5 text-blue-500" />
+                  <span className="text-sm">No Trades</span>
                 </Label>
               </div>
             </RadioGroup>
           </div>
 
-          <Separator />
+          <Separator className="my-4" />
 
           <div>
-            <h3 className="text-lg font-medium mb-4">Trading Rules Followed</h3>
-            <div className="grid gap-4">
+            <h3 className="text-lg font-medium mb-3">Trading Rules Followed</h3>
+            <div className="space-y-3">
               <div className="flex items-center space-x-2">
                 <Checkbox 
                   id="position_sizing"
@@ -125,10 +124,11 @@ export const PostSessionSection = ({
                       setFollowedRules(followedRules.filter(rule => rule !== 'position_sizing'));
                     }
                   }}
+                  className="border-primary/30 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                 />
                 <label
                   htmlFor="position_sizing"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                 >
                   Proper position sizing
                 </label>
@@ -144,10 +144,11 @@ export const PostSessionSection = ({
                       setFollowedRules(followedRules.filter(rule => rule !== 'entry_criteria'));
                     }
                   }}
+                  className="border-primary/30 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                 />
                 <label
                   htmlFor="entry_criteria"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                 >
                   Entry Criteria
                 </label>
@@ -163,10 +164,11 @@ export const PostSessionSection = ({
                       setFollowedRules(followedRules.filter(rule => rule !== 'exit_strategy'));
                     }
                   }}
+                  className="border-primary/30 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                 />
                 <label
                   htmlFor="exit_strategy"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                 >
                   Exit Strategy
                 </label>
@@ -177,8 +179,8 @@ export const PostSessionSection = ({
       </Card>
 
       {trades && trades.length > 0 && (
-        <Card className="p-6">
-          <div className="space-y-6">
+        <Card className="p-4">
+          <div className="space-y-4">
             <div>
               <h3 className="text-lg font-medium">Trades</h3>
               <p className="text-sm text-muted-foreground">
@@ -189,8 +191,6 @@ export const PostSessionSection = ({
           </div>
         </Card>
       )}
-
-      <Separator />
     </div>
   );
 };

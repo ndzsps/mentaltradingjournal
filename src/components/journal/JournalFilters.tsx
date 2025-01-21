@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { TradeFormDialog } from "@/components/analytics/trade-form/TradeFormDialog";
+import { AddTradeDialog } from "@/components/analytics/AddTradeDialog";
 import { Trade } from "@/types/trade";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -17,38 +17,44 @@ export const JournalFilters = () => {
     if (!user) return;
 
     try {
-      // Convert trade data to JSON-compatible format
-      const jsonTrade = {
-        id: tradeData.id,
-        instrument: tradeData.instrument || '',
-        direction: tradeData.direction || '',
-        entryDate: tradeData.entryDate || '',
-        exitDate: tradeData.exitDate || '',
-        entryPrice: tradeData.entryPrice?.toString() || '',
-        exitPrice: tradeData.exitPrice?.toString() || '',
-        stopLoss: tradeData.stopLoss?.toString() || '',
-        takeProfit: tradeData.takeProfit?.toString() || '',
-        quantity: tradeData.quantity?.toString() || '',
-        fees: tradeData.fees?.toString() || '',
-        setup: tradeData.setup || '',
-        pnl: tradeData.pnl?.toString() || '',
-        forecastScreenshot: tradeData.forecastScreenshot || '',
-        resultScreenshot: tradeData.resultScreenshot || '',
-      };
+      const entryDate = tradeData.entryDate ? new Date(tradeData.entryDate) : new Date();
+      const startOfDay = new Date(entryDate);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(entryDate);
+      endOfDay.setHours(23, 59, 59, 999);
 
-      // Create a new journal entry for this trade
-      const { error: createError } = await supabase
+      // Check for existing journal entry for this day
+      const { data: existingEntries } = await supabase
         .from('journal_entries')
-        .insert({
-          user_id: user.id,
-          session_type: 'trade',
-          emotion: 'neutral',
-          emotion_detail: 'neutral',
-          notes: 'Trade entry',
-          trades: [jsonTrade]
-        });
+        .select('*')
+        .eq('user_id', user.id)
+        .gte('created_at', startOfDay.toISOString())
+        .lte('created_at', endOfDay.toISOString());
 
-      if (createError) throw createError;
+      if (existingEntries && existingEntries.length > 0) {
+        const existingEntry = existingEntries[0];
+        const updatedTrades = [...(existingEntry.trades || []), tradeData];
+        
+        const { error: updateError } = await supabase
+          .from('journal_entries')
+          .update({ trades: updatedTrades })
+          .eq('id', existingEntry.id);
+
+        if (updateError) throw updateError;
+      } else {
+        const { error: createError } = await supabase
+          .from('journal_entries')
+          .insert({
+            user_id: user.id,
+            session_type: 'trade',
+            emotion: 'neutral',
+            emotion_detail: 'neutral',
+            notes: `Trade entry for ${tradeData.instrument || 'Unknown Instrument'}`,
+            trades: [tradeData]
+          });
+
+        if (createError) throw createError;
+      }
       
       toast.success("Trade added successfully");
       setIsTradeFormOpen(false);
@@ -67,25 +73,17 @@ export const JournalFilters = () => {
       >
         Pre-Session
       </Button>
-      <Button 
-        variant="outline"
-        onClick={() => setIsTradeFormOpen(true)}
-        className="gap-1"
-      >
-        <Plus className="h-4 w-4" /> Add Trade
-      </Button>
+      <AddTradeDialog
+        open={isTradeFormOpen}
+        onOpenChange={setIsTradeFormOpen}
+        onSubmit={handleTradeSubmit}
+      />
       <Button 
         variant="outline"
         onClick={() => navigate('/journal-entry')}
       >
         Post-Session
       </Button>
-
-      <TradeFormDialog
-        open={isTradeFormOpen}
-        onOpenChange={setIsTradeFormOpen}
-        onSubmit={handleTradeSubmit}
-      />
     </div>
   );
 };

@@ -32,7 +32,8 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
           schema: 'public',
           table: 'journal_entries',
         },
-        () => {
+        (payload) => {
+          console.log('Real-time update received:', payload);
           // Invalidate and refetch data when changes occur
           queryClient.invalidateQueries({ queryKey: ['journal-entries'] });
           queryClient.invalidateQueries({ queryKey: ['analytics'] });

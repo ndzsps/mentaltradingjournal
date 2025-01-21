@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { AnalyticsInsight } from "@/types/analytics";
+import { AnalyticsInsight, JournalEntry } from "@/types/analytics";
 import { calculateDataRequirements } from "./dataRequirements";
 import { processJournalTrades, calculateAssetPairStats } from "./analytics/tradeProcessing";
 import { calculateEmotionRecovery, calculateEmotionTrend } from "./analytics/emotionAnalysis";
@@ -7,7 +7,6 @@ import { calculateMistakeFrequencies } from "./analytics/mistakeAnalysis";
 import { analyzeTradeDurations } from "./analytics/tradeDurationAnalysis";
 
 export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
-  // Fetch ALL journal entries to include trades, not just post-session entries
   const { data: entries, error } = await supabase
     .from('journal_entries')
     .select('*')
@@ -18,7 +17,12 @@ export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
     throw error;
   }
 
-  const journalEntries = entries || [];
+  // Cast the entries to the correct type and ensure session_type is 'pre' or 'post'
+  const journalEntries = (entries || []).map(entry => ({
+    ...entry,
+    session_type: entry.session_type === 'pre' ? 'pre' : 'post'
+  })) as JournalEntry[];
+
   const dataRequirements = calculateDataRequirements(journalEntries);
 
   // Process trades using utility functions
@@ -33,16 +37,24 @@ export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
   const volatilityData = journalEntries.map(entry => ({
     volatility: entry.market_conditions?.includes('high') ? 75 :
       entry.market_conditions?.includes('medium') ? 50 : 25,
-    performance: entry.trades?.reduce((sum, trade) => sum + (Number(trade.pnl) || 0), 0) || 0,
+    performance: entry.trades?.reduce((sum, trade) => {
+      const pnl = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : 
+                 typeof trade.pnl === 'number' ? trade.pnl : 
+                 typeof trade.profit_loss === 'string' ? parseFloat(trade.profit_loss) :
+                 typeof trade.profit_loss === 'number' ? trade.profit_loss : 0;
+      return sum + pnl;
+    }, 0) || 0,
     emotional: entry.emotion
   }));
 
   // Calculate risk/reward data
-  const riskRewardData = allTrades.map(trade => ({
-    risk: trade.stopLoss ? Math.abs(Number(trade.entryPrice) - Number(trade.stopLoss)) : 0,
-    reward: trade.takeProfit ? Math.abs(Number(trade.takeProfit) - Number(trade.entryPrice)) : 0,
-    size: Number(trade.quantity) || 1,
-  })).filter(data => data.risk > 0 && data.reward > 0);
+  const riskRewardData = allTrades
+    .filter(trade => trade.entryPrice && trade.stopLoss && trade.takeProfit)
+    .map(trade => ({
+      risk: Math.abs(Number(trade.entryPrice) - Number(trade.stopLoss)),
+      reward: Math.abs(Number(trade.takeProfit) - Number(trade.entryPrice)),
+      size: Number(trade.quantity) || 1,
+    }));
 
   return {
     journalEntries,

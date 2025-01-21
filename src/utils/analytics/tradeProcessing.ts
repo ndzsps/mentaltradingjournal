@@ -1,20 +1,21 @@
 import { JournalEntry, Trade } from "@/types/analytics";
 
-export const normalizeTradePnL = (trade: Trade) => {
+export const normalizeTradePnL = (trade: Trade): Trade => {
+  const pnl = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) :
+             typeof trade.pnl === 'number' ? trade.pnl :
+             typeof trade.profit_loss === 'string' ? parseFloat(trade.profit_loss) :
+             typeof trade.profit_loss === 'number' ? trade.profit_loss : 0;
+  
   return {
     ...trade,
-    pnl: typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : 
-         typeof trade.pnl === 'number' ? trade.pnl : 
-         typeof trade.profit_loss === 'string' ? parseFloat(trade.profit_loss) :
-         typeof trade.profit_loss === 'number' ? trade.profit_loss : 0
+    pnl
   };
 };
 
-export const processJournalTrades = (journalEntries: JournalEntry[]) => {
-  return journalEntries.flatMap(entry => {
-    const trades = entry.trades || [];
-    return trades.map(normalizeTradePnL);
-  });
+export const processJournalTrades = (journalEntries: JournalEntry[]): Trade[] => {
+  return journalEntries.flatMap(entry => 
+    (entry.trades || []).map(normalizeTradePnL)
+  );
 };
 
 export const calculateAssetPairStats = (trades: Trade[]) => {

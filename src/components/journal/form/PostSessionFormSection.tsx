@@ -10,9 +10,6 @@ interface PostSessionFormSectionProps {
   selectedMistakes: string[];
   setSelectedMistakes: (mistakes: string[]) => void;
   trades: Trade[];
-  showAddTradeDialog: boolean;
-  setShowAddTradeDialog: (show: boolean) => void;
-  onTradeSubmit: (tradeData: Trade) => void;
 }
 
 export const PostSessionFormSection = ({
@@ -23,9 +20,6 @@ export const PostSessionFormSection = ({
   selectedMistakes,
   setSelectedMistakes,
   trades,
-  showAddTradeDialog,
-  setShowAddTradeDialog,
-  onTradeSubmit,
 }: PostSessionFormSectionProps) => {
   return (
     <PostSessionSection

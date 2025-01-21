@@ -1,18 +1,41 @@
 import { Card } from "@/components/ui/card";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BalanceSelector } from "./equity-curve/BalanceSelector";
 import { EquityCurveChart } from "./equity-curve/EquityCurveChart";
 import { EquityMetrics } from "./equity-curve/EquityMetrics";
+import { supabase } from "@/integrations/supabase/client";
 
 export const EquityCurve = () => {
   const [selectedBalance, setSelectedBalance] = useState(10000);
   
-  const { data: analytics, isLoading } = useQuery({
+  const { data: analytics, isLoading, refetch } = useQuery({
     queryKey: ['analytics'],
     queryFn: generateAnalytics,
   });
+
+  // Subscribe to real-time updates
+  useEffect(() => {
+    const channel = supabase
+      .channel('journal_entries_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'journal_entries',
+        },
+        () => {
+          refetch();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [refetch]);
 
   if (isLoading || !analytics) {
     return (
@@ -31,7 +54,13 @@ export const EquityCurve = () => {
   const equityData = analytics.journalEntries
     .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
     .reduce((acc: any[], entry) => {
-      const dailyPnL = entry.trades?.reduce((sum, trade) => sum + (Number(trade.pnl) || 0), 0) || 0;
+      // Ensure trades array exists and has elements
+      const trades = entry.trades || [];
+      const dailyPnL = trades.reduce((sum, trade) => {
+        const pnlValue = trade.pnl || trade.profit_loss || 0;
+        return sum + (typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue);
+      }, 0);
+
       runningBalance += dailyPnL;
       
       acc.push({

@@ -1,16 +1,17 @@
 import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { AddTradeDialog } from "@/components/analytics/AddTradeDialog";
-import { Trade } from "@/types/trade";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { Trade } from "@/types/trade";
 
 export const JournalFilters = () => {
   const navigate = useNavigate();
-  const [isTradeFormOpen, setIsTradeFormOpen] = useState(false);
   const { user } = useAuth();
+  const [isAddTradeOpen, setIsAddTradeOpen] = useState(false);
 
   const handleTradeSubmit = async (tradeData: Trade, isEdit: boolean) => {
     if (!user) return;
@@ -74,35 +75,28 @@ export const JournalFilters = () => {
 
         if (createError) throw createError;
       }
-      
-      toast.success("Trade added successfully");
-      setIsTradeFormOpen(false);
 
+      toast.success(isEdit ? "Trade updated successfully!" : "Trade added successfully!");
     } catch (error) {
       console.error('Error managing trade:', error);
-      toast.error("Failed to save trade");
+      toast.error("Failed to manage trade");
     }
   };
 
   return (
-    <div className="flex gap-2 justify-start">
-      <Button 
-        variant="outline" 
-        onClick={() => navigate('/journal-entry')}
-      >
-        Pre-Session
-      </Button>
-      <AddTradeDialog
-        open={isTradeFormOpen}
-        onOpenChange={setIsTradeFormOpen}
-        onSubmit={handleTradeSubmit}
-      />
-      <Button 
-        variant="outline"
-        onClick={() => navigate('/journal-entry')}
-      >
-        Post-Session
-      </Button>
+    <div className="flex flex-wrap gap-2 items-center justify-between mb-4">
+      <div className="flex gap-2">
+        <AddTradeDialog
+          open={isAddTradeOpen}
+          onOpenChange={setIsAddTradeOpen}
+          onSubmit={handleTradeSubmit}
+        >
+          <Button variant="outline" size="sm" className="gap-2">
+            <Plus className="h-4 w-4" />
+            Add Trade
+          </Button>
+        </AddTradeDialog>
+      </div>
     </div>
   );
 };

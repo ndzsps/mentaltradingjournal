@@ -58,14 +58,6 @@ export const useJournalFormSubmission = ({
 
     // Validate post-session requirements
     if (sessionType === "post") {
-      if (trades.length === 0 && selectedOutcome !== "no_trades") {
-        toast.error("Trades Required", {
-          description: "Please add at least one trade before submitting your post-session entry.",
-          duration: 5000,
-        });
-        return;
-      }
-
       if (!selectedEmotion || !selectedEmotionDetail || !notes || !selectedOutcome || followedRules?.length === 0) {
         toast.error("Missing Information", {
           description: "Please fill in all required fields for post-session.",

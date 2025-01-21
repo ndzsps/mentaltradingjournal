@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { AddTradeDialog } from "@/components/analytics/AddTradeDialog";
@@ -23,6 +22,26 @@ export const JournalFilters = () => {
       const endOfDay = new Date(entryDate);
       endOfDay.setHours(23, 59, 59, 999);
 
+      // Convert trade data to JSON-compatible format
+      const jsonTrade = {
+        id: tradeData.id,
+        instrument: tradeData.instrument || '',
+        direction: tradeData.direction || '',
+        entryDate: tradeData.entryDate || '',
+        exitDate: tradeData.exitDate || '',
+        entryPrice: tradeData.entryPrice?.toString() || '',
+        exitPrice: tradeData.exitPrice?.toString() || '',
+        stopLoss: tradeData.stopLoss?.toString() || '',
+        takeProfit: tradeData.takeProfit?.toString() || '',
+        quantity: tradeData.quantity?.toString() || '',
+        fees: tradeData.fees?.toString() || '',
+        setup: tradeData.setup || '',
+        pnl: tradeData.pnl?.toString() || '',
+        forecastScreenshot: tradeData.forecastScreenshot || '',
+        resultScreenshot: tradeData.resultScreenshot || '',
+        htfBias: tradeData.htfBias || ''
+      };
+
       // Check for existing journal entry for this day
       const { data: existingEntries } = await supabase
         .from('journal_entries')
@@ -33,7 +52,7 @@ export const JournalFilters = () => {
 
       if (existingEntries && existingEntries.length > 0) {
         const existingEntry = existingEntries[0];
-        const updatedTrades = [...(existingEntry.trades || []), tradeData];
+        const updatedTrades = [...(existingEntry.trades || []), jsonTrade];
         
         const { error: updateError } = await supabase
           .from('journal_entries')
@@ -50,7 +69,7 @@ export const JournalFilters = () => {
             emotion: 'neutral',
             emotion_detail: 'neutral',
             notes: `Trade entry for ${tradeData.instrument || 'Unknown Instrument'}`,
-            trades: [tradeData]
+            trades: [jsonTrade]
           });
 
         if (createError) throw createError;

@@ -55,9 +55,9 @@ export const PostSessionSection = ({
                 />
                 <Label
                   htmlFor="win"
-                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-transparent p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
+                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-transparent p-4 hover:bg-primary/5 hover:border-primary peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 [&:has([data-state=checked])]:border-primary cursor-pointer transition-colors duration-200"
                 >
-                  <ThumbsUp className="mb-2 h-6 w-6 text-green-500" />
+                  <ThumbsUp className="mb-2 h-5 w-5 text-green-500" />
                   <span>Win</span>
                 </Label>
               </div>
@@ -70,9 +70,9 @@ export const PostSessionSection = ({
                 />
                 <Label
                   htmlFor="breakeven"
-                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-transparent p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
+                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-transparent p-4 hover:bg-primary/5 hover:border-primary peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 [&:has([data-state=checked])]:border-primary cursor-pointer transition-colors duration-200"
                 >
-                  <Equal className="mb-2 h-6 w-6 text-yellow-500" />
+                  <Equal className="mb-2 h-5 w-5 text-gray-500" />
                   <span>Breakeven</span>
                 </Label>
               </div>
@@ -85,9 +85,9 @@ export const PostSessionSection = ({
                 />
                 <Label
                   htmlFor="loss"
-                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-transparent p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
+                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-transparent p-4 hover:bg-primary/5 hover:border-primary peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 [&:has([data-state=checked])]:border-primary cursor-pointer transition-colors duration-200"
                 >
-                  <ThumbsDown className="mb-2 h-6 w-6 text-red-500" />
+                  <ThumbsDown className="mb-2 h-5 w-5 text-red-500" />
                   <span>Loss</span>
                 </Label>
               </div>
@@ -100,9 +100,9 @@ export const PostSessionSection = ({
                 />
                 <Label
                   htmlFor="no_trades"
-                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-transparent p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
+                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-transparent p-4 hover:bg-primary/5 hover:border-primary peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 [&:has([data-state=checked])]:border-primary cursor-pointer transition-colors duration-200"
                 >
-                  <XCircle className="mb-2 h-6 w-6 text-blue-500" />
+                  <XCircle className="mb-2 h-5 w-5 text-blue-500" />
                   <span>No Trades</span>
                 </Label>
               </div>
@@ -125,10 +125,11 @@ export const PostSessionSection = ({
                       setFollowedRules(followedRules.filter(rule => rule !== 'position_sizing'));
                     }
                   }}
+                  className="border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
                 />
                 <label
                   htmlFor="position_sizing"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                 >
                   Proper position sizing
                 </label>
@@ -144,10 +145,11 @@ export const PostSessionSection = ({
                       setFollowedRules(followedRules.filter(rule => rule !== 'entry_criteria'));
                     }
                   }}
+                  className="border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
                 />
                 <label
                   htmlFor="entry_criteria"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                 >
                   Entry Criteria
                 </label>
@@ -163,10 +165,11 @@ export const PostSessionSection = ({
                       setFollowedRules(followedRules.filter(rule => rule !== 'exit_strategy'));
                     }
                   }}
+                  className="border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
                 />
                 <label
                   htmlFor="exit_strategy"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                 >
                   Exit Strategy
                 </label>

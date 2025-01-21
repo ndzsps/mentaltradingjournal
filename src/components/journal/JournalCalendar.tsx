@@ -32,12 +32,15 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
           schema: 'public',
           table: 'journal_entries',
         },
-        (payload) => {
+        async (payload) => {
           console.log('Real-time update received:', payload);
-          // Invalidate and refetch data when changes occur
-          queryClient.invalidateQueries({ queryKey: ['journal-entries'] });
-          queryClient.invalidateQueries({ queryKey: ['analytics'] });
-          queryClient.invalidateQueries({ queryKey: ['weekly-performance'] });
+          // Immediately refetch data when changes occur
+          await Promise.all([
+            queryClient.invalidateQueries({ queryKey: ['journal-entries'] }),
+            queryClient.invalidateQueries({ queryKey: ['analytics'] }),
+            queryClient.invalidateQueries({ queryKey: ['weekly-performance'] })
+          ]);
+          await queryClient.refetchQueries({ queryKey: ['journal-entries'] });
         }
       )
       .subscribe();

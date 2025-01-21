@@ -8,9 +8,10 @@ interface TradeFormDialogProps {
   onOpenChange: (open: boolean) => void;
   onSubmit: (tradeData: Trade, isEdit: boolean) => void;
   editTrade?: Trade;
+  children: React.ReactNode;
 }
 
-export const TradeFormDialog = ({ open, onOpenChange, onSubmit, editTrade }: TradeFormDialogProps) => {
+export const TradeFormDialog = ({ open, onOpenChange, onSubmit, editTrade, children }: TradeFormDialogProps) => {
   const [direction, setDirection] = useState<'buy' | 'sell' | null>(null);
 
   useEffect(() => {
@@ -21,6 +22,7 @@ export const TradeFormDialog = ({ open, onOpenChange, onSubmit, editTrade }: Tra
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
+      {children}
       <DialogContent className="max-h-[90vh] flex flex-col p-0 sm:max-w-[1000px]">
         <div className="p-6 pb-0">
           <DialogTitle>{editTrade ? 'Edit Trade' : 'Add Trade'}</DialogTitle>

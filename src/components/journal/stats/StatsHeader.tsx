@@ -1,16 +1,17 @@
-import { Card } from "@/components/ui/card";
-import { DollarSign, Percent, Smile, Flame, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { EmotionalTendencies } from "./EmotionalTendencies";
 import { useQuery } from "@tanstack/react-query";
 import { generateAnalytics } from "@/utils/analyticsUtils";
-import { useProgressTracking } from "@/hooks/useProgressTracking";
 import { TradeWinPercentage } from "./TradeWinPercentage";
-import { Button } from "@/components/ui/button";
 import { useTimeFilter } from "@/contexts/TimeFilterContext";
 import { startOfMonth, subMonths, isWithinInterval, endOfMonth } from "date-fns";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSidebar } from "@/components/ui/sidebar";
+import { Card } from "@/components/ui/card";
+import { DollarSign, Percent, Smile, Flame, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { useProgressTracking } from "@/hooks/useProgressTracking";
 
 export const StatsHeader = () => {
   const queryClient = useQueryClient();
@@ -97,6 +98,33 @@ export const StatsHeader = () => {
       return sum;
     }, 0);
   }, 0);
+
+  // Calculate profit factor
+  const { profits, losses } = filteredEntries.reduce((acc, entry) => {
+    (entry.trades || []).forEach(trade => {
+      if (trade?.id && !processedTradeIds.has(`pf-${trade.id}`)) {
+        processedTradeIds.add(`pf-${trade.id}`);
+        const pnl = Number(trade.pnl) || 0;
+        if (pnl > 0) acc.profits += pnl;
+        if (pnl < 0) acc.losses += Math.abs(pnl);
+      }
+    });
+    return acc;
+  }, { profits: 0, losses: 0 });
+
+  const profitFactorValue = losses === 0 ? 
+    profits > 0 ? "∞" : "0" : 
+    (profits / losses).toFixed(2);
+
+  // Calculate emotion score
+  const emotionStats = filteredEntries.reduce((acc, entry) => {
+    if (entry.emotion?.toLowerCase().includes('positive')) acc.positive++;
+    acc.total++;
+    return acc;
+  }, { positive: 0, total: 0 });
+
+  const emotionScore = emotionStats.total === 0 ? 0 : 
+    (emotionStats.positive / emotionStats.total) * 100;
 
   if (isAnalyticsLoading) {
     return (

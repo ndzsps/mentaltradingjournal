@@ -3,11 +3,11 @@ import { AnalyticsInsight, JournalEntry } from "@/types/analytics";
 import { calculateDataRequirements } from "./dataRequirements";
 
 export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
+  // Fetch ALL journal entries to include trades, not just post-session entries
   const { data: entries, error } = await supabase
     .from('journal_entries')
     .select('*')
-    .eq('session_type', 'post')
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: true });
 
   if (error) {
     console.error('Error fetching journal entries:', error);
@@ -18,7 +18,18 @@ export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
   const dataRequirements = calculateDataRequirements(journalEntries);
 
   // Process all trades from journal entries
-  const allTrades = journalEntries.flatMap(entry => entry.trades || []);
+  const allTrades = journalEntries.flatMap(entry => {
+    // Ensure trades is an array and has elements
+    const trades = entry.trades || [];
+    return trades.map(trade => ({
+      ...trade,
+      // Normalize PnL value to always be a number
+      pnl: typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : 
+           typeof trade.pnl === 'number' ? trade.pnl : 
+           typeof trade.profit_loss === 'string' ? parseFloat(trade.profit_loss) :
+           typeof trade.profit_loss === 'number' ? trade.profit_loss : 0
+    }));
+  });
   
   // Calculate asset pair performance
   const assetPairStats = allTrades.reduce((acc, trade) => {

@@ -10,6 +10,7 @@ interface PostSessionFormSectionProps {
   selectedMistakes: string[];
   setSelectedMistakes: (mistakes: string[]) => void;
   trades: Trade[];
+  onTradeSubmit?: (tradeData: Trade) => void;
 }
 
 export const PostSessionFormSection = ({
@@ -20,6 +21,7 @@ export const PostSessionFormSection = ({
   selectedMistakes,
   setSelectedMistakes,
   trades,
+  onTradeSubmit,
 }: PostSessionFormSectionProps) => {
   return (
     <PostSessionSection

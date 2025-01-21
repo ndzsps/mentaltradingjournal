@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { EmotionalTendencies } from "./EmotionalTendencies";
 import { useQuery } from "@tanstack/react-query";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { TradeWinPercentage } from "./TradeWinPercentage";

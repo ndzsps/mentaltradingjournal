@@ -1,6 +1,10 @@
 import { supabase } from "@/integrations/supabase/client";
-import { AnalyticsInsight, JournalEntry } from "@/types/analytics";
+import { AnalyticsInsight } from "@/types/analytics";
 import { calculateDataRequirements } from "./dataRequirements";
+import { processJournalTrades, calculateAssetPairStats } from "./analytics/tradeProcessing";
+import { calculateEmotionRecovery, calculateEmotionTrend } from "./analytics/emotionAnalysis";
+import { calculateMistakeFrequencies } from "./analytics/mistakeAnalysis";
+import { analyzeTradeDurations } from "./analytics/tradeDurationAnalysis";
 
 export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
   // Fetch ALL journal entries to include trades, not just post-session entries
@@ -14,92 +18,16 @@ export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
     throw error;
   }
 
-  const journalEntries = entries as JournalEntry[] || [];
+  const journalEntries = entries || [];
   const dataRequirements = calculateDataRequirements(journalEntries);
 
-  // Process all trades from journal entries
-  const allTrades = journalEntries.flatMap(entry => {
-    // Ensure trades is an array and has elements
-    const trades = entry.trades || [];
-    return trades.map(trade => ({
-      ...trade,
-      // Normalize PnL value to always be a number
-      pnl: typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : 
-           typeof trade.pnl === 'number' ? trade.pnl : 
-           typeof trade.profit_loss === 'string' ? parseFloat(trade.profit_loss) :
-           typeof trade.profit_loss === 'number' ? trade.profit_loss : 0
-    }));
-  });
-  
-  // Calculate asset pair performance
-  const assetPairStats = allTrades.reduce((acc, trade) => {
-    const instrument = trade.instrument || 'Unknown';
-    if (!acc[instrument]) {
-      acc[instrument] = { profit: 0, loss: 0, total: 0 };
-    }
-    const pnl = Number(trade.pnl) || 0;
-    acc[instrument].total++;
-    if (pnl > 0) acc[instrument].profit += pnl;
-    else acc[instrument].loss += Math.abs(pnl);
-    return acc;
-  }, {} as Record<string, { profit: number; loss: number; total: number }>);
-
-  // Calculate mistake frequencies
-  const mistakeFrequencies = journalEntries.reduce((acc, entry) => {
-    (entry.mistakes || []).forEach(mistake => {
-      if (!acc[mistake]) acc[mistake] = { count: 0, loss: 0 };
-      acc[mistake].count++;
-      // Sum up losses for trades in entries with this mistake
-      const totalLoss = (entry.trades || [])
-        .reduce((sum, trade) => sum + (Number(trade.pnl) < 0 ? Math.abs(Number(trade.pnl)) : 0), 0);
-      acc[mistake].loss += totalLoss;
-    });
-    return acc;
-  }, {} as Record<string, { count: number; loss: number }>);
-
-  // Calculate emotion recovery patterns
-  const emotionRecovery = journalEntries.reduce((acc, entry, i, arr) => {
-    if (entry.outcome === 'loss') {
-      let daysToRecover = 0;
-      for (let j = i - 1; j >= 0; j--) {
-        if (arr[j].outcome === 'win') break;
-        daysToRecover++;
-      }
-      const recoveryRange = daysToRecover <= 1 ? '< 1 day' :
-        daysToRecover <= 2 ? '1-2 days' :
-        daysToRecover <= 3 ? '2-3 days' : '> 3 days';
-      acc[recoveryRange] = (acc[recoveryRange] || 0) + 1;
-    }
-    return acc;
-  }, {} as Record<string, number>);
-
-  // Calculate trade durations
-  const tradeDurations = allTrades.reduce((acc, trade) => {
-    const duration = trade.exitDate && trade.entryDate ?
-      Math.floor((new Date(trade.exitDate).getTime() - new Date(trade.entryDate).getTime()) / (1000 * 60)) : 0;
-    const range = duration <= 10 ? '< 10 min' :
-      duration <= 30 ? '10-30 min' :
-      duration <= 60 ? '30-60 min' : '> 1 hour';
-    if (!acc[range]) acc[range] = { count: 0, wins: 0 };
-    acc[range].count++;
-    if (Number(trade.pnl) > 0) acc[range].wins++;
-    return acc;
-  }, {} as Record<string, { count: number; wins: number }>);
-
-  // Calculate emotion trend
-  const emotionTrend = journalEntries.slice(0, 30).map(entry => {
-    const emotionalScore = entry.emotion?.toLowerCase().includes('positive') ? 75 :
-      entry.emotion?.toLowerCase().includes('neutral') ? 50 : 25;
-    
-    const tradingResult = entry.trades?.reduce((acc, trade) => 
-      acc + (Number(trade.pnl) || 0), 0) || 0;
-
-    return {
-      date: new Date(entry.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-      emotionalScore,
-      tradingResult,
-    };
-  }).reverse();
+  // Process trades using utility functions
+  const allTrades = processJournalTrades(journalEntries);
+  const assetPairStats = calculateAssetPairStats(allTrades);
+  const mistakeFrequencies = calculateMistakeFrequencies(journalEntries);
+  const emotionRecovery = calculateEmotionRecovery(journalEntries);
+  const tradeDurations = analyzeTradeDurations(allTrades);
+  const emotionTrend = calculateEmotionTrend(journalEntries);
 
   // Process market volatility data
   const volatilityData = journalEntries.map(entry => ({
@@ -141,7 +69,6 @@ export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
     mainInsight: "Based on your journal entries, there's a strong correlation between emotional state and trading performance.",
     recommendedAction: "Focus on maintaining emotional balance during trading sessions.",
     dataRequirements,
-    // Additional real data
     mistakeFrequencies,
     assetPairStats,
     emotionRecovery,

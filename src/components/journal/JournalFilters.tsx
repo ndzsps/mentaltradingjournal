@@ -36,20 +36,11 @@ export const JournalFilters = () => {
         resultScreenshot: tradeData.resultScreenshot || '',
       };
 
-      // Create a standalone trade entry
-      const { error: createError } = await supabase
-        .from('journal_entries')
-        .insert({
-          user_id: user.id,
-          session_type: 'trade',
-          emotion: 'neutral',
-          emotion_detail: 'neutral',
-          notes: `Trade entry for ${tradeData.instrument || 'Unknown Instrument'}`,
-          trades: [jsonTrade]
-        });
+      if (isEdit) {
+        // Handle edit case if needed
+        return;
+      }
 
-      if (createError) throw createError;
-      
       toast.success("Trade added successfully");
       setIsTradeFormOpen(false);
 

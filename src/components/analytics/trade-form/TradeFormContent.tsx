@@ -127,7 +127,8 @@ export const TradeFormContent = ({
     });
 
     try {
-      if (!editTrade) {
+      // Only create journal entry if it's not an edit and not from journal entry page
+      if (!editTrade && !isPostSessionEntry) {
         await createJournalEntry(tradeData);
       }
       

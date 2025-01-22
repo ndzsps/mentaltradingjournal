@@ -55,13 +55,16 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
         resultUrl: tradeData.resultUrl,
       };
 
-      // Create a trade entry without session type and emotion
+      // Create a trade entry with required fields
       const { error: tradeError } = await supabase
         .from('journal_entries')
         .insert({
           user_id: user?.id,
           notes: `Trade: ${tradeData.instrument || 'Unknown Instrument'} - PNL: ${tradeData.pnl}`,
-          trades: [tradeObject]
+          trades: [tradeObject],
+          session_type: 'post',  // Required field
+          emotion: 'neutral',    // Required field
+          emotion_detail: 'none' // Required field
         });
 
       if (tradeError) {

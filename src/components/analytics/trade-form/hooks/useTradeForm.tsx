@@ -16,47 +16,6 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
   const location = useLocation();
   const isPostSessionEntry = location.pathname === "/journal-entry";
 
-  const createJournalEntry = async (tradeData: Trade) => {
-    if (!user || isPostSessionEntry) return;
-
-    const tradeObject = {
-      id: tradeData.id,
-      instrument: tradeData.instrument,
-      direction: tradeData.direction,
-      entryDate: tradeData.entryDate,
-      exitDate: tradeData.exitDate,
-      entryPrice: tradeData.entryPrice,
-      exitPrice: tradeData.exitPrice,
-      stopLoss: tradeData.stopLoss,
-      takeProfit: tradeData.takeProfit,
-      quantity: tradeData.quantity,
-      fees: tradeData.fees,
-      setup: tradeData.setup,
-      pnl: tradeData.pnl,
-      forecastScreenshot: tradeData.forecastScreenshot,
-      resultScreenshot: tradeData.resultScreenshot,
-      htfBias: tradeData.htfBias
-    };
-
-    try {
-      const { error: journalError } = await supabase
-        .from('journal_entries')
-        .insert({
-          user_id: user.id,
-          session_type: 'trade',
-          emotion: 'neutral',
-          emotion_detail: 'neutral',
-          notes: `Trade entry for ${tradeData.instrument || 'Unknown Instrument'}`,
-          trades: [tradeObject]
-        });
-
-      if (journalError) throw journalError;
-    } catch (error) {
-      console.error('Error managing journal entry:', error);
-      throw error;
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -84,8 +43,20 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
     });
 
     try {
-      if (!editTrade && !isPostSessionEntry) {
-        await createJournalEntry(tradeData);
+      // Only create a journal entry if we're in the journal entry context
+      if (isPostSessionEntry) {
+        const { error: journalError } = await supabase
+          .from('journal_entries')
+          .insert({
+            user_id: user?.id,
+            session_type: 'trade',
+            emotion: 'neutral',
+            emotion_detail: 'neutral',
+            notes: `Trade entry for ${tradeData.instrument || 'Unknown Instrument'}`,
+            trades: [tradeData]
+          });
+
+        if (journalError) throw journalError;
       }
       
       onSubmit(tradeData, !!editTrade);

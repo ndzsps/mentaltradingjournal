@@ -62,19 +62,19 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
         htfBias: tradeData.htfBias
       };
 
-      // Create a journal entry for both dashboard and post-session trades
-      const { error: journalError } = await supabase
+      // Create a standalone trade entry
+      const { error: tradeError } = await supabase
         .from('journal_entries')
         .insert({
           user_id: user?.id,
-          session_type: 'trade',
-          emotion: 'neutral',
-          emotion_detail: 'neutral',
-          notes: `Trade entry for ${tradeData.instrument || 'Unknown Instrument'}`,
+          session_type: 'standalone_trade',
+          emotion: '',
+          emotion_detail: '',
+          notes: `Trade: ${tradeData.instrument || 'Unknown Instrument'}`,
           trades: [tradeObject]
         });
 
-      if (journalError) throw journalError;
+      if (tradeError) throw tradeError;
       
       onSubmit(tradeData, !!editTrade);
       onOpenChange(false);

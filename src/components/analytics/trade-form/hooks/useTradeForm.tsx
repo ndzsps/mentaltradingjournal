@@ -43,40 +43,38 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
     });
 
     try {
-      // Only create a journal entry if we're in the journal entry context
-      if (isPostSessionEntry) {
-        const tradeObject = {
-          id: tradeData.id,
-          instrument: tradeData.instrument,
-          direction: tradeData.direction,
-          entryDate: tradeData.entryDate,
-          exitDate: tradeData.exitDate,
-          entryPrice: tradeData.entryPrice,
-          exitPrice: tradeData.exitPrice,
-          stopLoss: tradeData.stopLoss,
-          takeProfit: tradeData.takeProfit,
-          quantity: tradeData.quantity,
-          fees: tradeData.fees,
-          setup: tradeData.setup,
-          pnl: tradeData.pnl,
-          forecastScreenshot: tradeData.forecastScreenshot,
-          resultScreenshot: tradeData.resultScreenshot,
-          htfBias: tradeData.htfBias
-        };
+      const tradeObject = {
+        id: tradeData.id,
+        instrument: tradeData.instrument,
+        direction: tradeData.direction,
+        entryDate: tradeData.entryDate,
+        exitDate: tradeData.exitDate,
+        entryPrice: tradeData.entryPrice,
+        exitPrice: tradeData.exitPrice,
+        stopLoss: tradeData.stopLoss,
+        takeProfit: tradeData.takeProfit,
+        quantity: tradeData.quantity,
+        fees: tradeData.fees,
+        setup: tradeData.setup,
+        pnl: tradeData.pnl,
+        forecastScreenshot: tradeData.forecastScreenshot,
+        resultScreenshot: tradeData.resultScreenshot,
+        htfBias: tradeData.htfBias
+      };
 
-        const { error: journalError } = await supabase
-          .from('journal_entries')
-          .insert({
-            user_id: user?.id,
-            session_type: 'trade',
-            emotion: 'neutral',
-            emotion_detail: 'neutral',
-            notes: `Trade entry for ${tradeData.instrument || 'Unknown Instrument'}`,
-            trades: [tradeObject]
-          });
+      // Create a journal entry for both dashboard and post-session trades
+      const { error: journalError } = await supabase
+        .from('journal_entries')
+        .insert({
+          user_id: user?.id,
+          session_type: 'trade',
+          emotion: 'neutral',
+          emotion_detail: 'neutral',
+          notes: `Trade entry for ${tradeData.instrument || 'Unknown Instrument'}`,
+          trades: [tradeObject]
+        });
 
-        if (journalError) throw journalError;
-      }
+      if (journalError) throw journalError;
       
       onSubmit(tradeData, !!editTrade);
       onOpenChange(false);

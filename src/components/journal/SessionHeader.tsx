@@ -17,6 +17,7 @@ export const SessionHeader = ({
   outcome
 }: SessionHeaderProps) => {
   const isPreSession = sessionType === 'pre';
+  const isTradeEntry = sessionType === 'trade';
 
   const formatOutcome = (outcome: string) => {
     if (outcome === 'no_trades') return 'No Trades';
@@ -30,13 +31,13 @@ export const SessionHeader = ({
       </div>
       <div className="flex items-center gap-3 flex-wrap">
         <Badge 
-          variant={isPreSession ? "default" : "secondary"}
+          variant={isPreSession ? "default" : isTradeEntry ? "secondary" : "secondary"}
           className="capitalize px-4 py-1.5 rounded-full text-sm font-medium"
         >
-          {isPreSession ? 'Pre-Session' : 'Post-Session'}
+          {isTradeEntry ? 'Trade Entry' : isPreSession ? 'Pre-Session' : 'Post-Session'}
         </Badge>
-        <EmotionBadge emotion={emotion} detail={emotionDetail} />
-        {!isPreSession && outcome && (
+        {!isTradeEntry && <EmotionBadge emotion={emotion} detail={emotionDetail} />}
+        {!isTradeEntry && !isPreSession && outcome && (
           <Badge 
             variant="outline" 
             className={`capitalize px-4 py-1.5 rounded-full text-sm font-medium ${

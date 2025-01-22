@@ -60,11 +60,11 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
         .from('journal_entries')
         .insert({
           user_id: user?.id,
-          notes: `Trade: ${tradeData.instrument || 'Unknown Instrument'} - PNL: ${tradeData.pnl}`,
+          notes: `Trade entry for ${tradeData.instrument}`,
           trades: [tradeObject],
-          session_type: 'post',  // Required field
-          emotion: 'neutral',    // Required field
-          emotion_detail: 'none' // Required field
+          session_type: 'trade',  // Changed from 'post' to 'trade'
+          emotion: 'neutral',    
+          emotion_detail: 'neutral'
         });
 
       if (tradeError) {

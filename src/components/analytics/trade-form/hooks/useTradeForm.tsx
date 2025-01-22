@@ -1,9 +1,8 @@
-import { useState, useEffect } from "react";
-import { Trade } from "@/types/trade";
-import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { Trade } from "@/types/trade";
 import { toast } from "sonner";
-import { useLocation } from "react-router-dom";
 
 interface UseTradeFormProps {
   editTrade?: Trade;
@@ -12,114 +11,76 @@ interface UseTradeFormProps {
 }
 
 export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeFormProps) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useAuth();
-  const location = useLocation();
-  const isPostSessionEntry = location.pathname === "/journal-entry";
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    
-    const tradeData: Trade = {
-      id: editTrade?.id || crypto.randomUUID(),
-      direction: direction as 'buy' | 'sell',
-    };
-
-    const fields = [
-      'entryDate', 'instrument', 'setup', 'entryPrice', 'quantity', 
-      'stopLoss', 'takeProfit', 'exitDate', 'exitPrice', 'pnl', 
-      'fees', 'forecastScreenshot', 'resultUrl', 'htfBias'
-    ];
-
-    fields.forEach(field => {
-      const value = formData.get(field);
-      if (value && value !== '') {
-        if (['entryPrice', 'exitPrice', 'stopLoss', 'takeProfit', 'quantity', 'pnl', 'fees'].includes(field)) {
-          tradeData[field] = parseFloat(value as string);
-        } else {
-          tradeData[field] = value as string;
-        }
-      }
-    });
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setIsSubmitting(true);
 
     try {
-      const tradeObject = {
-        id: tradeData.id,
-        instrument: tradeData.instrument,
-        direction: tradeData.direction,
-        entryDate: tradeData.entryDate,
-        exitDate: tradeData.exitDate,
-        entryPrice: tradeData.entryPrice,
-        exitPrice: tradeData.exitPrice,
-        stopLoss: tradeData.stopLoss,
-        takeProfit: tradeData.takeProfit,
-        quantity: tradeData.quantity,
-        fees: tradeData.fees,
-        setup: tradeData.setup,
-        pnl: tradeData.pnl,
-        forecastScreenshot: tradeData.forecastScreenshot,
-        resultScreenshot: tradeData.resultScreenshot,
-        htfBias: tradeData.htfBias
+      const formData = new FormData(event.currentTarget);
+      const tradeData = {
+        entryDate: formData.get("entryDate") as string,
+        instrument: formData.get("instrument") as string,
+        setup: formData.get("setup") as string,
+        direction: formData.get("direction") as string,
+        entryPrice: parseFloat(formData.get("entryPrice") as string),
+        exitPrice: parseFloat(formData.get("exitPrice") as string),
+        quantity: parseFloat(formData.get("quantity") as string),
+        stopLoss: parseFloat(formData.get("stopLoss") as string),
+        takeProfit: parseFloat(formData.get("takeProfit") as string),
+        pnl: parseFloat(formData.get("pnl") as string),
+        fees: parseFloat(formData.get("fees") as string),
+        exitDate: formData.get("exitDate") as string,
+        forecastScreenshot: formData.get("forecastScreenshot") as string,
+        resultUrl: formData.get("resultUrl") as string,
       };
 
-      // Create a trade entry
+      const tradeObject = {
+        id: editTrade?.id || crypto.randomUUID(),
+        entryDate: tradeData.entryDate,
+        exitDate: tradeData.exitDate,
+        instrument: tradeData.instrument,
+        setup: tradeData.setup,
+        direction: tradeData.direction,
+        entryPrice: tradeData.entryPrice,
+        exitPrice: tradeData.exitPrice,
+        quantity: tradeData.quantity,
+        stopLoss: tradeData.stopLoss,
+        takeProfit: tradeData.takeProfit,
+        pnl: tradeData.pnl,
+        fees: tradeData.fees,
+        forecastScreenshot: tradeData.forecastScreenshot,
+        resultUrl: tradeData.resultUrl,
+      };
+
+      // Create a trade entry without session type and emotion
       const { error: tradeError } = await supabase
         .from('journal_entries')
         .insert({
           user_id: user?.id,
-          session_type: 'post',  // Changed from 'standalone_trade' to 'post'
-          emotion: 'neutral',
-          emotion_detail: 'neutral',
-          notes: `Trade: ${tradeData.instrument || 'Unknown Instrument'}`,
+          notes: `Trade: ${tradeData.instrument || 'Unknown Instrument'} - PNL: ${tradeData.pnl}`,
           trades: [tradeObject]
         });
 
-      if (tradeError) throw tradeError;
-      
-      onSubmit(tradeData, !!editTrade);
+      if (tradeError) {
+        throw tradeError;
+      }
+
+      await onSubmit(tradeObject as Trade, !!editTrade);
       onOpenChange(false);
-      toast.success(editTrade ? "Trade updated successfully!" : "Trade added successfully!");
-    } catch (error) {
-      console.error('Error managing trade:', error);
-      toast.error("Failed to manage trade");
+      toast.success("Trade saved successfully!");
+    } catch (error: any) {
+      console.error("Error saving trade:", error);
+      toast.error("Failed to save trade. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const [direction, setDirection] = useState<'buy' | 'sell' | null>(null);
-
-  useEffect(() => {
-    if (editTrade) {
-      setDirection(editTrade.direction);
-      
-      const fields = [
-        { id: 'entryDate', value: editTrade.entryDate },
-        { id: 'instrument', value: editTrade.instrument },
-        { id: 'setup', value: editTrade.setup },
-        { id: 'entryPrice', value: editTrade.entryPrice },
-        { id: 'quantity', value: editTrade.quantity },
-        { id: 'stopLoss', value: editTrade.stopLoss },
-        { id: 'takeProfit', value: editTrade.takeProfit },
-        { id: 'exitDate', value: editTrade.exitDate },
-        { id: 'exitPrice', value: editTrade.exitPrice },
-        { id: 'pnl', value: editTrade.pnl },
-        { id: 'fees', value: editTrade.fees },
-        { id: 'forecastScreenshot', value: editTrade.forecastScreenshot },
-        { id: 'resultUrl', value: editTrade.resultScreenshot },
-        { id: 'htfBias', value: editTrade.htfBias }
-      ];
-
-      fields.forEach(({ id, value }) => {
-        const element = document.getElementById(id) as HTMLInputElement;
-        if (element && value !== undefined && value !== null) {
-          element.value = value.toString();
-        }
-      });
-    }
-  }, [editTrade]);
-
   return {
-    direction,
-    setDirection,
-    handleSubmit
+    handleSubmit,
+    isSubmitting,
   };
 };

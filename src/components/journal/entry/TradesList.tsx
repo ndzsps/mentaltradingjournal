@@ -2,7 +2,7 @@ import { Trade } from "@/types/trade";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Pencil, ArrowUp, ArrowDown } from "lucide-react";
+import { ExternalLink, Pencil } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { useState } from "react";
 import { AddTradeDialog } from "@/components/analytics/AddTradeDialog";
@@ -109,23 +109,13 @@ export const TradesList = ({ trades }: TradesListProps) => {
                 <div className="flex items-center gap-3">
                   <Badge 
                     variant={trade.direction === 'buy' ? 'default' : 'destructive'}
-                    className="capitalize flex items-center gap-1"
+                    className="px-3 py-1 rounded-md"
                   >
-                    {trade.direction === 'buy' ? (
-                      <ArrowUp className="h-3 w-3" />
-                    ) : (
-                      <ArrowDown className="h-3 w-3" />
-                    )}
-                    {trade.direction}
+                    {trade.direction?.toUpperCase()}
                   </Badge>
-                  <span className={`font-medium flex items-center gap-1 ${
+                  <span className={`font-medium ${
                     Number(trade.pnl) >= 0 ? 'text-green-500' : 'text-red-500'
                   }`}>
-                    {trade.direction === 'buy' ? (
-                      <ArrowUp className="h-4 w-4" />
-                    ) : (
-                      <ArrowDown className="h-4 w-4" />
-                    )}
                     {Number(trade.pnl) >= 0 ? '+$' : '-$'}{Math.abs(Number(trade.pnl)).toLocaleString()}
                   </span>
                 </div>

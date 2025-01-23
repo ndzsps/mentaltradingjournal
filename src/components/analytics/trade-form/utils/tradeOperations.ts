@@ -18,22 +18,29 @@ export const findTradeEntry = async (tradeId: string) => {
   return entry;
 };
 
-export const createTradeObject = (formData: FormData): Trade => ({
-  entryDate: formData.get("entryDate") as string,
-  instrument: formData.get("instrument") as string,
-  setup: formData.get("setup") as string,
-  direction: formData.get("direction") as string,
-  entryPrice: parseFloat(formData.get("entryPrice") as string),
-  exitPrice: parseFloat(formData.get("exitPrice") as string),
-  quantity: parseFloat(formData.get("quantity") as string),
-  stopLoss: parseFloat(formData.get("stopLoss") as string),
-  takeProfit: parseFloat(formData.get("takeProfit") as string),
-  pnl: parseFloat(formData.get("pnl") as string),
-  fees: parseFloat(formData.get("fees") as string),
-  exitDate: formData.get("exitDate") as string,
-  forecastScreenshot: formData.get("forecastScreenshot") as string,
-  resultUrl: formData.get("resultUrl") as string,
-});
+export const createTradeObject = (formData: FormData): Trade => {
+  const direction = formData.get("direction") as string;
+  if (direction !== 'buy' && direction !== 'sell') {
+    throw new Error('Invalid direction value');
+  }
+
+  return {
+    entryDate: formData.get("entryDate") as string,
+    instrument: formData.get("instrument") as string,
+    setup: formData.get("setup") as string,
+    direction: direction as 'buy' | 'sell',
+    entryPrice: parseFloat(formData.get("entryPrice") as string),
+    exitPrice: parseFloat(formData.get("exitPrice") as string),
+    quantity: parseFloat(formData.get("quantity") as string),
+    stopLoss: parseFloat(formData.get("stopLoss") as string),
+    takeProfit: parseFloat(formData.get("takeProfit") as string),
+    pnl: parseFloat(formData.get("pnl") as string),
+    fees: parseFloat(formData.get("fees") as string),
+    exitDate: formData.get("exitDate") as string,
+    forecastScreenshot: formData.get("forecastScreenshot") as string,
+    resultUrl: formData.get("resultUrl") as string,
+  };
+};
 
 export const updateExistingTrade = async (entry: any, editTrade: Trade, tradeData: Trade) => {
   const trades = entry.trades as any[];

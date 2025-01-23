@@ -49,8 +49,10 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
         if (!entries || entries.length === 0) throw new Error('Journal entry not found');
 
         const entry = entries[0];
-        const updatedTrades = entry.trades.map((trade: Trade) => 
-          trade.id === editTrade.id ? { ...trade, ...tradeData, id: editTrade.id } : trade
+        const updatedTrades = (entry.trades as any[]).map((trade: any) => 
+          trade.id === editTrade.id 
+            ? { ...trade, ...tradeData, id: editTrade.id } 
+            : trade
         );
 
         // Update the journal entry with the modified trades array

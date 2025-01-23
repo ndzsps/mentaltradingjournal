@@ -38,17 +38,22 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
       };
 
       if (editTrade) {
-        // Get the journal entry containing this trade
+        // Get all journal entries for trades
         const { data: entries, error: fetchError } = await supabase
           .from('journal_entries')
           .select('*')
-          .eq('session_type', 'trade')
-          .contains('trades', [{ id: editTrade.id }]);
+          .eq('session_type', 'trade');
 
         if (fetchError) throw fetchError;
-        if (!entries || entries.length === 0) throw new Error('Journal entry not found');
+        
+        // Find the entry containing our trade
+        const entry = entries?.find(entry => {
+          const trades = entry.trades as any[];
+          return trades?.some(trade => trade.id === editTrade.id);
+        });
 
-        const entry = entries[0];
+        if (!entry) throw new Error('Journal entry not found');
+
         const trades = entry.trades as any[];
         
         // Create a clean trade object for the update

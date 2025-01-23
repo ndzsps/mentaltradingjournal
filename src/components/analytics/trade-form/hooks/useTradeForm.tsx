@@ -37,46 +37,56 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
         resultUrl: formData.get("resultUrl") as string,
       };
 
-      const tradeObject = {
-        id: editTrade?.id || crypto.randomUUID(),
-        entryDate: tradeData.entryDate,
-        exitDate: tradeData.exitDate,
-        instrument: tradeData.instrument,
-        setup: tradeData.setup,
-        direction: tradeData.direction,
-        entryPrice: tradeData.entryPrice,
-        exitPrice: tradeData.exitPrice,
-        quantity: tradeData.quantity,
-        stopLoss: tradeData.stopLoss,
-        takeProfit: tradeData.takeProfit,
-        pnl: tradeData.pnl,
-        fees: tradeData.fees,
-        forecastScreenshot: tradeData.forecastScreenshot,
-        resultUrl: tradeData.resultUrl,
-      };
+      if (editTrade) {
+        // Get the journal entry containing this trade
+        const { data: entries, error: fetchError } = await supabase
+          .from('journal_entries')
+          .select('*')
+          .eq('session_type', 'trade')
+          .contains('trades', [{ id: editTrade.id }]);
 
-      // Create a trade entry with required fields
-      const { error: tradeError } = await supabase
-        .from('journal_entries')
-        .insert({
-          user_id: user?.id,
-          notes: `Trade entry for ${tradeData.instrument}`,
-          trades: [tradeObject],
-          session_type: 'trade',  // Changed from 'post' to 'trade'
-          emotion: 'neutral',    
-          emotion_detail: 'neutral'
-        });
+        if (fetchError) throw fetchError;
+        if (!entries || entries.length === 0) throw new Error('Journal entry not found');
 
-      if (tradeError) {
-        throw tradeError;
+        const entry = entries[0];
+        const updatedTrades = entry.trades.map((trade: Trade) => 
+          trade.id === editTrade.id ? { ...trade, ...tradeData, id: editTrade.id } : trade
+        );
+
+        // Update the journal entry with the modified trades array
+        const { error: updateError } = await supabase
+          .from('journal_entries')
+          .update({ trades: updatedTrades })
+          .eq('id', entry.id);
+
+        if (updateError) throw updateError;
+      } else {
+        // Create a new trade entry
+        const tradeObject = {
+          id: crypto.randomUUID(),
+          ...tradeData
+        };
+
+        const { error: tradeError } = await supabase
+          .from('journal_entries')
+          .insert({
+            user_id: user?.id,
+            notes: `Trade entry for ${tradeData.instrument}`,
+            trades: [tradeObject],
+            session_type: 'trade',
+            emotion: 'neutral',    
+            emotion_detail: 'neutral'
+          });
+
+        if (tradeError) throw tradeError;
       }
 
-      await onSubmit(tradeObject as Trade, !!editTrade);
+      await onSubmit(tradeData as Trade, !!editTrade);
       onOpenChange(false);
-      toast.success("Trade saved successfully!");
+      toast.success(editTrade ? "Trade updated successfully!" : "Trade saved successfully!");
     } catch (error: any) {
-      console.error("Error saving trade:", error);
-      toast.error("Failed to save trade. Please try again.");
+      console.error(editTrade ? "Error updating trade:" : "Error saving trade:", error);
+      toast.error(editTrade ? "Failed to update trade" : "Failed to save trade");
     } finally {
       setIsSubmitting(false);
     }

@@ -24,6 +24,7 @@ export const TradeEntrySection = () => {
             id="quantity"
             name="quantity"
             placeholder="Enter lot size or contracts"
+            step="0.01"
           />
         </div>
         <div className="grid w-full items-center gap-1.5">

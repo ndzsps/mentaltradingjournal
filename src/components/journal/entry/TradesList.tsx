@@ -1,6 +1,5 @@
 import { Trade } from "@/types/trade";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, Pencil } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
@@ -107,14 +106,17 @@ export const TradesList = ({ trades }: TradesListProps) => {
               <div className="flex items-center justify-between w-full pr-4">
                 <span className="font-medium">{trade.instrument}</span>
                 <div className="flex items-center gap-3">
-                  <Badge 
-                    variant={trade.direction === 'buy' ? 'default' : 'destructive'}
-                    className="px-3 py-1 rounded-md"
+                  <span 
+                    className={`px-4 py-1 rounded-md text-white ${
+                      trade.direction === 'buy' 
+                        ? 'bg-[#2E7D32]' 
+                        : 'bg-[#ea384c]'
+                    }`}
                   >
                     {trade.direction?.toUpperCase()}
-                  </Badge>
+                  </span>
                   <span className={`font-medium ${
-                    Number(trade.pnl) >= 0 ? 'text-green-500' : 'text-red-500'
+                    Number(trade.pnl) >= 0 ? 'text-[#2E7D32]' : 'text-[#ea384c]'
                   }`}>
                     {Number(trade.pnl) >= 0 ? '+$' : '-$'}{Math.abs(Number(trade.pnl)).toLocaleString()}
                   </span>

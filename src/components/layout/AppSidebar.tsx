@@ -1,4 +1,4 @@
-import { Home, BookOpen, BarChart2, Settings, UserCog, FlaskConical, BrainCircuit, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { Home, BookOpen, BarChart2, Settings, UserCog, FlaskConical, BrainCircuit } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
   Sidebar,
@@ -18,7 +18,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
 const menuItems = [
@@ -31,34 +30,19 @@ const menuItems = [
 
 export function AppSidebar() {
   const [showMentorDialog, setShowMentorDialog] = useState(false);
-  const { toggleSidebar, state } = useSidebar();
+  const { state } = useSidebar();
 
   return (
     <>
       <Sidebar>
         <SidebarContent>
           <div className="p-4">
-            <div className="flex items-center justify-between">
-              <Link to="/" className="flex items-center gap-2 group">
-                <BrainCircuit className="w-6 h-6 text-primary transition-all duration-300 group-hover:text-accent" />
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent transition-all duration-300">
-                  Mental
-                </h1>
-              </Link>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleSidebar}
-                className="ml-2 hover:bg-primary/10 relative z-50"
-                title={state === "expanded" ? "Collapse Sidebar" : "Expand Sidebar"}
-              >
-                {state === "expanded" ? (
-                  <PanelLeftClose className="h-4 w-4" />
-                ) : (
-                  <PanelLeftOpen className="h-4 w-4" />
-                )}
-              </Button>
-            </div>
+            <Link to="/" className="flex items-center gap-2 group">
+              <BrainCircuit className="w-6 h-6 text-primary transition-all duration-300 group-hover:text-accent" />
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent transition-all duration-300">
+                Mental
+              </h1>
+            </Link>
           </div>
           <SidebarGroup>
             <SidebarGroupLabel>Menu</SidebarGroupLabel>

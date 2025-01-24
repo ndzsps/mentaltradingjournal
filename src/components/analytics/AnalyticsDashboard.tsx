@@ -17,14 +17,11 @@ import { AssetPairPerformance } from "./AssetPairPerformance";
 import { TimeBasedPerformance } from "./TimeBasedPerformance";
 import { EquityCurve } from "./EquityCurve";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Menu } from "lucide-react";
-import { useSidebar } from "@/components/ui/sidebar";
 
 const queryClient = new QueryClient();
 
 export const AnalyticsDashboard = () => {
   const [activeView, setActiveView] = useState<'all' | 'psychological' | 'trading'>('all');
-  const { toggle } = useSidebar();
 
   const psychologicalComponents = [
     EmotionTrend,
@@ -63,21 +60,11 @@ export const AnalyticsDashboard = () => {
     <QueryClientProvider client={queryClient}>
       <div className="container mx-auto p-4 space-y-6">
         <div className="space-y-4">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggle}
-              className="shrink-0"
-            >
-              <Menu className="h-5 w-5" />
-            </Button>
-            <div className="space-y-2">
-              <h2 className="text-2xl md:text-3xl font-bold">Trading Analytics</h2>
-              <p className="text-sm md:text-base text-muted-foreground">
-                Analyze your trading performance and emotional patterns
-              </p>
-            </div>
+          <div className="space-y-2">
+            <h2 className="text-2xl md:text-3xl font-bold">Trading Analytics</h2>
+            <p className="text-sm md:text-base text-muted-foreground">
+              Analyze your trading performance and emotional patterns
+            </p>
           </div>
 
           <div className="flex gap-2">

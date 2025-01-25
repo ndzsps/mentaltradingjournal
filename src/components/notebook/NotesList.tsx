@@ -25,10 +25,14 @@ export const NotesList = ({ folderId }: { folderId: string | null }) => {
     queryKey: ["notes", folderId],
     queryFn: async () => {
       if (!folderId) return [];
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("No user found");
+
       const { data, error } = await supabase
         .from("notebook_notes")
         .select("*")
         .eq("folder_id", folderId)
+        .eq("user_id", user.id)
         .order("created_at", { ascending: false });
       
       if (error) throw error;
@@ -40,9 +44,17 @@ export const NotesList = ({ folderId }: { folderId: string | null }) => {
   const createNote = useMutation({
     mutationFn: async ({ title, content }: { title: string; content: string }) => {
       if (!folderId) throw new Error("No folder selected");
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("No user found");
+
       const { data, error } = await supabase
         .from("notebook_notes")
-        .insert([{ folder_id: folderId, title, content }])
+        .insert([{ 
+          folder_id: folderId, 
+          title, 
+          content,
+          user_id: user.id
+        }])
         .select()
         .single();
       

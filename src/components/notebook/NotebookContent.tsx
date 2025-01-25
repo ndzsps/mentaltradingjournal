@@ -17,9 +17,13 @@ export const NotebookContent = () => {
   const { data: folders, isLoading: foldersLoading } = useQuery({
     queryKey: ["folders"],
     queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("No user found");
+
       const { data, error } = await supabase
         .from("notebook_folders")
         .select("*")
+        .eq("user_id", user.id)
         .order("created_at", { ascending: true });
       
       if (error) throw error;
@@ -29,9 +33,15 @@ export const NotebookContent = () => {
 
   const createFolder = useMutation({
     mutationFn: async (name: string) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("No user found");
+
       const { data, error } = await supabase
         .from("notebook_folders")
-        .insert([{ name }])
+        .insert([{ 
+          name,
+          user_id: user.id
+        }])
         .select()
         .single();
       

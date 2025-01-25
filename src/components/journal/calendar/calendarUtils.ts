@@ -55,15 +55,17 @@ export const getEmotionStyle = (stats: { totalPL: number } | null) => {
     };
   }
 
+  if (stats.totalPL > 0) {
+    return {
+      bg: "bg-emerald-50 dark:bg-emerald-950/30",
+      border: "border-emerald-500 dark:border-emerald-500",
+      shadow: "shadow-emerald-100/50 dark:shadow-emerald-900/50",
+    };
+  }
+
   return {
-    bg: stats.totalPL > 0 
-      ? "bg-emerald-50 dark:bg-emerald-950/30" 
-      : "bg-red-50 dark:bg-red-950/30",
-    border: stats.totalPL > 0 
-      ? "border-emerald-100 dark:border-emerald-800" 
-      : "border-red-100 dark:border-red-800",
-    shadow: stats.totalPL > 0 
-      ? "shadow-emerald-100/50 dark:shadow-emerald-900/50" 
-      : "shadow-red-100/50 dark:shadow-red-900/50",
+    bg: "bg-red-50 dark:bg-red-950/30",
+    border: "border-red-500 dark:border-red-500",
+    shadow: "shadow-red-100/50 dark:shadow-red-900/50",
   };
 };

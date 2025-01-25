@@ -11,6 +11,7 @@ import Journal from "./pages/Journal";
 import Analytics from "./pages/Analytics";
 import Backtesting from "./pages/Backtesting";
 import BlueprintSessions from "./pages/BlueprintSessions";
+import Notebook from "./pages/Notebook";
 import Login from "./pages/Login";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 
@@ -83,6 +84,14 @@ const App = () => {
                     element={
                       <ProtectedRoute>
                         <Backtesting />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/notebook"
+                    element={
+                      <ProtectedRoute>
+                        <Notebook />
                       </ProtectedRoute>
                     }
                   />

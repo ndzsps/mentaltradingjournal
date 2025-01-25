@@ -30,6 +30,11 @@ export const CalendarDay = ({
   const isToday = dayDate.toDateString() === new Date().toDateString();
   const hasEntries = stats !== null;
 
+  const getPnLColor = (amount: number) => {
+    if (amount === 0) return 'text-gray-500 dark:text-gray-400';
+    return amount > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400';
+  };
+
   const dayButton = (
     <button 
       onClick={() => onSelect(dayDate)}
@@ -59,7 +64,7 @@ export const CalendarDay = ({
       {stats && (
         <div className="absolute inset-0 flex flex-col justify-end p-2 bg-gradient-to-t from-white/90 to-transparent dark:from-gray-900/90">
           <div className="space-y-1 text-center w-full">
-            <p className={`text-lg font-semibold ${stats.totalPL >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}`}>
+            <p className={`text-lg font-semibold ${getPnLColor(stats.totalPL)}`}>
               {formatCurrency(stats.totalPL)}
             </p>
             <p className="text-xs text-gray-600 dark:text-gray-300">

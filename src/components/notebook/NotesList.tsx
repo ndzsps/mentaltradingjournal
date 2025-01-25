@@ -8,6 +8,7 @@ import { Plus } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Note {
   id: string;
@@ -20,13 +21,12 @@ export const NotesList = ({ folderId }: { folderId: string | null }) => {
   const [newNoteContent, setNewNoteContent] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   const { data: notes, isLoading } = useQuery({
     queryKey: ["notes", folderId],
     queryFn: async () => {
-      if (!folderId) return [];
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("No user found");
+      if (!folderId || !user) return [];
 
       const { data, error } = await supabase
         .from("notebook_notes")
@@ -38,14 +38,12 @@ export const NotesList = ({ folderId }: { folderId: string | null }) => {
       if (error) throw error;
       return data;
     },
-    enabled: !!folderId,
+    enabled: !!folderId && !!user,
   });
 
   const createNote = useMutation({
     mutationFn: async ({ title, content }: { title: string; content: string }) => {
-      if (!folderId) throw new Error("No folder selected");
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("No user found");
+      if (!folderId || !user) throw new Error("No folder selected or user not found");
 
       const { data, error } = await supabase
         .from("notebook_notes")

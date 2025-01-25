@@ -7,17 +7,18 @@ import { Plus } from "lucide-react";
 import { FolderList } from "./FolderList";
 import { NotesList } from "./NotesList";
 import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const NotebookContent = () => {
   const [newFolderName, setNewFolderName] = useState("");
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   const { data: folders, isLoading: foldersLoading } = useQuery({
     queryKey: ["folders"],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No user found");
 
       const { data, error } = await supabase
@@ -29,11 +30,11 @@ export const NotebookContent = () => {
       if (error) throw error;
       return data;
     },
+    enabled: !!user,
   });
 
   const createFolder = useMutation({
     mutationFn: async (name: string) => {
-      const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No user found");
 
       const { data, error } = await supabase

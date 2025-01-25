@@ -2,6 +2,7 @@ import { Progress } from "@/components/ui/progress";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Trophy } from "lucide-react";
+import ReactConfetti from "react-confetti";
 
 export interface SessionProgressProps {
   emotionSelected: boolean;
@@ -29,6 +30,22 @@ export const SessionProgress = ({
   showCelebration,
 }: SessionProgressProps) => {
   const [progress, setProgress] = useState(0);
+  const [windowSize, setWindowSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const calculateProgress = () => {
     const steps = isPostSession
@@ -62,6 +79,25 @@ export const SessionProgress = ({
 
   return (
     <div className="space-y-4">
+      {showCelebration && (
+        <ReactConfetti
+          width={windowSize.width}
+          height={windowSize.height}
+          recycle={false}
+          numberOfPieces={500}
+          gravity={0.2}
+          initialVelocityY={20}
+          tweenDuration={2000}
+          colors={['#6E59A5', '#9b87f5', '#FEC6A1', '#0EA5E9', '#38BDF8']}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            zIndex: 50,
+            pointerEvents: 'none'
+          }}
+        />
+      )}
       <div className="flex justify-between items-center">
         <span className="text-sm font-medium text-muted-foreground">
           {isPostSession ? "Post-Session Progress" : "Pre-Session Progress"}

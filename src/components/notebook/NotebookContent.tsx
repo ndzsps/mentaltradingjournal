@@ -6,12 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Plus } from "lucide-react";
 import { FolderList } from "./FolderList";
 import { NotesList } from "./NotesList";
+import { NoteView } from "./NoteView";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 
 export const NotebookContent = () => {
   const [newFolderName, setNewFolderName] = useState("");
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
+  const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { user } = useAuth();
@@ -101,8 +103,8 @@ export const NotebookContent = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-12 gap-6">
-          <div className="col-span-3">
+        <div className="grid grid-cols-12 gap-6 min-h-[600px]">
+          <div className="col-span-2 border-r">
             <FolderList
               folders={folders || []}
               isLoading={foldersLoading}
@@ -110,8 +112,15 @@ export const NotebookContent = () => {
               onSelectFolder={setSelectedFolderId}
             />
           </div>
-          <div className="col-span-9">
-            <NotesList folderId={selectedFolderId} />
+          <div className="col-span-4 border-r">
+            <NotesList 
+              folderId={selectedFolderId} 
+              selectedNoteId={selectedNoteId}
+              onSelectNote={setSelectedNoteId}
+            />
+          </div>
+          <div className="col-span-6">
+            <NoteView noteId={selectedNoteId} />
           </div>
         </div>
       </div>

@@ -10,13 +10,13 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 
-interface Note {
-  id: string;
-  title: string;
-  content: string;
+interface NotesListProps {
+  folderId: string | null;
+  selectedNoteId: string | null;
+  onSelectNote: (id: string | null) => void;
 }
 
-export const NotesList = ({ folderId }: { folderId: string | null }) => {
+export const NotesList = ({ folderId, selectedNoteId, onSelectNote }: NotesListProps) => {
   const [newNoteTitle, setNewNoteTitle] = useState("");
   const [newNoteContent, setNewNoteContent] = useState("");
   const { toast } = useToast();
@@ -59,10 +59,11 @@ export const NotesList = ({ folderId }: { folderId: string | null }) => {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["notes", folderId] });
       setNewNoteTitle("");
       setNewNoteContent("");
+      onSelectNote(data.id);
       toast({
         title: "Success",
         description: "Note created successfully",
@@ -97,10 +98,6 @@ export const NotesList = ({ folderId }: { folderId: string | null }) => {
     );
   }
 
-  if (isLoading) {
-    return <div className="animate-pulse h-[400px] bg-muted rounded-lg" />;
-  }
-
   return (
     <div className="space-y-4">
       <div className="space-y-4">
@@ -128,12 +125,20 @@ export const NotesList = ({ folderId }: { folderId: string | null }) => {
       <ScrollArea className="h-[400px]">
         <div className="space-y-4">
           {notes?.map((note) => (
-            <Card key={note.id}>
-              <CardHeader>
-                <CardTitle>{note.title}</CardTitle>
+            <Card 
+              key={note.id}
+              className={`cursor-pointer transition-colors hover:bg-muted/50 ${
+                selectedNoteId === note.id ? "bg-muted" : ""
+              }`}
+              onClick={() => onSelectNote(note.id)}
+            >
+              <CardHeader className="p-4">
+                <CardTitle className="text-base">{note.title}</CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="whitespace-pre-wrap">{note.content}</p>
+              <CardContent className="p-4 pt-0">
+                <p className="text-sm text-muted-foreground line-clamp-2">
+                  {note.content}
+                </p>
               </CardContent>
             </Card>
           ))}

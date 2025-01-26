@@ -1,4 +1,4 @@
-import { Home, BookOpen, BarChart2, Settings, UserCog, FlaskConical, BrainCircuit, Notebook, ChevronRight, ChevronLeft } from "lucide-react";
+import { Home, BookOpen, BarChart2, Settings, UserCog, FlaskConical, BrainCircuit, Notebook } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
   Sidebar,
@@ -18,14 +18,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 
 const menuItems = [
   { title: "Journal Entry", icon: Home, url: "/journal-entry" },
@@ -38,76 +31,40 @@ const menuItems = [
 
 export function AppSidebar() {
   const [showMentorDialog, setShowMentorDialog] = useState(false);
-  const { state, toggleSidebar } = useSidebar();
-  const isCollapsed = state === "collapsed";
+  const { state } = useSidebar();
 
   return (
     <>
       <Sidebar>
         <SidebarContent>
-          <div className="p-3 flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-1.5 group">
-              <BrainCircuit className="w-5 h-5 text-primary transition-all duration-300 group-hover:text-accent" />
-              <h1 className={`text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent transition-all duration-300 ${isCollapsed ? 'hidden' : 'block'}`}>
+          <div className="p-4">
+            <Link to="/" className="flex items-center gap-2 group">
+              <BrainCircuit className="w-6 h-6 text-primary transition-all duration-300 group-hover:text-accent" />
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent transition-all duration-300">
                 Mental
               </h1>
             </Link>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 absolute -right-4 top-6 bg-background border shadow-sm z-50"
-              onClick={toggleSidebar}
-            >
-              {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-            </Button>
           </div>
           <SidebarGroup>
-            <SidebarGroupLabel className={isCollapsed ? 'hidden' : 'block'}>Menu</SidebarGroupLabel>
+            <SidebarGroupLabel>Menu</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                <TooltipProvider>
-                  {menuItems.map((item) => (
-                    <SidebarMenuItem key={item.title}>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <SidebarMenuButton asChild>
-                            <Link 
-                              to={item.url} 
-                              className="flex items-center gap-2 relative group"
-                            >
-                              <item.icon className="w-4 h-4 shrink-0" />
-                              <span className={`text-sm transition-all duration-300 ${isCollapsed ? 'hidden' : 'block'}`}>
-                                {item.title}
-                              </span>
-                            </Link>
-                          </SidebarMenuButton>
-                        </TooltipTrigger>
-                        {isCollapsed && (
-                          <TooltipContent side="right">
-                            {item.title}
-                          </TooltipContent>
-                        )}
-                      </Tooltip>
-                    </SidebarMenuItem>
-                  ))}
-                  <SidebarMenuItem>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <SidebarMenuButton onClick={() => setShowMentorDialog(true)}>
-                          <UserCog className="w-4 h-4 shrink-0" />
-                          <span className={`text-sm ${isCollapsed ? 'hidden' : 'block'}`}>
-                            Mentor Mode
-                          </span>
-                        </SidebarMenuButton>
-                      </TooltipTrigger>
-                      {isCollapsed && (
-                        <TooltipContent side="right">
-                          Mentor Mode
-                        </TooltipContent>
-                      )}
-                    </Tooltip>
+                {menuItems.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <Link to={item.url} className="flex items-center gap-2">
+                        <item.icon className="w-5 h-5" />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
                   </SidebarMenuItem>
-                </TooltipProvider>
+                ))}
+                <SidebarMenuItem>
+                  <SidebarMenuButton onClick={() => setShowMentorDialog(true)}>
+                    <UserCog className="w-5 h-5" />
+                    <span>Mentor Mode</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>

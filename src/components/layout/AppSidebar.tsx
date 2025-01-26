@@ -18,6 +18,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
@@ -59,33 +65,49 @@ export function AppSidebar() {
             <SidebarGroupLabel className={isCollapsed ? 'hidden' : 'block'}>Menu</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {menuItems.map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild>
-                      <Link 
-                        to={item.url} 
-                        className="flex items-center gap-2 relative group"
-                        title={isCollapsed ? item.title : undefined}
-                      >
-                        <item.icon className="w-4 h-4" />
-                        <span className={`text-sm transition-all duration-300 ${isCollapsed ? 'hidden' : 'block'}`}>
-                          {item.title}
-                        </span>
-                      </Link>
-                    </SidebarMenuButton>
+                <TooltipProvider>
+                  {menuItems.map((item) => (
+                    <SidebarMenuItem key={item.title}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <SidebarMenuButton asChild>
+                            <Link 
+                              to={item.url} 
+                              className="flex items-center gap-2 relative group"
+                            >
+                              <item.icon className="w-4 h-4 shrink-0" />
+                              <span className={`text-sm transition-all duration-300 ${isCollapsed ? 'hidden' : 'block'}`}>
+                                {item.title}
+                              </span>
+                            </Link>
+                          </SidebarMenuButton>
+                        </TooltipTrigger>
+                        {isCollapsed && (
+                          <TooltipContent side="right">
+                            {item.title}
+                          </TooltipContent>
+                        )}
+                      </Tooltip>
+                    </SidebarMenuItem>
+                  ))}
+                  <SidebarMenuItem>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <SidebarMenuButton onClick={() => setShowMentorDialog(true)}>
+                          <UserCog className="w-4 h-4 shrink-0" />
+                          <span className={`text-sm ${isCollapsed ? 'hidden' : 'block'}`}>
+                            Mentor Mode
+                          </span>
+                        </SidebarMenuButton>
+                      </TooltipTrigger>
+                      {isCollapsed && (
+                        <TooltipContent side="right">
+                          Mentor Mode
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
                   </SidebarMenuItem>
-                ))}
-                <SidebarMenuItem>
-                  <SidebarMenuButton 
-                    onClick={() => setShowMentorDialog(true)}
-                    title={isCollapsed ? "Mentor Mode" : undefined}
-                  >
-                    <UserCog className="w-4 h-4" />
-                    <span className={`text-sm ${isCollapsed ? 'hidden' : 'block'}`}>
-                      Mentor Mode
-                    </span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                </TooltipProvider>
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>

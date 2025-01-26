@@ -1,32 +1,14 @@
-import { AppLayout } from "@/components/layout/AppLayout";
-import { EmotionLogger } from "@/components/journal/EmotionLogger";
-import { useNavigate, useParams } from "react-router-dom";
-import { useEffect } from "react";
+import { StatsHeader } from "@/components/journal/stats/StatsHeader";
+import { JournalFormSubmission } from "@/components/journal/JournalFormSubmission";
+import { SidebarProvider } from "@/components/ui/sidebar";
 
-const AddJournalEntry = () => {
-  const { type } = useParams();
-  const navigate = useNavigate();
-
-  // Validate entry type
-  useEffect(() => {
-    const validTypes = ["pre-session", "post-session"];
-    if (type && !validTypes.includes(type)) {
-      navigate("/dashboard");
-    }
-  }, [type, navigate]);
-
+export default function AddJournalEntry() {
   return (
-    <AppLayout>
-      <div className="max-w-7xl mx-auto px-4">
-        <EmotionLogger 
-          initialSessionType={type === "pre-session" ? "pre" : "post"}
-          onSubmitSuccess={() => {
-            navigate("/dashboard");
-          }}
-        />
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full flex-col space-y-6">
+        <StatsHeader />
+        <JournalFormSubmission />
       </div>
-    </AppLayout>
+    </SidebarProvider>
   );
-};
-
-export default AddJournalEntry;
+}

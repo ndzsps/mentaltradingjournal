@@ -37,10 +37,10 @@ export function AppSidebar() {
     <>
       <Sidebar>
         <SidebarContent>
-          <div className="p-4">
-            <Link to="/" className="flex items-center gap-2 group">
-              <BrainCircuit className="w-6 h-6 text-primary transition-all duration-300 group-hover:text-accent" />
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent transition-all duration-300">
+          <div className="p-3">
+            <Link to="/" className="flex items-center gap-1.5 group">
+              <BrainCircuit className="w-5 h-5 text-primary transition-all duration-300 group-hover:text-accent" />
+              <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent transition-all duration-300">
                 Mental
               </h1>
             </Link>
@@ -53,16 +53,16 @@ export function AppSidebar() {
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild>
                       <Link to={item.url} className="flex items-center gap-2">
-                        <item.icon className="w-5 h-5" />
-                        <span>{item.title}</span>
+                        <item.icon className="w-4 h-4" />
+                        <span className="text-sm">{item.title}</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
                 <SidebarMenuItem>
                   <SidebarMenuButton onClick={() => setShowMentorDialog(true)}>
-                    <UserCog className="w-5 h-5" />
-                    <span>Mentor Mode</span>
+                    <UserCog className="w-4 h-4" />
+                    <span className="text-sm">Mentor Mode</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               </SidebarMenu>

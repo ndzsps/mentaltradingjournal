@@ -1,14 +1,16 @@
+import { useJournalFormSubmission } from "@/components/journal/JournalFormSubmission";
 import { StatsHeader } from "@/components/journal/stats/StatsHeader";
-import { JournalFormSubmission } from "@/components/journal/JournalFormSubmission";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { AppLayout } from "@/components/layout/AppLayout";
 
 export default function AddJournalEntry() {
+  const JournalFormSubmission = useJournalFormSubmission();
+  
   return (
-    <SidebarProvider>
+    <AppLayout>
       <div className="min-h-screen flex w-full flex-col space-y-6">
         <StatsHeader />
         <JournalFormSubmission />
       </div>
-    </SidebarProvider>
+    </AppLayout>
   );
 }

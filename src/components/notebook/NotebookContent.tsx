@@ -1,33 +1,29 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { PenLine, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Plus } from "lucide-react";
-import { FolderList } from "./FolderList";
 import { NotesList } from "./NotesList";
 import { NoteView } from "./NoteView";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 
 export const NotebookContent = () => {
-  const [newFolderName, setNewFolderName] = useState("");
-  const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
-  const { data: folders, isLoading: foldersLoading } = useQuery({
-    queryKey: ["folders"],
+  const { data: notes, isLoading } = useQuery({
+    queryKey: ["notes"],
     queryFn: async () => {
       if (!user) throw new Error("No user found");
 
       const { data, error } = await supabase
-        .from("notebook_folders")
+        .from("notebook_notes")
         .select("*")
         .eq("user_id", user.id)
-        .order("created_at", { ascending: true });
+        .order("created_at", { ascending: false });
       
       if (error) throw error;
       return data;
@@ -35,15 +31,17 @@ export const NotebookContent = () => {
     enabled: !!user,
   });
 
-  const createFolder = useMutation({
-    mutationFn: async (name: string) => {
+  const createNote = useMutation({
+    mutationFn: async () => {
       if (!user) throw new Error("No user found");
 
       const { data, error } = await supabase
-        .from("notebook_folders")
+        .from("notebook_notes")
         .insert([{ 
-          name,
-          user_id: user.id
+          title: "Untitled Note",
+          content: "",
+          user_id: user.id,
+          folder_id: null // We'll implement folders later
         }])
         .select()
         .single();
@@ -51,78 +49,52 @@ export const NotebookContent = () => {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["folders"] });
-      setNewFolderName("");
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
+      setSelectedNoteId(data.id);
       toast({
         title: "Success",
-        description: "Folder created successfully",
+        description: "New note created",
       });
     },
     onError: (error) => {
       toast({
         title: "Error",
-        description: "Failed to create folder",
+        description: "Failed to create note",
         variant: "destructive",
       });
     },
   });
 
-  const handleCreateFolder = () => {
-    if (!newFolderName.trim()) {
-      toast({
-        title: "Error",
-        description: "Please enter a folder name",
-        variant: "destructive",
-      });
-      return;
-    }
-    createFolder.mutate(newFolderName);
-  };
-
   return (
-    <div className="container mx-auto p-6">
-      <div className="flex flex-col space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Notebook 📝</h1>
-          <div className="flex items-center gap-2">
-            <Input
-              placeholder="New folder name"
-              value={newFolderName}
-              onChange={(e) => setNewFolderName(e.target.value)}
-              className="w-64"
-            />
-            <Button
-              onClick={handleCreateFolder}
-              disabled={createFolder.isPending}
-              className="flex items-center gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              Create Folder
-            </Button>
+    <div className="flex h-[calc(100vh-4rem)]">
+      <div className="w-80 border-r bg-background">
+        <div className="p-4 border-b">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold">Notes</h2>
+            <div className="flex gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => createNote.mutate()}
+              >
+                <PenLine className="h-4 w-4" />
+              </Button>
+              <Button variant="ghost" size="icon">
+                <Search className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
-
-        <div className="grid grid-cols-12 gap-6 min-h-[600px]">
-          <div className="col-span-2 border-r">
-            <FolderList
-              folders={folders || []}
-              isLoading={foldersLoading}
-              selectedFolderId={selectedFolderId}
-              onSelectFolder={setSelectedFolderId}
-            />
-          </div>
-          <div className="col-span-4 border-r">
-            <NotesList 
-              folderId={selectedFolderId} 
-              selectedNoteId={selectedNoteId}
-              onSelectNote={setSelectedNoteId}
-            />
-          </div>
-          <div className="col-span-6">
-            <NoteView noteId={selectedNoteId} />
-          </div>
-        </div>
+        <NotesList 
+          notes={notes || []} 
+          isLoading={isLoading}
+          selectedNoteId={selectedNoteId}
+          onSelectNote={setSelectedNoteId}
+        />
+      </div>
+      <div className="flex-1">
+        <NoteView noteId={selectedNoteId} />
       </div>
     </div>
   );

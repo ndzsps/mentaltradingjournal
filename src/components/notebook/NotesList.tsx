@@ -1,154 +1,55 @@
-import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Plus } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { format } from "date-fns";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAuth } from "@/contexts/AuthContext";
+
+interface Note {
+  id: string;
+  title: string;
+  content: string;
+  created_at: string;
+}
 
 interface NotesListProps {
-  folderId: string | null;
+  notes: Note[];
+  isLoading: boolean;
   selectedNoteId: string | null;
   onSelectNote: (id: string | null) => void;
 }
 
-export const NotesList = ({ folderId, selectedNoteId, onSelectNote }: NotesListProps) => {
-  const [newNoteTitle, setNewNoteTitle] = useState("");
-  const [newNoteContent, setNewNoteContent] = useState("");
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const { user } = useAuth();
-
-  const { data: notes, isLoading } = useQuery({
-    queryKey: ["notes", folderId],
-    queryFn: async () => {
-      if (!folderId || !user) return [];
-
-      const { data, error } = await supabase
-        .from("notebook_notes")
-        .select("*")
-        .eq("folder_id", folderId)
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
-      
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!folderId && !!user,
-  });
-
-  const createNote = useMutation({
-    mutationFn: async ({ title, content }: { title: string; content: string }) => {
-      if (!folderId || !user) throw new Error("No folder selected or user not found");
-
-      const { data, error } = await supabase
-        .from("notebook_notes")
-        .insert([{ 
-          folder_id: folderId, 
-          title, 
-          content,
-          user_id: user.id
-        }])
-        .select()
-        .single();
-      
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["notes", folderId] });
-      setNewNoteTitle("");
-      setNewNoteContent("");
-      onSelectNote(data.id);
-      toast({
-        title: "Success",
-        description: "Note created successfully",
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: "Failed to create note",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const handleCreateNote = () => {
-    if (!newNoteTitle.trim()) {
-      toast({
-        title: "Error",
-        description: "Please enter a note title",
-        variant: "destructive",
-      });
-      return;
-    }
-    createNote.mutate({ title: newNoteTitle, content: newNoteContent });
-  };
-
-  if (!folderId) {
-    return (
-      <div className="text-center py-10 text-muted-foreground">
-        Select a folder to view and create notes
-      </div>
-    );
+export const NotesList = ({ notes, isLoading, selectedNoteId, onSelectNote }: NotesListProps) => {
+  if (isLoading) {
+    return <div className="animate-pulse p-4 space-y-4">
+      {[...Array(5)].map((_, i) => (
+        <div key={i} className="h-20 bg-muted rounded-lg" />
+      ))}
+    </div>;
   }
 
   return (
-    <div className="space-y-4">
-      <div className="space-y-4">
-        <Input
-          placeholder="Note title"
-          value={newNoteTitle}
-          onChange={(e) => setNewNoteTitle(e.target.value)}
-        />
-        <Textarea
-          placeholder="Note content"
-          value={newNoteContent}
-          onChange={(e) => setNewNoteContent(e.target.value)}
-          rows={4}
-        />
-        <Button
-          onClick={handleCreateNote}
-          disabled={createNote.isPending}
-          className="flex items-center gap-2"
-        >
-          <Plus className="h-4 w-4" />
-          Add Note
-        </Button>
-      </div>
-
-      <ScrollArea className="h-[400px]">
-        <div className="space-y-4">
-          {notes?.map((note) => (
-            <Card 
-              key={note.id}
-              className={`cursor-pointer transition-colors hover:bg-muted/50 ${
-                selectedNoteId === note.id ? "bg-muted" : ""
-              }`}
-              onClick={() => onSelectNote(note.id)}
-            >
-              <CardHeader className="p-4">
-                <CardTitle className="text-base">{note.title}</CardTitle>
-              </CardHeader>
-              <CardContent className="p-4 pt-0">
-                <p className="text-sm text-muted-foreground line-clamp-2">
-                  {note.content}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
-          {notes?.length === 0 && (
-            <p className="text-center text-muted-foreground">
-              No notes in this folder yet. Create one above!
+    <ScrollArea className="h-[calc(100vh-8rem)]">
+      <div className="p-4 space-y-4">
+        {notes.map((note) => (
+          <div
+            key={note.id}
+            className={`p-4 rounded-lg cursor-pointer transition-colors ${
+              selectedNoteId === note.id ? "bg-muted" : "hover:bg-muted/50"
+            }`}
+            onClick={() => onSelectNote(note.id)}
+          >
+            <h3 className="font-medium mb-1 line-clamp-1">{note.title}</h3>
+            <p className="text-sm text-muted-foreground line-clamp-2">
+              {note.content || "No content"}
             </p>
-          )}
-        </div>
-      </ScrollArea>
-    </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              {format(new Date(note.created_at), "d MMM yyyy")}
+            </p>
+          </div>
+        ))}
+        {notes.length === 0 && (
+          <p className="text-center text-muted-foreground py-4">
+            No notes yet. Create one to get started!
+          </p>
+        )}
+      </div>
+    </ScrollArea>
   );
 };

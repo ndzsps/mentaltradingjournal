@@ -1,11 +1,13 @@
 import { format } from "date-fns";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
 
 interface Note {
   id: string;
   title: string;
   content: string;
   created_at: string;
+  tags: string[];
 }
 
 interface NotesListProps {
@@ -39,6 +41,15 @@ export const NotesList = ({ notes, isLoading, selectedNoteId, onSelectNote }: No
             <p className="text-sm text-muted-foreground line-clamp-2">
               {note.content || "No content"}
             </p>
+            {note.tags && note.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1 mt-2">
+                {note.tags.map((tag) => (
+                  <Badge key={tag} variant="secondary" className="text-xs">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+            )}
             <p className="text-xs text-muted-foreground mt-2">
               {format(new Date(note.created_at), "d MMM yyyy")}
             </p>

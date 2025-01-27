@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { Badge } from "@/components/ui/badge";
+import { PlusCircle, X } from "lucide-react";
 
 interface NoteViewProps {
   noteId: string | null;
@@ -13,6 +15,8 @@ interface NoteViewProps {
 export const NoteView = ({ noteId }: NoteViewProps) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [tags, setTags] = useState<string[]>([]);
+  const [newTag, setNewTag] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { user } = useAuth();
@@ -39,16 +43,17 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
     if (note) {
       setTitle(note.title);
       setContent(note.content || "");
+      setTags(note.tags || []);
     }
   }, [note]);
 
   const updateNote = useMutation({
-    mutationFn: async ({ title, content }: { title: string; content: string }) => {
+    mutationFn: async ({ title, content, tags }: { title: string; content: string; tags: string[] }) => {
       if (!noteId || !user) throw new Error("No note selected or user not found");
 
       const { data, error } = await supabase
         .from("notebook_notes")
-        .update({ title, content })
+        .update({ title, content, tags })
         .eq("id", noteId)
         .eq("user_id", user.id)
         .select()
@@ -76,12 +81,27 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value);
-    updateNote.mutate({ title: e.target.value, content });
+    updateNote.mutate({ title: e.target.value, content, tags });
   };
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setContent(e.target.value);
-    updateNote.mutate({ title, content: e.target.value });
+    updateNote.mutate({ title, content: e.target.value, tags });
+  };
+
+  const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && newTag.trim()) {
+      const updatedTags = [...tags, newTag.trim()];
+      setTags(updatedTags);
+      setNewTag("");
+      updateNote.mutate({ title, content, tags: updatedTags });
+    }
+  };
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    const updatedTags = tags.filter(tag => tag !== tagToRemove);
+    setTags(updatedTags);
+    updateNote.mutate({ title, content, tags: updatedTags });
   };
 
   if (!noteId) {
@@ -107,6 +127,27 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
         placeholder="Note title"
         className="text-2xl font-semibold border-none px-0 focus-visible:ring-0"
       />
+      <div className="flex flex-wrap gap-2 items-center min-h-[32px]">
+        {tags.map((tag) => (
+          <Badge key={tag} variant="secondary" className="gap-1">
+            {tag}
+            <X 
+              className="h-3 w-3 cursor-pointer hover:text-destructive" 
+              onClick={() => handleRemoveTag(tag)}
+            />
+          </Badge>
+        ))}
+        <div className="flex items-center gap-2">
+          <PlusCircle className="h-4 w-4 text-muted-foreground" />
+          <Input
+            value={newTag}
+            onChange={(e) => setNewTag(e.target.value)}
+            onKeyDown={handleAddTag}
+            placeholder="Add a tag..."
+            className="border-none w-24 px-0 focus-visible:ring-0 placeholder:text-muted-foreground"
+          />
+        </div>
+      </div>
       <Textarea
         value={content}
         onChange={handleContentChange}

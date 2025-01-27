@@ -195,6 +195,7 @@ export type Database = {
           created_at: string
           folder_id: string
           id: string
+          tags: string[] | null
           title: string
           updated_at: string
           user_id: string
@@ -204,6 +205,7 @@ export type Database = {
           created_at?: string
           folder_id: string
           id?: string
+          tags?: string[] | null
           title: string
           updated_at?: string
           user_id: string
@@ -213,6 +215,7 @@ export type Database = {
           created_at?: string
           folder_id?: string
           id?: string
+          tags?: string[] | null
           title?: string
           updated_at?: string
           user_id?: string

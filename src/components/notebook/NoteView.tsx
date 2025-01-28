@@ -120,40 +120,48 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
   }
 
   return (
-    <div className="p-8 space-y-4">
-      <Input
-        value={title}
-        onChange={handleTitleChange}
-        placeholder="Note title"
-        className="text-2xl font-semibold border-none px-0 focus-visible:ring-0"
-      />
-      <div className="flex flex-wrap gap-2 items-center min-h-[32px]">
-        {tags.map((tag) => (
-          <Badge key={tag} variant="secondary" className="gap-1">
-            {tag}
-            <X 
-              className="h-3 w-3 cursor-pointer hover:text-destructive" 
-              onClick={() => handleRemoveTag(tag)}
+    <div className="min-h-screen bg-background p-8 transition-all duration-200 ease-in-out">
+      <div className="max-w-3xl mx-auto space-y-6">
+        <Input
+          value={title}
+          onChange={handleTitleChange}
+          placeholder="Untitled"
+          className="text-3xl font-semibold bg-transparent border-none px-0 focus-visible:ring-0 placeholder:text-muted-foreground/50 transition-colors duration-200"
+        />
+        
+        <div className="flex flex-wrap gap-2 items-center min-h-[32px] opacity-70 hover:opacity-100 transition-opacity duration-200">
+          {tags.map((tag) => (
+            <Badge 
+              key={tag} 
+              variant="secondary" 
+              className="gap-1 bg-secondary-hover hover:bg-secondary/10 transition-colors duration-200"
+            >
+              {tag}
+              <X 
+                className="h-3 w-3 cursor-pointer hover:text-destructive transition-colors duration-200" 
+                onClick={() => handleRemoveTag(tag)}
+              />
+            </Badge>
+          ))}
+          <div className="flex items-center gap-2 group">
+            <PlusCircle className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors duration-200" />
+            <Input
+              value={newTag}
+              onChange={(e) => setNewTag(e.target.value)}
+              onKeyDown={handleAddTag}
+              placeholder="Add a tag..."
+              className="border-none w-24 px-0 focus-visible:ring-0 placeholder:text-muted-foreground/50 bg-transparent transition-colors duration-200"
             />
-          </Badge>
-        ))}
-        <div className="flex items-center gap-2">
-          <PlusCircle className="h-4 w-4 text-muted-foreground" />
-          <Input
-            value={newTag}
-            onChange={(e) => setNewTag(e.target.value)}
-            onKeyDown={handleAddTag}
-            placeholder="Add a tag..."
-            className="border-none w-24 px-0 focus-visible:ring-0 placeholder:text-muted-foreground"
-          />
+          </div>
         </div>
+
+        <Textarea
+          value={content}
+          onChange={handleContentChange}
+          placeholder="Start writing..."
+          className="min-h-[calc(100vh-300px)] resize-none border-none px-0 focus-visible:ring-0 placeholder:text-muted-foreground/50 bg-transparent text-lg leading-relaxed transition-colors duration-200"
+        />
       </div>
-      <Textarea
-        value={content}
-        onChange={handleContentChange}
-        placeholder="Start writing..."
-        className="min-h-[500px] resize-none border-none px-0 focus-visible:ring-0"
-      />
     </div>
   );
 };

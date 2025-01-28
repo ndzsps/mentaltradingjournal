@@ -1,12 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { Badge } from "@/components/ui/badge";
-import { PlusCircle, X } from "lucide-react";
+import { NoteTitle } from "./NoteTitle";
+import { NoteTags } from "./NoteTags";
+import { NoteContent } from "./NoteContent";
 
 interface NoteViewProps {
   noteId: string | null;
@@ -16,7 +15,6 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [tags, setTags] = useState<string[]>([]);
-  const [newTag, setNewTag] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { user } = useAuth();
@@ -68,7 +66,6 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
     },
   });
 
-  // Debounced update function with useCallback
   const debouncedUpdate = useCallback(
     (() => {
       let timeoutId: NodeJS.Timeout;
@@ -76,35 +73,30 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
         clearTimeout(timeoutId);
         timeoutId = setTimeout(() => {
           updateNote.mutate({ title, content, tags });
-        }, 1000); // 1 second delay
+        }, 1000);
       };
     })(),
     [updateNote]
   );
 
-  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newTitle = e.target.value;
-    setTitle(newTitle); // Update local state immediately
+  const handleTitleChange = (newTitle: string) => {
+    setTitle(newTitle);
     debouncedUpdate(newTitle, content, tags);
   };
 
-  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newContent = e.target.value;
-    setContent(newContent); // Update local state immediately
+  const handleContentChange = (newContent: string) => {
+    setContent(newContent);
     debouncedUpdate(title, newContent, tags);
   };
 
-  const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && newTag.trim()) {
-      const updatedTags = [...tags, newTag.trim()];
-      setTags(updatedTags);
-      setNewTag("");
-      debouncedUpdate(title, content, updatedTags);
-      toast({
-        title: "Tag added",
-        description: `Added tag: ${newTag.trim()}`,
-      });
-    }
+  const handleAddTag = (newTag: string) => {
+    const updatedTags = [...tags, newTag];
+    setTags(updatedTags);
+    debouncedUpdate(title, content, updatedTags);
+    toast({
+      title: "Tag added",
+      description: `Added tag: ${newTag}`,
+    });
   };
 
   const handleRemoveTag = (tagToRemove: string) => {
@@ -112,8 +104,8 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
     setTags(updatedTags);
     debouncedUpdate(title, content, updatedTags);
     toast({
-        title: "Tag removed",
-        description: `Removed tag: ${tagToRemove}`,
+      title: "Tag removed",
+      description: `Removed tag: ${tagToRemove}`,
     });
   };
 
@@ -135,45 +127,9 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
   return (
     <div className="min-h-screen bg-background p-8 transition-all duration-200 ease-in-out">
       <div className="max-w-3xl mx-auto space-y-6">
-        <Input
-          value={title}
-          onChange={handleTitleChange}
-          placeholder="Untitled"
-          className="text-3xl font-semibold bg-transparent border-none px-0 focus-visible:ring-0 placeholder:text-muted-foreground/50 transition-colors duration-200"
-        />
-        
-        <div className="flex flex-wrap gap-2 items-center min-h-[32px] opacity-70 hover:opacity-100 transition-opacity duration-200">
-          {tags.map((tag) => (
-            <Badge 
-              key={tag} 
-              variant="secondary" 
-              className="gap-1 bg-secondary-hover hover:bg-secondary/10 transition-colors duration-200"
-            >
-              {tag}
-              <X 
-                className="h-3 w-3 cursor-pointer hover:text-destructive transition-colors duration-200" 
-                onClick={() => handleRemoveTag(tag)}
-              />
-            </Badge>
-          ))}
-          <div className="flex items-center gap-2 group">
-            <PlusCircle className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors duration-200" />
-            <Input
-              value={newTag}
-              onChange={(e) => setNewTag(e.target.value)}
-              onKeyDown={handleAddTag}
-              placeholder="Add a tag..."
-              className="border-none w-24 px-0 focus-visible:ring-0 placeholder:text-muted-foreground/50 bg-transparent transition-colors duration-200"
-            />
-          </div>
-        </div>
-
-        <Textarea
-          value={content}
-          onChange={handleContentChange}
-          placeholder="Start writing..."
-          className="min-h-[calc(100vh-300px)] resize-none border-none px-0 focus-visible:ring-0 placeholder:text-muted-foreground/50 bg-transparent text-lg leading-relaxed transition-colors duration-200"
-        />
+        <NoteTitle title={title} onTitleChange={handleTitleChange} />
+        <NoteTags tags={tags} onAddTag={handleAddTag} onRemoveTag={handleRemoveTag} />
+        <NoteContent content={content} onContentChange={handleContentChange} />
       </div>
     </div>
   );

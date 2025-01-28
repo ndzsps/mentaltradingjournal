@@ -5,25 +5,51 @@ import { PenLine, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NotesList } from "./NotesList";
 import { NoteView } from "./NoteView";
+import { FolderList } from "./FolderList";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 
 export const NotebookContent = () => {
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
+  const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
-  const { data: notes, isLoading } = useQuery({
-    queryKey: ["notes"],
+  const { data: notes, isLoading: isLoadingNotes } = useQuery({
+    queryKey: ["notes", selectedFolderId],
     queryFn: async () => {
       if (!user) throw new Error("No user found");
 
-      const { data, error } = await supabase
+      const query = supabase
         .from("notebook_notes")
         .select("*")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
+
+      if (selectedFolderId) {
+        query.eq("folder_id", selectedFolderId);
+      } else {
+        query.is("folder_id", null);
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  const { data: folders, isLoading: isLoadingFolders } = useQuery({
+    queryKey: ["folders"],
+    queryFn: async () => {
+      if (!user) throw new Error("No user found");
+
+      const { data, error } = await supabase
+        .from("notebook_folders")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: true });
       
       if (error) throw error;
       return data;
@@ -41,7 +67,7 @@ export const NotebookContent = () => {
           title: "Untitled Note",
           content: "",
           user_id: user.id,
-          folder_id: null // We'll implement folders later
+          folder_id: selectedFolderId
         }])
         .select()
         .single();
@@ -66,6 +92,41 @@ export const NotebookContent = () => {
     },
   });
 
+  const moveNoteToFolder = useMutation({
+    mutationFn: async ({ noteId, folderId }: { noteId: string, folderId: string }) => {
+      if (!user) throw new Error("No user found");
+
+      const { data, error } = await supabase
+        .from("notebook_notes")
+        .update({ folder_id: folderId })
+        .eq("id", noteId)
+        .eq("user_id", user.id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
+      toast({
+        title: "Success",
+        description: "Note moved successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to move note",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleDrop = (noteId: string, folderId: string) => {
+    moveNoteToFolder.mutate({ noteId, folderId });
+  };
+
   return (
     <div className="flex h-[calc(100vh-4rem)]">
       <div className="w-80 border-r bg-background">
@@ -85,10 +146,17 @@ export const NotebookContent = () => {
               </Button>
             </div>
           </div>
+          <FolderList 
+            folders={folders || []} 
+            isLoading={isLoadingFolders}
+            selectedFolderId={selectedFolderId}
+            onSelectFolder={setSelectedFolderId}
+            onDrop={handleDrop}
+          />
         </div>
         <NotesList 
           notes={notes || []} 
-          isLoading={isLoading}
+          isLoading={isLoadingNotes}
           selectedNoteId={selectedNoteId}
           onSelectNote={setSelectedNoteId}
         />

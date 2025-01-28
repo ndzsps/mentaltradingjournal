@@ -18,6 +18,10 @@ interface NotesListProps {
 }
 
 export const NotesList = ({ notes, isLoading, selectedNoteId, onSelectNote }: NotesListProps) => {
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, noteId: string) => {
+    e.dataTransfer.setData("noteId", noteId);
+  };
+
   if (isLoading) {
     return <div className="animate-pulse p-4 space-y-4">
       {[...Array(5)].map((_, i) => (
@@ -36,6 +40,8 @@ export const NotesList = ({ notes, isLoading, selectedNoteId, onSelectNote }: No
               selectedNoteId === note.id ? "bg-muted" : "hover:bg-muted/50"
             }`}
             onClick={() => onSelectNote(note.id)}
+            draggable
+            onDragStart={(e) => handleDragStart(e, note.id)}
           >
             <h3 className="font-medium mb-1 line-clamp-1">{note.title}</h3>
             <p className="text-sm text-muted-foreground line-clamp-2">

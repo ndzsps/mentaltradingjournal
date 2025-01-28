@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
@@ -68,19 +68,30 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
     },
   });
 
-  // Debounced update function
-  const debouncedUpdate = (title: string, content: string, tags: string[]) => {
-    updateNote.mutate({ title, content, tags });
-  };
+  // Debounced update function with useCallback
+  const debouncedUpdate = useCallback(
+    (() => {
+      let timeoutId: NodeJS.Timeout;
+      return (title: string, content: string, tags: string[]) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          updateNote.mutate({ title, content, tags });
+        }, 1000); // 1 second delay
+      };
+    })(),
+    [updateNote]
+  );
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTitle(e.target.value);
-    debouncedUpdate(e.target.value, content, tags);
+    const newTitle = e.target.value;
+    setTitle(newTitle); // Update local state immediately
+    debouncedUpdate(newTitle, content, tags);
   };
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setContent(e.target.value);
-    debouncedUpdate(title, e.target.value, tags);
+    const newContent = e.target.value;
+    setContent(newContent); // Update local state immediately
+    debouncedUpdate(title, newContent, tags);
   };
 
   const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {

@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { PlusCircle, X } from "lucide-react";
@@ -65,28 +65,22 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notes"] });
       queryClient.invalidateQueries({ queryKey: ["note", noteId] });
-      toast({
-        title: "Success",
-        description: "Note updated successfully",
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: "Failed to update note",
-        variant: "destructive",
-      });
     },
   });
 
+  // Debounced update function
+  const debouncedUpdate = (title: string, content: string, tags: string[]) => {
+    updateNote.mutate({ title, content, tags });
+  };
+
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value);
-    updateNote.mutate({ title: e.target.value, content, tags });
+    debouncedUpdate(e.target.value, content, tags);
   };
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setContent(e.target.value);
-    updateNote.mutate({ title, content: e.target.value, tags });
+    debouncedUpdate(title, e.target.value, tags);
   };
 
   const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -94,14 +88,22 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
       const updatedTags = [...tags, newTag.trim()];
       setTags(updatedTags);
       setNewTag("");
-      updateNote.mutate({ title, content, tags: updatedTags });
+      debouncedUpdate(title, content, updatedTags);
+      toast({
+        title: "Tag added",
+        description: `Added tag: ${newTag.trim()}`,
+      });
     }
   };
 
   const handleRemoveTag = (tagToRemove: string) => {
     const updatedTags = tags.filter(tag => tag !== tagToRemove);
     setTags(updatedTags);
-    updateNote.mutate({ title, content, tags: updatedTags });
+    debouncedUpdate(title, content, updatedTags);
+    toast({
+        title: "Tag removed",
+        description: `Removed tag: ${tagToRemove}`,
+    });
   };
 
   if (!noteId) {

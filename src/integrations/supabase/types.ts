@@ -193,7 +193,7 @@ export type Database = {
         Row: {
           content: string | null
           created_at: string
-          folder_id: string
+          folder_id: string | null
           id: string
           tags: string[] | null
           title: string
@@ -203,7 +203,7 @@ export type Database = {
         Insert: {
           content?: string | null
           created_at?: string
-          folder_id: string
+          folder_id?: string | null
           id?: string
           tags?: string[] | null
           title: string
@@ -213,7 +213,7 @@ export type Database = {
         Update: {
           content?: string | null
           created_at?: string
-          folder_id?: string
+          folder_id?: string | null
           id?: string
           tags?: string[] | null
           title?: string

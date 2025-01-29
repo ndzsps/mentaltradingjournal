@@ -87,11 +87,11 @@ export const FolderList = ({
   };
 
   if (isLoading) {
-    return <div className="animate-pulse h-[200px] bg-muted rounded-lg" />;
+    return <div className="animate-pulse h-24 bg-muted rounded-lg" />;
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       <div className="flex items-center justify-between px-4">
         <h3 className="text-sm font-semibold">Folders</h3>
         <Button 
@@ -135,7 +135,7 @@ export const FolderList = ({
         </div>
       )}
 
-      <ScrollArea className="h-[200px]">
+      <ScrollArea className="h-24">
         <div className="space-y-1 p-2">
           {folders.map((folder) => (
             <Button
@@ -152,7 +152,7 @@ export const FolderList = ({
             </Button>
           ))}
           {folders.length === 0 && !isCreating && (
-            <p className="text-sm text-muted-foreground text-center py-4">
+            <p className="text-sm text-muted-foreground text-center py-2">
               No folders yet
             </p>
           )}

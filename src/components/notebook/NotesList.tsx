@@ -24,32 +24,32 @@ export const NotesList = ({ notes, isLoading, selectedNoteId, onSelectNote }: No
 
   if (isLoading) {
     return (
-      <ScrollArea className="h-[calc(100vh-12rem)] flex-1">
-        <div className="animate-pulse p-4 space-y-4">
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="h-20 bg-muted/5 rounded-lg" />
+      <div className="p-4">
+        <div className="animate-pulse space-y-2">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="h-[88px] bg-muted rounded-lg" />
           ))}
         </div>
-      </ScrollArea>
+      </div>
     );
   }
 
   return (
-    <ScrollArea className="h-[calc(100vh-12rem)] flex-1">
-      <div className="p-4 space-y-4">
+    <ScrollArea className="h-[calc(100vh-16rem)]">
+      <div className="p-4 space-y-2">
         {notes.map((note) => (
           <div
             key={note.id}
             className={`p-4 rounded-lg cursor-pointer transition-all duration-200 ${
               selectedNoteId === note.id 
-                ? "bg-primary-hover border border-primary/10" 
-                : "bg-background hover:bg-primary-hover"
+                ? "bg-accent border border-accent/20" 
+                : "hover:bg-accent/10"
             }`}
             onClick={() => onSelectNote(note.id)}
             draggable
             onDragStart={(e) => handleDragStart(e, note.id)}
           >
-            <h3 className="font-medium mb-1 line-clamp-1 text-foreground">
+            <h3 className="font-medium mb-1 line-clamp-1">
               {note.title}
             </h3>
             <p className="text-sm text-muted-foreground line-clamp-2">
@@ -61,7 +61,7 @@ export const NotesList = ({ notes, isLoading, selectedNoteId, onSelectNote }: No
                   <Badge 
                     key={tag} 
                     variant="secondary" 
-                    className="text-xs bg-accent-hover text-accent-foreground hover:bg-accent/20"
+                    className="text-xs bg-primary/10 hover:bg-primary/20"
                   >
                     {tag}
                   </Badge>
@@ -74,7 +74,7 @@ export const NotesList = ({ notes, isLoading, selectedNoteId, onSelectNote }: No
           </div>
         ))}
         {notes.length === 0 && (
-          <p className="text-center text-muted-foreground py-4">
+          <p className="text-center text-muted-foreground py-2">
             No notes yet. Create one to get started!
           </p>
         )}

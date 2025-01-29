@@ -23,15 +23,19 @@ export const NotesList = ({ notes, isLoading, selectedNoteId, onSelectNote }: No
   };
 
   if (isLoading) {
-    return <div className="animate-pulse p-4 space-y-4">
-      {[...Array(5)].map((_, i) => (
-        <div key={i} className="h-20 bg-muted rounded-lg" />
-      ))}
-    </div>;
+    return (
+      <ScrollArea className="h-[calc(100vh-12rem)] flex-1">
+        <div className="animate-pulse p-4 space-y-4">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="h-20 bg-muted rounded-lg" />
+          ))}
+        </div>
+      </ScrollArea>
+    );
   }
 
   return (
-    <ScrollArea className="h-[calc(100vh-8rem)]">
+    <ScrollArea className="h-[calc(100vh-12rem)] flex-1">
       <div className="p-4 space-y-4">
         {notes.map((note) => (
           <div

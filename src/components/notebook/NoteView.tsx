@@ -39,13 +39,12 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
   });
 
   useEffect(() => {
-    if (note && noteId) {
-      // Only update state if the note ID changes or if it's the initial load
+    if (note) {
       setTitle(note.title);
       setContent(note.content || "");
       setTags(note.tags || []);
     }
-  }, [noteId, note?.id]); // Only depend on noteId and note.id changes
+  }, [note?.id]); // Only depend on note.id changes
 
   const updateNote = useMutation({
     mutationFn: async ({ title, content, tags }: { title: string; content: string; tags: string[] }) => {
@@ -63,11 +62,11 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
       return data;
     },
     onSuccess: (data) => {
-      // Update both the notes list and the current note in the cache
+      // Update the notes list in the cache
       queryClient.setQueryData(["notes"], (oldData: any) => {
         if (!oldData) return oldData;
         return oldData.map((note: any) => 
-          note.id === data.id ? data : note
+          note.id === data.id ? { ...note, title: data.title, content: data.content, tags: data.tags } : note
         );
       });
     },
@@ -88,12 +87,12 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
 
   const handleTitleChange = (newTitle: string) => {
     setTitle(newTitle);
-    // Immediately update the cache to reflect the title change
+    // Update the notes list immediately for a smoother UI experience
     if (noteId) {
       queryClient.setQueryData(["notes"], (oldData: any) => {
         if (!oldData) return oldData;
         return oldData.map((note: any) => 
-          note.id === noteId ? { ...note, title: newTitle } : note
+          note.id === noteId ? { ...note, title: newTitle, content } : note
         );
       });
     }
@@ -102,6 +101,15 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
 
   const handleContentChange = (newContent: string) => {
     setContent(newContent);
+    // Update the notes list immediately for content as well
+    if (noteId) {
+      queryClient.setQueryData(["notes"], (oldData: any) => {
+        if (!oldData) return oldData;
+        return oldData.map((note: any) => 
+          note.id === noteId ? { ...note, title, content: newContent } : note
+        );
+      });
+    }
     debouncedUpdate(title, newContent, tags);
   };
 

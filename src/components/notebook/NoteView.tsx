@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { NoteTitle } from "./NoteTitle";
 import { NoteTags } from "./NoteTags";
 import { NoteContent } from "./NoteContent";
+import { Separator } from "@/components/ui/separator";
 
 interface NoteViewProps {
   noteId: string | null;
@@ -119,16 +120,18 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
 
   if (isLoading) {
     return <div className="animate-pulse p-8 space-y-4">
-      <div className="h-8 bg-muted rounded w-1/3" />
-      <div className="h-[500px] bg-muted rounded" />
+      <div className="h-8 bg-muted/50 rounded w-1/3" />
+      <div className="h-4 bg-muted/50 rounded w-1/4" />
+      <div className="h-[500px] bg-muted/50 rounded" />
     </div>;
   }
 
   return (
-    <div className="min-h-screen bg-background p-8 transition-all duration-200 ease-in-out">
+    <div className="h-full bg-background p-8">
       <div className="max-w-3xl mx-auto space-y-6">
         <NoteTitle title={title} onTitleChange={handleTitleChange} />
         <NoteTags tags={tags} onAddTag={handleAddTag} onRemoveTag={handleRemoveTag} />
+        <Separator className="my-4" />
         <NoteContent content={content} onContentChange={handleContentChange} />
       </div>
     </div>

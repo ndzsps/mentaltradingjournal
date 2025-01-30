@@ -27,7 +27,7 @@ export const NotesList = ({ notes, isLoading, selectedNoteId, onSelectNote }: No
       <div className="p-4">
         <div className="animate-pulse space-y-2">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-[88px] bg-muted rounded-lg" />
+            <div key={i} className="h-[88px] bg-muted/50 rounded-lg" />
           ))}
         </div>
       </div>
@@ -35,15 +35,15 @@ export const NotesList = ({ notes, isLoading, selectedNoteId, onSelectNote }: No
   }
 
   return (
-    <ScrollArea className="h-[calc(100vh-16rem)]">
+    <ScrollArea className="flex-1">
       <div className="p-4 space-y-2">
         {notes.map((note) => (
           <div
             key={note.id}
             className={`p-4 rounded-lg cursor-pointer transition-all duration-200 ${
               selectedNoteId === note.id 
-                ? "bg-accent border border-accent/20" 
-                : "hover:bg-accent/10"
+                ? "bg-secondary/10 border border-secondary/20" 
+                : "hover:bg-secondary/5"
             }`}
             onClick={() => onSelectNote(note.id)}
             draggable
@@ -61,7 +61,7 @@ export const NotesList = ({ notes, isLoading, selectedNoteId, onSelectNote }: No
                   <Badge 
                     key={tag} 
                     variant="secondary" 
-                    className="text-xs bg-primary/10 hover:bg-primary/20"
+                    className="text-xs bg-secondary/10 hover:bg-secondary/20"
                   >
                     {tag}
                   </Badge>

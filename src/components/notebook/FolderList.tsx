@@ -87,29 +87,35 @@ export const FolderList = ({
   };
 
   if (isLoading) {
-    return <div className="animate-pulse h-24 bg-muted rounded-lg" />;
+    return <div className="animate-pulse space-y-2">
+      {[...Array(3)].map((_, i) => (
+        <div key={i} className="h-10 bg-muted/50 rounded-lg" />
+      ))}
+    </div>;
   }
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between px-4">
-        <h3 className="text-sm font-semibold">Folders</h3>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
         <Button 
           variant="ghost" 
-          size="icon"
+          size="sm"
           onClick={() => setIsCreating(true)}
+          className="w-full justify-start text-muted-foreground hover:text-foreground"
         >
-          <Plus className="h-4 w-4" />
+          <Plus className="h-4 w-4 mr-2" />
+          New Folder
         </Button>
       </div>
       
       {isCreating && (
-        <div className="px-4 space-y-2">
+        <div className="space-y-2">
           <Input
             value={newFolderName}
             onChange={(e) => setNewFolderName(e.target.value)}
             placeholder="Folder name"
             className="h-8"
+            autoFocus
           />
           <div className="flex gap-2">
             <Button 
@@ -135,12 +141,12 @@ export const FolderList = ({
         </div>
       )}
 
-      <ScrollArea className="h-24">
-        <div className="space-y-1 p-2">
+      <ScrollArea className="h-[calc(100vh-12rem)]">
+        <div className="space-y-1">
           {folders.map((folder) => (
             <Button
               key={folder.id}
-              variant={selectedFolderId === folder.id ? "default" : "ghost"}
+              variant={selectedFolderId === folder.id ? "secondary" : "ghost"}
               className="w-full justify-start"
               onClick={() => onSelectFolder(folder.id)}
               onDragOver={handleDragOver}

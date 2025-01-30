@@ -8,6 +8,7 @@ import { NoteView } from "./NoteView";
 import { FolderList } from "./FolderList";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { Separator } from "@/components/ui/separator";
 
 export const NotebookContent = () => {
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
@@ -129,23 +130,10 @@ export const NotebookContent = () => {
 
   return (
     <div className="flex h-[calc(100vh-4rem)]">
-      <div className="w-80 border-r bg-background">
-        <div className="p-4 border-b">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">Notes</h2>
-            <div className="flex gap-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => createNote.mutate()}
-              >
-                <PenLine className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="icon">
-                <Search className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
+      {/* Folders Section (20%) */}
+      <div className="w-1/5 min-w-[200px] border-r bg-background/50 flex flex-col">
+        <div className="p-4 space-y-4">
+          <h2 className="text-lg font-semibold">Folders</h2>
           <FolderList 
             folders={folders || []} 
             isLoading={isLoadingFolders}
@@ -154,6 +142,34 @@ export const NotebookContent = () => {
             onDrop={handleDrop}
           />
         </div>
+      </div>
+
+      <Separator orientation="vertical" className="mx-0" />
+
+      {/* Notes Section (30%) */}
+      <div className="w-[30%] min-w-[280px] border-r bg-background/30 flex flex-col">
+        <div className="p-4 border-b bg-background/50">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-lg font-semibold">Notes</h2>
+            <div className="flex gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => createNote.mutate()}
+                className="hover:bg-primary/10"
+              >
+                <PenLine className="h-4 w-4" />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                className="hover:bg-primary/10"
+              >
+                <Search className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
         <NotesList 
           notes={notes || []} 
           isLoading={isLoadingNotes}
@@ -161,7 +177,11 @@ export const NotebookContent = () => {
           onSelectNote={setSelectedNoteId}
         />
       </div>
-      <div className="flex-1">
+
+      <Separator orientation="vertical" className="mx-0" />
+
+      {/* Editor Section (50%) */}
+      <div className="flex-1 bg-background">
         <NoteView noteId={selectedNoteId} />
       </div>
     </div>

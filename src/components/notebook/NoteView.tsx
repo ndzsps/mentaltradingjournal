@@ -39,12 +39,13 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
   });
 
   useEffect(() => {
-    if (note) {
+    if (note && noteId) {
+      // Only update state if the note ID changes or if it's the initial load
       setTitle(note.title);
       setContent(note.content || "");
       setTags(note.tags || []);
     }
-  }, [note?.id]); // Only depend on note.id changes
+  }, [noteId, note?.id]); // Only depend on noteId and note.id changes
 
   const updateNote = useMutation({
     mutationFn: async ({ title, content, tags }: { title: string; content: string; tags: string[] }) => {
@@ -61,14 +62,8 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
       if (error) throw error;
       return data;
     },
-    onSuccess: (data) => {
-      // Update the notes list in the cache
-      queryClient.setQueryData(["notes"], (oldData: any) => {
-        if (!oldData) return oldData;
-        return oldData.map((note: any) => 
-          note.id === data.id ? { ...note, title: data.title, content: data.content, tags: data.tags } : note
-        );
-      });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
     },
   });
 
@@ -87,29 +82,11 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
 
   const handleTitleChange = (newTitle: string) => {
     setTitle(newTitle);
-    // Update the notes list immediately for a smoother UI experience
-    if (noteId) {
-      queryClient.setQueryData(["notes"], (oldData: any) => {
-        if (!oldData) return oldData;
-        return oldData.map((note: any) => 
-          note.id === noteId ? { ...note, title: newTitle, content } : note
-        );
-      });
-    }
     debouncedUpdate(newTitle, content, tags);
   };
 
   const handleContentChange = (newContent: string) => {
     setContent(newContent);
-    // Update the notes list immediately for content as well
-    if (noteId) {
-      queryClient.setQueryData(["notes"], (oldData: any) => {
-        if (!oldData) return oldData;
-        return oldData.map((note: any) => 
-          note.id === noteId ? { ...note, title, content: newContent } : note
-        );
-      });
-    }
     debouncedUpdate(title, newContent, tags);
   };
 

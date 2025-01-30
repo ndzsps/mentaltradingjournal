@@ -16,6 +16,7 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [tags, setTags] = useState<string[]>([]);
+  const [isLocalUpdate, setIsLocalUpdate] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { user } = useAuth();
@@ -39,12 +40,12 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
   });
 
   useEffect(() => {
-    if (note) {
+    if (note && !isLocalUpdate) {
       setTitle(note.title);
       setContent(note.content || "");
       setTags(note.tags || []);
     }
-  }, [note]);
+  }, [note, isLocalUpdate]);
 
   const updateNote = useMutation({
     mutationFn: async ({ title, content, tags }: { title: string; content: string; tags: string[] }) => {
@@ -64,6 +65,7 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notes"] });
       queryClient.invalidateQueries({ queryKey: ["note", noteId] });
+      setIsLocalUpdate(false);
     },
   });
 
@@ -81,16 +83,19 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
   );
 
   const handleTitleChange = (newTitle: string) => {
+    setIsLocalUpdate(true);
     setTitle(newTitle);
     debouncedUpdate(newTitle, content, tags);
   };
 
   const handleContentChange = (newContent: string) => {
+    setIsLocalUpdate(true);
     setContent(newContent);
     debouncedUpdate(title, newContent, tags);
   };
 
   const handleAddTag = (newTag: string) => {
+    setIsLocalUpdate(true);
     const updatedTags = [...tags, newTag];
     setTags(updatedTags);
     debouncedUpdate(title, content, updatedTags);
@@ -101,6 +106,7 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
   };
 
   const handleRemoveTag = (tagToRemove: string) => {
+    setIsLocalUpdate(true);
     const updatedTags = tags.filter(tag => tag !== tagToRemove);
     setTags(updatedTags);
     debouncedUpdate(title, content, updatedTags);

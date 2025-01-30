@@ -16,12 +16,11 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [tags, setTags] = useState<string[]>([]);
-  const [isLocalUpdate, setIsLocalUpdate] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
-  const { data: note, isLoading } = useQuery({
+  const { data: note } = useQuery({
     queryKey: ["note", noteId],
     queryFn: async () => {
       if (!noteId || !user) return null;
@@ -40,12 +39,13 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
   });
 
   useEffect(() => {
-    if (note && !isLocalUpdate) {
+    if (note && noteId) {
+      // Only update state if the note ID changes or if it's the initial load
       setTitle(note.title);
       setContent(note.content || "");
       setTags(note.tags || []);
     }
-  }, [note, isLocalUpdate]);
+  }, [noteId, note?.id]); // Only depend on noteId and note.id changes
 
   const updateNote = useMutation({
     mutationFn: async ({ title, content, tags }: { title: string; content: string; tags: string[] }) => {
@@ -64,8 +64,6 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notes"] });
-      queryClient.invalidateQueries({ queryKey: ["note", noteId] });
-      setIsLocalUpdate(false);
     },
   });
 
@@ -83,19 +81,16 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
   );
 
   const handleTitleChange = (newTitle: string) => {
-    setIsLocalUpdate(true);
     setTitle(newTitle);
     debouncedUpdate(newTitle, content, tags);
   };
 
   const handleContentChange = (newContent: string) => {
-    setIsLocalUpdate(true);
     setContent(newContent);
     debouncedUpdate(title, newContent, tags);
   };
 
   const handleAddTag = (newTag: string) => {
-    setIsLocalUpdate(true);
     const updatedTags = [...tags, newTag];
     setTags(updatedTags);
     debouncedUpdate(title, content, updatedTags);
@@ -106,7 +101,6 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
   };
 
   const handleRemoveTag = (tagToRemove: string) => {
-    setIsLocalUpdate(true);
     const updatedTags = tags.filter(tag => tag !== tagToRemove);
     setTags(updatedTags);
     debouncedUpdate(title, content, updatedTags);
@@ -124,7 +118,7 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
     );
   }
 
-  if (isLoading) {
+  if (!note) {
     return <div className="animate-pulse p-8 space-y-4">
       <div className="h-8 bg-muted/50 rounded w-1/3" />
       <div className="h-4 bg-muted/50 rounded w-1/4" />

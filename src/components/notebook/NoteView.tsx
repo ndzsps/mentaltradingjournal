@@ -62,8 +62,14 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notes"] });
+    onSuccess: (data) => {
+      // Update both the notes list and the current note in the cache
+      queryClient.setQueryData(["notes"], (oldData: any) => {
+        if (!oldData) return oldData;
+        return oldData.map((note: any) => 
+          note.id === data.id ? data : note
+        );
+      });
     },
   });
 
@@ -82,6 +88,15 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
 
   const handleTitleChange = (newTitle: string) => {
     setTitle(newTitle);
+    // Immediately update the cache to reflect the title change
+    if (noteId) {
+      queryClient.setQueryData(["notes"], (oldData: any) => {
+        if (!oldData) return oldData;
+        return oldData.map((note: any) => 
+          note.id === noteId ? { ...note, title: newTitle } : note
+        );
+      });
+    }
     debouncedUpdate(newTitle, content, tags);
   };
 

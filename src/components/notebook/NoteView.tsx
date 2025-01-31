@@ -62,7 +62,6 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
       return data;
     },
     onSuccess: (data) => {
-      // Update both the notes list and the individual note cache
       queryClient.setQueryData(["note", noteId], data);
       queryClient.invalidateQueries({ queryKey: ["notes"] });
     },
@@ -70,11 +69,14 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
 
   const debouncedUpdate = useCallback(
     (() => {
-      let timeoutId: NodeJS.Timeout;
+      let timeoutId: NodeJS.Timeout | null = null;
       return (title: string, content: string, tags: string[]) => {
-        clearTimeout(timeoutId);
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+        }
         timeoutId = setTimeout(() => {
           updateNote.mutate({ title, content, tags });
+          timeoutId = null;
         }, 1000);
       };
     })(),
@@ -83,11 +85,25 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
 
   const handleTitleChange = (newTitle: string) => {
     setTitle(newTitle);
+    // Optimistically update the cache
+    if (note) {
+      queryClient.setQueryData(["note", noteId], {
+        ...note,
+        title: newTitle,
+      });
+    }
     debouncedUpdate(newTitle, content, tags);
   };
 
   const handleContentChange = (newContent: string) => {
     setContent(newContent);
+    // Optimistically update the cache
+    if (note) {
+      queryClient.setQueryData(["note", noteId], {
+        ...note,
+        content: newContent,
+      });
+    }
     debouncedUpdate(title, newContent, tags);
   };
 

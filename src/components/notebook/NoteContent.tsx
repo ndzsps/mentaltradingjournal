@@ -12,6 +12,7 @@ export const NoteContent = ({ content, onContentChange }: NoteContentProps) => {
       onChange={(e) => onContentChange(e.target.value)}
       placeholder="Start writing..."
       className="min-h-[calc(100vh-300px)] resize-none border-none px-0 focus-visible:ring-0 placeholder:text-muted-foreground/50 bg-transparent text-lg leading-relaxed transition-colors duration-200"
+      spellCheck={false}
     />
   );
 };

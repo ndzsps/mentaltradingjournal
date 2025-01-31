@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -19,6 +19,7 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const updateTimeoutRef = useRef<NodeJS.Timeout>();
 
   const { data: note } = useQuery({
     queryKey: ["note", noteId],
@@ -61,47 +62,49 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
       if (error) throw error;
       return data;
     },
-    onSuccess: (data) => {
-      queryClient.setQueryData(["note", noteId], data);
-      queryClient.invalidateQueries({ queryKey: ["notes"] });
-    },
   });
 
-  const debouncedUpdate = useCallback(
-    (() => {
-      let timeoutId: NodeJS.Timeout | null = null;
-      return (title: string, content: string, tags: string[]) => {
-        if (timeoutId) {
-          clearTimeout(timeoutId);
+  const debouncedUpdate = useCallback((title: string, content: string, tags: string[]) => {
+    if (updateTimeoutRef.current) {
+      clearTimeout(updateTimeoutRef.current);
+    }
+
+    // Update local state immediately
+    queryClient.setQueryData(["note", noteId], (oldData: any) => ({
+      ...oldData,
+      title,
+      content,
+      tags,
+    }));
+
+    // Debounce the server update
+    updateTimeoutRef.current = setTimeout(() => {
+      updateNote.mutate(
+        { title, content, tags },
+        {
+          onSuccess: (data) => {
+            queryClient.setQueryData(["note", noteId], data);
+            queryClient.invalidateQueries({ queryKey: ["notes"] });
+          },
+          onError: () => {
+            toast({
+              title: "Error",
+              description: "Failed to save changes",
+              variant: "destructive",
+            });
+          },
         }
-        timeoutId = setTimeout(() => {
-          updateNote.mutate({ title, content, tags });
-          timeoutId = null;
-        }, 500); // Reduced debounce time for better responsiveness
-      };
-    })(),
-    [updateNote]
-  );
+      );
+    }, 1000);
+  }, [noteId, queryClient, updateNote, toast]);
 
   const handleTitleChange = (newTitle: string) => {
     setTitle(newTitle);
-    if (note) {
-      queryClient.setQueryData(["note", noteId], {
-        ...note,
-        title: newTitle,
-      });
-    }
     debouncedUpdate(newTitle, content, tags);
   };
 
   const handleContentChange = (newContent: string) => {
     setContent(newContent);
-    if (note) {
-      queryClient.setQueryData(["note", noteId], {
-        ...note,
-        content: newContent,
-      });
-    }
     debouncedUpdate(title, newContent, tags);
   };
 
@@ -124,6 +127,15 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
       description: `Removed tag: ${tagToRemove}`,
     });
   };
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (updateTimeoutRef.current) {
+        clearTimeout(updateTimeoutRef.current);
+      }
+    };
+  }, []);
 
   if (!noteId) {
     return (

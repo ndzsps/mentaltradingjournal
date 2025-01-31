@@ -39,13 +39,12 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
   });
 
   useEffect(() => {
-    if (note && noteId) {
-      // Only update state if the note ID changes or if it's the initial load
-      setTitle(note.title);
+    if (note) {
+      setTitle(note.title || "");
       setContent(note.content || "");
       setTags(note.tags || []);
     }
-  }, [noteId, note?.id]); // Only depend on noteId and note.id changes
+  }, [noteId, note]);
 
   const updateNote = useMutation({
     mutationFn: async ({ title, content, tags }: { title: string; content: string; tags: string[] }) => {
@@ -62,7 +61,9 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      // Update both the notes list and the individual note cache
+      queryClient.setQueryData(["note", noteId], data);
       queryClient.invalidateQueries({ queryKey: ["notes"] });
     },
   });

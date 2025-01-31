@@ -27,7 +27,7 @@ export const NotesList = ({ notes, isLoading, selectedNoteId, onSelectNote }: No
       <div className="p-4">
         <div className="animate-pulse space-y-2">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-[88px] bg-muted/50 rounded-lg" />
+            <div key={i} className="h-16 bg-muted/50 rounded-lg" />
           ))}
         </div>
       </div>
@@ -49,12 +49,9 @@ export const NotesList = ({ notes, isLoading, selectedNoteId, onSelectNote }: No
             draggable
             onDragStart={(e) => handleDragStart(e, note.id)}
           >
-            <h3 className="font-medium mb-1 line-clamp-1">
-              {note.title}
+            <h3 className="font-medium mb-1">
+              {note.title || "Untitled"}
             </h3>
-            <p className="text-sm text-muted-foreground line-clamp-2">
-              {note.content || "No content"}
-            </p>
             {note.tags && note.tags.length > 0 && (
               <div className="flex flex-wrap gap-1 mt-2">
                 {note.tags.map((tag) => (

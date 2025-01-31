@@ -77,7 +77,7 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
         timeoutId = setTimeout(() => {
           updateNote.mutate({ title, content, tags });
           timeoutId = null;
-        }, 1000);
+        }, 500); // Reduced debounce time for better responsiveness
       };
     })(),
     [updateNote]
@@ -85,7 +85,6 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
 
   const handleTitleChange = (newTitle: string) => {
     setTitle(newTitle);
-    // Optimistically update the cache
     if (note) {
       queryClient.setQueryData(["note", noteId], {
         ...note,
@@ -97,7 +96,6 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
 
   const handleContentChange = (newContent: string) => {
     setContent(newContent);
-    // Optimistically update the cache
     if (note) {
       queryClient.setQueryData(["note", noteId], {
         ...note,

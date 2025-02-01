@@ -9,7 +9,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 
 interface Note {
   id: string;
@@ -24,31 +23,12 @@ interface NotesListProps {
   isLoading: boolean;
   selectedNoteId: string | null;
   onSelectNote: (id: string | null) => void;
+  onDeleteNote: (id: string) => void;
 }
 
-export const NotesList = ({ notes, isLoading, selectedNoteId, onSelectNote }: NotesListProps) => {
+export const NotesList = ({ notes, isLoading, selectedNoteId, onSelectNote, onDeleteNote }: NotesListProps) => {
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>, noteId: string) => {
     e.dataTransfer.setData("noteId", noteId);
-  };
-
-  const handleDeleteNote = async (noteId: string, e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent note selection when deleting
-    try {
-      const { error } = await supabase
-        .from('notebook_notes')
-        .delete()
-        .eq('id', noteId);
-
-      if (error) throw error;
-      
-      toast.success("Note deleted successfully");
-      if (selectedNoteId === noteId) {
-        onSelectNote(null);
-      }
-    } catch (error) {
-      toast.error("Failed to delete note");
-      console.error("Error deleting note:", error);
-    }
   };
 
   const handleChangeIcon = (noteId: string, e: React.MouseEvent) => {
@@ -95,7 +75,10 @@ export const NotesList = ({ notes, isLoading, selectedNoteId, onSelectNote }: No
                     Change Icon
                   </DropdownMenuItem>
                   <DropdownMenuItem 
-                    onClick={(e) => handleDeleteNote(note.id, e)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDeleteNote(note.id);
+                    }}
                     className="text-destructive focus:text-destructive"
                   >
                     <Trash2 className="mr-2 h-4 w-4" />

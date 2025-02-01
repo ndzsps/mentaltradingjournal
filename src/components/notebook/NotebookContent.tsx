@@ -93,6 +93,23 @@ export const NotebookContent = () => {
     },
   });
 
+  const deleteNote = useMutation({
+    mutationFn: async (noteId: string) => {
+      if (!user) throw new Error("No user found");
+
+      const { error } = await supabase
+        .from("notebook_notes")
+        .delete()
+        .eq("id", noteId)
+        .eq("user_id", user.id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
+    },
+  });
+
   const moveNoteToFolder = useMutation({
     mutationFn: async ({ noteId, folderId }: { noteId: string, folderId: string }) => {
       if (!user) throw new Error("No user found");
@@ -126,6 +143,25 @@ export const NotebookContent = () => {
 
   const handleDrop = (noteId: string, folderId: string) => {
     moveNoteToFolder.mutate({ noteId, folderId });
+  };
+
+  const handleDeleteNote = async (noteId: string) => {
+    try {
+      await deleteNote.mutateAsync(noteId);
+      if (selectedNoteId === noteId) {
+        setSelectedNoteId(null);
+      }
+      toast({
+        title: "Success",
+        description: "Note deleted successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete note",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -175,6 +211,7 @@ export const NotebookContent = () => {
           isLoading={isLoadingNotes}
           selectedNoteId={selectedNoteId}
           onSelectNote={setSelectedNoteId}
+          onDeleteNote={handleDeleteNote}
         />
       </div>
 

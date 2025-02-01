@@ -1,6 +1,15 @@
 import { format } from "date-fns";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
+import { MoreVertical, Edit2, Trash2 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Note {
   id: string;
@@ -22,6 +31,32 @@ export const NotesList = ({ notes, isLoading, selectedNoteId, onSelectNote }: No
     e.dataTransfer.setData("noteId", noteId);
   };
 
+  const handleDeleteNote = async (noteId: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent note selection when deleting
+    try {
+      const { error } = await supabase
+        .from('notebook_notes')
+        .delete()
+        .eq('id', noteId);
+
+      if (error) throw error;
+      
+      toast.success("Note deleted successfully");
+      if (selectedNoteId === noteId) {
+        onSelectNote(null);
+      }
+    } catch (error) {
+      toast.error("Failed to delete note");
+      console.error("Error deleting note:", error);
+    }
+  };
+
+  const handleChangeIcon = (noteId: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent note selection when changing icon
+    // TODO: Implement icon change functionality
+    toast.info("Icon change feature coming soon!");
+  };
+
   if (isLoading) {
     return (
       <div className="p-4">
@@ -40,7 +75,7 @@ export const NotesList = ({ notes, isLoading, selectedNoteId, onSelectNote }: No
         {notes.map((note) => (
           <div
             key={note.id}
-            className={`p-4 rounded-lg cursor-pointer transition-all duration-200 ${
+            className={`relative p-4 rounded-lg cursor-pointer transition-all duration-200 group ${
               selectedNoteId === note.id 
                 ? "bg-secondary/10 border border-secondary/20" 
                 : "hover:bg-secondary/5"
@@ -49,6 +84,27 @@ export const NotesList = ({ notes, isLoading, selectedNoteId, onSelectNote }: No
             draggable
             onDragStart={(e) => handleDragStart(e, note.id)}
           >
+            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+              <DropdownMenu>
+                <DropdownMenuTrigger className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-secondary/20 transition-colors">
+                  <MoreVertical className="h-4 w-4" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-40">
+                  <DropdownMenuItem onClick={(e) => handleChangeIcon(note.id, e)}>
+                    <Edit2 className="mr-2 h-4 w-4" />
+                    Change Icon
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={(e) => handleDeleteNote(note.id, e)}
+                    className="text-destructive focus:text-destructive"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+
             <h3 className="font-medium mb-1">
               {note.title || "Untitled"}
             </h3>

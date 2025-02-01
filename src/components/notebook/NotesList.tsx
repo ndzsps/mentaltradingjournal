@@ -26,6 +26,9 @@ interface NotesListProps {
   onDeleteNote: (id: string) => void;
 }
 
+// Default emojis for different note contexts
+const defaultEmojis = ["📝", "🎯", "💡", "🔥", "🎨", "📊", "🌟", "📌", "🔍", "📚"];
+
 export const NotesList = ({ notes, isLoading, selectedNoteId, onSelectNote, onDeleteNote }: NotesListProps) => {
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>, noteId: string) => {
     e.dataTransfer.setData("noteId", noteId);
@@ -35,6 +38,10 @@ export const NotesList = ({ notes, isLoading, selectedNoteId, onSelectNote, onDe
     e.stopPropagation(); // Prevent note selection when changing icon
     // TODO: Implement icon change functionality
     toast.info("Icon change feature coming soon!");
+  };
+
+  const getRandomEmoji = () => {
+    return defaultEmojis[Math.floor(Math.random() * defaultEmojis.length)];
   };
 
   if (isLoading) {
@@ -88,9 +95,15 @@ export const NotesList = ({ notes, isLoading, selectedNoteId, onSelectNote, onDe
               </DropdownMenu>
             </div>
 
-            <h3 className="font-medium mb-1">
-              {note.title || "Untitled"}
-            </h3>
+            <div className="flex items-center gap-2">
+              <span className="text-lg select-none" role="img" aria-label="note emoji">
+                {getRandomEmoji()}
+              </span>
+              <h3 className="font-medium">
+                {note.title || "Untitled"}
+              </h3>
+            </div>
+
             {note.tags && note.tags.length > 0 && (
               <div className="flex flex-wrap gap-1 mt-2">
                 {note.tags.map((tag) => (

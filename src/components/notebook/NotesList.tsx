@@ -29,6 +29,9 @@ interface NotesListProps {
 // Default emojis for different note contexts
 const defaultEmojis = ["📝", "🎯", "💡", "🔥", "🎨", "📊", "🌟", "📌", "🔍", "📚"];
 
+// Use a Map to store consistent emojis for each note
+const noteEmojis = new Map<string, string>();
+
 export const NotesList = ({ notes, isLoading, selectedNoteId, onSelectNote, onDeleteNote }: NotesListProps) => {
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>, noteId: string) => {
     e.dataTransfer.setData("noteId", noteId);
@@ -40,8 +43,12 @@ export const NotesList = ({ notes, isLoading, selectedNoteId, onSelectNote, onDe
     toast.info("Icon change feature coming soon!");
   };
 
-  const getRandomEmoji = () => {
-    return defaultEmojis[Math.floor(Math.random() * defaultEmojis.length)];
+  const getEmojiForNote = (noteId: string) => {
+    if (!noteEmojis.has(noteId)) {
+      // If this note doesn't have an emoji yet, assign one randomly
+      noteEmojis.set(noteId, defaultEmojis[Math.floor(Math.random() * defaultEmojis.length)]);
+    }
+    return noteEmojis.get(noteId);
   };
 
   if (isLoading) {
@@ -97,7 +104,7 @@ export const NotesList = ({ notes, isLoading, selectedNoteId, onSelectNote, onDe
 
             <div className="flex items-center gap-2">
               <span className="text-lg select-none" role="img" aria-label="note emoji">
-                {getRandomEmoji()}
+                {getEmojiForNote(note.id)}
               </span>
               <h3 className="font-medium">
                 {note.title || "Untitled"}

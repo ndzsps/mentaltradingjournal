@@ -6,8 +6,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { toast } from "sonner";
+import { EmojiPicker } from "./EmojiPicker";
+import { useState } from "react";
 
 interface Note {
   id: string;
@@ -32,13 +34,10 @@ export const NoteItem = ({
   onDelete,
   getEmojiForNote 
 }: NoteItemProps) => {
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
     e.dataTransfer.setData("noteId", note.id);
-  };
-
-  const handleChangeIcon = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    toast.info("Icon change feature coming soon!");
   };
 
   return (
@@ -57,11 +56,15 @@ export const NoteItem = ({
           <DropdownMenuTrigger className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-secondary/20 transition-colors">
             <MoreVertical className="h-4 w-4" />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-40">
-            <DropdownMenuItem onClick={handleChangeIcon}>
+          <DropdownMenuContent align="end" className="w-[240px]">
+            <DropdownMenuItem onClick={(e) => {
+              e.stopPropagation();
+              setShowEmojiPicker(true);
+            }}>
               <Edit2 className="mr-2 h-4 w-4" />
               Change Icon
             </DropdownMenuItem>
+            <DropdownMenuSeparator />
             <DropdownMenuItem 
               onClick={(e) => {
                 e.stopPropagation();
@@ -101,6 +104,13 @@ export const NoteItem = ({
       <p className="text-xs text-muted-foreground mt-2">
         {format(new Date(note.created_at), "d MMM yyyy")}
       </p>
+
+      {showEmojiPicker && (
+        <EmojiPicker
+          noteId={note.id}
+          onClose={() => setShowEmojiPicker(false)}
+        />
+      )}
     </div>
   );
 };

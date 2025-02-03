@@ -41,9 +41,21 @@ export const NoteItem = ({
 
   const handleNoteClick = (e: React.MouseEvent) => {
     // Only select the note if we're not clicking the dropdown or its content
-    if (!(e.target as HTMLElement).closest('.note-actions')) {
+    const target = e.target as HTMLElement;
+    if (!target.closest('.note-actions') && !target.closest('[role="dialog"]')) {
       onSelect(note.id);
     }
+  };
+
+  const handleEmojiPickerClose = () => {
+    setShowEmojiPicker(false);
+    // Small delay to ensure the dialog is fully closed before allowing new interactions
+    setTimeout(() => {
+      const overlay = document.querySelector('[role="presentation"]');
+      if (overlay) {
+        overlay.remove();
+      }
+    }, 100);
   };
 
   return (
@@ -108,7 +120,7 @@ export const NoteItem = ({
       {showEmojiPicker && (
         <EmojiPicker
           noteId={note.id}
-          onClose={() => setShowEmojiPicker(false)}
+          onClose={handleEmojiPickerClose}
         />
       )}
     </div>

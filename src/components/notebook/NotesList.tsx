@@ -9,6 +9,7 @@ interface Note {
   content: string;
   created_at: string;
   tags: string[];
+  emoji: string;
 }
 
 interface NotesListProps {
@@ -19,12 +20,6 @@ interface NotesListProps {
   onDeleteNote: (id: string) => void;
 }
 
-// Default emojis for different note contexts
-const defaultEmojis = ["📝", "🎯", "💡", "🔥", "🎨", "📊", "🌟", "📌", "🔍", "📚"];
-
-// Use a Map to store consistent emojis for each note
-const noteEmojis = new Map<string, string>();
-
 export const NotesList = ({ 
   notes, 
   isLoading, 
@@ -32,14 +27,6 @@ export const NotesList = ({
   onSelectNote,
   onDeleteNote 
 }: NotesListProps) => {
-  const getEmojiForNote = (noteId: string) => {
-    if (!noteEmojis.has(noteId)) {
-      // If this note doesn't have an emoji yet, assign one randomly
-      noteEmojis.set(noteId, defaultEmojis[Math.floor(Math.random() * defaultEmojis.length)]);
-    }
-    return noteEmojis.get(noteId);
-  };
-
   if (isLoading) {
     return <NotesLoadingSkeleton />;
   }
@@ -54,7 +41,6 @@ export const NotesList = ({
             isSelected={selectedNoteId === note.id}
             onSelect={onSelectNote}
             onDelete={onDeleteNote}
-            getEmojiForNote={getEmojiForNote}
           />
         ))}
         {notes.length === 0 && <NotesEmptyState />}

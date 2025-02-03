@@ -1,10 +1,10 @@
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 interface EmojiPickerProps {
   noteId: string;
@@ -31,7 +31,7 @@ export const EmojiPicker = ({ noteId, onClose }: EmojiPickerProps) => {
         .update({ emoji })
         .eq("id", noteId)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
@@ -67,6 +67,7 @@ export const EmojiPicker = ({ noteId, onClose }: EmojiPickerProps) => {
   return (
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent className="max-w-md">
+        <DialogTitle>Choose an Emoji</DialogTitle>
         <div className="space-y-4">
           <Input
             placeholder="Search emojis..."

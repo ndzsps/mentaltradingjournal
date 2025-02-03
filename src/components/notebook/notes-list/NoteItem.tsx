@@ -17,6 +17,7 @@ interface Note {
   content: string;
   created_at: string;
   tags: string[];
+  emoji: string;
 }
 
 interface NoteItemProps {
@@ -24,7 +25,6 @@ interface NoteItemProps {
   isSelected: boolean;
   onSelect: (id: string) => void;
   onDelete: (id: string) => void;
-  getEmojiForNote: (id: string) => string | undefined;
 }
 
 export const NoteItem = ({ 
@@ -32,7 +32,6 @@ export const NoteItem = ({
   isSelected, 
   onSelect, 
   onDelete,
-  getEmojiForNote 
 }: NoteItemProps) => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
@@ -81,7 +80,7 @@ export const NoteItem = ({
 
       <div className="flex items-center gap-2">
         <span className="text-lg select-none" role="img" aria-label="note emoji">
-          {getEmojiForNote(note.id)}
+          {note.emoji || "📝"}
         </span>
         <h3 className="font-medium">
           {note.title || "Untitled"}

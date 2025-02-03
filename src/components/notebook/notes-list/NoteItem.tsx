@@ -39,6 +39,13 @@ export const NoteItem = ({
     e.dataTransfer.setData("noteId", note.id);
   };
 
+  const handleNoteClick = (e: React.MouseEvent) => {
+    // Only select the note if we're not clicking the dropdown or its content
+    if (!(e.target as HTMLElement).closest('.note-actions')) {
+      onSelect(note.id);
+    }
+  };
+
   return (
     <div
       className={`relative p-4 rounded-lg cursor-pointer transition-all duration-200 group ${
@@ -46,29 +53,23 @@ export const NoteItem = ({
           ? "bg-secondary/10 border border-secondary/20" 
           : "hover:bg-secondary/5"
       }`}
-      onClick={() => onSelect(note.id)}
+      onClick={handleNoteClick}
       draggable
       onDragStart={handleDragStart}
     >
-      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity note-actions">
         <DropdownMenu>
           <DropdownMenuTrigger className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-secondary/20 transition-colors">
             <MoreVertical className="h-4 w-4" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-[240px]">
-            <DropdownMenuItem onClick={(e) => {
-              e.stopPropagation();
-              setShowEmojiPicker(true);
-            }}>
+            <DropdownMenuItem onClick={() => setShowEmojiPicker(true)}>
               <Edit2 className="mr-2 h-4 w-4" />
               Change Icon
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem 
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete(note.id);
-              }}
+              onClick={() => onDelete(note.id)}
               className="text-destructive focus:text-destructive"
             >
               <Trash2 className="mr-2 h-4 w-4" />

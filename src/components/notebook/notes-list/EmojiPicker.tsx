@@ -2,6 +2,9 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 interface EmojiPickerProps {
   noteId: string;
@@ -18,11 +21,41 @@ const emojis = {
 
 export const EmojiPicker = ({ noteId, onClose }: EmojiPickerProps) => {
   const [searchTerm, setSearchTerm] = useState("");
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const updateEmoji = useMutation({
+    mutationFn: async (emoji: string) => {
+      const { data, error } = await supabase
+        .from("notebook_notes")
+        .update({ emoji })
+        .eq("id", noteId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
+      queryClient.invalidateQueries({ queryKey: ["note", noteId] });
+      toast({
+        title: "Success",
+        description: "Note emoji updated successfully",
+      });
+      onClose();
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update note emoji",
+        variant: "destructive",
+      });
+    },
+  });
 
   const handleEmojiSelect = (emoji: string) => {
-    // TODO: Implement emoji selection logic
-    console.log(`Selected emoji ${emoji} for note ${noteId}`);
-    onClose();
+    updateEmoji.mutate(emoji);
   };
 
   const filteredEmojis = searchTerm

@@ -193,6 +193,7 @@ export type Database = {
         Row: {
           content: string | null
           created_at: string
+          emoji: string | null
           folder_id: string | null
           id: string
           tags: string[] | null
@@ -203,6 +204,7 @@ export type Database = {
         Insert: {
           content?: string | null
           created_at?: string
+          emoji?: string | null
           folder_id?: string | null
           id?: string
           tags?: string[] | null
@@ -213,6 +215,7 @@ export type Database = {
         Update: {
           content?: string | null
           created_at?: string
+          emoji?: string | null
           folder_id?: string | null
           id?: string
           tags?: string[] | null

@@ -11,7 +11,6 @@ interface EmojiPickerProps {
   onClose: () => void;
 }
 
-// Common emoji categories
 const emojis = {
   recent: ["😊", "🤔", "👍", "🎉", "❤️", "🔥", "⭐", "📝", "💡", "✨"],
   emotions: ["😀", "😃", "😄", "😁", "😅", "😂", "🤣", "😊", "😇", "🙂", "🙃", "😉", "😌", "😍", "🥰", "😘"],
@@ -21,6 +20,7 @@ const emojis = {
 
 export const EmojiPicker = ({ noteId, onClose }: EmojiPickerProps) => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [isOpen, setIsOpen] = useState(true);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -43,6 +43,7 @@ export const EmojiPicker = ({ noteId, onClose }: EmojiPickerProps) => {
         title: "Success",
         description: "Note emoji updated successfully",
       });
+      setIsOpen(false);
       onClose();
     },
     onError: () => {
@@ -58,6 +59,13 @@ export const EmojiPicker = ({ noteId, onClose }: EmojiPickerProps) => {
     updateEmoji.mutate(emoji);
   };
 
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+    if (!open) {
+      onClose();
+    }
+  };
+
   const filteredEmojis = searchTerm
     ? Object.values(emojis).flat().filter(emoji => 
         emoji.toLowerCase().includes(searchTerm.toLowerCase())
@@ -65,7 +73,7 @@ export const EmojiPicker = ({ noteId, onClose }: EmojiPickerProps) => {
     : null;
 
   return (
-    <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-md">
         <DialogTitle>Choose an Emoji</DialogTitle>
         <div className="space-y-4">

@@ -20,7 +20,7 @@ const emojis = {
 
 export const EmojiPicker = ({ noteId, onClose }: EmojiPickerProps) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [isOpen, setIsOpen] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(true);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -43,8 +43,7 @@ export const EmojiPicker = ({ noteId, onClose }: EmojiPickerProps) => {
         title: "Success",
         description: "Note emoji updated successfully",
       });
-      setIsOpen(false);
-      onClose();
+      handleClose();
     },
     onError: () => {
       toast({
@@ -55,15 +54,13 @@ export const EmojiPicker = ({ noteId, onClose }: EmojiPickerProps) => {
     },
   });
 
-  const handleEmojiSelect = (emoji: string) => {
-    updateEmoji.mutate(emoji);
+  const handleClose = () => {
+    setDialogOpen(false);
+    onClose();
   };
 
-  const handleOpenChange = (open: boolean) => {
-    setIsOpen(open);
-    if (!open) {
-      onClose();
-    }
+  const handleEmojiSelect = (emoji: string) => {
+    updateEmoji.mutate(emoji);
   };
 
   const filteredEmojis = searchTerm
@@ -73,8 +70,8 @@ export const EmojiPicker = ({ noteId, onClose }: EmojiPickerProps) => {
     : null;
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-w-md">
+    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <DialogContent className="max-w-md" onInteractOutside={handleClose}>
         <DialogTitle>Choose an Emoji</DialogTitle>
         <div className="space-y-4">
           <Input

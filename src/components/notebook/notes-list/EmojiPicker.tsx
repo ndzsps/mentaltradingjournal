@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useState } from "react";
@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 
 interface EmojiPickerProps {
   noteId: string;
-  onClose: () => void;
+  onEmojiSelect: (emoji: string) => void;
 }
 
 const emojis = {
@@ -18,9 +18,8 @@ const emojis = {
   symbols: ["✅", "❌", "⭕", "❗", "❓", "⚡", "💯", "🔄", "🔍", "➡️", "⬅️", "⬆️", "⬇️", "↗️", "↘️", "🔸"],
 };
 
-export const EmojiPicker = ({ noteId, onClose }: EmojiPickerProps) => {
+export const EmojiPicker = ({ noteId, onEmojiSelect }: EmojiPickerProps) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [dialogOpen, setDialogOpen] = useState(true);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -36,14 +35,14 @@ export const EmojiPicker = ({ noteId, onClose }: EmojiPickerProps) => {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (_, emoji) => {
       queryClient.invalidateQueries({ queryKey: ["notes"] });
       queryClient.invalidateQueries({ queryKey: ["note", noteId] });
       toast({
         title: "Success",
         description: "Note emoji updated successfully",
       });
-      handleClose();
+      onEmojiSelect(emoji);
     },
     onError: () => {
       toast({
@@ -53,11 +52,6 @@ export const EmojiPicker = ({ noteId, onClose }: EmojiPickerProps) => {
       });
     },
   });
-
-  const handleClose = () => {
-    setDialogOpen(false);
-    onClose();
-  };
 
   const handleEmojiSelect = (emoji: string) => {
     updateEmoji.mutate(emoji);
@@ -70,53 +64,51 @@ export const EmojiPicker = ({ noteId, onClose }: EmojiPickerProps) => {
     : null;
 
   return (
-    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-      <DialogContent className="max-w-md" onInteractOutside={handleClose}>
-        <DialogTitle>Choose an Emoji</DialogTitle>
-        <div className="space-y-4">
-          <Input
-            placeholder="Search emojis..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full"
-          />
-          
-          <ScrollArea className="h-[300px] pr-4">
-            {filteredEmojis ? (
-              <div className="grid grid-cols-8 gap-2">
-                {filteredEmojis.map((emoji, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleEmojiSelect(emoji)}
-                    className="p-2 text-xl hover:bg-secondary/20 rounded-md transition-colors"
-                  >
-                    {emoji}
-                  </button>
-                ))}
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {Object.entries(emojis).map(([category, categoryEmojis]) => (
-                  <div key={category}>
-                    <h3 className="text-sm font-medium capitalize mb-2">{category}</h3>
-                    <div className="grid grid-cols-8 gap-2">
-                      {categoryEmojis.map((emoji, index) => (
-                        <button
-                          key={index}
-                          onClick={() => handleEmojiSelect(emoji)}
-                          className="p-2 text-xl hover:bg-secondary/20 rounded-md transition-colors"
-                        >
-                          {emoji}
-                        </button>
-                      ))}
-                    </div>
+    <DialogContent className="max-w-md">
+      <DialogTitle>Choose an Emoji</DialogTitle>
+      <div className="space-y-4">
+        <Input
+          placeholder="Search emojis..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full"
+        />
+        
+        <ScrollArea className="h-[300px] pr-4">
+          {filteredEmojis ? (
+            <div className="grid grid-cols-8 gap-2">
+              {filteredEmojis.map((emoji, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleEmojiSelect(emoji)}
+                  className="p-2 text-xl hover:bg-secondary/20 rounded-md transition-colors"
+                >
+                  {emoji}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {Object.entries(emojis).map(([category, categoryEmojis]) => (
+                <div key={category}>
+                  <h3 className="text-sm font-medium capitalize mb-2">{category}</h3>
+                  <div className="grid grid-cols-8 gap-2">
+                    {categoryEmojis.map((emoji, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleEmojiSelect(emoji)}
+                        className="p-2 text-xl hover:bg-secondary/20 rounded-md transition-colors"
+                      >
+                        {emoji}
+                      </button>
+                    ))}
                   </div>
-                ))}
-              </div>
-            )}
-          </ScrollArea>
-        </div>
-      </DialogContent>
-    </Dialog>
+                </div>
+              ))}
+            </div>
+          )}
+        </ScrollArea>
+      </div>
+    </DialogContent>
   );
 };

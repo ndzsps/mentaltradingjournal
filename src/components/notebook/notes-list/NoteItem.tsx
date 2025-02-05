@@ -8,6 +8,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { Dialog } from "@/components/ui/dialog";
 import { EmojiPicker } from "./EmojiPicker";
 import { useState } from "react";
 
@@ -44,6 +45,10 @@ export const NoteItem = ({
     if (!target.closest('.note-actions')) {
       onSelect(note.id);
     }
+  };
+
+  const handleEmojiSelect = () => {
+    setShowEmojiPicker(false);
   };
 
   return (
@@ -105,12 +110,12 @@ export const NoteItem = ({
         {format(new Date(note.created_at), "d MMM yyyy")}
       </p>
 
-      {showEmojiPicker && (
+      <Dialog open={showEmojiPicker} onOpenChange={setShowEmojiPicker}>
         <EmojiPicker
           noteId={note.id}
-          onClose={() => setShowEmojiPicker(false)}
+          onEmojiSelect={handleEmojiSelect}
         />
-      )}
+      </Dialog>
     </div>
   );
 };

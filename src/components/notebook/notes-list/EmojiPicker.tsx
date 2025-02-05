@@ -65,7 +65,7 @@ export const EmojiPicker = ({ noteId, onClose }: EmojiPickerProps) => {
     : null;
 
   return (
-    <Dialog open={true} onOpenChange={onClose}>
+    <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-md">
         <DialogTitle>Choose an Emoji</DialogTitle>
         <div className="space-y-4">

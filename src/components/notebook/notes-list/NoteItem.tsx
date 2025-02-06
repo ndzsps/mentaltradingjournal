@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { Dialog } from "@/components/ui/dialog";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { EmojiPicker } from "./EmojiPicker";
 import { useState } from "react";
 
@@ -68,10 +68,18 @@ export const NoteItem = ({
             <MoreVertical className="h-4 w-4" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-[240px]">
-            <DropdownMenuItem onClick={() => setShowEmojiPicker(true)}>
-              <Edit2 className="mr-2 h-4 w-4" />
-              Change Icon
-            </DropdownMenuItem>
+            <Dialog open={showEmojiPicker} onOpenChange={setShowEmojiPicker}>
+              <DialogTrigger asChild>
+                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                  <Edit2 className="mr-2 h-4 w-4" />
+                  Change Icon
+                </DropdownMenuItem>
+              </DialogTrigger>
+              <EmojiPicker
+                noteId={note.id}
+                onEmojiSelect={handleEmojiSelect}
+              />
+            </Dialog>
             <DropdownMenuSeparator />
             <DropdownMenuItem 
               onClick={() => onDelete(note.id)}
@@ -109,13 +117,6 @@ export const NoteItem = ({
       <p className="text-xs text-muted-foreground mt-2">
         {format(new Date(note.created_at), "d MMM yyyy")}
       </p>
-
-      <Dialog open={showEmojiPicker} onOpenChange={setShowEmojiPicker}>
-        <EmojiPicker
-          noteId={note.id}
-          onEmojiSelect={handleEmojiSelect}
-        />
-      </Dialog>
     </div>
   );
 };

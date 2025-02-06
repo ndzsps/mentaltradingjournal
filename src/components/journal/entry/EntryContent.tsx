@@ -71,7 +71,7 @@ export const EntryContent = ({
               {weeklyUrl && (
                 <Button
                   variant="outline"
-                  className="justify-start space-x-2"
+                  className="justify-start space-x-2 w-full"
                   onClick={() => window.open(weeklyUrl, '_blank')}
                 >
                   <ExternalLink className="h-4 w-4" />
@@ -81,7 +81,7 @@ export const EntryContent = ({
               {dailyUrl && (
                 <Button
                   variant="outline"
-                  className="justify-start space-x-2"
+                  className="justify-start space-x-2 w-full"
                   onClick={() => window.open(dailyUrl, '_blank')}
                 >
                   <ExternalLink className="h-4 w-4" />
@@ -91,7 +91,7 @@ export const EntryContent = ({
               {fourHourUrl && (
                 <Button
                   variant="outline"
-                  className="justify-start space-x-2"
+                  className="justify-start space-x-2 w-full"
                   onClick={() => window.open(fourHourUrl, '_blank')}
                 >
                   <ExternalLink className="h-4 w-4" />
@@ -101,7 +101,7 @@ export const EntryContent = ({
               {oneHourUrl && (
                 <Button
                   variant="outline"
-                  className="justify-start space-x-2"
+                  className="justify-start space-x-2 w-full"
                   onClick={() => window.open(oneHourUrl, '_blank')}
                 >
                   <ExternalLink className="h-4 w-4" />

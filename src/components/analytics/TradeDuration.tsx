@@ -25,10 +25,10 @@ const CustomTooltip = ({ active, payload, label }: any) => {
             style={{ backgroundColor: item.fill }}
           />
           <span className="text-muted-foreground">
-            {item.name === 'tradeCount' ? '# of Trades:' : 'Win Rate:'}
+            {item.name === '# of Trades' ? '# of Trades:' : 'Win Rate:'}
           </span>
           <span className="font-medium text-foreground">
-            {item.name === 'tradeCount' ? 
+            {item.name === '# of Trades' ? 
               `${item.value} trades` : 
               `${item.value.toFixed(1)}%`}
           </span>
@@ -74,7 +74,10 @@ export const TradeDuration = () => {
   const data = durationRanges.map(range => {
     const tradesInRange = allTrades.filter(trade => {
       const duration = calculateDuration(trade);
-      return duration <= range.max;
+      const previousMax = range.max === 10 ? 0 : 
+                         range.max === 30 ? 10 :
+                         range.max === 60 ? 30 : 60;
+      return duration > previousMax && duration <= range.max;
     });
 
     const totalTrades = tradesInRange.length;

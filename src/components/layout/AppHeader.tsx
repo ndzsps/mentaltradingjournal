@@ -51,6 +51,17 @@ export function AppHeader() {
 
   const displayName = user?.user_metadata?.username || user?.email?.split('@')[0] || 'User';
 
+  const AuthButtons = () => (
+    <div className="flex items-center space-x-4">
+      <Button variant="ghost" asChild>
+        <Link to="/pricing">Pricing</Link>
+      </Button>
+      <Button variant="default" asChild>
+        <Link to="/login">Sign In</Link>
+      </Button>
+    </div>
+  );
+
   return (
     <header className="border-b border-border/40 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 max-w-screen-2xl items-center justify-between">
@@ -125,14 +136,7 @@ export function AppHeader() {
               </PopoverContent>
             </Popover>
           ) : (
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" asChild>
-                <Link to="/pricing">Pricing</Link>
-              </Button>
-              <Button variant="default" asChild>
-                <Link to="/login">Sign In</Link>
-              </Button>
-            </div>
+            <AuthButtons />
           )}
         </nav>
 

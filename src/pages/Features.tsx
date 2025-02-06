@@ -1,4 +1,3 @@
-import { AppLayout } from "@/components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { 
@@ -46,8 +45,26 @@ const Features = () => {
   ];
 
   return (
-    <AppLayout>
-      <div className="container mx-auto py-12">
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-b">
+        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+          <Link to="/" className="text-xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
+            Mental
+          </Link>
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" asChild>
+              <Link to="/login">Sign In</Link>
+            </Button>
+            <Button asChild>
+              <Link to="/login">Get Started</Link>
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <div className="container mx-auto py-24">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4">Features</h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -74,7 +91,7 @@ const Features = () => {
           </Button>
         </div>
       </div>
-    </AppLayout>
+    </div>
   );
 };
 

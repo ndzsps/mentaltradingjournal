@@ -15,6 +15,10 @@ interface JournalFormSubmissionProps {
   selectedMistakes?: string[];
   preTradingActivities: string[];
   trades: Trade[];
+  weeklyUrl?: string;
+  dailyUrl?: string;
+  fourHourUrl?: string;
+  oneHourUrl?: string;
   resetForm: () => void;
   onSubmitSuccess?: () => void;
 }
@@ -29,6 +33,10 @@ export const useJournalFormSubmission = ({
   selectedMistakes,
   preTradingActivities,
   trades,
+  weeklyUrl,
+  dailyUrl,
+  fourHourUrl,
+  oneHourUrl,
   resetForm,
   onSubmitSuccess,
 }: JournalFormSubmissionProps) => {
@@ -68,25 +76,6 @@ export const useJournalFormSubmission = ({
     }
 
     try {
-      // Format trades as JSONB array
-      const formattedTrades = trades.map(trade => ({
-        id: trade.id,
-        entryDate: trade.entryDate,
-        instrument: trade.instrument,
-        setup: trade.setup,
-        direction: trade.direction,
-        entryPrice: trade.entryPrice.toString(),
-        quantity: trade.quantity.toString(),
-        stopLoss: trade.stopLoss.toString(),
-        takeProfit: trade.takeProfit.toString(),
-        exitDate: trade.exitDate,
-        exitPrice: trade.exitPrice.toString(),
-        pnl: trade.pnl.toString(),
-        fees: trade.fees.toString(),
-        forecastScreenshot: trade.forecastScreenshot,
-        resultScreenshot: trade.resultScreenshot,
-      }));
-
       const { error } = await supabase.from('journal_entries').insert({
         user_id: user.id,
         session_type: sessionType,
@@ -97,7 +86,11 @@ export const useJournalFormSubmission = ({
         followed_rules: followedRules,
         mistakes: selectedMistakes,
         pre_trading_activities: preTradingActivities,
-        trades: formattedTrades,
+        trades,
+        weekly_url: weeklyUrl,
+        daily_url: dailyUrl,
+        four_hour_url: fourHourUrl,
+        one_hour_url: oneHourUrl,
       });
 
       if (error) throw error;

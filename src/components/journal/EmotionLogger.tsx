@@ -10,6 +10,9 @@ import { FormHeader } from "./form/FormHeader";
 import { EmotionSection } from "./form/EmotionSection";
 import { PostSessionFormSection } from "./form/PostSessionFormSection";
 import { ProgressStats } from "./ProgressStats";
+import { TradingOutcomeSection } from "./post-session/TradingOutcomeSection";
+import { TradingRulesSection } from "./post-session/TradingRulesSection";
+import { ObservationsSection } from "./post-session/ObservationsSection";
 
 const PRE_TRADING_ACTIVITIES = [
   "Meditation",
@@ -41,7 +44,11 @@ export const EmotionLogger = ({
   const [preTradingActivities, setPreTradingActivities] = useState<string[]>([]);
   const [showCelebration, setShowCelebration] = useState(false);
   const [trades, setTrades] = useState<Trade[]>([]);
-  
+  const [weeklyUrl, setWeeklyUrl] = useState('');
+  const [dailyUrl, setDailyUrl] = useState('');
+  const [fourHourUrl, setFourHourUrl] = useState('');
+  const [oneHourUrl, setOneHourUrl] = useState('');
+
   const { stats } = useProgressTracking();
 
   // Set initial session type when provided
@@ -60,6 +67,10 @@ export const EmotionLogger = ({
     setFollowedRules([]);
     setPreTradingActivities([]);
     setTrades([]);
+    setWeeklyUrl('');
+    setDailyUrl('');
+    setFourHourUrl('');
+    setOneHourUrl('');
   };
 
   const { handleSubmit } = useJournalFormSubmission({
@@ -72,6 +83,10 @@ export const EmotionLogger = ({
     selectedMistakes,
     preTradingActivities,
     trades,
+    weeklyUrl,
+    dailyUrl,
+    fourHourUrl,
+    oneHourUrl,
     resetForm,
     onSubmitSuccess: () => {
       setShowCelebration(true);
@@ -159,6 +174,14 @@ export const EmotionLogger = ({
               setSelectedMistakes={setSelectedMistakes}
               trades={trades}
               onTradeSubmit={handleTradeSubmit}
+              weeklyUrl={weeklyUrl}
+              setWeeklyUrl={setWeeklyUrl}
+              dailyUrl={dailyUrl}
+              setDailyUrl={setDailyUrl}
+              fourHourUrl={fourHourUrl}
+              setFourHourUrl={setFourHourUrl}
+              oneHourUrl={oneHourUrl}
+              setOneHourUrl={setOneHourUrl}
             />
           )}
 

@@ -28,6 +28,7 @@ export function AppHeader() {
   
   const navigationItems = [
     { icon: Home, label: "Home", path: "/" },
+    { label: "Features", path: "/features" },
     { icon: BookOpen, label: "Dashboard", path: "/dashboard" },
     { icon: BarChart2, label: "Analytics", path: "/analytics" },
   ];
@@ -73,7 +74,7 @@ export function AppHeader() {
               )}
             >
               <Link to={item.path} className="flex items-center gap-2">
-                <item.icon className="h-4 w-4" />
+                {item.icon && <item.icon className="h-4 w-4" />}
                 <span>{item.label}</span>
               </Link>
             </Button>
@@ -148,7 +149,7 @@ export function AppHeader() {
                   onClick={() => setIsOpen(false)}
                 >
                   <Link to={item.path} className="flex items-center gap-2">
-                    <item.icon className="h-4 w-4" />
+                    {item.icon && <item.icon className="h-4 w-4" />}
                     <span>{item.label}</span>
                   </Link>
                 </Button>

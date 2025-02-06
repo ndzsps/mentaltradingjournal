@@ -1,25 +1,18 @@
 import { AppLayout } from "@/components/layout/AppLayout";
 import { EmotionLogger } from "@/components/journal/EmotionLogger";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 
 const AddJournalEntry = () => {
-  const { type } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
-
-  // Validate entry type
-  useEffect(() => {
-    const validTypes = ["pre-session", "post-session"];
-    if (type && !validTypes.includes(type)) {
-      navigate("/dashboard");
-    }
-  }, [type, navigate]);
+  const sessionType = location.state?.sessionType === 'post-session' ? 'post' : 'pre';
 
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4">
         <EmotionLogger 
-          initialSessionType={type === "pre-session" ? "pre" : "post"}
+          initialSessionType={sessionType}
           onSubmitSuccess={() => {
             navigate("/dashboard");
           }}

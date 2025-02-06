@@ -286,7 +286,7 @@ export type Database = {
           created_at: string
           currency: string
           description: string | null
-          features: PricingFeature[] | null
+          features: Json[] | null
           id: string
           interval: string
           is_active: boolean | null
@@ -298,7 +298,7 @@ export type Database = {
           created_at?: string
           currency?: string
           description?: string | null
-          features?: PricingFeature[] | null
+          features?: Json[] | null
           id?: string
           interval?: string
           is_active?: boolean | null
@@ -310,7 +310,7 @@ export type Database = {
           created_at?: string
           currency?: string
           description?: string | null
-          features?: PricingFeature[] | null
+          features?: Json[] | null
           id?: string
           interval?: string
           is_active?: boolean | null
@@ -382,7 +382,7 @@ export type Database = {
           post_session_streak?: number
           pre_session_streak?: number
           updated_at?: string
-          user_id: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -483,7 +483,7 @@ export type Tables<
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
         Database[PublicTableNameOrOptions["schema"]]["Views"])
-    : never,
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
       Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
@@ -570,7 +570,3 @@ export type CompositeTypes<
   : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
     ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
-
-export type PricingFeature = {
-  description: string;
-}

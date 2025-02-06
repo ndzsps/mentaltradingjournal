@@ -58,11 +58,22 @@ export const EmotionalTendencies = () => {
   }
 
   // Transform the data to include both emotional score and trading result
-  const data = analytics.emotionTrend.map(entry => ({
-    date: format(new Date(entry.date), 'MMM dd'),
-    emotionalScore: emotionToNumber(entry.emotion),
-    tradingResult: entry.pnl || 0,
-  }));
+  const data = analytics.journalEntries.map(entry => {
+    // Calculate total P&L from all trades in this entry
+    const totalPnL = entry.trades?.reduce((sum, trade) => {
+      const pnlValue = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) :
+                      typeof trade.pnl === 'number' ? trade.pnl :
+                      typeof trade.profit_loss === 'string' ? parseFloat(trade.profit_loss) :
+                      typeof trade.profit_loss === 'number' ? trade.profit_loss : 0;
+      return sum + (isNaN(pnlValue) ? 0 : pnlValue);
+    }, 0) || 0;
+
+    return {
+      date: format(new Date(entry.created_at), 'MMM dd'),
+      emotionalScore: emotionToNumber(entry.emotion),
+      tradingResult: totalPnL,
+    };
+  }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   const formatValue = (value: number) => {
     if (typeof value === 'number') {

@@ -21,9 +21,23 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
 
   const checkSubscription = async () => {
     try {
-      const { data, error } = await supabase.functions.invoke('check-subscription');
+      const { data: { session } } = await supabase.auth.getSession();
       
-      if (error) throw error;
+      if (!session) {
+        setLoading(false);
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke('check-subscription', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        }
+      });
+      
+      if (error) {
+        console.error('Subscription check error:', error);
+        throw error;
+      }
       
       setIsSubscribed(data.subscribed);
     } catch (error) {

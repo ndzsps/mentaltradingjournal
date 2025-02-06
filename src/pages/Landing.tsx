@@ -52,6 +52,13 @@ const Landing = () => {
               </Button>
               <Button
                 variant="ghost"
+                className="text-white/70 hover:text-white hover:bg-white/5"
+                asChild
+              >
+                <Link to="/pricing">Pricing</Link>
+              </Button>
+              <Button
+                variant="ghost"
                 className="flex items-center gap-2 text-white/70 hover:text-white hover:bg-white/5"
                 onClick={() => navigate("/login")}
               >

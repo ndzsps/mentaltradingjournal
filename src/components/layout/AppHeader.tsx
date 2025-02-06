@@ -200,7 +200,7 @@ export function AppHeader() {
                 </div>
               ) : (
                 <div className="space-y-2">
-                  <Button variant="ghost" asChild className="w-full">
+                  <Button variant="ghost" asChild className="w-full justify-start">
                     <Link to="/pricing" onClick={() => setIsOpen(false)}>
                       Pricing
                     </Link>

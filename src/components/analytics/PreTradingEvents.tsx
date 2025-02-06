@@ -14,7 +14,7 @@ import { useQuery } from "@tanstack/react-query";
 const PREDEFINED_ACTIVITIES = [
   "Meditation",
   "Exercise",
-  "Review Daily Goals",
+  "Review\nDaily Goals",
   "Cold Shower",
   "Good Sleep",
   "Affirmation"
@@ -75,12 +75,14 @@ export const PreTradingEvents = () => {
     }, 0);
 
     entry.pre_trading_activities.forEach(activity => {
-      if (PREDEFINED_ACTIVITIES.includes(activity)) {
-        if (!acc[activity]) {
-          acc[activity] = { totalPnL: 0, count: 0 };
+      // Replace newline in activity name for comparison
+      const normalizedActivity = activity.replace(" Daily Goals", "\nDaily Goals");
+      if (PREDEFINED_ACTIVITIES.includes(normalizedActivity)) {
+        if (!acc[normalizedActivity]) {
+          acc[normalizedActivity] = { totalPnL: 0, count: 0 };
         }
-        acc[activity].totalPnL += dailyPnL;
-        acc[activity].count += 1;
+        acc[normalizedActivity].totalPnL += dailyPnL;
+        acc[normalizedActivity].count += 1;
       }
     });
 
@@ -129,7 +131,7 @@ export const PreTradingEvents = () => {
               angle={-45}
               textAnchor="end"
               interval={0}
-              height={60}
+              height={70}
             />
             <YAxis 
               tick={{ fontSize: 12 }}
@@ -166,10 +168,10 @@ export const PreTradingEvents = () => {
         <h4 className="font-semibold text-sm md:text-base">Activity Impact Analysis</h4>
         <div className="space-y-2 text-xs md:text-sm text-muted-foreground">
           {mostPositive.activity && (
-            <p><span className="font-medium text-foreground">{mostPositive.activity}</span> shows the strongest positive impact on your trading, improving performance by {formatValue(mostPositive.impact)}.</p>
+            <p><span className="font-medium text-foreground">{mostPositive.activity.replace('\n', ' ')}</span> shows the strongest positive impact on your trading, improving performance by {formatValue(mostPositive.impact)}.</p>
           )}
           {mostNegative.activity && mostNegative.impact < 0 && (
-            <p>Consider reviewing your {mostNegative.activity.toLowerCase()} routine, as it correlates with a {formatValue(Math.abs(mostNegative.impact))} decrease in performance.</p>
+            <p>Consider reviewing your {mostNegative.activity.toLowerCase().replace('\n', ' ')} routine, as it correlates with a {formatValue(Math.abs(mostNegative.impact))} decrease in performance.</p>
           )}
         </div>
       </div>

@@ -35,6 +35,7 @@ export const NoteItem = ({
   onDelete,
 }: NoteItemProps) => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
     e.dataTransfer.setData("noteId", note.id);
@@ -49,6 +50,7 @@ export const NoteItem = ({
 
   const handleEmojiSelect = () => {
     setShowEmojiPicker(false);
+    setDropdownOpen(false);
   };
 
   return (
@@ -63,7 +65,7 @@ export const NoteItem = ({
       onDragStart={handleDragStart}
     >
       <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity note-actions">
-        <DropdownMenu>
+        <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
           <DropdownMenuTrigger className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-secondary/20 transition-colors">
             <MoreVertical className="h-4 w-4" />
           </DropdownMenuTrigger>

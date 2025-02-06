@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 
 interface EmojiPickerProps {
   noteId: string;
-  onEmojiSelect: (emoji: string) => void;
+  onEmojiSelect: () => void;
 }
 
 const emojis = {
@@ -35,15 +35,10 @@ export const EmojiPicker = ({ noteId, onEmojiSelect }: EmojiPickerProps) => {
       if (error) throw error;
       return data;
     },
-    onSuccess: (_, emoji) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notes"] });
       queryClient.invalidateQueries({ queryKey: ["note", noteId] });
-      toast({
-        title: "Success",
-        description: "Note emoji updated successfully",
-        duration: 3000,
-      });
-      onEmojiSelect(emoji);
+      onEmojiSelect();
     },
     onError: () => {
       toast({

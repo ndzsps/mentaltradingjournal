@@ -3,6 +3,9 @@ import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
+
+type PricingPlan = Database['public']['Tables']['pricing_plans']['Row'];
 
 const Pricing = () => {
   const navigate = useNavigate();
@@ -39,7 +42,7 @@ const Pricing = () => {
         </div>
 
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {plans?.map((plan) => (
+          {plans?.map((plan: PricingPlan) => (
             <Card key={plan.id} className="p-6 hover:shadow-lg transition-shadow">
               <div className="text-center mb-6">
                 <h2 className="text-2xl font-bold mb-2">{plan.name}</h2>

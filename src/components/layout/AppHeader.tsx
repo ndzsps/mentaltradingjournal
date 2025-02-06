@@ -51,17 +51,6 @@ export function AppHeader() {
 
   const displayName = user?.user_metadata?.username || user?.email?.split('@')[0] || 'User';
 
-  const AuthButtons = () => (
-    <div className="flex items-center space-x-4">
-      <Button variant="ghost" asChild>
-        <Link to="/pricing">Pricing</Link>
-      </Button>
-      <Button variant="default" asChild>
-        <Link to="/login">Sign In</Link>
-      </Button>
-    </div>
-  );
-
   return (
     <header className="border-b border-border/40 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 max-w-screen-2xl items-center justify-between">
@@ -92,52 +81,48 @@ export function AppHeader() {
 
           <ThemeToggle />
 
-          {user ? (
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="ghost" className="gap-2">
-                  <User className="h-4 w-4" />
-                  <span>{displayName}</span>
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-80">
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    {isEditing ? (
-                      <div className="flex gap-2">
-                        <Input
-                          value={username}
-                          onChange={(e) => setUsername(e.target.value)}
-                          placeholder="Enter new username"
-                        />
-                        <Button onClick={handleUpdateUsername}>Save</Button>
-                      </div>
-                    ) : (
-                      <Button
-                        variant="outline"
-                        className="w-full"
-                        onClick={() => {
-                          setUsername(displayName);
-                          setIsEditing(true);
-                        }}
-                      >
-                        Edit Username
-                      </Button>
-                    )}
-                  </div>
-                  <Button
-                    variant="destructive"
-                    className="w-full"
-                    onClick={() => signOut()}
-                  >
-                    Sign Out
-                  </Button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" className="gap-2">
+                <User className="h-4 w-4" />
+                <span>{displayName}</span>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  {isEditing ? (
+                    <div className="flex gap-2">
+                      <Input
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        placeholder="Enter new username"
+                      />
+                      <Button onClick={handleUpdateUsername}>Save</Button>
+                    </div>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => {
+                        setUsername(displayName);
+                        setIsEditing(true);
+                      }}
+                    >
+                      Edit Username
+                    </Button>
+                  )}
                 </div>
-              </PopoverContent>
-            </Popover>
-          ) : (
-            <AuthButtons />
-          )}
+                <Button
+                  variant="destructive"
+                  className="w-full"
+                  onClick={() => signOut()}
+                >
+                  Sign Out
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
         </nav>
 
         {/* Mobile Navigation */}
@@ -169,53 +154,38 @@ export function AppHeader() {
                 </Button>
               ))}
               <ThemeToggle />
-              {user ? (
-                <div className="space-y-2">
-                  {isEditing ? (
-                    <div className="space-y-2">
-                      <Input
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        placeholder="Enter new username"
-                      />
-                      <Button onClick={handleUpdateUsername} className="w-full">
-                        Save
-                      </Button>
-                    </div>
-                  ) : (
-                    <Button
-                      variant="outline"
-                      className="w-full"
-                      onClick={() => {
-                        setUsername(displayName);
-                        setIsEditing(true);
-                      }}
-                    >
-                      Edit Username
+              <div className="space-y-2">
+                {isEditing ? (
+                  <div className="space-y-2">
+                    <Input
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      placeholder="Enter new username"
+                    />
+                    <Button onClick={handleUpdateUsername} className="w-full">
+                      Save
                     </Button>
-                  )}
+                  </div>
+                ) : (
                   <Button
-                    variant="destructive"
+                    variant="outline"
                     className="w-full"
-                    onClick={() => signOut()}
+                    onClick={() => {
+                      setUsername(displayName);
+                      setIsEditing(true);
+                    }}
                   >
-                    Sign Out
+                    Edit Username
                   </Button>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <Button variant="ghost" asChild className="w-full justify-start">
-                    <Link to="/pricing" onClick={() => setIsOpen(false)}>
-                      Pricing
-                    </Link>
-                  </Button>
-                  <Button variant="default" asChild className="w-full">
-                    <Link to="/login" onClick={() => setIsOpen(false)}>
-                      Sign In
-                    </Link>
-                  </Button>
-                </div>
-              )}
+                )}
+                <Button
+                  variant="destructive"
+                  className="w-full"
+                  onClick={() => signOut()}
+                >
+                  Sign Out
+                </Button>
+              </div>
             </nav>
           </SheetContent>
         </Sheet>

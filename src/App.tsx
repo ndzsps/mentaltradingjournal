@@ -13,7 +13,6 @@ import Backtesting from "./pages/Backtesting";
 import BlueprintSessions from "./pages/BlueprintSessions";
 import Notebook from "./pages/Notebook";
 import Login from "./pages/Login";
-import Pricing from "./pages/Pricing";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 
 const queryClient = new QueryClient({
@@ -56,7 +55,6 @@ const App = () => {
                 <Routes>
                   <Route path="/" element={<Landing />} />
                   <Route path="/login" element={<Login />} />
-                  <Route path="/pricing" element={<Pricing />} />
                   <Route
                     path="/journal-entry"
                     element={

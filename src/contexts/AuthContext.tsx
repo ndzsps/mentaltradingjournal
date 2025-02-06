@@ -69,6 +69,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return "Please verify your email address before signing in.";
       case "User not found":
         return "No account found with this email address.";
+      case "Invalid email or password":
+        return "The email or password you entered is incorrect. Please try again.";
       default:
         return error.message;
     }
@@ -76,11 +78,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     try {
+      console.log("Attempting to sign in with:", email);
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
       if (error) {
+        console.error("Sign in error:", error);
         toast({
           variant: "destructive",
           title: "Error signing in",

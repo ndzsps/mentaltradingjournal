@@ -38,12 +38,12 @@ export const EmojiPicker = ({ noteId, onEmojiSelect }: EmojiPickerProps) => {
     onSuccess: (_, emoji) => {
       queryClient.invalidateQueries({ queryKey: ["notes"] });
       queryClient.invalidateQueries({ queryKey: ["note", noteId] });
+      onEmojiSelect(emoji);
       toast({
         title: "Success",
         description: "Note emoji updated successfully",
         duration: 3000,
       });
-      onEmojiSelect(emoji);
     },
     onError: () => {
       toast({

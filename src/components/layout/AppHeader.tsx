@@ -81,48 +81,59 @@ export function AppHeader() {
 
           <ThemeToggle />
 
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="ghost" className="gap-2">
-                <User className="h-4 w-4" />
-                <span>{displayName}</span>
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-80">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  {isEditing ? (
-                    <div className="flex gap-2">
-                      <Input
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        placeholder="Enter new username"
-                      />
-                      <Button onClick={handleUpdateUsername}>Save</Button>
-                    </div>
-                  ) : (
-                    <Button
-                      variant="outline"
-                      className="w-full"
-                      onClick={() => {
-                        setUsername(displayName);
-                        setIsEditing(true);
-                      }}
-                    >
-                      Edit Username
-                    </Button>
-                  )}
-                </div>
-                <Button
-                  variant="destructive"
-                  className="w-full"
-                  onClick={() => signOut()}
-                >
-                  Sign Out
+          {user ? (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" className="gap-2">
+                  <User className="h-4 w-4" />
+                  <span>{displayName}</span>
                 </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
+              </PopoverTrigger>
+              <PopoverContent className="w-80">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    {isEditing ? (
+                      <div className="flex gap-2">
+                        <Input
+                          value={username}
+                          onChange={(e) => setUsername(e.target.value)}
+                          placeholder="Enter new username"
+                        />
+                        <Button onClick={handleUpdateUsername}>Save</Button>
+                      </div>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        className="w-full"
+                        onClick={() => {
+                          setUsername(displayName);
+                          setIsEditing(true);
+                        }}
+                      >
+                        Edit Username
+                      </Button>
+                    )}
+                  </div>
+                  <Button
+                    variant="destructive"
+                    className="w-full"
+                    onClick={() => signOut()}
+                  >
+                    Sign Out
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
+          ) : (
+            <div className="flex items-center space-x-4">
+              <Button variant="ghost" asChild>
+                <Link to="/pricing">Pricing</Link>
+              </Button>
+              <Button variant="default" asChild>
+                <Link to="/login">Sign In</Link>
+              </Button>
+            </div>
+          )}
         </nav>
 
         {/* Mobile Navigation */}
@@ -154,38 +165,53 @@ export function AppHeader() {
                 </Button>
               ))}
               <ThemeToggle />
-              <div className="space-y-2">
-                {isEditing ? (
-                  <div className="space-y-2">
-                    <Input
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      placeholder="Enter new username"
-                    />
-                    <Button onClick={handleUpdateUsername} className="w-full">
-                      Save
+              {user ? (
+                <div className="space-y-2">
+                  {isEditing ? (
+                    <div className="space-y-2">
+                      <Input
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        placeholder="Enter new username"
+                      />
+                      <Button onClick={handleUpdateUsername} className="w-full">
+                        Save
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => {
+                        setUsername(displayName);
+                        setIsEditing(true);
+                      }}
+                    >
+                      Edit Username
                     </Button>
-                  </div>
-                ) : (
+                  )}
                   <Button
-                    variant="outline"
+                    variant="destructive"
                     className="w-full"
-                    onClick={() => {
-                      setUsername(displayName);
-                      setIsEditing(true);
-                    }}
+                    onClick={() => signOut()}
                   >
-                    Edit Username
+                    Sign Out
                   </Button>
-                )}
-                <Button
-                  variant="destructive"
-                  className="w-full"
-                  onClick={() => signOut()}
-                >
-                  Sign Out
-                </Button>
-              </div>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Button variant="ghost" asChild className="w-full">
+                    <Link to="/pricing" onClick={() => setIsOpen(false)}>
+                      Pricing
+                    </Link>
+                  </Button>
+                  <Button variant="default" asChild className="w-full">
+                    <Link to="/login" onClick={() => setIsOpen(false)}>
+                      Sign In
+                    </Link>
+                  </Button>
+                </div>
+              )}
             </nav>
           </SheetContent>
         </Sheet>

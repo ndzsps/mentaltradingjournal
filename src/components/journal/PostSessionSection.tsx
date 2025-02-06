@@ -5,6 +5,7 @@ import { TradesList } from "./entry/TradesList";
 import { TradingRules } from "./entry/TradingRules";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { ThumbsUp, Equal, ThumbsDown, XCircle } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 
@@ -173,6 +174,54 @@ export const PostSessionSection = ({
                 >
                   Exit Strategy
                 </label>
+              </div>
+            </div>
+          </div>
+
+          <Separator />
+
+          <div>
+            <h3 className="text-lg font-medium mb-4">Observations</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="weekly_url">Weekly</Label>
+                  <Input
+                    id="weekly_url"
+                    type="url"
+                    placeholder="Enter weekly chart URL"
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="daily_url">Daily</Label>
+                  <Input
+                    id="daily_url"
+                    type="url"
+                    placeholder="Enter daily chart URL"
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="four_hour_url">4HR</Label>
+                  <Input
+                    id="four_hour_url"
+                    type="url"
+                    placeholder="Enter 4-hour chart URL"
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="one_hour_url">1HR/15m</Label>
+                  <Input
+                    id="one_hour_url"
+                    type="url"
+                    placeholder="Enter 1-hour/15min chart URL"
+                    className="mt-1"
+                  />
+                </div>
               </div>
             </div>
           </div>

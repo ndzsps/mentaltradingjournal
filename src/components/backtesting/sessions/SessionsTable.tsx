@@ -9,6 +9,7 @@ import {
 import { ExternalLink } from "lucide-react";
 import { Session } from "./types";
 import { BacktestingStats } from "./BacktestingStats";
+import { Button } from "@/components/ui/button";
 
 interface SessionsTableProps {
   sessions: Session[];
@@ -29,16 +30,19 @@ const formatNumber = (value: number) => {
 };
 
 const renderUrlLink = (url: string | null, label: string) => {
-  return url ? (
-    <a 
-      href={url} 
-      target="_blank" 
-      rel="noopener noreferrer"
-      className="text-blue-600 hover:text-blue-800"
+  if (!url) return '-';
+  
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      className="h-8 w-8 p-0"
+      onClick={() => window.open(url, '_blank')}
     >
       <ExternalLink className="h-4 w-4" />
-    </a>
-  ) : '-';
+      <span className="sr-only">View {label} chart</span>
+    </Button>
+  );
 };
 
 export const SessionsTable = ({ sessions }: SessionsTableProps) => {

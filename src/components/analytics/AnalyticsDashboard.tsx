@@ -17,11 +17,17 @@ import { AssetPairPerformance } from "./AssetPairPerformance";
 import { TimeBasedPerformance } from "./TimeBasedPerformance";
 import { EquityCurve } from "./EquityCurve";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 
 const queryClient = new QueryClient();
 
 export const AnalyticsDashboard = () => {
   const [activeView, setActiveView] = useState<'all' | 'psychological' | 'trading'>('all');
+  const navigate = useNavigate();
+
+  const handlePostSession = () => {
+    navigate('/journal/add', { state: { sessionType: 'post-session' } });
+  };
 
   const psychologicalComponents = [
     EmotionTrend,
@@ -88,6 +94,13 @@ export const AnalyticsDashboard = () => {
               className="flex-1 sm:flex-none"
             >
               Trading Analytics
+            </Button>
+            <Button
+              onClick={handlePostSession}
+              variant="secondary"
+              className="flex-1 sm:flex-none"
+            >
+              Post Session
             </Button>
           </div>
         </div>

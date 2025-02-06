@@ -1,4 +1,4 @@
-import { DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useState } from "react";
@@ -41,7 +41,7 @@ export const EmojiPicker = ({ noteId, onEmojiSelect }: EmojiPickerProps) => {
       toast({
         title: "Success",
         description: "Note emoji updated successfully",
-        duration: 3000, // Add a 3-second duration
+        duration: 3000,
       });
       onEmojiSelect(emoji);
     },
@@ -50,7 +50,7 @@ export const EmojiPicker = ({ noteId, onEmojiSelect }: EmojiPickerProps) => {
         title: "Error",
         description: "Failed to update note emoji",
         variant: "destructive",
-        duration: 3000, // Add a 3-second duration
+        duration: 3000,
       });
     },
   });

@@ -115,7 +115,11 @@ export const PreTradingEvents = () => {
 
       <div className="h-[250px] md:h-[300px] w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
+          <BarChart 
+            data={data} 
+            margin={{ top: 5, right: 5, left: 25, bottom: 5 }}
+            layout="horizontal"
+          >
             <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
             <XAxis 
               dataKey="activity" 
@@ -132,11 +136,17 @@ export const PreTradingEvents = () => {
               stroke="currentColor"
               tickLine={{ stroke: 'currentColor' }}
               tickFormatter={formatValue}
+              width={80}
               label={{ 
                 value: 'Average P&L per Trade', 
                 angle: -90, 
                 position: 'insideLeft',
-                style: { textAnchor: 'middle' }
+                offset: 10,
+                style: { 
+                  textAnchor: 'middle',
+                  fontSize: '12px',
+                  fill: 'currentColor'
+                }
               }}
             />
             <Tooltip 

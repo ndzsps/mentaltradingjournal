@@ -6,6 +6,51 @@ import { Check, DollarSign } from "lucide-react";
 const Pricing = () => {
   const navigate = useNavigate();
 
+  const features = [
+    {
+      name: "Accounts",
+      description: "Manage multiple trading accounts in one place",
+      free: "1",
+      pro: "Unlimited",
+    },
+    {
+      name: "Data Storage",
+      description: "Store your trading data securely",
+      free: "1GB",
+      pro: "Unlimited",
+    },
+    {
+      name: "Trade Imports",
+      description: "Import your trading history from various brokers using auto-sync, file upload or manual input",
+      free: "Limited",
+      pro: "Unlimited",
+    },
+    {
+      name: "Trade Sharing",
+      description: "Share trades or analysis with other traders",
+      free: true,
+      pro: true,
+    },
+    {
+      name: "Commissions & Fees",
+      description: "Factor in and analyze commissions and fees paid",
+      free: true,
+      pro: true,
+    },
+    {
+      name: "Multiple Currency Support",
+      description: "Select from various currencies to track your performance",
+      free: true,
+      pro: true,
+    },
+    {
+      name: "Breakeven Settings",
+      description: "Define your breakeven range for a precise analysis",
+      free: true,
+      pro: true,
+    },
+  ];
+
   return (
     <div className="min-h-screen relative bg-[#1A1F2C] overflow-hidden">
       {/* Background effects - matching Landing page style */}
@@ -73,7 +118,7 @@ const Pricing = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-20">
             {/* Free Plan */}
             <div className="relative p-8 rounded-xl backdrop-blur-sm bg-white/5 border border-white/10">
               <div className="flex items-center justify-between mb-6">
@@ -137,6 +182,60 @@ const Pricing = () => {
               >
                 Get Pro
               </Button>
+            </div>
+          </div>
+
+          {/* Features Comparison Table */}
+          <div className="max-w-5xl mx-auto mt-20">
+            <h2 className="text-3xl font-bold text-white mb-12 text-center">
+              Compare Features
+            </h2>
+            <div className="space-y-8">
+              {features.map((feature) => (
+                <div
+                  key={feature.name}
+                  className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center py-6 border-b border-white/10"
+                >
+                  <div className="md:col-span-6">
+                    <h3 className="text-lg font-semibold text-white mb-2">
+                      {feature.name}
+                    </h3>
+                    <p className="text-gray-400 text-sm">
+                      {feature.description}
+                    </p>
+                  </div>
+                  <div className="md:col-span-3 text-center">
+                    <div className="text-gray-300">
+                      {typeof feature.free === "boolean" ? (
+                        feature.free ? (
+                          <Check className="h-6 w-6 mx-auto text-primary" />
+                        ) : (
+                          "—"
+                        )
+                      ) : (
+                        <span className="text-primary font-medium">
+                          {feature.free}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="md:col-span-3 text-center">
+                    <div className="text-gray-300">
+                      {typeof feature.pro === "boolean" ? (
+                        feature.pro ? (
+                          <Check className="h-6 w-6 mx-auto text-primary" />
+                        ) : (
+                          "—"
+                        )
+                      ) : (
+                        <span className="text-primary-light font-medium">
+                          {feature.pro}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>

@@ -12,7 +12,7 @@ import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { CustomTooltip } from "./shared/CustomTooltip";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 
 const emotionToNumber = (emotion: string) => {
   switch (emotion.toLowerCase()) {
@@ -57,9 +57,13 @@ export const EmotionalTendencies = () => {
     );
   }
 
-  // Transform the data to include both emotional score and trading result
-  const data = analytics.journalEntries.map(entry => {
-    // Calculate total P&L from all trades in this entry
+  // Create a map to store aggregated data by date
+  const dataByDate = new Map();
+
+  // First pass: Aggregate P&L and collect emotions for each date
+  analytics.journalEntries.forEach(entry => {
+    const date = format(parseISO(entry.created_at), 'MMM dd');
+    
     const totalPnL = entry.trades?.reduce((sum, trade) => {
       const pnlValue = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) :
                       typeof trade.pnl === 'number' ? trade.pnl :
@@ -68,12 +72,25 @@ export const EmotionalTendencies = () => {
       return sum + (isNaN(pnlValue) ? 0 : pnlValue);
     }, 0) || 0;
 
-    return {
-      date: format(new Date(entry.created_at), 'MMM dd'),
-      emotionalScore: emotionToNumber(entry.emotion),
-      tradingResult: totalPnL,
-    };
-  }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    if (!dataByDate.has(date)) {
+      dataByDate.set(date, {
+        date,
+        emotionalScore: emotionToNumber(entry.emotion),
+        tradingResult: totalPnL,
+        rawDate: entry.created_at // Keep raw date for sorting
+      });
+    } else {
+      const existing = dataByDate.get(date);
+      dataByDate.set(date, {
+        ...existing,
+        tradingResult: existing.tradingResult + totalPnL
+      });
+    }
+  });
+
+  // Convert map to array and sort by date
+  const data = Array.from(dataByDate.values())
+    .sort((a, b) => new Date(a.rawDate).getTime() - new Date(b.rawDate).getTime());
 
   const formatValue = (value: number) => {
     if (typeof value === 'number') {

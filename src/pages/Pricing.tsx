@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 
 type PricingPlan = Database['public']['Tables']['pricing_plans']['Row'];
+type PricingFeature = { description: string };
 
 const Pricing = () => {
   const navigate = useNavigate();
@@ -60,7 +61,7 @@ const Pricing = () => {
               </div>
 
               <div className="space-y-4 mb-6">
-                {plan.features?.map((feature, index) => (
+                {(plan.features as PricingFeature[])?.map((feature, index) => (
                   <div key={index} className="flex items-center">
                     <svg
                       className="h-5 w-5 text-primary flex-shrink-0"

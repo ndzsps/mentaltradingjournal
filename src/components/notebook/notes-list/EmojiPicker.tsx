@@ -41,6 +41,7 @@ export const EmojiPicker = ({ noteId, onEmojiSelect }: EmojiPickerProps) => {
       toast({
         title: "Success",
         description: "Note emoji updated successfully",
+        duration: 3000, // Add a 3-second duration
       });
       onEmojiSelect(emoji);
     },
@@ -49,6 +50,7 @@ export const EmojiPicker = ({ noteId, onEmojiSelect }: EmojiPickerProps) => {
         title: "Error",
         description: "Failed to update note emoji",
         variant: "destructive",
+        duration: 3000, // Add a 3-second duration
       });
     },
   });

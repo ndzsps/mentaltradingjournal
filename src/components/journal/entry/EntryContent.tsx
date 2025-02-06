@@ -33,6 +33,21 @@ export const EntryContent = ({
 }: EntryContentProps) => {
   const hasObservationLinks = weeklyUrl || dailyUrl || fourHourUrl || oneHourUrl;
 
+  const renderChartButton = (url: string | undefined | null, label: string) => {
+    if (!url) return null;
+    
+    return (
+      <Button
+        variant="outline"
+        className="justify-start space-x-2 w-full"
+        onClick={() => window.open(url, '_blank')}
+      >
+        <ExternalLink className="h-4 w-4" />
+        <span>{label}</span>
+      </Button>
+    );
+  };
+
   return (
     <div className="space-y-6">
       {notes && (
@@ -68,46 +83,10 @@ export const EntryContent = ({
           <div className="space-y-4">
             <h3 className="text-lg font-medium">Observations</h3>
             <div className="grid grid-cols-2 gap-4">
-              {weeklyUrl && (
-                <Button
-                  variant="outline"
-                  className="justify-start space-x-2 w-full"
-                  onClick={() => window.open(weeklyUrl, '_blank')}
-                >
-                  <ExternalLink className="h-4 w-4" />
-                  <span>Weekly Chart</span>
-                </Button>
-              )}
-              {dailyUrl && (
-                <Button
-                  variant="outline"
-                  className="justify-start space-x-2 w-full"
-                  onClick={() => window.open(dailyUrl, '_blank')}
-                >
-                  <ExternalLink className="h-4 w-4" />
-                  <span>Daily Chart</span>
-                </Button>
-              )}
-              {fourHourUrl && (
-                <Button
-                  variant="outline"
-                  className="justify-start space-x-2 w-full"
-                  onClick={() => window.open(fourHourUrl, '_blank')}
-                >
-                  <ExternalLink className="h-4 w-4" />
-                  <span>4HR Chart</span>
-                </Button>
-              )}
-              {oneHourUrl && (
-                <Button
-                  variant="outline"
-                  className="justify-start space-x-2 w-full"
-                  onClick={() => window.open(oneHourUrl, '_blank')}
-                >
-                  <ExternalLink className="h-4 w-4" />
-                  <span>1HR Chart</span>
-                </Button>
-              )}
+              {renderChartButton(weeklyUrl, "Weekly Chart")}
+              {renderChartButton(dailyUrl, "Daily Chart")}
+              {renderChartButton(fourHourUrl, "4HR Chart")}
+              {renderChartButton(oneHourUrl, "1HR Chart")}
             </div>
           </div>
         </>

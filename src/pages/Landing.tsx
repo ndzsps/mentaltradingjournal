@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { AnalyticsSection } from "@/components/landing/AnalyticsSection";
 import { CommunitySection } from "@/components/landing/CommunitySection";
 import { User, ArrowRightCircle } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -42,6 +43,13 @@ const Landing = () => {
               </span>
             </div>
             <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                className="text-white/70 hover:text-white hover:bg-white/5"
+                asChild
+              >
+                <Link to="/features">Features</Link>
+              </Button>
               <Button
                 variant="ghost"
                 className="flex items-center gap-2 text-white/70 hover:text-white hover:bg-white/5"

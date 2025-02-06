@@ -12,6 +12,7 @@ import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { CustomTooltip } from "./shared/CustomTooltip";
+import { format } from "date-fns";
 
 const emotionToNumber = (emotion: string) => {
   switch (emotion.toLowerCase()) {
@@ -56,8 +57,12 @@ export const EmotionalTendencies = () => {
     );
   }
 
-  // The data already contains emotionalScore, so we don't need to transform it
-  const data = analytics.emotionTrend;
+  // Transform the data to include both emotional score and trading result
+  const data = analytics.emotionTrend.map(entry => ({
+    date: format(new Date(entry.date), 'MMM dd'),
+    emotionalScore: emotionToNumber(entry.emotion),
+    tradingResult: entry.pnl || 0,
+  }));
 
   const formatValue = (value: number) => {
     if (typeof value === 'number') {
@@ -82,7 +87,10 @@ export const EmotionalTendencies = () => {
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" className="opacity-50" />
-            <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+            <XAxis 
+              dataKey="date" 
+              tick={{ fontSize: 12 }}
+            />
             <YAxis 
               yAxisId="emotion"
               domain={[0, 2]}

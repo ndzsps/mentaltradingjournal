@@ -14,7 +14,7 @@ import { useQuery } from "@tanstack/react-query";
 const PREDEFINED_ACTIVITIES = [
   "Meditation",
   "Exercise",
-  "Review\nDaily Goals",
+  "Review\nDaily\nGoals",
   "Cold Shower",
   "Good Sleep",
   "Affirmation"
@@ -32,7 +32,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
   return (
     <div className="bg-background/95 backdrop-blur-sm border border-border rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95">
-      <p className="font-medium text-sm text-foreground mb-2">{label}</p>
+      <p className="font-medium text-sm text-foreground mb-2">{label.replace('\n', ' ')}</p>
       <div className="flex items-center gap-2 text-sm">
         <div
           className="w-2 h-2 rounded-full"
@@ -75,8 +75,8 @@ export const PreTradingEvents = () => {
     }, 0);
 
     entry.pre_trading_activities.forEach(activity => {
-      // Replace newline in activity name for comparison
-      const normalizedActivity = activity.replace(" Daily Goals", "\nDaily Goals");
+      // Replace spaces with newlines for comparison
+      const normalizedActivity = activity.replace("Review Daily Goals", "Review\nDaily\nGoals");
       if (PREDEFINED_ACTIVITIES.includes(normalizedActivity)) {
         if (!acc[normalizedActivity]) {
           acc[normalizedActivity] = { totalPnL: 0, count: 0 };
@@ -131,7 +131,7 @@ export const PreTradingEvents = () => {
               angle={-45}
               textAnchor="end"
               interval={0}
-              height={70}
+              height={80}
             />
             <YAxis 
               tick={{ fontSize: 12 }}
@@ -168,10 +168,10 @@ export const PreTradingEvents = () => {
         <h4 className="font-semibold text-sm md:text-base">Activity Impact Analysis</h4>
         <div className="space-y-2 text-xs md:text-sm text-muted-foreground">
           {mostPositive.activity && (
-            <p><span className="font-medium text-foreground">{mostPositive.activity.replace('\n', ' ')}</span> shows the strongest positive impact on your trading, improving performance by {formatValue(mostPositive.impact)}.</p>
+            <p><span className="font-medium text-foreground">{mostPositive.activity.replace(/\n/g, ' ')}</span> shows the strongest positive impact on your trading, improving performance by {formatValue(mostPositive.impact)}.</p>
           )}
           {mostNegative.activity && mostNegative.impact < 0 && (
-            <p>Consider reviewing your {mostNegative.activity.toLowerCase().replace('\n', ' ')} routine, as it correlates with a {formatValue(Math.abs(mostNegative.impact))} decrease in performance.</p>
+            <p>Consider reviewing your {mostNegative.activity.toLowerCase().replace(/\n/g, ' ')} routine, as it correlates with a {formatValue(Math.abs(mostNegative.impact))} decrease in performance.</p>
           )}
         </div>
       </div>

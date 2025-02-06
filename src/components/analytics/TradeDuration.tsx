@@ -25,10 +25,12 @@ const CustomTooltip = ({ active, payload, label }: any) => {
             style={{ backgroundColor: item.fill }}
           />
           <span className="text-muted-foreground">
-            {item.name}:
+            {item.name === 'tradeCount' ? '# of Trades:' : 'Win Rate:'}
           </span>
           <span className="font-medium text-foreground">
-            {item.value.toFixed(1)}%
+            {item.name === 'tradeCount' ? 
+              `${item.value} trades` : 
+              `${item.value.toFixed(1)}%`}
           </span>
         </div>
       ))}
@@ -81,7 +83,7 @@ export const TradeDuration = () => {
     return {
       duration: range.label,
       winRate: totalTrades ? (winningTrades / totalTrades) * 100 : 0,
-      volume: totalTrades ? (totalTrades / allTrades.length) * 100 : 0,
+      tradeCount: totalTrades,
     };
   });
 
@@ -115,9 +117,9 @@ export const TradeDuration = () => {
               radius={[4, 4, 0, 0]}
             />
             <Bar 
-              dataKey="volume" 
+              dataKey="tradeCount" 
               fill="#0EA5E9" 
-              name="Volume" 
+              name="# of Trades" 
               radius={[4, 4, 0, 0]}
             />
           </BarChart>

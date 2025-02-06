@@ -11,6 +11,15 @@ import {
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
 
+const PREDEFINED_ACTIVITIES = [
+  "Meditation",
+  "Exercise",
+  "Review Daily Goals",
+  "Cold Shower",
+  "Good Sleep",
+  "Affirmation"
+];
+
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload || !payload.length) return null;
 
@@ -22,9 +31,9 @@ const CustomTooltip = ({ active, payload, label }: any) => {
           className="w-2 h-2 rounded-full"
           style={{ backgroundColor: payload[0].color || payload[0].fill }}
         />
-        <span className="text-muted-foreground">Impact:</span>
+        <span className="text-muted-foreground">Performance Impact:</span>
         <span className="font-medium text-foreground">
-          {payload[0].value > 0 ? '+' : ''}{payload[0].value}%
+          {payload[0].value > 0 ? '+' : ''}{payload[0].value.toFixed(2)}%
         </span>
       </div>
     </div>
@@ -48,78 +57,52 @@ export const PreTradingEvents = () => {
     );
   }
 
-  console.log('Raw journal entries:', analytics.journalEntries);
-
   // Process journal entries to calculate impact of pre-trading activities
   const activityImpact = analytics.journalEntries.reduce((acc: { [key: string]: { totalPnL: number; count: number } }, entry) => {
-    // Log each entry being processed
-    console.log('Processing entry:', {
-      pre_trading_activities: entry.pre_trading_activities,
-      trades: entry.trades,
-      hasActivities: Boolean(entry.pre_trading_activities),
-      hasTrades: Boolean(entry.trades?.length)
-    });
-
-    if (!entry.pre_trading_activities || !entry.trades?.length) {
-      console.log('Skipping entry - missing activities or trades');
-      return acc;
-    }
+    if (!entry.pre_trading_activities || !entry.trades?.length) return acc;
 
     const dailyPnL = entry.trades.reduce((sum, trade) => {
       const pnlValue = trade.pnl || trade.profit_loss || 0;
       const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
-      console.log('Trade PnL:', { raw: pnlValue, numeric: numericPnL });
       return sum + (isNaN(numericPnL) ? 0 : numericPnL);
     }, 0);
 
-    console.log('Daily PnL:', dailyPnL);
-
     entry.pre_trading_activities.forEach(activity => {
-      if (!acc[activity]) {
-        acc[activity] = { totalPnL: 0, count: 0 };
+      if (PREDEFINED_ACTIVITIES.includes(activity)) {
+        if (!acc[activity]) {
+          acc[activity] = { totalPnL: 0, count: 0 };
+        }
+        acc[activity].totalPnL += dailyPnL;
+        acc[activity].count += 1;
       }
-      acc[activity].totalPnL += dailyPnL;
-      acc[activity].count += 1;
-      console.log(`Activity "${activity}" stats:`, acc[activity]);
     });
 
     return acc;
   }, {});
 
-  console.log('Activity impact data:', activityImpact);
-
-  // Calculate average impact percentage for each activity
-  const data = Object.entries(activityImpact)
-    .filter(([_, stats]) => {
-      const hasEnoughData = stats.count >= 3;
-      console.log('Activity stats:', { stats, hasEnoughData });
-      return hasEnoughData;
-    })
-    .map(([activity, stats]) => {
-      const averageImpact = (stats.totalPnL / stats.count) * 100 / 1000;
-      return {
-        event: activity,
-        impact: parseFloat(averageImpact.toFixed(2)),
-        fill: averageImpact > 0 ? "#6E59A5" : "#FEC6A1"
-      };
-    })
-    .sort((a, b) => Math.abs(b.impact) - Math.abs(a.impact))
-    .slice(0, 5);
-
-  console.log('Final chart data:', data);
+  // Calculate average impact percentage for each predefined activity
+  const data = PREDEFINED_ACTIVITIES.map(activity => {
+    const stats = activityImpact[activity] || { totalPnL: 0, count: 0 };
+    const averageImpact = stats.count > 0 ? (stats.totalPnL / stats.count) * 100 / 1000 : 0;
+    return {
+      activity,
+      impact: parseFloat(averageImpact.toFixed(2)),
+      fill: averageImpact > 0 ? "#6E59A5" : "#FEC6A1"
+    };
+  }).sort((a, b) => Math.abs(b.impact) - Math.abs(a.impact));
 
   // Find most positive and negative impacts for insights
   const mostPositive = data.reduce((prev, current) => 
-    current.impact > prev.impact ? current : prev, { impact: -Infinity, event: '' });
+    current.impact > prev.impact ? current : prev, { impact: -Infinity, activity: '' });
   const mostNegative = data.reduce((prev, current) => 
-    current.impact < prev.impact ? current : prev, { impact: Infinity, event: '' });
+    current.impact < prev.impact ? current : prev, { impact: Infinity, activity: '' });
 
   return (
     <Card className="p-4 md:p-6 space-y-4">
       <div className="space-y-2">
-        <h3 className="text-xl md:text-2xl font-bold">Impact of Pre-Trading Events</h3>
+        <h3 className="text-xl md:text-2xl font-bold">Pre-Trading Activities Impact</h3>
         <p className="text-sm text-muted-foreground">
-          How different activities before trading affect performance
+          How different activities affect your trading performance
         </p>
       </div>
 
@@ -128,15 +111,25 @@ export const PreTradingEvents = () => {
           <BarChart data={data} margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
             <XAxis 
-              dataKey="event" 
+              dataKey="activity" 
               tick={{ fontSize: 12 }}
               stroke="currentColor"
               tickLine={{ stroke: 'currentColor' }}
+              angle={-45}
+              textAnchor="end"
+              interval={0}
+              height={60}
             />
             <YAxis 
               tick={{ fontSize: 12 }}
               stroke="currentColor"
               tickLine={{ stroke: 'currentColor' }}
+              label={{ 
+                value: 'Performance Impact (%)', 
+                angle: -90, 
+                position: 'insideLeft',
+                style: { textAnchor: 'middle' }
+              }}
             />
             <Tooltip 
               content={<CustomTooltip />}
@@ -152,19 +145,13 @@ export const PreTradingEvents = () => {
       </div>
 
       <div className="space-y-2 bg-accent/10 p-3 md:p-4 rounded-lg">
-        <h4 className="font-semibold text-sm md:text-base">AI Insight</h4>
+        <h4 className="font-semibold text-sm md:text-base">Activity Impact Analysis</h4>
         <div className="space-y-2 text-xs md:text-sm text-muted-foreground">
-          {data.length > 0 ? (
-            <>
-              {mostNegative.event && (
-                <p>{mostNegative.event} activities resulted in a {Math.abs(mostNegative.impact).toFixed(1)}% drop in performance. Consider limiting these sessions.</p>
-              )}
-              {mostPositive.event && (
-                <p>{mostPositive.event} before trading increased performance by {mostPositive.impact.toFixed(1)}%.</p>
-              )}
-            </>
-          ) : (
-            <p>Add more journal entries with pre-trading activities to see their impact on your performance.</p>
+          {mostPositive.activity && (
+            <p><span className="font-medium text-foreground">{mostPositive.activity}</span> shows the strongest positive impact on your trading, improving performance by {mostPositive.impact.toFixed(1)}%.</p>
+          )}
+          {mostNegative.activity && mostNegative.impact < 0 && (
+            <p>Consider reviewing your {mostNegative.activity.toLowerCase()} routine, as it correlates with a {Math.abs(mostNegative.impact).toFixed(1)}% decrease in performance.</p>
           )}
         </div>
       </div>

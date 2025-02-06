@@ -11,6 +11,14 @@ interface PostSessionFormSectionProps {
   setSelectedMistakes: (mistakes: string[]) => void;
   trades: Trade[];
   onTradeSubmit?: (tradeData: Trade) => void;
+  weeklyUrl: string;
+  setWeeklyUrl: (url: string) => void;
+  dailyUrl: string;
+  setDailyUrl: (url: string) => void;
+  fourHourUrl: string;
+  setFourHourUrl: (url: string) => void;
+  oneHourUrl: string;
+  setOneHourUrl: (url: string) => void;
 }
 
 export const PostSessionFormSection = ({
@@ -22,6 +30,14 @@ export const PostSessionFormSection = ({
   setSelectedMistakes,
   trades,
   onTradeSubmit,
+  weeklyUrl,
+  setWeeklyUrl,
+  dailyUrl,
+  setDailyUrl,
+  fourHourUrl,
+  setFourHourUrl,
+  oneHourUrl,
+  setOneHourUrl,
 }: PostSessionFormSectionProps) => {
   return (
     <PostSessionSection
@@ -35,6 +51,14 @@ export const PostSessionFormSection = ({
       mistakeCategories={mistakeCategories}
       tradingRules={tradingRules}
       trades={trades}
+      weeklyUrl={weeklyUrl}
+      setWeeklyUrl={setWeeklyUrl}
+      dailyUrl={dailyUrl}
+      setDailyUrl={setDailyUrl}
+      fourHourUrl={fourHourUrl}
+      setFourHourUrl={setFourHourUrl}
+      oneHourUrl={oneHourUrl}
+      setOneHourUrl={setOneHourUrl}
     />
   );
 };

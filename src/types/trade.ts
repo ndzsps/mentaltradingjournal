@@ -1,4 +1,5 @@
 export interface Trade {
+  [key: string]: any;
   id?: string;
   instrument?: string;
   direction?: 'buy' | 'sell';

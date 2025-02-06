@@ -114,13 +114,16 @@ export type Database = {
       journal_entries: {
         Row: {
           created_at: string
+          daily_url: string | null
           emotion: string
           emotion_detail: string
           followed_rules: string[] | null
+          four_hour_url: string | null
           id: string
           market_conditions: string | null
           mistakes: string[] | null
           notes: string
+          one_hour_url: string | null
           outcome: string | null
           post_submission_notes: string | null
           pre_trading_activities: string[] | null
@@ -128,16 +131,20 @@ export type Database = {
           trades: Json[] | null
           trading_rules_notes: string | null
           user_id: string
+          weekly_url: string | null
         }
         Insert: {
           created_at?: string
+          daily_url?: string | null
           emotion: string
           emotion_detail: string
           followed_rules?: string[] | null
+          four_hour_url?: string | null
           id?: string
           market_conditions?: string | null
           mistakes?: string[] | null
           notes: string
+          one_hour_url?: string | null
           outcome?: string | null
           post_submission_notes?: string | null
           pre_trading_activities?: string[] | null
@@ -145,16 +152,20 @@ export type Database = {
           trades?: Json[] | null
           trading_rules_notes?: string | null
           user_id: string
+          weekly_url?: string | null
         }
         Update: {
           created_at?: string
+          daily_url?: string | null
           emotion?: string
           emotion_detail?: string
           followed_rules?: string[] | null
+          four_hour_url?: string | null
           id?: string
           market_conditions?: string | null
           mistakes?: string[] | null
           notes?: string
+          one_hour_url?: string | null
           outcome?: string | null
           post_submission_notes?: string | null
           pre_trading_activities?: string[] | null
@@ -162,6 +173,7 @@ export type Database = {
           trades?: Json[] | null
           trading_rules_notes?: string | null
           user_id?: string
+          weekly_url?: string | null
         }
         Relationships: []
       }

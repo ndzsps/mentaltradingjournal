@@ -5,7 +5,6 @@ import { TradesList } from "./entry/TradesList";
 import { TradingOutcomeSection } from "./post-session/TradingOutcomeSection";
 import { TradingRulesSection } from "./post-session/TradingRulesSection";
 import { ObservationsSection } from "./post-session/ObservationsSection";
-import { useState } from "react";
 
 interface PostSessionSectionProps {
   selectedOutcome: string;
@@ -18,6 +17,14 @@ interface PostSessionSectionProps {
   mistakeCategories: { label: string; value: string }[];
   tradingRules: { label: string; value: string }[];
   trades: Trade[];
+  weeklyUrl: string;
+  setWeeklyUrl: (url: string) => void;
+  dailyUrl: string;
+  setDailyUrl: (url: string) => void;
+  fourHourUrl: string;
+  setFourHourUrl: (url: string) => void;
+  oneHourUrl: string;
+  setOneHourUrl: (url: string) => void;
 }
 
 export const PostSessionSection = ({
@@ -31,12 +38,15 @@ export const PostSessionSection = ({
   mistakeCategories,
   tradingRules,
   trades,
+  weeklyUrl,
+  setWeeklyUrl,
+  dailyUrl,
+  setDailyUrl,
+  fourHourUrl,
+  setFourHourUrl,
+  oneHourUrl,
+  setOneHourUrl,
 }: PostSessionSectionProps) => {
-  const [weeklyUrl, setWeeklyUrl] = useState('');
-  const [dailyUrl, setDailyUrl] = useState('');
-  const [fourHourUrl, setFourHourUrl] = useState('');
-  const [oneHourUrl, setOneHourUrl] = useState('');
-
   return (
     <div className="space-y-6">
       <Card className="p-6">

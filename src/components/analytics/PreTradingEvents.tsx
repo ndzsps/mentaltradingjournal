@@ -20,6 +20,13 @@ const PREDEFINED_ACTIVITIES = [
   "Affirmation"
 ];
 
+const formatValue = (value: number): string => {
+  if (Math.abs(value) >= 1000) {
+    return `$${(value / 1000).toFixed(2)}K`;
+  }
+  return `$${value.toFixed(0)}`;
+};
+
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload || !payload.length) return null;
 
@@ -33,7 +40,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         />
         <span className="text-muted-foreground">Performance Impact:</span>
         <span className="font-medium text-foreground">
-          {payload[0].value > 0 ? '+' : ''}{payload[0].value.toFixed(2)}%
+          {formatValue(payload[0].value)}
         </span>
       </div>
     </div>
@@ -80,10 +87,10 @@ export const PreTradingEvents = () => {
     return acc;
   }, {});
 
-  // Calculate average impact percentage for each predefined activity
+  // Calculate average impact for each predefined activity
   const data = PREDEFINED_ACTIVITIES.map(activity => {
     const stats = activityImpact[activity] || { totalPnL: 0, count: 0 };
-    const averageImpact = stats.count > 0 ? (stats.totalPnL / stats.count) * 100 / 1000 : 0;
+    const averageImpact = stats.count > 0 ? (stats.totalPnL / stats.count) : 0;
     return {
       activity,
       impact: parseFloat(averageImpact.toFixed(2)),
@@ -124,8 +131,9 @@ export const PreTradingEvents = () => {
               tick={{ fontSize: 12 }}
               stroke="currentColor"
               tickLine={{ stroke: 'currentColor' }}
+              tickFormatter={formatValue}
               label={{ 
-                value: 'Performance Impact (%)', 
+                value: 'Average P&L per Trade', 
                 angle: -90, 
                 position: 'insideLeft',
                 style: { textAnchor: 'middle' }
@@ -148,10 +156,10 @@ export const PreTradingEvents = () => {
         <h4 className="font-semibold text-sm md:text-base">Activity Impact Analysis</h4>
         <div className="space-y-2 text-xs md:text-sm text-muted-foreground">
           {mostPositive.activity && (
-            <p><span className="font-medium text-foreground">{mostPositive.activity}</span> shows the strongest positive impact on your trading, improving performance by {mostPositive.impact.toFixed(1)}%.</p>
+            <p><span className="font-medium text-foreground">{mostPositive.activity}</span> shows the strongest positive impact on your trading, improving performance by {formatValue(mostPositive.impact)}.</p>
           )}
           {mostNegative.activity && mostNegative.impact < 0 && (
-            <p>Consider reviewing your {mostNegative.activity.toLowerCase()} routine, as it correlates with a {Math.abs(mostNegative.impact).toFixed(1)}% decrease in performance.</p>
+            <p>Consider reviewing your {mostNegative.activity.toLowerCase()} routine, as it correlates with a {formatValue(Math.abs(mostNegative.impact))} decrease in performance.</p>
           )}
         </div>
       </div>

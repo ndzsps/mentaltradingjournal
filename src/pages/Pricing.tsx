@@ -10,44 +10,44 @@ const Pricing = () => {
     {
       name: "Accounts",
       description: "Manage multiple trading accounts in one place",
-      free: "1",
-      pro: "Unlimited",
+      monthly: "1",
+      yearly: "Unlimited",
     },
     {
       name: "Data Storage",
       description: "Store your trading data securely",
-      free: "1GB",
-      pro: "Unlimited",
+      monthly: "1GB",
+      yearly: "Unlimited",
     },
     {
       name: "Trade Imports",
       description: "Import your trading history from various brokers using auto-sync, file upload or manual input",
-      free: "Limited",
-      pro: "Unlimited",
+      monthly: "Limited",
+      yearly: "Unlimited",
     },
     {
       name: "Trade Sharing",
       description: "Share trades or analysis with other traders",
-      free: true,
-      pro: true,
+      monthly: true,
+      yearly: true,
     },
     {
       name: "Commissions & Fees",
       description: "Factor in and analyze commissions and fees paid",
-      free: true,
-      pro: true,
+      monthly: true,
+      yearly: true,
     },
     {
       name: "Multiple Currency Support",
       description: "Select from various currencies to track your performance",
-      free: true,
-      pro: true,
+      monthly: true,
+      yearly: true,
     },
     {
       name: "Breakeven Settings",
       description: "Define your breakeven range for a precise analysis",
-      free: true,
-      pro: true,
+      monthly: true,
+      yearly: true,
     },
   ];
 
@@ -119,11 +119,14 @@ const Pricing = () => {
           </div>
 
           <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-20">
-            {/* Free Plan */}
+            {/* Monthly Plan */}
             <div className="relative p-8 rounded-xl backdrop-blur-sm bg-white/5 border border-white/10">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-2xl font-bold text-white">Free</h3>
-                <span className="text-2xl font-bold text-white">$0</span>
+                <h3 className="text-2xl font-bold text-white">Monthly Plan</h3>
+                <div className="text-right">
+                  <span className="text-2xl font-bold text-white">$9</span>
+                  <span className="text-gray-300 text-sm">/month</span>
+                </div>
               </div>
               <p className="text-gray-300 mb-6">Perfect for getting started with trading journaling</p>
               <ul className="space-y-4 mb-8">
@@ -147,16 +150,16 @@ const Pricing = () => {
               </Button>
             </div>
 
-            {/* Pro Plan */}
+            {/* Yearly Plan */}
             <div className="relative p-8 rounded-xl backdrop-blur-sm bg-primary/10 border border-primary/20">
               <div className="absolute -top-4 right-4 bg-primary/20 text-primary-light px-4 py-1 rounded-full text-sm">
-                Recommended
+                Save 8%
               </div>
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-2xl font-bold text-white">Pro</h3>
+                <h3 className="text-2xl font-bold text-white">Yearly Plan</h3>
                 <div className="text-right">
-                  <span className="text-2xl font-bold text-white">$29</span>
-                  <span className="text-gray-300 text-sm">/month</span>
+                  <span className="text-2xl font-bold text-white">$99</span>
+                  <span className="text-gray-300 text-sm">/year</span>
                 </div>
               </div>
               <p className="text-gray-300 mb-6">Everything you need to become a better trader</p>
@@ -180,7 +183,7 @@ const Pricing = () => {
                 className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
                 onClick={() => navigate("/login")}
               >
-                Get Pro
+                Get Yearly Plan
               </Button>
             </div>
           </div>
@@ -206,30 +209,30 @@ const Pricing = () => {
                   </div>
                   <div className="md:col-span-3 text-center">
                     <div className="text-gray-300">
-                      {typeof feature.free === "boolean" ? (
-                        feature.free ? (
+                      {typeof feature.monthly === "boolean" ? (
+                        feature.monthly ? (
                           <Check className="h-6 w-6 mx-auto text-primary" />
                         ) : (
                           "—"
                         )
                       ) : (
                         <span className="text-primary font-medium">
-                          {feature.free}
+                          {feature.monthly}
                         </span>
                       )}
                     </div>
                   </div>
                   <div className="md:col-span-3 text-center">
                     <div className="text-gray-300">
-                      {typeof feature.pro === "boolean" ? (
-                        feature.pro ? (
+                      {typeof feature.yearly === "boolean" ? (
+                        feature.yearly ? (
                           <Check className="h-6 w-6 mx-auto text-primary" />
                         ) : (
                           "—"
                         )
                       ) : (
                         <span className="text-primary-light font-medium">
-                          {feature.pro}
+                          {feature.yearly}
                         </span>
                       )}
                     </div>

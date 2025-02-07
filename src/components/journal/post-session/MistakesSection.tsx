@@ -15,7 +15,7 @@ export const MistakesSection = ({
   return (
     <div>
       <h3 className="text-lg font-medium mb-4">Trading Mistakes</h3>
-      <div className="grid gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {mistakeCategories.map((mistake) => (
           <div key={mistake.value} className="flex items-center space-x-2">
             <Checkbox 

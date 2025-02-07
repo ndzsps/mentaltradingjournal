@@ -24,17 +24,17 @@ export const WeekCard = ({ weekNumber, totalPnL, tradeCount }: WeekCardProps) =>
   return (
     <div className="px-2 mb-6">
       <Card
-        className="p-4 bg-card/30 backdrop-blur-xl border-primary/10 hover:border-primary/20 transition-colors w-full"
+        className="p-4 bg-card/30 backdrop-blur-xl border-primary/10 hover:border-primary/20 transition-colors w-full h-[4.5rem] flex flex-col justify-center"
       >
-        <div className="space-y-2">
-          <div className="flex justify-between items-center">
-            <p className={`text-sm font-medium ${totalPnL === 0 ? 'text-muted-foreground' : ''}`}>
-              Week {weekNumber}
-            </p>
-            <p className="text-sm text-muted-foreground">
-              {tradeCount} {tradeCount === 1 ? 'trade' : 'trades'}
-            </p>
-          </div>
+        <div className="flex justify-between items-center">
+          <p className={`text-sm font-medium ${totalPnL === 0 ? 'text-muted-foreground' : ''}`}>
+            Week {weekNumber}
+          </p>
+          <p className="text-sm text-muted-foreground">
+            {tradeCount} {tradeCount === 1 ? 'trade' : 'trades'}
+          </p>
+        </div>
+        <div className="flex justify-between items-center">
           <p className={`text-lg font-bold ${
             totalPnL > 0 
               ? 'text-emerald-500 dark:text-emerald-400'
@@ -49,7 +49,7 @@ export const WeekCard = ({ weekNumber, totalPnL, tradeCount }: WeekCardProps) =>
               variant="ghost"
               size="sm"
               onClick={() => navigate('/journal-entry')}
-              className="w-full text-sm text-muted-foreground hover:text-primary hover:bg-primary/5"
+              className="text-sm text-muted-foreground hover:text-primary hover:bg-primary/5"
             >
               + Weekly Review
             </Button>

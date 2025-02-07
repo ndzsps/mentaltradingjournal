@@ -35,23 +35,25 @@ export const WeekCard = ({ weekNumber, totalPnL, tradeCount }: WeekCardProps) =>
           </p>
         </div>
         <div className="flex justify-between items-center">
-          <p className={`text-lg font-bold ${
-            totalPnL > 0 
-              ? 'text-emerald-500 dark:text-emerald-400'
-              : totalPnL < 0
-                ? 'text-red-500 dark:text-red-400'
-                : 'text-muted-foreground'
-          }`}>
-            {formatCurrency(totalPnL)}
-          </p>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate('/journal-entry')}
-            className="text-sm text-muted-foreground hover:text-primary hover:bg-primary/5"
-          >
-            + Weekly Review
-          </Button>
+          <div className="flex gap-4 items-center">
+            <p className={`text-lg font-bold ${
+              totalPnL > 0 
+                ? 'text-emerald-500 dark:text-emerald-400'
+                : totalPnL < 0
+                  ? 'text-red-500 dark:text-red-400'
+                  : 'text-muted-foreground'
+            }`}>
+              {formatCurrency(totalPnL)}
+            </p>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/journal-entry')}
+              className="text-sm text-muted-foreground hover:text-primary hover:bg-primary/5 px-2 py-1 h-auto"
+            >
+              + Weekly Review
+            </Button>
+          </div>
         </div>
       </Card>
     </div>

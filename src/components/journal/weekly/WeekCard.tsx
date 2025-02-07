@@ -34,9 +34,9 @@ export const WeekCard = ({ weekNumber, totalPnL, tradeCount }: WeekCardProps) =>
             {tradeCount} {tradeCount === 1 ? 'trade' : 'trades'}
           </p>
         </div>
-        <div className="flex justify-between items-center mt-1">
-          <div className="flex-1 flex items-center">
-            <p className={`text-lg font-bold truncate mr-3 ${
+        <div className="flex justify-between items-center">
+          <div className="flex gap-4 items-center">
+            <p className={`text-lg font-bold ${
               totalPnL > 0 
                 ? 'text-emerald-500 dark:text-emerald-400'
                 : totalPnL < 0
@@ -49,7 +49,7 @@ export const WeekCard = ({ weekNumber, totalPnL, tradeCount }: WeekCardProps) =>
               variant="ghost"
               size="sm"
               onClick={() => navigate('/journal-entry')}
-              className="text-sm text-muted-foreground hover:text-primary hover:bg-primary/5 px-2 py-1 h-auto shrink-0"
+              className="text-sm text-muted-foreground hover:text-primary hover:bg-primary/5 px-2 py-1 h-auto"
             >
               + Weekly Review
             </Button>

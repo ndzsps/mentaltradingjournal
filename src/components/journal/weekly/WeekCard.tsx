@@ -1,7 +1,8 @@
 
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { WeeklyReviewDialog } from "./WeeklyReviewDialog";
 
 interface WeekCardProps {
   weekNumber: number;
@@ -19,7 +20,7 @@ const formatCurrency = (value: number) => {
 };
 
 export const WeekCard = ({ weekNumber, totalPnL, tradeCount }: WeekCardProps) => {
-  const navigate = useNavigate();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   return (
     <div className="px-2 mb-6">
@@ -48,7 +49,7 @@ export const WeekCard = ({ weekNumber, totalPnL, tradeCount }: WeekCardProps) =>
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => navigate('/journal-entry')}
+              onClick={() => setIsDialogOpen(true)}
               className="text-sm text-muted-foreground hover:text-primary hover:bg-primary/5 px-2 py-1 h-auto shrink-0"
             >
               + Weekly Review
@@ -56,6 +57,11 @@ export const WeekCard = ({ weekNumber, totalPnL, tradeCount }: WeekCardProps) =>
           </div>
         </div>
       </Card>
+      <WeeklyReviewDialog
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        weekNumber={weekNumber}
+      />
     </div>
   );
 };

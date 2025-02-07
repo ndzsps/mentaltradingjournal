@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import {
   AreaChart,
@@ -28,6 +29,9 @@ export const TradeFrequency = () => {
     );
   }
 
+  // Track processed trade IDs to avoid counting duplicates
+  const processedTradeIds = new Set<string>();
+  
   const last7Days = Array.from({ length: 7 }, (_, i) => {
     const date = new Date();
     date.setDate(date.getDate() - i);
@@ -39,9 +43,17 @@ export const TradeFrequency = () => {
       entry.created_at.split('T')[0] === date
     );
     
-    const tradesCount = entriesForDay.reduce((sum, entry) => 
-      sum + (entry.trades?.length || 0), 0
-    );
+    let tradesCount = 0;
+    entriesForDay.forEach(entry => {
+      if (!entry.trades) return;
+      
+      entry.trades.forEach(trade => {
+        if (trade.id && !processedTradeIds.has(`${date}-${trade.id}`)) {
+          processedTradeIds.add(`${date}-${trade.id}`);
+          tradesCount++;
+        }
+      });
+    });
 
     return {
       date: new Date(date).toLocaleDateString('en-US', { weekday: 'short' }),

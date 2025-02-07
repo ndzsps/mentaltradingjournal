@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { generateAnalytics } from "@/utils/analyticsUtils";
@@ -178,14 +177,6 @@ export const StatsHeader = () => {
           onClick={() => setTimeFilter("last-three-months")}
         >
           Last Quarter
-        </Button>
-        <Button 
-          variant="outline"
-          className="ml-2"
-          onClick={() => console.log("Add Weekly Review clicked")}
-        >
-          <PlusCircle className="mr-1 h-4 w-4" />
-          Add Weekly Review
         </Button>
       </div>
 

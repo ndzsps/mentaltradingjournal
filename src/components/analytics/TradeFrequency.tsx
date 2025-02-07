@@ -11,6 +11,7 @@ import {
 } from "recharts";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
+import { startOfDay, parseISO } from "date-fns";
 
 export const TradeFrequency = () => {
   const { data: analytics, isLoading } = useQuery({
@@ -29,35 +30,36 @@ export const TradeFrequency = () => {
     );
   }
 
-  // Track processed trade IDs to avoid counting duplicates
-  const processedTradeIds = new Set<string>();
-  
   const last7Days = Array.from({ length: 7 }, (_, i) => {
     const date = new Date();
     date.setDate(date.getDate() - i);
     return date.toISOString().split('T')[0];
   }).reverse();
 
-  const data = last7Days.map(date => {
-    const entriesForDay = analytics.journalEntries.filter(entry => 
-      entry.created_at.split('T')[0] === date
-    );
+  // Process all trades from journal entries
+  const tradeDateCounts = new Map<string, number>();
+  
+  analytics.journalEntries.forEach(entry => {
+    if (!entry.trades) return;
     
-    let tradesCount = 0;
-    entriesForDay.forEach(entry => {
-      if (!entry.trades) return;
+    entry.trades.forEach(trade => {
+      // Use trade entry date if available, otherwise use journal entry date
+      const tradeDate = trade.entryDate 
+        ? parseISO(trade.entryDate).toISOString().split('T')[0]
+        : entry.created_at.split('T')[0];
       
-      entry.trades.forEach(trade => {
-        if (trade.id && !processedTradeIds.has(`${date}-${trade.id}`)) {
-          processedTradeIds.add(`${date}-${trade.id}`);
-          tradesCount++;
-        }
-      });
+      // Only count if we have a valid trade ID to avoid duplicates
+      if (trade.id) {
+        const count = tradeDateCounts.get(tradeDate) || 0;
+        tradeDateCounts.set(tradeDate, count + 1);
+      }
     });
+  });
 
+  const data = last7Days.map(date => {
     return {
       date: new Date(date).toLocaleDateString('en-US', { weekday: 'short' }),
-      trades: tradesCount,
+      trades: tradeDateCounts.get(date) || 0,
     };
   });
 

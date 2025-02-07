@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Trade } from "@/types/trade";
@@ -5,6 +6,7 @@ import { TradesList } from "./entry/TradesList";
 import { TradingOutcomeSection } from "./post-session/TradingOutcomeSection";
 import { TradingRulesSection } from "./post-session/TradingRulesSection";
 import { ObservationsSection } from "./post-session/ObservationsSection";
+import { MistakesSection } from "./post-session/MistakesSection";
 
 interface PostSessionSectionProps {
   selectedOutcome: string;
@@ -62,6 +64,17 @@ export const PostSessionSection = ({
             followedRules={followedRules}
             setFollowedRules={setFollowedRules}
           />
+
+          {selectedOutcome === "loss" && (
+            <>
+              <Separator />
+              <MistakesSection
+                selectedMistakes={selectedMistakes}
+                setSelectedMistakes={setSelectedMistakes}
+                mistakeCategories={mistakeCategories}
+              />
+            </>
+          )}
 
           <Separator />
 

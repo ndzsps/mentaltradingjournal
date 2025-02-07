@@ -1,3 +1,4 @@
+
 import { PostSessionSection } from "../PostSessionSection";
 import { Trade } from "@/types/trade";
 import { tradingOutcome, mistakeCategories, tradingRules } from "../emotionConfig";

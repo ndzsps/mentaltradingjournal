@@ -1,3 +1,4 @@
+
 import { Smile, Meh, Frown, ThumbsUp, Equal, ThumbsDown, MinusCircle } from "lucide-react";
 import { Emotion, TradingOutcome, MistakeCategory, TradingRule } from "./types";
 
@@ -61,7 +62,7 @@ export const mistakeCategories: MistakeCategory[] = [
   { label: "Breaking Trading Plan", value: "breaking_plan" },
   { label: "Poor Position Sizing", value: "poor_sizing" },
   { label: "Emotional Trading", value: "emotional_trading" },
-  { label: "Poor Time Management", value: "poor_timing" },
+  { label: "No Trading Mistakes", value: "no_mistakes" },
 ];
 
 export const tradingRules: TradingRule[] = [

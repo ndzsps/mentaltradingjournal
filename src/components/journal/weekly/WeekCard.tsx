@@ -35,16 +35,16 @@ export const WeekCard = ({ weekNumber, totalPnL, tradeCount }: WeekCardProps) =>
           </p>
         </div>
         <div className="flex justify-between items-center mt-1">
-          <div className="flex-1 flex items-center">
-            <p className={`text-lg font-bold truncate mr-3 ${
-              totalPnL > 0 
-                ? 'text-emerald-500 dark:text-emerald-400'
-                : totalPnL < 0
-                  ? 'text-red-500 dark:text-red-400'
-                  : 'text-muted-foreground'
-            }`}>
-              {formatCurrency(totalPnL)}
-            </p>
+          <p className={`text-lg font-bold truncate mr-3 ${
+            totalPnL > 0 
+              ? 'text-emerald-500 dark:text-emerald-400'
+              : totalPnL < 0
+                ? 'text-red-500 dark:text-red-400'
+                : 'text-muted-foreground'
+          }`}>
+            {formatCurrency(totalPnL)}
+          </p>
+          <div className="flex-1 flex justify-end">
             <Button
               variant="ghost"
               size="sm"
@@ -59,3 +59,4 @@ export const WeekCard = ({ weekNumber, totalPnL, tradeCount }: WeekCardProps) =>
     </div>
   );
 };
+

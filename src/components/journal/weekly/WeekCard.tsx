@@ -44,16 +44,14 @@ export const WeekCard = ({ weekNumber, totalPnL, tradeCount }: WeekCardProps) =>
           }`}>
             {formatCurrency(totalPnL)}
           </p>
-          {tradeCount === 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate('/journal-entry')}
-              className="text-sm text-muted-foreground hover:text-primary hover:bg-primary/5"
-            >
-              + Weekly Review
-            </Button>
-          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/journal-entry')}
+            className="text-sm text-muted-foreground hover:text-primary hover:bg-primary/5"
+          >
+            + Weekly Review
+          </Button>
         </div>
       </Card>
     </div>

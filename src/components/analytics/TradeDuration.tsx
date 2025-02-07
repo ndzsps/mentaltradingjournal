@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import {
   BarChart,
@@ -26,12 +25,12 @@ const CustomTooltip = ({ active, payload, label }: any) => {
             style={{ backgroundColor: item.fill }}
           />
           <span className="text-muted-foreground">
-            {item.name === 'winRate' ? 'Win Rate:' : '# of Trades:'}
+            {item.dataKey === 'tradeCount' ? '# of Trades:' : 'Win Rate:'}
           </span>
           <span className="font-medium text-foreground">
-            {item.name === 'winRate' ? 
-              `${item.value.toFixed(1)}%` : 
-              `${item.value} trades`}
+            {item.dataKey === 'tradeCount' ? 
+              `${item.value} trades` : 
+              `${item.value.toFixed(1)}%`}
           </span>
         </div>
       ))}

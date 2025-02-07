@@ -24,7 +24,7 @@ export const WeekCard = ({ weekNumber, totalPnL, tradeCount }: WeekCardProps) =>
   return (
     <div className="px-2 mb-6">
       <Card
-        className="p-4 bg-card/30 backdrop-blur-xl border-primary/10 hover:border-primary/20 transition-colors w-[300px] h-[4.5rem] flex flex-col justify-center"
+        className="p-4 bg-card/30 backdrop-blur-xl border-primary/10 hover:border-primary/20 transition-colors w-full h-[4.5rem] flex flex-col justify-center"
       >
         <div className="flex justify-between items-center">
           <p className={`text-sm font-medium ${totalPnL === 0 ? 'text-muted-foreground' : ''}`}>
@@ -34,9 +34,9 @@ export const WeekCard = ({ weekNumber, totalPnL, tradeCount }: WeekCardProps) =>
             {tradeCount} {tradeCount === 1 ? 'trade' : 'trades'}
           </p>
         </div>
-        <div className="flex justify-between items-center">
-          <div className="flex gap-4 items-center">
-            <p className={`text-lg font-bold truncate ${
+        <div className="flex justify-between items-center mt-1">
+          <div className="flex-1 flex items-center">
+            <p className={`text-lg font-bold truncate mr-3 ${
               totalPnL > 0 
                 ? 'text-emerald-500 dark:text-emerald-400'
                 : totalPnL < 0
@@ -59,4 +59,3 @@ export const WeekCard = ({ weekNumber, totalPnL, tradeCount }: WeekCardProps) =>
     </div>
   );
 };
-

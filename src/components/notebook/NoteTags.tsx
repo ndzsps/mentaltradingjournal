@@ -56,7 +56,7 @@ export const NoteTags = ({ tags, onAddTag, onRemoveTag }: NoteTagsProps) => {
           onChange={(e) => setNewTag(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Add a tag..."
-          className="border-none w-24 px-0 focus-visible:ring-0 placeholder:text-muted-foreground/50 bg-transparent transition-colors duration-200"
+          className="border-none w-24 px-0 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/50 bg-transparent transition-colors duration-200 outline-none"
         />
       </div>
     </div>

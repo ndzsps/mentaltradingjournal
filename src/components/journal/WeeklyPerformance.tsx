@@ -1,4 +1,3 @@
-
 import { useWeeklyStats } from "@/hooks/useWeeklyStats";
 import { WeekCard } from "./weekly/WeekCard";
 import { LoadingSkeleton } from "./weekly/LoadingSkeleton";
@@ -38,7 +37,7 @@ export const WeeklyPerformance = () => {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-20rem)] pt-[150px] min-w-[350px]">
+    <div className="flex flex-col h-[calc(100vh-20rem)] pt-[150px]">
       {weeklyStats?.map((week) => (
         <WeekCard
           key={week.weekNumber}

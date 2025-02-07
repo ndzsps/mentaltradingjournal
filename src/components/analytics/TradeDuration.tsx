@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import {
   BarChart,
@@ -59,22 +60,23 @@ export const TradeDuration = () => {
   const allTrades = analytics.journalEntries.flatMap(entry => entry.trades || []);
   
   const calculateDuration = (trade: any) => {
+    if (!trade.entryDate || !trade.exitDate) return 0;
     const entryTime = new Date(trade.entryDate).getTime();
     const exitTime = new Date(trade.exitDate).getTime();
-    return (exitTime - entryTime) / (1000 * 60); // Duration in minutes
+    return Math.max(0, (exitTime - entryTime) / (1000 * 60)); // Duration in minutes
   };
 
   const durationRanges = [
-    { max: 10, label: "< 10 min" },
-    { max: 30, label: "10-30 min" },
-    { max: 60, label: "30-60 min" },
-    { max: Infinity, label: "> 1 hour" },
+    { min: 0, max: 10, label: "< 10 min" },
+    { min: 10, max: 30, label: "10-30 min" },
+    { min: 30, max: 60, label: "30-60 min" },
+    { min: 60, max: Infinity, label: "> 1 hour" },
   ];
 
   const data = durationRanges.map(range => {
     const tradesInRange = allTrades.filter(trade => {
       const duration = calculateDuration(trade);
-      return duration <= range.max;
+      return duration > range.min && duration <= range.max;
     });
 
     const totalTrades = tradesInRange.length;

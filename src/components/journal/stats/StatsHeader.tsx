@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { generateAnalytics } from "@/utils/analyticsUtils";
@@ -9,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSidebar } from "@/components/ui/sidebar";
 import { Card } from "@/components/ui/card";
-import { DollarSign, Percent, Smile, Flame, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { DollarSign, Percent, Smile, Flame, PanelLeftClose, PanelLeftOpen, PlusCircle } from "lucide-react";
 import { useProgressTracking } from "@/hooks/useProgressTracking";
 
 export const StatsHeader = () => {
@@ -177,6 +178,14 @@ export const StatsHeader = () => {
           onClick={() => setTimeFilter("last-three-months")}
         >
           Last Quarter
+        </Button>
+        <Button 
+          variant="outline"
+          className="ml-2"
+          onClick={() => console.log("Add Weekly Review clicked")}
+        >
+          <PlusCircle className="mr-1 h-4 w-4" />
+          Add Weekly Review
         </Button>
       </div>
 

@@ -35,7 +35,7 @@ export const WeekCard = ({ weekNumber, totalPnL, tradeCount }: WeekCardProps) =>
           </p>
         </div>
         <div className="flex justify-between items-center mt-1">
-          <p className={`text-lg font-bold truncate mr-3 ${
+          <p className={`text-lg font-bold whitespace-nowrap ${
             totalPnL > 0 
               ? 'text-emerald-500 dark:text-emerald-400'
               : totalPnL < 0
@@ -59,4 +59,3 @@ export const WeekCard = ({ weekNumber, totalPnL, tradeCount }: WeekCardProps) =>
     </div>
   );
 };
-

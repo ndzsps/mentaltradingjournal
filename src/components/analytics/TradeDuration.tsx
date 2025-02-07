@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import {
   BarChart,
@@ -25,12 +26,12 @@ const CustomTooltip = ({ active, payload, label }: any) => {
             style={{ backgroundColor: item.fill }}
           />
           <span className="text-muted-foreground">
-            {item.name === 'tradeCount' ? '# of Trades:' : 'Win Rate:'}
+            {item.name === 'winRate' ? 'Win Rate:' : '# of Trades:'}
           </span>
           <span className="font-medium text-foreground">
-            {item.name === 'tradeCount' ? 
-              `${item.value} trades` : 
-              `${item.value.toFixed(1)}%`}
+            {item.name === 'winRate' ? 
+              `${item.value.toFixed(1)}%` : 
+              `${item.value} trades`}
           </span>
         </div>
       ))}
@@ -111,15 +112,15 @@ export const TradeDuration = () => {
               cursor={{ fill: 'transparent' }}
             />
             <Bar 
-              dataKey="winRate" 
-              fill="#6E59A5" 
-              name="Win Rate" 
-              radius={[4, 4, 0, 0]}
-            />
-            <Bar 
               dataKey="tradeCount" 
               fill="#0EA5E9" 
               name="# of Trades" 
+              radius={[4, 4, 0, 0]}
+            />
+            <Bar 
+              dataKey="winRate" 
+              fill="#6E59A5" 
+              name="Win Rate" 
               radius={[4, 4, 0, 0]}
             />
           </BarChart>

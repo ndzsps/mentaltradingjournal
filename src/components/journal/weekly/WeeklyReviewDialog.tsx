@@ -17,9 +17,9 @@ export const WeeklyReviewDialog = ({
   onOpenChange,
   weekNumber,
 }: WeeklyReviewDialogProps) => {
-  const [overview, setOverview] = useState("");
-  const [improvements, setImprovements] = useState("");
-  const [actionPlan, setActionPlan] = useState("");
+  const [strength, setStrength] = useState("");
+  const [weakness, setWeakness] = useState("");
+  const [improvement, setImprovement] = useState("");
   const { toast } = useToast();
 
   const handleSave = () => {
@@ -43,41 +43,41 @@ export const WeeklyReviewDialog = ({
 
         <div className="space-y-6 py-4">
           <div className="space-y-2">
-            <h3 className="text-lg font-semibold">Overview</h3>
+            <h3 className="text-lg font-semibold">Reflection: Strength</h3>
             <p className="text-sm text-muted-foreground">
-              What key objectives did you achieve? What are you most proud of from your performance?
+              What did you do best this week?
             </p>
             <Textarea
-              value={overview}
-              onChange={(e) => setOverview(e.target.value)}
+              value={strength}
+              onChange={(e) => setStrength(e.target.value)}
               className="min-h-[120px] bg-card/50 border-primary/10 focus-visible:ring-primary/30"
-              placeholder="Write your overview here..."
+              placeholder="Write about your strengths..."
             />
           </div>
 
           <div className="space-y-2">
-            <h3 className="text-lg font-semibold">Areas of Improvement</h3>
+            <h3 className="text-lg font-semibold">Reflection: Weakness</h3>
             <p className="text-sm text-muted-foreground">
-              What challenges did you face? What lessons did you learn from this week?
+              What is the one thing you must improve on?
             </p>
             <Textarea
-              value={improvements}
-              onChange={(e) => setImprovements(e.target.value)}
+              value={weakness}
+              onChange={(e) => setWeakness(e.target.value)}
               className="min-h-[120px] bg-card/50 border-primary/10 focus-visible:ring-primary/30"
-              placeholder="Write about areas for improvement..."
+              placeholder="Write about your area of improvement..."
             />
           </div>
 
           <div className="space-y-2">
-            <h3 className="text-lg font-semibold">Action Plan</h3>
+            <h3 className="text-lg font-semibold">Plan: Improvement</h3>
             <p className="text-sm text-muted-foreground">
-              What are your focus areas for next week?
+              What is your plan to ensure you make this improvement next week?
             </p>
             <Textarea
-              value={actionPlan}
-              onChange={(e) => setActionPlan(e.target.value)}
+              value={improvement}
+              onChange={(e) => setImprovement(e.target.value)}
               className="min-h-[120px] bg-card/50 border-primary/10 focus-visible:ring-primary/30"
-              placeholder="Write your action plan here..."
+              placeholder="Write your improvement plan..."
             />
           </div>
 

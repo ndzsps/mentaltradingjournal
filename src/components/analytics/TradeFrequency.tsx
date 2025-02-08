@@ -12,6 +12,7 @@ import {
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
 import { format, parseISO } from "date-fns";
+import { CustomTooltip } from "./shared/CustomTooltip";
 
 export const TradeFrequency = () => {
   const { data: analytics, isLoading } = useQuery({
@@ -81,6 +82,8 @@ export const TradeFrequency = () => {
   const averageTrades = totalTrades / 7;
   const peakTradingDay = data.reduce((max, day) => day.trades > max.trades ? day : max);
 
+  const valueFormatter = (value: number) => `${value} trades`;
+
   return (
     <Card className="p-4 md:p-6 space-y-4">
       <div className="space-y-2">
@@ -109,17 +112,12 @@ export const TradeFrequency = () => {
               }}
             />
             <Tooltip 
-              formatter={(value: number) => [formatYAxisTick(value), 'Trades']}
-              labelStyle={{ color: 'var(--foreground)' }}
-              contentStyle={{ 
-                backgroundColor: 'var(--background)',
-                border: '1px solid var(--border)',
-                borderRadius: '6px'
-              }}
+              content={<CustomTooltip valueFormatter={valueFormatter} />}
             />
             <Area 
               type="monotone" 
               dataKey="trades" 
+              name="Trades"
               fill="#6E59A5" 
               stroke="#6E59A5" 
               fillOpacity={0.2}

@@ -1,3 +1,4 @@
+
 import {
   LineChart,
   Line,
@@ -13,10 +14,8 @@ import { format } from "date-fns";
 
 interface RiskRewardData {
   date: Date;
-  cumulativeRR: number;
-  avgRR: number;
-  isSignificant: boolean;
   riskRewardRatio: number;
+  isSignificant: boolean;
   pnl: number;
 }
 
@@ -42,21 +41,7 @@ const CustomTooltip = ({ active, payload }: any) => {
             <div className="w-2 h-2 rounded-full bg-primary" />
             <span className="text-muted-foreground">Trade R:R:</span>
             <span className="font-medium text-foreground">
-              {data.riskRewardRatio.toFixed(2)}:1
-            </span>
-          </div>
-          <div className="flex items-center gap-2 text-sm">
-            <div className="w-2 h-2 rounded-full bg-primary" />
-            <span className="text-muted-foreground">Cumulative R:R:</span>
-            <span className="font-medium text-foreground">
-              {data.cumulativeRR.toFixed(2)}
-            </span>
-          </div>
-          <div className="flex items-center gap-2 text-sm">
-            <div className="w-2 h-2 rounded-full bg-primary" />
-            <span className="text-muted-foreground">Average R:R:</span>
-            <span className="font-medium text-foreground">
-              {data.avgRR.toFixed(2)}:1
+              {data.riskRewardRatio.toFixed(2)}
             </span>
           </div>
           <div className="flex items-center gap-2 text-sm">
@@ -92,7 +77,7 @@ export const RiskRewardChart = ({ data }: RiskRewardChartProps) => {
           <YAxis
             tick={{ fontSize: 12 }}
             label={{
-              value: 'Cumulative R:R',
+              value: 'R:R',
               angle: -90,
               position: 'insideLeft',
               style: { fontSize: '12px' }
@@ -102,14 +87,14 @@ export const RiskRewardChart = ({ data }: RiskRewardChartProps) => {
           <ReferenceLine y={0} stroke="#666" />
           <Line
             type="monotone"
-            dataKey="cumulativeRR"
+            dataKey="riskRewardRatio"
             stroke="#6E59A5"
             strokeWidth={2}
             dot={false}
           />
           <Scatter
             data={data.filter(d => d.isSignificant)}
-            dataKey="cumulativeRR"
+            dataKey="riskRewardRatio"
             fill="#FF6B6B"
             shape="star"
             r={6}

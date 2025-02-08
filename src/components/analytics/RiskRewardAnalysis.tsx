@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
@@ -21,7 +22,7 @@ export const RiskRewardAnalysis = () => {
     );
   }
 
-  // Process trades to calculate cumulative R:R data
+  // Process trades to calculate R:R data
   const data = analytics.journalEntries
     .flatMap(entry => (entry.trades || []).map(trade => ({
       trade,
@@ -54,25 +55,6 @@ export const RiskRewardAnalysis = () => {
     .filter(d => d.riskRewardRatio > 0)
     .sort((a, b) => a.date.getTime() - b.date.getTime());
 
-  // Calculate cumulative R:R
-  let cumulativeRR = 0;
-  const cumulativeData = data.map((item, index) => {
-    cumulativeRR += item.riskRewardRatio;
-    return {
-      date: item.date,
-      cumulativeRR,
-      avgRR: cumulativeRR / (index + 1),
-      isSignificant: item.isSignificant,
-      riskRewardRatio: item.riskRewardRatio,
-      pnl: item.pnl,
-    };
-  });
-
-  // Calculate average R:R ratio
-  const avgRiskReward = Math.round(
-    cumulativeRR / (data.length || 1)
-  );
-
   // Calculate percentage of trades with favorable ratio
   const favorableRatioPercentage = data.filter(d => d.riskRewardRatio >= 2).length / data.length;
 
@@ -81,14 +63,13 @@ export const RiskRewardAnalysis = () => {
       <div className="space-y-2">
         <h3 className="text-xl md:text-2xl font-bold">Risk/Reward Analysis</h3>
         <p className="text-sm text-muted-foreground">
-          Cumulative risk-reward ratio over time
+          Risk to reward ratio over time
         </p>
       </div>
 
-      <RiskRewardChart data={cumulativeData} />
+      <RiskRewardChart data={data} />
 
       <RiskRewardInsight 
-        avgRiskReward={avgRiskReward}
         favorableRatioPercentage={favorableRatioPercentage}
         hasData={data.length > 0}
       />

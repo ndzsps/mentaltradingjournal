@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
@@ -24,7 +25,7 @@ export const AssetPairPerformance = () => {
   const data = Object.entries(analytics.assetPairStats).map(([pair, stats]) => ({
     pair,
     profit: stats.profit,
-    loss: -Math.abs(stats.loss), // Make loss negative for the chart
+    loss: -Math.abs(stats.loss), // Make loss negative for the chart, but don't stack
     net: stats.profit - stats.loss,
   }));
 

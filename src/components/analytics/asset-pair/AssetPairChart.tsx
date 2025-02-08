@@ -1,3 +1,4 @@
+
 import {
   BarChart,
   Bar,
@@ -60,13 +61,11 @@ export const AssetPairChart = ({ data }: AssetPairChartProps) => {
           <ReferenceLine y={0} stroke="hsl(var(--border))" />
           <Bar
             dataKey="profit"
-            stackId="a"
             fill="hsl(142.1 76.2% 36.3%)"
             radius={[4, 4, 0, 0]}
           />
           <Bar
             dataKey="loss"
-            stackId="a"
             fill="hsl(346.8 77.2% 49.8%)"
             radius={[0, 0, 4, 4]}
           />

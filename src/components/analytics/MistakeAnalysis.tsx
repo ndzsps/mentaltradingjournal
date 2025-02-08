@@ -10,6 +10,7 @@ import {
 } from "recharts";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
+import { mistakeCategories } from "@/components/journal/emotionConfig";
 
 interface TooltipData {
   name: string;
@@ -72,6 +73,14 @@ export const MistakeAnalysis = () => {
   const mistakes = Object.entries(analytics.mistakeFrequencies);
   const totalMistakes = mistakes.reduce((sum, [_, { count }]) => sum + count, 0);
 
+  // Get all possible mistake categories except "No Trading Mistakes"
+  const allMistakeCategories = mistakeCategories
+    .filter(category => category.value !== 'no_mistakes')
+    .map(category => ({
+      value: category.value,
+      label: category.label
+    }));
+
   // If there are no mistakes, show empty state
   if (totalMistakes === 0) {
     const emptyData = [{ name: "No Data", value: 100, loss: 0 }];
@@ -110,16 +119,19 @@ export const MistakeAnalysis = () => {
     );
   }
 
-  const data = Object.entries(analytics.mistakeFrequencies)
-    .map(([name, { count, loss }]) => ({
-      name: name.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
-      value: (count / totalMistakes) * 100, // This will ensure percentages sum to 100
-      loss,
-    }))
+  // Create data array including all possible mistakes
+  const data = allMistakeCategories.map(category => {
+    const mistakeData = analytics.mistakeFrequencies[category.value] || { count: 0, loss: 0 };
+    return {
+      name: category.label,
+      value: (mistakeData.count / totalMistakes) * 100,
+      loss: mistakeData.loss,
+    };
+  }).filter(item => item.value > 0)
     .sort((a, b) => b.loss - a.loss)
-    .slice(0, 4);
+    .slice(0, 6);  // Show top 6 mistakes by loss impact
 
-  const COLORS = ['#6E59A5', '#0EA5E9', '#FEC6A1', '#F87171'];
+  const COLORS = ['#6E59A5', '#0EA5E9', '#FEC6A1', '#F87171', '#A78BFA', '#34D399'];
 
   return (
     <Card className="p-4 md:p-6 space-y-4">
@@ -173,3 +185,4 @@ export const MistakeAnalysis = () => {
     </Card>
   );
 };
+

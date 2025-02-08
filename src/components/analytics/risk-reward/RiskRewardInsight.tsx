@@ -1,3 +1,4 @@
+
 interface RiskRewardInsightProps {
   avgRiskReward: number;
   favorableRatioPercentage: number;

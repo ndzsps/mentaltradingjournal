@@ -58,6 +58,11 @@ export const RiskRewardAnalysis = () => {
   // Calculate percentage of trades with favorable ratio
   const favorableRatioPercentage = data.filter(d => d.riskRewardRatio >= 2).length / data.length;
 
+  // Calculate average risk/reward ratio
+  const avgRiskReward = data.length > 0
+    ? Number((data.reduce((sum, d) => sum + d.riskRewardRatio, 0) / data.length).toFixed(2))
+    : 0;
+
   return (
     <Card className="p-4 md:p-6 space-y-4">
       <div className="space-y-2">
@@ -72,6 +77,7 @@ export const RiskRewardAnalysis = () => {
       <RiskRewardInsight 
         favorableRatioPercentage={favorableRatioPercentage}
         hasData={data.length > 0}
+        avgRiskReward={avgRiskReward}
       />
     </Card>
   );

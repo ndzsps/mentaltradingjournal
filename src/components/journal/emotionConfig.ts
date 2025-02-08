@@ -60,8 +60,6 @@ export const mistakeCategories: MistakeCategory[] = [
   { label: "FOMO Trade", value: "fomo_trade" },
   { label: "Over-leveraging", value: "over_leveraging" },
   { label: "Breaking Trading Plan", value: "breaking_plan" },
-  { label: "Poor Position Sizing", value: "poor_sizing" },
-  { label: "Emotional Trading", value: "emotional_trading" },
   { label: "No Trading Mistakes", value: "no_mistakes" },
 ];
 
@@ -73,3 +71,4 @@ export const tradingRules: TradingRule[] = [
   { label: "Entry Criteria", value: "entry_criteria" },
   { label: "Exit Strategy", value: "exit_strategy" },
 ];
+

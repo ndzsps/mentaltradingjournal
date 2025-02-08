@@ -80,17 +80,20 @@ export const TradeDuration = () => {
     });
 
     const totalTrades = tradesInRange.length;
-    const winningTrades = tradesInRange.filter(trade => Number(trade.pnl) > 0).length;
+    const winningTrades = tradesInRange.filter(trade => {
+      const pnl = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : trade.pnl;
+      return pnl > 0;
+    }).length;
 
     return {
       duration: range.label,
-      winRate: totalTrades ? (winningTrades / totalTrades) * 100 : 0,
+      winRate: totalTrades > 0 ? (winningTrades / totalTrades) * 100 : 0,
       tradeCount: totalTrades,
     };
   });
 
   const bestDuration = data.reduce((prev, current) => 
-    current.winRate > prev.winRate ? current : prev
+    current.winRate > prev.winRate && current.tradeCount > 0 ? current : prev
   );
 
   return (
@@ -138,3 +141,4 @@ export const TradeDuration = () => {
     </Card>
   );
 };
+

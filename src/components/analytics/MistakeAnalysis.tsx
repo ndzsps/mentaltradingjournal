@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import {
   PieChart,
@@ -35,7 +36,7 @@ const CustomTooltip = ({ active, payload }: {
           />
           <span className="text-muted-foreground">Frequency:</span>
           <span className="font-medium text-foreground">
-            {data.payload.value.toFixed(1)}%
+            {data.value.toFixed(1)}%
           </span>
         </div>
         <div className="flex items-center gap-2 text-sm">
@@ -67,13 +68,52 @@ export const MistakeAnalysis = () => {
     );
   }
 
-  const totalMistakes = Object.values(analytics.mistakeFrequencies)
-    .reduce((sum, { count }) => sum + count, 0);
+  // Process mistakes and calculate percentages
+  const mistakes = Object.entries(analytics.mistakeFrequencies);
+  const totalMistakes = mistakes.reduce((sum, [_, { count }]) => sum + count, 0);
+
+  // If there are no mistakes, show empty state
+  if (totalMistakes === 0) {
+    const emptyData = [{ name: "No Data", value: 100, loss: 0 }];
+    return (
+      <Card className="p-4 md:p-6 space-y-4">
+        <div className="space-y-2">
+          <h3 className="text-xl md:text-2xl font-bold">Behavioral Slippage</h3>
+          <p className="text-sm text-muted-foreground">
+            Analysis of trading mistakes and their impact
+          </p>
+        </div>
+
+        <div className="h-[250px] md:h-[300px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={emptyData}
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={80}
+                fill="#6E59A5"
+                dataKey="value"
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="space-y-2 bg-accent/10 p-3 md:p-4 rounded-lg">
+          <h4 className="font-semibold text-sm md:text-base">AI Insight</h4>
+          <p className="text-xs md:text-sm text-muted-foreground">
+            Start logging your trading mistakes to get insights on areas for improvement.
+          </p>
+        </div>
+      </Card>
+    );
+  }
 
   const data = Object.entries(analytics.mistakeFrequencies)
     .map(([name, { count, loss }]) => ({
       name: name.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
-      value: (count / totalMistakes) * 100,
+      value: (count / totalMistakes) * 100, // This will ensure percentages sum to 100
       loss,
     }))
     .sort((a, b) => b.loss - a.loss)

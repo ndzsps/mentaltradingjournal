@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import {
   BarChart,
@@ -22,7 +23,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
             style={{ backgroundColor: payload[0].color }}
           />
           <span className="text-muted-foreground">Frequency:</span>
-          <span className="font-medium text-foreground">{payload[0].value}%</span>
+          <span className="font-medium text-foreground">{Math.round(payload[0].value)}%</span>
         </div>
       </div>
     );
@@ -51,7 +52,7 @@ export const EmotionRecovery = () => {
   const totalRecoveries = Object.values(analytics.emotionRecovery).reduce((a, b) => a + b, 0);
   const data = Object.entries(analytics.emotionRecovery).map(([days, frequency]) => ({
     days,
-    frequency: (frequency / totalRecoveries) * 100
+    frequency: Math.round((frequency / totalRecoveries) * 100) // Round to whole number
   })).sort((a, b) => {
     // Custom sort to maintain the correct order
     const order = {

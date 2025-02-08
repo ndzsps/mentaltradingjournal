@@ -11,7 +11,7 @@ import {
 } from "recharts";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
-import { startOfYear, eachDayOfInterval, format, parseISO } from "date-fns";
+import { format, parseISO } from "date-fns";
 
 export const TradeFrequency = () => {
   const { data: analytics, isLoading } = useQuery({
@@ -30,39 +30,45 @@ export const TradeFrequency = () => {
     );
   }
 
-  // Get all days in the current year
-  const startDate = startOfYear(new Date());
-  const endDate = new Date();
-  const yearDates = eachDayOfInterval({ start: startDate, end: endDate }).map(date => 
-    format(date, 'yyyy-MM-dd')
-  );
+  // Initialize weekday counts
+  const weekdayCounts: Record<string, number> = {
+    'Sunday': 0,
+    'Monday': 0,
+    'Tuesday': 0,
+    'Wednesday': 0,
+    'Thursday': 0,
+    'Friday': 0,
+    'Saturday': 0
+  };
 
   // Process all trades from journal entries
-  const tradeDateCounts = new Map<string, number>();
+  const processedTradeIds = new Set<string>();
   
   analytics.journalEntries.forEach(entry => {
     if (!entry.trades) return;
     
     entry.trades.forEach(trade => {
+      // Skip if we've already counted this trade
+      if (!trade.id || processedTradeIds.has(trade.id)) return;
+      
       // Use trade entry date if available, otherwise use journal entry date
       const tradeDate = trade.entryDate 
-        ? format(parseISO(trade.entryDate), 'yyyy-MM-dd')
-        : format(parseISO(entry.created_at), 'yyyy-MM-dd');
+        ? parseISO(trade.entryDate)
+        : parseISO(entry.created_at);
       
-      // Only count if we have a valid trade ID to avoid duplicates
-      if (trade.id) {
-        const count = tradeDateCounts.get(tradeDate) || 0;
-        tradeDateCounts.set(tradeDate, count + 1);
-      }
+      const weekday = format(tradeDate, 'EEEE'); // Get full weekday name
+      weekdayCounts[weekday]++;
+      
+      // Mark this trade as processed
+      processedTradeIds.add(trade.id);
     });
   });
 
-  const data = yearDates.map(date => {
-    return {
-      date: format(parseISO(date), 'MMM dd'),
-      trades: tradeDateCounts.get(date) || 0,
-    };
-  });
+  // Convert weekday counts to chart data format
+  const data = Object.entries(weekdayCounts).map(([day, trades]) => ({
+    date: day,
+    trades: trades,
+  }));
 
   const formatYAxisTick = (value: number): string => {
     if (value >= 1000) {
@@ -71,7 +77,8 @@ export const TradeFrequency = () => {
     return value.toString();
   };
 
-  const averageTrades = data.reduce((sum, day) => sum + day.trades, 0) / data.length;
+  const totalTrades = data.reduce((sum, day) => sum + day.trades, 0);
+  const averageTrades = totalTrades / 7;
   const peakTradingDay = data.reduce((max, day) => day.trades > max.trades ? day : max);
 
   return (
@@ -79,7 +86,7 @@ export const TradeFrequency = () => {
       <div className="space-y-2">
         <h3 className="text-xl md:text-2xl font-bold">Trade Frequency</h3>
         <p className="text-sm text-muted-foreground">
-          Number of trades executed per day
+          Number of trades by day of the week
         </p>
       </div>
 
@@ -90,7 +97,6 @@ export const TradeFrequency = () => {
             <XAxis 
               dataKey="date" 
               tick={{ fontSize: 12 }}
-              interval={30} // Show date every ~month
             />
             <YAxis 
               tick={{ fontSize: 12 }} 
@@ -131,3 +137,4 @@ export const TradeFrequency = () => {
     </Card>
   );
 };
+

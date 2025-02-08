@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import {
   RadarChart,
@@ -57,13 +58,13 @@ export const PersonalityPatterns = () => {
     return acc + (followedRulesCount > 0 ? 1 : 0);
   }, 0);
 
-  // Calculate risk tolerance based on position sizing and stop losses
+  // Calculate risk tolerance based on individual trades using stop loss
   const riskToleranceScore = entries.reduce((acc, entry) => {
     const trades = entry.trades || [];
-    const hasProperRisk = trades.every(trade => 
-      trade.stopLoss && trade.quantity // Check if stop loss and position size are set
+    const tradesWithRiskManagement = trades.filter(trade => 
+      trade.stopLoss && trade.quantity
     );
-    return acc + (hasProperRisk ? 1 : 0);
+    return acc + (tradesWithRiskManagement.length > 0 ? 1 : 0);
   }, 0);
 
   // Calculate emotional resilience based on recovery after losses
@@ -86,12 +87,23 @@ export const PersonalityPatterns = () => {
     return acc + (hasPreSession || hasLongTrades ? 1 : 0);
   }, 0);
 
-  // Calculate adaptability based on performance in different market conditions
+  // Calculate adaptability based on profitable trades across different sessions and conditions
   const adaptabilityScore = entries.reduce((acc, entry) => {
-    const hasMarketCondition = entry.market_conditions !== null;
     const trades = entry.trades || [];
-    const profitableTrades = trades.filter(trade => Number(trade.pnl) > 0);
-    return acc + (hasMarketCondition && profitableTrades.length > 0 ? 1 : 0);
+    
+    // Check for profitable trades
+    const hasProfitableTrades = trades.some(trade => Number(trade.pnl) > 0);
+    
+    // Check for trading success in different emotional states
+    const successfulUnderEmotion = hasProfitableTrades && entry.emotion !== 'neutral';
+    
+    // Check for consistency across different sessions
+    const hasSuccessfulPrePost = entry.session_type === 'post' && 
+      hasProfitableTrades && 
+      entry.followed_rules?.length;
+    
+    // Award points for demonstrating adaptability through any of these conditions
+    return acc + ((successfulUnderEmotion || hasSuccessfulPrePost) ? 1 : 0);
   }, 0);
 
   // Convert scores to percentages
@@ -101,7 +113,7 @@ export const PersonalityPatterns = () => {
     { 
       trait: "Discipline", 
       current: normalizeScore(disciplineScore),
-      previous: normalizeScore(disciplineScore - 5) // Compare with previous period
+      previous: normalizeScore(disciplineScore - 5)
     },
     { 
       trait: "Risk Tolerance", 

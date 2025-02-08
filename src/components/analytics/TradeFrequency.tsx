@@ -11,7 +11,7 @@ import {
 } from "recharts";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
-import { startOfDay, parseISO } from "date-fns";
+import { startOfYear, eachDayOfInterval, format, parseISO } from "date-fns";
 
 export const TradeFrequency = () => {
   const { data: analytics, isLoading } = useQuery({
@@ -30,11 +30,12 @@ export const TradeFrequency = () => {
     );
   }
 
-  const last7Days = Array.from({ length: 7 }, (_, i) => {
-    const date = new Date();
-    date.setDate(date.getDate() - i);
-    return date.toISOString().split('T')[0];
-  }).reverse();
+  // Get all days in the current year
+  const startDate = startOfYear(new Date());
+  const endDate = new Date();
+  const yearDates = eachDayOfInterval({ start: startDate, end: endDate }).map(date => 
+    format(date, 'yyyy-MM-dd')
+  );
 
   // Process all trades from journal entries
   const tradeDateCounts = new Map<string, number>();
@@ -45,8 +46,8 @@ export const TradeFrequency = () => {
     entry.trades.forEach(trade => {
       // Use trade entry date if available, otherwise use journal entry date
       const tradeDate = trade.entryDate 
-        ? parseISO(trade.entryDate).toISOString().split('T')[0]
-        : entry.created_at.split('T')[0];
+        ? format(parseISO(trade.entryDate), 'yyyy-MM-dd')
+        : format(parseISO(entry.created_at), 'yyyy-MM-dd');
       
       // Only count if we have a valid trade ID to avoid duplicates
       if (trade.id) {
@@ -56,9 +57,9 @@ export const TradeFrequency = () => {
     });
   });
 
-  const data = last7Days.map(date => {
+  const data = yearDates.map(date => {
     return {
-      date: new Date(date).toLocaleDateString('en-US', { weekday: 'short' }),
+      date: format(parseISO(date), 'MMM dd'),
       trades: tradeDateCounts.get(date) || 0,
     };
   });
@@ -71,6 +72,7 @@ export const TradeFrequency = () => {
   };
 
   const averageTrades = data.reduce((sum, day) => sum + day.trades, 0) / data.length;
+  const peakTradingDay = data.reduce((max, day) => day.trades > max.trades ? day : max);
 
   return (
     <Card className="p-4 md:p-6 space-y-4">
@@ -85,7 +87,11 @@ export const TradeFrequency = () => {
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={data} margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+            <XAxis 
+              dataKey="date" 
+              tick={{ fontSize: 12 }}
+              interval={30} // Show date every ~month
+            />
             <YAxis 
               tick={{ fontSize: 12 }} 
               tickFormatter={formatYAxisTick}
@@ -119,7 +125,7 @@ export const TradeFrequency = () => {
       <div className="space-y-2 bg-accent/10 p-3 md:p-4 rounded-lg">
         <h4 className="font-semibold text-sm md:text-base">AI Insight</h4>
         <p className="text-xs md:text-sm text-muted-foreground">
-          Your trading frequency averages {averageTrades.toFixed(1)} trades per day, with peak activity on {data.reduce((max, day) => day.trades > max.trades ? day : max).date}.
+          Your trading frequency averages {averageTrades.toFixed(1)} trades per day, with peak activity of {peakTradingDay.trades} trades on {peakTradingDay.date}.
         </p>
       </div>
     </Card>

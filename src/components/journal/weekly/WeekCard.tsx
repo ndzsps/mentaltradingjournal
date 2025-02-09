@@ -22,11 +22,14 @@ export const WeekCard = ({ weekNumber, totalPnL, tradeCount }: WeekCardProps) =>
           <p className={`text-sm font-medium ${totalPnL === 0 ? 'text-muted-foreground' : ''}`}>
             Week {weekNumber}
           </p>
+          <p className={`text-sm ${totalPnL >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+            {totalPnL >= 0 ? '+' : ''}{totalPnL.toFixed(2)}
+          </p>
+        </div>
+        <div className="flex justify-between items-center mt-1">
           <p className="text-sm text-muted-foreground">
             {tradeCount} {tradeCount === 1 ? 'trade' : 'trades'}
           </p>
-        </div>
-        <div className="flex justify-end items-center mt-1">
           <Button
             variant="ghost"
             size="sm"

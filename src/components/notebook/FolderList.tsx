@@ -1,5 +1,5 @@
 
-import { Folder, Plus, MoreVertical, Trash2 } from "lucide-react";
+import { Folder, Plus, MoreVertical, Trash2, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -37,6 +37,8 @@ export const FolderList = ({
 }: FolderListProps) => {
   const [isCreating, setIsCreating] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
+  const [editingFolderId, setEditingFolderId] = useState<string | null>(null);
+  const [editingFolderName, setEditingFolderName] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { user } = useAuth();
@@ -70,6 +72,36 @@ export const FolderList = ({
       toast({
         title: "Error",
         description: "Failed to create folder",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const renameFolder = useMutation({
+    mutationFn: async ({ folderId, newName }: { folderId: string; newName: string }) => {
+      if (!user) throw new Error("No user found");
+      
+      const { error } = await supabase
+        .from("notebook_folders")
+        .update({ name: newName })
+        .eq("id", folderId)
+        .eq("user_id", user.id);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["folders"] });
+      setEditingFolderId(null);
+      setEditingFolderName("");
+      toast({
+        title: "Success",
+        description: "Folder renamed successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to rename folder",
         variant: "destructive",
       });
     },
@@ -125,6 +157,17 @@ export const FolderList = ({
     const target = e.target as HTMLElement;
     if (!target.closest('.folder-actions')) {
       onSelectFolder(folderId);
+    }
+  };
+
+  const handleStartRename = (folder: Folder) => {
+    setEditingFolderId(folder.id);
+    setEditingFolderName(folder.name);
+  };
+
+  const handleRenameSubmit = (folderId: string) => {
+    if (editingFolderName.trim()) {
+      renameFolder.mutate({ folderId, newName: editingFolderName });
     }
   };
 
@@ -190,35 +233,81 @@ export const FolderList = ({
               key={folder.id}
               className="group relative"
             >
-              <Button
-                variant={selectedFolderId === folder.id ? "secondary" : "ghost"}
-                className="w-full justify-start"
-                onClick={(e) => handleFolderClick(e, folder.id)}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={(e) => handleDrop(e, folder.id)}
-              >
-                <Folder className="mr-2 h-4 w-4" />
-                {folder.name}
-              </Button>
-              <div className="absolute top-1/2 right-2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity folder-actions">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-[160px]">
-                    <DropdownMenuItem 
-                      onClick={() => deleteFolder.mutate(folder.id)}
-                      className="text-destructive focus:text-destructive"
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
+              {editingFolderId === folder.id ? (
+                <div className="flex gap-2">
+                  <Input
+                    value={editingFolderName}
+                    onChange={(e) => setEditingFolderName(e.target.value)}
+                    className="h-8"
+                    autoFocus
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        handleRenameSubmit(folder.id);
+                      } else if (e.key === 'Escape') {
+                        setEditingFolderId(null);
+                        setEditingFolderName("");
+                      }
+                    }}
+                  />
+                  <Button 
+                    size="sm"
+                    className="h-8"
+                    onClick={() => handleRenameSubmit(folder.id)}
+                    disabled={!editingFolderName.trim()}
+                  >
+                    Save
+                  </Button>
+                  <Button 
+                    size="sm"
+                    variant="outline"
+                    className="h-8"
+                    onClick={() => {
+                      setEditingFolderId(null);
+                      setEditingFolderName("");
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <Button
+                    variant={selectedFolderId === folder.id ? "secondary" : "ghost"}
+                    className="w-full justify-start"
+                    onClick={(e) => handleFolderClick(e, folder.id)}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={(e) => handleDrop(e, folder.id)}
+                  >
+                    <Folder className="mr-2 h-4 w-4" />
+                    {folder.name}
+                  </Button>
+                  <div className="absolute top-1/2 right-2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity folder-actions">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-[160px]">
+                        <DropdownMenuItem 
+                          onClick={() => handleStartRename(folder)}
+                        >
+                          <Pencil className="mr-2 h-4 w-4" />
+                          Rename
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={() => deleteFolder.mutate(folder.id)}
+                          className="text-destructive focus:text-destructive"
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </>
+              )}
             </div>
           ))}
           {folders.length === 0 && !isCreating && (

@@ -25,7 +25,9 @@ export const WeeklyPerformance = () => {
         },
         async () => {
           // Immediately refetch the data when changes occur
-          await queryClient.invalidateQueries({ queryKey: ['weekly-performance'] });
+          await queryClient.invalidateQueries({ 
+            queryKey: ['weekly-performance', selectedDate?.getMonth(), selectedDate?.getFullYear()]
+          });
         }
       )
       .subscribe();
@@ -33,7 +35,7 @@ export const WeeklyPerformance = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [queryClient]);
+  }, [queryClient, selectedDate]);
 
   if (isLoading) {
     return <LoadingSkeleton />;

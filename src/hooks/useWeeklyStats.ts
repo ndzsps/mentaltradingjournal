@@ -32,8 +32,8 @@ export const useWeeklyStats = (selectedDate: Date) => {
         tradeCount: 0,
       }));
 
-      // Track processed trade IDs for each week
-      const processedTradeIds: Set<string>[] = Array.from({ length: 5 }, () => new Set());
+      // Track unique dates for trading days count
+      const tradingDays: Set<string>[] = Array.from({ length: 5 }, () => new Set());
 
       const { data: entries, error } = await supabase
         .from('journal_entries')
@@ -41,6 +41,11 @@ export const useWeeklyStats = (selectedDate: Date) => {
         .eq('user_id', user.id);
 
       if (error) throw error;
+
+      console.log('Selected Month Range:', {
+        start: monthStart.toISOString(),
+        end: monthEnd.toISOString()
+      });
 
       // Filter and process entries
       (entries as JournalEntryType[])?.forEach(entry => {
@@ -51,6 +56,13 @@ export const useWeeklyStats = (selectedDate: Date) => {
           
           const tradeDate = new Date(trade.entryDate);
           
+          // Debug log for trade dates
+          console.log('Processing trade:', {
+            date: tradeDate.toISOString(),
+            isInMonth: isWithinInterval(tradeDate, { start: monthStart, end: monthEnd }),
+            pnl: trade.pnl
+          });
+
           // Strictly check if the trade falls within the selected month's interval
           if (!isWithinInterval(tradeDate, { start: monthStart, end: monthEnd })) {
             return;
@@ -62,20 +74,26 @@ export const useWeeklyStats = (selectedDate: Date) => {
           if (weekNumber >= 1 && weekNumber <= 5) {
             const weekIndex = weekNumber - 1;
             
-            // Only process each trade once per week using its ID
-            if (trade.id && !processedTradeIds[weekIndex].has(trade.id)) {
-              processedTradeIds[weekIndex].add(trade.id);
-              const pnlValue = trade.pnl || trade.profit_loss || 0;
-              const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
-              
-              if (!isNaN(numericPnL)) {
-                weeks[weekIndex].totalPnL += numericPnL;
-                weeks[weekIndex].tradeCount++;
-              }
+            // Add trading day
+            tradingDays[weekIndex].add(tradeDate.toISOString().split('T')[0]);
+            
+            const pnlValue = trade.pnl || trade.profit_loss || 0;
+            const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
+            
+            if (!isNaN(numericPnL)) {
+              weeks[weekIndex].totalPnL += numericPnL;
+              weeks[weekIndex].tradeCount++;
             }
           }
         });
       });
+
+      // Set trading days count for each week
+      weeks.forEach((week, index) => {
+        week.tradingDays = tradingDays[index].size;
+      });
+
+      console.log('Processed weekly stats:', weeks);
 
       return weeks;
     },

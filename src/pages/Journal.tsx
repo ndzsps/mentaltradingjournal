@@ -13,7 +13,7 @@ import { useJournalFilters } from "@/hooks/useJournalFilters";
 import { JournalEntryType } from "@/types/journal";
 import { StatsHeader } from "@/components/journal/stats/StatsHeader";
 import { TimeFilterProvider } from "@/contexts/TimeFilterContext";
-import { startOfDay, endOfDay } from "date-fns";
+import { startOfDay, endOfDay, isSameDay } from "date-fns";
 import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";
 
 const Journal = () => {
@@ -74,17 +74,13 @@ const Journal = () => {
   // Filter entries for the selected date based on trade entry dates
   const displayedEntries = selectedDate
     ? entries.filter(entry => {
-        // If this is a trade entry, check the trade entry dates
-        if (entry.trades && entry.trades.length > 0) {
-          return entry.trades.some(trade => {
-            if (!trade.entryDate) return false;
-            const tradeDate = new Date(trade.entryDate);
-            const start = startOfDay(selectedDate);
-            const end = endOfDay(selectedDate);
-            return tradeDate >= start && tradeDate <= end;
-          });
-        }
-        return false; // If no trades, don't show the entry
+        if (!entry.trades || entry.trades.length === 0) return false;
+        
+        return entry.trades.some(trade => {
+          if (!trade.entryDate) return false;
+          const tradeDate = new Date(trade.entryDate);
+          return isSameDay(tradeDate, selectedDate);
+        });
       })
     : filteredEntries;
 
@@ -160,4 +156,3 @@ const Journal = () => {
 };
 
 export default Journal;
-

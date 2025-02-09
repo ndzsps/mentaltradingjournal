@@ -508,13 +508,6 @@ export type Database = {
         }
         Returns: number
       }
-      get_first_monday_of_month: {
-        Args: {
-          year: number
-          month: number
-        }
-        Returns: string
-      }
       get_trade_duration: {
         Args: {
           entry_date: string

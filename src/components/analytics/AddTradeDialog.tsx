@@ -1,3 +1,4 @@
+
 import { DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { TradeFormDialog } from "./trade-form/TradeFormDialog";
@@ -15,11 +16,37 @@ export const AddTradeDialog = (props: AddTradeDialogProps) => {
 
   const handleTradeSubmit = async (tradeData: any, isEdit: boolean) => {
     await props.onSubmit(tradeData, isEdit);
-    // Invalidate and refetch queries to update the UI
+    
+    // Immediately start refetch to minimize delay
     await Promise.all([
-      queryClient.invalidateQueries({ queryKey: ['journal-entries'] }),
-      queryClient.invalidateQueries({ queryKey: ['analytics'] }),
-      queryClient.invalidateQueries({ queryKey: ['weekly-performance'] })
+      queryClient.invalidateQueries({ 
+        queryKey: ['journal-entries'],
+        refetchType: 'active'
+      }),
+      queryClient.invalidateQueries({ 
+        queryKey: ['analytics'],
+        refetchType: 'active'
+      }),
+      queryClient.invalidateQueries({ 
+        queryKey: ['weekly-performance'],
+        refetchType: 'active'
+      })
+    ]);
+    
+    // Force an immediate refetch
+    await Promise.all([
+      queryClient.refetchQueries({ 
+        queryKey: ['journal-entries'],
+        exact: true
+      }),
+      queryClient.refetchQueries({ 
+        queryKey: ['analytics'],
+        exact: true
+      }),
+      queryClient.refetchQueries({ 
+        queryKey: ['weekly-performance'],
+        exact: true
+      })
     ]);
   };
 

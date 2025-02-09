@@ -70,7 +70,7 @@ const Journal = () => {
     };
   }, [user]);
 
-  // Filter entries based on selected date, including trades
+  // Filter entries based on selected date, ensuring we use local timezone for comparison
   const displayedEntries = selectedDate
     ? filteredEntries.filter(entry => {
         const start = startOfDay(selectedDate);
@@ -79,32 +79,32 @@ const Journal = () => {
         // For entries with trades, check each trade's entry date
         if (entry.trades && entry.trades.length > 0) {
           return entry.trades.some(trade => {
-            // Use trade's entryDate if available, otherwise use entry creation date
+            // Convert trade date to local timezone for comparison
             const tradeDate = trade.entryDate 
-              ? parseISO(trade.entryDate) 
-              : parseISO(entry.created_at);
+              ? new Date(trade.entryDate)
+              : new Date(entry.created_at);
             return isWithinInterval(tradeDate, { start, end });
           });
         }
         
         // For non-trade entries, check the entry creation date
-        const entryDate = parseISO(entry.created_at);
+        const entryDate = new Date(entry.created_at);
         return isWithinInterval(entryDate, { start, end });
       })
     : filteredEntries;
 
-  // Map all trades to their respective dates for the calendar
+  // Map all trades to their respective dates for the calendar, ensuring consistent timezone handling
   const calendarEntries = entries.flatMap(entry => 
     entry.trades && entry.trades.length > 0
       ? entry.trades.map(trade => ({
           date: trade.entryDate 
-            ? parseISO(trade.entryDate)
-            : parseISO(entry.created_at),
+            ? new Date(trade.entryDate)
+            : new Date(entry.created_at),
           emotion: entry.emotion,
           trades: [trade]
         }))
       : [{
-          date: parseISO(entry.created_at),
+          date: new Date(entry.created_at),
           emotion: entry.emotion,
           trades: entry.trades || []
         }]

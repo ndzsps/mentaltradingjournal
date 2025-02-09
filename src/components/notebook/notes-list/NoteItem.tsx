@@ -1,3 +1,4 @@
+
 import { MoreVertical, Edit2, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
@@ -107,7 +108,7 @@ export const NoteItem = ({
             <Badge 
               key={tag} 
               variant="secondary" 
-              className="text-xs bg-secondary/10 hover:bg-secondary/20"
+              className="text-xs bg-purple-100 hover:bg-purple-200 text-purple-800 dark:bg-purple-900/30 dark:hover:bg-purple-900/50 dark:text-purple-300"
             >
               {tag}
             </Badge>

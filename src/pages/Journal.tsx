@@ -13,7 +13,7 @@ import { useJournalFilters } from "@/hooks/useJournalFilters";
 import { JournalEntryType } from "@/types/journal";
 import { StatsHeader } from "@/components/journal/stats/StatsHeader";
 import { TimeFilterProvider } from "@/contexts/TimeFilterContext";
-import { startOfDay, endOfDay, parseISO } from "date-fns";
+import { startOfDay, endOfDay } from "date-fns";
 import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";
 
 const Journal = () => {
@@ -68,47 +68,33 @@ const Journal = () => {
     };
   }, [user]);
 
-  // Filter entries based on selected date, focusing on trade entry dates
+  // Filter entries for the selected date based on trade entry dates
   const displayedEntries = selectedDate
-    ? filteredEntries.filter(entry => {
-        const start = startOfDay(selectedDate);
-        const end = endOfDay(selectedDate);
-        
-        console.log('Filtering entry:', entry);
-        console.log('Selected date range:', start, end);
-        
-        // For entries with trades, check if any trade's entry date falls within the selected date
+    ? entries.filter(entry => {
+        // If this is a trade entry, check the trade entry dates
         if (entry.trades && entry.trades.length > 0) {
-          const hasTrade = entry.trades.some(trade => {
-            // Convert the trade date to the user's local timezone for comparison
-            const tradeDate = trade.entryDate 
-              ? new Date(trade.entryDate)
-              : new Date(entry.created_at);
-            
-            // Use local timezone comparison
-            const isWithin = tradeDate >= start && tradeDate <= end;
-            console.log('Trade date:', tradeDate, 'Is within interval:', isWithin);
-            return isWithin;
+          return entry.trades.some(trade => {
+            if (!trade.entryDate) return false;
+            const tradeDate = new Date(trade.entryDate);
+            const start = startOfDay(selectedDate);
+            const end = endOfDay(selectedDate);
+            return tradeDate >= start && tradeDate <= end;
           });
-          console.log('Entry has matching trade:', hasTrade);
-          return hasTrade;
         }
-        
-        // For non-trade entries, check the entry creation date in local timezone
-        const entryDate = new Date(entry.created_at);
-        const isWithin = entryDate >= start && entryDate <= end;
-        console.log('Entry date:', entryDate, 'Is within interval:', isWithin);
-        return isWithin;
+        return false; // If no trades, don't show the entry
       })
     : filteredEntries;
 
-  const calendarEntries = entries.map(entry => ({
-    date: entry.trades && entry.trades.length > 0 && entry.trades[0].entryDate
-      ? new Date(entry.trades[0].entryDate)  // Convert to local timezone
-      : new Date(entry.created_at),
-    emotion: entry.emotion,
-    trades: entry.trades
-  }));
+  // Map entries for calendar display
+  const calendarEntries = entries
+    .filter(entry => entry.trades && entry.trades.length > 0)
+    .flatMap(entry => 
+      entry.trades.map(trade => ({
+        date: trade.entryDate ? new Date(trade.entryDate) : new Date(entry.created_at),
+        emotion: entry.emotion,
+        trades: [trade]
+      }))
+    );
 
   return (
     <AppLayout>

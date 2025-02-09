@@ -94,6 +94,8 @@ export const useWeeklyStats = (selectedDate: Date) => {
         // For debugging: store trades by week
         const tradesByWeek = new Map<number, { date: string; pnl: number; }[]>();
 
+        console.log('First Monday of month:', format(firstMonday, 'yyyy-MM-dd'));
+        
         // Process each trade
         for (const entry of (entries as JournalEntryType[] || [])) {
           if (!entry.trades || !Array.isArray(entry.trades)) continue;
@@ -135,6 +137,15 @@ export const useWeeklyStats = (selectedDate: Date) => {
               if (weekIndex !== -1) {
                 allWeeks[weekIndex].totalPnL += numericPnL;
                 allWeeks[weekIndex].tradeCount++;
+
+                // Log each trade being added to week 1
+                if (weekNumber === 1) {
+                  console.log(`Adding trade to Week 1:`, {
+                    date: format(tradeDate, 'yyyy-MM-dd'),
+                    pnl: numericPnL,
+                    entryId: entry.id
+                  });
+                }
               }
 
               // Store trade details for debugging
@@ -172,12 +183,7 @@ export const useWeeklyStats = (selectedDate: Date) => {
         }
 
         // Log detailed breakdown for debugging
-        allWeeks.forEach(week => {
-          const trades = tradesByWeek.get(week.weekNumber) || [];
-          console.log(`Week ${week.weekNumber} Trade Breakdown:`, 
-            trades.sort((a, b) => a.date.localeCompare(b.date))
-          );
-        });
+        console.log('Week 1 Trades:', tradesByWeek.get(1)?.sort((a, b) => a.date.localeCompare(b.date)));
       }
 
       return allWeeks.sort((a, b) => a.weekNumber - b.weekNumber);

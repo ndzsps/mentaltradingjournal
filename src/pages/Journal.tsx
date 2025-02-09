@@ -13,7 +13,7 @@ import { useJournalFilters } from "@/hooks/useJournalFilters";
 import { JournalEntryType } from "@/types/journal";
 import { StatsHeader } from "@/components/journal/stats/StatsHeader";
 import { TimeFilterProvider } from "@/contexts/TimeFilterContext";
-import { startOfDay, endOfDay, parseISO } from "date-fns";
+import { startOfDay, endOfDay, parseISO, format } from "date-fns";
 import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";
 
 const Journal = () => {
@@ -70,7 +70,7 @@ const Journal = () => {
     };
   }, [user]);
 
-  // Filter entries based on selected date, including trades
+  // Filter entries based on selected date
   const displayedEntries = selectedDate
     ? filteredEntries.filter(entry => {
         const start = startOfDay(selectedDate);
@@ -81,29 +81,25 @@ const Journal = () => {
           return entry.trades.some(trade => {
             if (!trade.entryDate) return false;
             
-            // Convert the trade entry date string to a Date object
-            const tradeDateStr = trade.entryDate;
-            const tradeDate = new Date(tradeDateStr);
+            const tradeDate = new Date(trade.entryDate);
             
             // Debug logging
             console.log('Trade date comparison:', {
-              tradeDateStr,
-              tradeDate,
-              selectedDate,
-              start: start.toISOString(),
-              end: end.toISOString(),
-              isStartBeforeOrEqual: start <= tradeDate,
-              isEndAfterOrEqual: end >= tradeDate,
-              isWithinRange: start <= tradeDate && tradeDate <= end
+              tradeDate: format(tradeDate, 'yyyy-MM-dd HH:mm:ss'),
+              selectedDate: format(selectedDate, 'yyyy-MM-dd HH:mm:ss'),
+              start: format(start, 'yyyy-MM-dd HH:mm:ss'),
+              end: format(end, 'yyyy-MM-dd HH:mm:ss'),
+              isWithinRange: tradeDate >= start && tradeDate <= end
             });
 
-            return start <= tradeDate && tradeDate <= end;
+            // Only compare the trade's entry date with the selected date
+            return tradeDate >= start && tradeDate <= end;
           });
         }
         
-        // For non-trade entries, check the entry creation date
+        // For non-trade entries, check if the entry was created on the selected date
         const entryDate = parseISO(entry.created_at);
-        return start <= entryDate && entryDate <= end;
+        return entryDate >= start && entryDate <= end;
       })
     : filteredEntries;
 

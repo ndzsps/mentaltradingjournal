@@ -83,7 +83,8 @@ export const useWeeklyStats = (selectedDate: Date) => {
         const { data: entries, error } = await supabase
           .from('journal_entries')
           .select('*')
-          .eq('user_id', user.id);
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: true });
 
         if (error) throw error;
 
@@ -154,8 +155,8 @@ export const useWeeklyStats = (selectedDate: Date) => {
         });
 
         // Store the calculated stats in the week_stats table
-        const promises = allWeeks.map(week => 
-          supabase
+        for (const week of allWeeks) {
+          await supabase
             .from('week_stats')
             .upsert({
               user_id: user.id,
@@ -165,11 +166,10 @@ export const useWeeklyStats = (selectedDate: Date) => {
               total_pnl: week.totalPnL,
               trading_days: week.tradingDays,
               trade_count: week.tradeCount
-            })
-            .select()
-        );
-
-        await Promise.all(promises);
+            }, {
+              onConflict: 'user_id,year,month,week_number'
+            });
+        }
 
         // Log detailed breakdown for debugging
         allWeeks.forEach(week => {

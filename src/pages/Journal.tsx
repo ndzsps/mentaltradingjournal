@@ -13,7 +13,7 @@ import { useJournalFilters } from "@/hooks/useJournalFilters";
 import { JournalEntryType } from "@/types/journal";
 import { StatsHeader } from "@/components/journal/stats/StatsHeader";
 import { TimeFilterProvider } from "@/contexts/TimeFilterContext";
-import { startOfDay, endOfDay, isSameDay } from "date-fns";
+import { startOfDay, endOfDay } from "date-fns";
 import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";
 
 const Journal = () => {
@@ -25,26 +25,24 @@ const Journal = () => {
     filteredEntries
   } = useJournalFilters(entries);
 
-  const fetchEntries = async () => {
-    if (!user) return;
-    
-    console.log('Fetching entries for user:', user.id);
-    const { data, error } = await supabase
-      .from('journal_entries')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error('Error fetching journal entries:', error);
-      return;
-    }
-
-    console.log('Fetched entries:', data);
-    setEntries(data || []);
-  };
-
   useEffect(() => {
     if (!user) return;
+
+    const fetchEntries = async () => {
+      console.log('Fetching entries for user:', user.id);
+      const { data, error } = await supabase
+        .from('journal_entries')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching journal entries:', error);
+        return;
+      }
+
+      console.log('Fetched entries:', data);
+      setEntries(data || []);
+    };
 
     fetchEntries();
 
@@ -60,7 +58,6 @@ const Journal = () => {
         },
         (payload) => {
           console.log('Realtime update received:', payload);
-          // Immediately refresh entries when any change occurs
           fetchEntries();
         }
       )
@@ -74,13 +71,17 @@ const Journal = () => {
   // Filter entries for the selected date based on trade entry dates
   const displayedEntries = selectedDate
     ? entries.filter(entry => {
-        if (!entry.trades || entry.trades.length === 0) return false;
-        
-        return entry.trades.some(trade => {
-          if (!trade.entryDate) return false;
-          const tradeDate = new Date(trade.entryDate);
-          return isSameDay(tradeDate, selectedDate);
-        });
+        // If this is a trade entry, check the trade entry dates
+        if (entry.trades && entry.trades.length > 0) {
+          return entry.trades.some(trade => {
+            if (!trade.entryDate) return false;
+            const tradeDate = new Date(trade.entryDate);
+            const start = startOfDay(selectedDate);
+            const end = endOfDay(selectedDate);
+            return tradeDate >= start && tradeDate <= end;
+          });
+        }
+        return false; // If no trades, don't show the entry
       })
     : filteredEntries;
 

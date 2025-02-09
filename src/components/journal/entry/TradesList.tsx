@@ -31,6 +31,7 @@ export const TradesList = ({ trades }: TradesListProps) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedTrade, setSelectedTrade] = useState<Trade | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const handleEditClick = (trade: Trade) => {
     setSelectedTrade(trade);
@@ -90,6 +91,7 @@ export const TradesList = ({ trades }: TradesListProps) => {
   };
 
   const handleTradeUpdate = async (updatedTrade: Trade) => {
+    setIsUpdating(true);
     try {
       const { data: entries, error: fetchError } = await supabase
         .from('journal_entries')
@@ -137,12 +139,22 @@ export const TradesList = ({ trades }: TradesListProps) => {
 
       if (updateError) throw updateError;
 
-      toast.success('Trade updated successfully');
+      toast.success('Trade updated successfully', {
+        description: 'Refreshing page to show latest changes...',
+        duration: 2000,
+      });
+      
       setIsEditDialogOpen(false);
-      window.location.reload();
+      
+      // Add a small delay before refresh for better UX
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     } catch (error) {
       console.error('Error updating trade:', error);
       toast.error('Failed to update trade');
+    } finally {
+      setIsUpdating(false);
     }
   };
 

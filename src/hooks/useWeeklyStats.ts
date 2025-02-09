@@ -8,11 +8,8 @@ import {
   endOfMonth,
   isWithinInterval,
   format,
-  getDay,
   parseISO,
-  isWeekend,
-  addWeeks,
-  isBefore
+  isWeekend
 } from "date-fns";
 
 interface WeekSummary {
@@ -33,15 +30,6 @@ export const useWeeklyStats = (selectedDate: Date) => {
     queryKey: ['weekly-performance', month, year],
     queryFn: async () => {
       if (!user) return [];
-
-      // Get the first Monday of the month using our Supabase function
-      const { data: firstMondayResult } = await supabase
-        .rpc('get_first_monday_of_month', {
-          year,
-          month
-        });
-
-      const firstMonday = new Date(firstMondayResult);
       
       // Always initialize 5 weeks
       const allWeeks: WeekSummary[] = Array.from({ length: 5 }, (_, i) => ({
@@ -94,7 +82,6 @@ export const useWeeklyStats = (selectedDate: Date) => {
         // For debugging: store trades by week
         const tradesByWeek = new Map<number, { date: string; pnl: number; entryId: string }[]>();
 
-        console.log('First Monday of month:', format(firstMonday, 'yyyy-MM-dd'));
         console.log('Month start:', format(monthStart, 'yyyy-MM-dd'));
         console.log('Month end:', format(monthEnd, 'yyyy-MM-dd'));
         
@@ -198,4 +185,3 @@ export const useWeeklyStats = (selectedDate: Date) => {
     staleTime: 0,
   });
 };
-

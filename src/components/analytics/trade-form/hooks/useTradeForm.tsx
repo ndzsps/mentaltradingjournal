@@ -100,10 +100,10 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
       onOpenChange(false);
       
       if (!editTrade) {
-        toast.success("Trade Successfully Added!", {
-          description: "Every trade is a lesson. Win or lose, you're growing stronger.",
-          duration: 5000,
-        });
+        // Store success message in sessionStorage before refresh
+        sessionStorage.setItem('tradeSuccess', 'true');
+        // Refresh the page
+        window.location.reload();
       } else {
         toast.success("Trade updated successfully!");
       }

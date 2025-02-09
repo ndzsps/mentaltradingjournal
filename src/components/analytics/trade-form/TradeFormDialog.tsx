@@ -1,7 +1,9 @@
+
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useState, useEffect } from "react";
 import { TradeFormContent } from "./TradeFormContent";
 import { Trade } from "@/types/trade";
+import { SuccessDialog } from "../SuccessDialog";
 
 interface TradeFormDialogProps {
   open: boolean;
@@ -21,20 +23,23 @@ export const TradeFormDialog = ({ open, onOpenChange, onSubmit, editTrade, child
   }, [editTrade]);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      {children}
-      <DialogContent className="max-h-[90vh] flex flex-col p-0 sm:max-w-[1000px]">
-        <div className="p-6 pb-0">
-          <DialogTitle>{editTrade ? 'Edit Trade' : 'Add Trade'}</DialogTitle>
-        </div>
-        <TradeFormContent
-          direction={direction}
-          setDirection={setDirection}
-          onSubmit={onSubmit}
-          editTrade={editTrade}
-          onOpenChange={onOpenChange}
-        />
-      </DialogContent>
-    </Dialog>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        {children}
+        <DialogContent className="max-h-[90vh] flex flex-col p-0 sm:max-w-[1000px]">
+          <div className="p-6 pb-0">
+            <DialogTitle>{editTrade ? 'Edit Trade' : 'Add Trade'}</DialogTitle>
+          </div>
+          <TradeFormContent
+            direction={direction}
+            setDirection={setDirection}
+            onSubmit={onSubmit}
+            editTrade={editTrade}
+            onOpenChange={onOpenChange}
+          />
+        </DialogContent>
+      </Dialog>
+      <SuccessDialog />
+    </>
   );
 };

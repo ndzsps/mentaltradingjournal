@@ -1,3 +1,4 @@
+
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { useEffect, useState } from "react";
@@ -32,6 +33,7 @@ const Journal = () => {
       const { data, error } = await supabase
         .from('journal_entries')
         .select('*')
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -54,6 +56,7 @@ const Journal = () => {
           event: '*',
           schema: 'public',
           table: 'journal_entries',
+          filter: `user_id=eq.${user.id}`,
         },
         (payload) => {
           console.log('Realtime update received:', payload);
@@ -76,8 +79,7 @@ const Journal = () => {
         // For entries with trades, check if any trade's entry date falls within the selected date
         if (entry.trades && entry.trades.length > 0) {
           return entry.trades.some(trade => {
-            if (!trade.entryDate) return false;
-            const tradeDate = parseISO(trade.entryDate);
+            const tradeDate = trade.entryDate ? parseISO(trade.entryDate) : parseISO(entry.created_at);
             return isWithinInterval(tradeDate, { start, end });
           });
         }
@@ -91,7 +93,7 @@ const Journal = () => {
   const calendarEntries = entries.map(entry => ({
     date: entry.trades && entry.trades.length > 0 && entry.trades[0].entryDate
       ? parseISO(entry.trades[0].entryDate)  // Use trade date for trade entries
-      : parseISO(entry.created_at),
+      : parseISO(entry.created_at),  // Fallback to creation date
     emotion: entry.emotion,
     trades: entry.trades
   }));

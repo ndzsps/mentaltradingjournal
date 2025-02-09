@@ -1,4 +1,5 @@
-import { Folder, Plus } from "lucide-react";
+
+import { Folder, Plus, MoreVertical, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -7,6 +8,12 @@ import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface Folder {
   id: string;
@@ -68,6 +75,34 @@ export const FolderList = ({
     },
   });
 
+  const deleteFolder = useMutation({
+    mutationFn: async (folderId: string) => {
+      if (!user) throw new Error("No user found");
+      
+      const { error } = await supabase
+        .from("notebook_folders")
+        .delete()
+        .eq("id", folderId)
+        .eq("user_id", user.id);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["folders"] });
+      toast({
+        title: "Success",
+        description: "Folder deleted successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete folder",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     e.currentTarget.classList.add("bg-muted");
@@ -83,6 +118,13 @@ export const FolderList = ({
     const noteId = e.dataTransfer.getData("noteId");
     if (noteId) {
       onDrop(noteId, folderId);
+    }
+  };
+
+  const handleFolderClick = (e: React.MouseEvent, folderId: string) => {
+    const target = e.target as HTMLElement;
+    if (!target.closest('.folder-actions')) {
+      onSelectFolder(folderId);
     }
   };
 
@@ -144,18 +186,40 @@ export const FolderList = ({
       <ScrollArea className="h-[calc(100vh-12rem)]">
         <div className="space-y-1">
           {folders.map((folder) => (
-            <Button
+            <div
               key={folder.id}
-              variant={selectedFolderId === folder.id ? "secondary" : "ghost"}
-              className="w-full justify-start"
-              onClick={() => onSelectFolder(folder.id)}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={(e) => handleDrop(e, folder.id)}
+              className="group relative"
             >
-              <Folder className="mr-2 h-4 w-4" />
-              {folder.name}
-            </Button>
+              <Button
+                variant={selectedFolderId === folder.id ? "secondary" : "ghost"}
+                className="w-full justify-start"
+                onClick={(e) => handleFolderClick(e, folder.id)}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={(e) => handleDrop(e, folder.id)}
+              >
+                <Folder className="mr-2 h-4 w-4" />
+                {folder.name}
+              </Button>
+              <div className="absolute top-1/2 right-2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity folder-actions">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-[160px]">
+                    <DropdownMenuItem 
+                      onClick={() => deleteFolder.mutate(folder.id)}
+                      className="text-destructive focus:text-destructive"
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </div>
           ))}
           {folders.length === 0 && !isCreating && (
             <p className="text-sm text-muted-foreground text-center py-2">

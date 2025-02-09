@@ -117,7 +117,7 @@ export const TradesList = ({ trades }: TradesListProps) => {
                   <span className={`font-medium ${
                     Number(trade.pnl) >= 0 ? 'text-green-500' : 'text-red-500'
                   }`}>
-                    {trade.direction?.toUpperCase()} ${Math.abs(Number(trade.pnl)).toLocaleString()}
+                    {Number(trade.pnl) >= 0 ? '+' : '-'}${Math.abs(Number(trade.pnl)).toLocaleString()}
                   </span>
                 </div>
               </div>

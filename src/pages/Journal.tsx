@@ -25,24 +25,26 @@ const Journal = () => {
     filteredEntries
   } = useJournalFilters(entries);
 
+  const fetchEntries = async () => {
+    if (!user) return;
+    
+    console.log('Fetching entries for user:', user.id);
+    const { data, error } = await supabase
+      .from('journal_entries')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching journal entries:', error);
+      return;
+    }
+
+    console.log('Fetched entries:', data);
+    setEntries(data || []);
+  };
+
   useEffect(() => {
     if (!user) return;
-
-    const fetchEntries = async () => {
-      console.log('Fetching entries for user:', user.id);
-      const { data, error } = await supabase
-        .from('journal_entries')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error fetching journal entries:', error);
-        return;
-      }
-
-      console.log('Fetched entries:', data);
-      setEntries(data || []);
-    };
 
     fetchEntries();
 
@@ -58,6 +60,7 @@ const Journal = () => {
         },
         (payload) => {
           console.log('Realtime update received:', payload);
+          // Immediately refresh entries when any change occurs
           fetchEntries();
         }
       )
@@ -157,3 +160,4 @@ const Journal = () => {
 };
 
 export default Journal;
+

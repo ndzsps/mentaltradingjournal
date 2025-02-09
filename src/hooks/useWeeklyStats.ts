@@ -13,15 +13,14 @@ interface WeekSummary {
   tradeCount: number;
 }
 
-export const useWeeklyStats = () => {
+export const useWeeklyStats = (selectedDate: Date) => {
   const { user } = useAuth();
-  const currentDate = new Date();
-  const monthStart = startOfMonth(currentDate);
-  const monthEnd = endOfMonth(currentDate);
+  const monthStart = startOfMonth(selectedDate);
+  const monthEnd = endOfMonth(selectedDate);
   const firstWeekOfMonth = getWeek(monthStart);
 
   return useQuery({
-    queryKey: ['weekly-performance', currentDate.getMonth(), currentDate.getFullYear()],
+    queryKey: ['weekly-performance', selectedDate.getMonth(), selectedDate.getFullYear()],
     queryFn: async () => {
       if (!user) return [];
 
@@ -51,7 +50,7 @@ export const useWeeklyStats = () => {
           
           const tradeDate = new Date(trade.entryDate);
           
-          // Check if the trade falls within the current month
+          // Check if the trade falls within the selected month
           if (!isWithinInterval(tradeDate, { start: monthStart, end: monthEnd })) {
             return;
           }

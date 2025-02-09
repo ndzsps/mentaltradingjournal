@@ -1,13 +1,16 @@
+
 import { useWeeklyStats } from "@/hooks/useWeeklyStats";
 import { WeekCard } from "./weekly/WeekCard";
 import { LoadingSkeleton } from "./weekly/LoadingSkeleton";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { useJournalFilters } from "@/hooks/useJournalFilters";
 
 export const WeeklyPerformance = () => {
   const queryClient = useQueryClient();
-  const { data: weeklyStats, isLoading } = useWeeklyStats();
+  const { selectedDate } = useJournalFilters([]);
+  const { data: weeklyStats, isLoading } = useWeeklyStats(selectedDate || new Date());
 
   // Subscribe to real-time updates
   useEffect(() => {

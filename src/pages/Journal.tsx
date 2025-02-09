@@ -76,10 +76,13 @@ const Journal = () => {
         const start = startOfDay(selectedDate);
         const end = endOfDay(selectedDate);
         
-        // For entries with trades, check if any trade's entry date falls within the selected date
+        // For entries with trades, check each trade's entry date
         if (entry.trades && entry.trades.length > 0) {
           return entry.trades.some(trade => {
-            const tradeDate = trade.entryDate ? parseISO(trade.entryDate) : parseISO(entry.created_at);
+            // Use trade's entryDate if available, otherwise use entry creation date
+            const tradeDate = trade.entryDate 
+              ? parseISO(trade.entryDate) 
+              : parseISO(entry.created_at);
             return isWithinInterval(tradeDate, { start, end });
           });
         }
@@ -90,13 +93,22 @@ const Journal = () => {
       })
     : filteredEntries;
 
-  const calendarEntries = entries.map(entry => ({
-    date: entry.trades && entry.trades.length > 0 && entry.trades[0].entryDate
-      ? parseISO(entry.trades[0].entryDate)  // Use trade date for trade entries
-      : parseISO(entry.created_at),  // Fallback to creation date
-    emotion: entry.emotion,
-    trades: entry.trades
-  }));
+  // Map all trades to their respective dates for the calendar
+  const calendarEntries = entries.flatMap(entry => 
+    entry.trades && entry.trades.length > 0
+      ? entry.trades.map(trade => ({
+          date: trade.entryDate 
+            ? parseISO(trade.entryDate)
+            : parseISO(entry.created_at),
+          emotion: entry.emotion,
+          trades: [trade]
+        }))
+      : [{
+          date: parseISO(entry.created_at),
+          emotion: entry.emotion,
+          trades: entry.trades || []
+        }]
+  );
 
   return (
     <AppLayout>

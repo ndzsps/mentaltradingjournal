@@ -10,7 +10,8 @@ import { useJournalFilters } from "@/hooks/useJournalFilters";
 export const WeeklyPerformance = () => {
   const queryClient = useQueryClient();
   const { selectedDate } = useJournalFilters([]);
-  const { data: weeklyStats, isLoading } = useWeeklyStats(selectedDate || new Date());
+  const currentDate = selectedDate || new Date();
+  const { data: weeklyStats, isLoading } = useWeeklyStats(currentDate);
 
   // Subscribe to real-time updates
   useEffect(() => {
@@ -26,7 +27,7 @@ export const WeeklyPerformance = () => {
         async () => {
           // Immediately refetch the data when changes occur
           await queryClient.invalidateQueries({ 
-            queryKey: ['weekly-performance', selectedDate?.getMonth(), selectedDate?.getFullYear()]
+            queryKey: ['weekly-performance', currentDate.getMonth(), currentDate.getFullYear()]
           });
         }
       )
@@ -35,7 +36,7 @@ export const WeeklyPerformance = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [queryClient, selectedDate]);
+  }, [queryClient, currentDate]);
 
   if (isLoading) {
     return <LoadingSkeleton />;

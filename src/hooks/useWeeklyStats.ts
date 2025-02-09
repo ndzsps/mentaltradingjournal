@@ -86,7 +86,7 @@ export const useWeeklyStats = (selectedDate: Date) => {
       const tradingDays: Set<string>[] = weeksInMonth.map(() => new Set());
 
       // For debugging: store trades by week
-      const tradesByWeek: { date: string; pnl: number; }[][] = weeksInMonth.map(() => []);
+      const tradesByWeek: { date: string; pnl: number; entryId: string }[][] = weeksInMonth.map(() => []);
 
       // Filter and process entries
       (entries as JournalEntryType[])?.forEach(entry => {
@@ -121,7 +121,8 @@ export const useWeeklyStats = (selectedDate: Date) => {
               // Store trade details for debugging
               tradesByWeek[weekIndex].push({
                 date: format(tradeDate, 'yyyy-MM-dd'),
-                pnl: numericPnL
+                pnl: numericPnL,
+                entryId: entry.id
               });
             }
           }
@@ -134,9 +135,22 @@ export const useWeeklyStats = (selectedDate: Date) => {
       });
 
       // Log detailed breakdown for week 2
-      console.log('Week 2 Trade Breakdown:', 
-        tradesByWeek[1]?.sort((a, b) => a.date.localeCompare(b.date))
-      );
+      const week2Trades = tradesByWeek[1]?.sort((a, b) => a.date.localeCompare(b.date));
+      console.log('Week 2 Trade Breakdown:', week2Trades);
+      
+      if (week2Trades) {
+        const totalPnL = week2Trades.reduce((sum, trade) => sum + trade.pnl, 0);
+        console.log('Week 2 Total PnL (calculated):', totalPnL);
+        console.log('Week 2 Total PnL (from weeks array):', weeks[1].totalPnL);
+        
+        // Group by date for easier verification
+        const byDate = week2Trades.reduce((acc, trade) => {
+          acc[trade.date] = (acc[trade.date] || 0) + trade.pnl;
+          return acc;
+        }, {} as Record<string, number>);
+        
+        console.log('Week 2 PnL by date:', byDate);
+      }
 
       // Store the calculated stats in the week_stats table
       const promises = weeks.map(week => 

@@ -1,4 +1,3 @@
-
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { useEffect, useState } from "react";
@@ -13,7 +12,7 @@ import { useJournalFilters } from "@/hooks/useJournalFilters";
 import { JournalEntryType } from "@/types/journal";
 import { StatsHeader } from "@/components/journal/stats/StatsHeader";
 import { TimeFilterProvider } from "@/contexts/TimeFilterContext";
-import { startOfDay, parseISO, format, isSameDay } from "date-fns";
+import { startOfDay, endOfDay, parseISO, isWithinInterval } from "date-fns";
 import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";
 
 const Journal = () => {
@@ -33,7 +32,6 @@ const Journal = () => {
       const { data, error } = await supabase
         .from('journal_entries')
         .select('*')
-        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -56,7 +54,6 @@ const Journal = () => {
           event: '*',
           schema: 'public',
           table: 'journal_entries',
-          filter: `user_id=eq.${user.id}`
         },
         (payload) => {
           console.log('Realtime update received:', payload);
@@ -70,71 +67,34 @@ const Journal = () => {
     };
   }, [user]);
 
-  // Create a map of entries by date
-  const entriesByDate = new Map<string, JournalEntryType[]>();
-  
-  // First, handle regular journal entries
-  filteredEntries.forEach(entry => {
-    if (selectedDate && isSameDay(parseISO(entry.created_at), selectedDate)) {
-      const dateKey = format(parseISO(entry.created_at), 'yyyy-MM-dd');
-      if (!entriesByDate.has(dateKey)) {
-        entriesByDate.set(dateKey, []);
-      }
-      // Only add the entry if it has no trades or if its trades are from a different date
-      const entryWithoutMatchingTrades = {
-        ...entry,
-        trades: entry.trades?.filter(trade => 
-          !trade.entryDate || !isSameDay(parseISO(trade.entryDate), selectedDate)
-        ) || []
-      };
-      if (!entry.trades || entryWithoutMatchingTrades.trades.length > 0) {
-        entriesByDate.get(dateKey)?.push(entryWithoutMatchingTrades);
-      }
-    }
-  });
-
-  // Then, handle trades separately
-  filteredEntries.forEach(entry => {
-    if (entry.trades) {
-      entry.trades.forEach(trade => {
-        if (trade.entryDate && selectedDate && isSameDay(parseISO(trade.entryDate), selectedDate)) {
-          const dateKey = format(parseISO(trade.entryDate), 'yyyy-MM-dd');
-          if (!entriesByDate.has(dateKey)) {
-            entriesByDate.set(dateKey, []);
-          }
-          // Create a new entry just for this trade
-          entriesByDate.get(dateKey)?.push({
-            ...entry,
-            trades: [trade]
+  // Filter entries based on selected date, including trades
+  const displayedEntries = selectedDate
+    ? filteredEntries.filter(entry => {
+        const start = startOfDay(selectedDate);
+        const end = endOfDay(selectedDate);
+        
+        // For entries with trades, check if any trade's entry date falls within the selected date
+        if (entry.trades && entry.trades.length > 0) {
+          return entry.trades.some(trade => {
+            if (!trade.entryDate) return false;
+            const tradeDate = parseISO(trade.entryDate);
+            return isWithinInterval(tradeDate, { start, end });
           });
         }
-      });
-    }
-  });
+        
+        // For non-trade entries, check the entry creation date
+        const entryDate = parseISO(entry.created_at);
+        return isWithinInterval(entryDate, { start, end });
+      })
+    : filteredEntries;
 
-  // Convert the map to an array and sort by date
-  const displayedEntries = Array.from(entriesByDate.values())
-    .flat()
-    .sort((a, b) => {
-      const dateA = a.trades?.[0]?.entryDate || a.created_at;
-      const dateB = b.trades?.[0]?.entryDate || b.created_at;
-      return new Date(dateB).getTime() - new Date(dateA).getTime();
-    });
-
-  const calendarEntries = entries.flatMap(entry => {
-    if (entry.trades && entry.trades.length > 0) {
-      return entry.trades.map(trade => ({
-        date: parseISO(trade.entryDate || entry.created_at),
-        emotion: entry.emotion,
-        trades: [trade]
-      }));
-    }
-    return [{
-      date: parseISO(entry.created_at),
-      emotion: entry.emotion,
-      trades: entry.trades
-    }];
-  });
+  const calendarEntries = entries.map(entry => ({
+    date: entry.trades && entry.trades.length > 0 && entry.trades[0].entryDate
+      ? parseISO(entry.trades[0].entryDate)  // Use trade date for trade entries
+      : parseISO(entry.created_at),
+    emotion: entry.emotion,
+    trades: entry.trades
+  }));
 
   return (
     <AppLayout>
@@ -175,8 +135,8 @@ const Journal = () => {
               <ScrollArea className="h-[600px] pr-4">
                 {displayedEntries.length > 0 ? (
                   <div className="space-y-4">
-                    {displayedEntries.map((entry, index) => (
-                      <JournalEntry key={`${entry.id}-${index}`} entry={entry} />
+                    {displayedEntries.map((entry) => (
+                      <JournalEntry key={entry.id} entry={entry} />
                     ))}
                   </div>
                 ) : (

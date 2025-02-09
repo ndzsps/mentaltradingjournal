@@ -76,7 +76,6 @@ export const useTradeActions = (user: User | null) => {
     }
 
     setIsUpdating(true);
-    const loadingToast = toast.loading('Updating trade...');
     
     try {
       const { data: entries } = await supabase
@@ -116,16 +115,24 @@ export const useTradeActions = (user: User | null) => {
         .update({ trades: updatedTrades })
         .eq('id', entryWithTrade?.id);
 
-      toast.dismiss(loadingToast);
-      toast.success('Trade updated successfully!', {
-        description: 'Your changes have been saved. Refreshing page...'
-      });
-
+      toast.success('Trade updated successfully!');
       setIsEditDialogOpen(false);
       
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
+      // Create a full-screen loading overlay
+      const overlay = document.createElement('div');
+      overlay.className = 'fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center';
+      overlay.innerHTML = `
+        <div class="flex flex-col items-center gap-2">
+          <div class="h-8 w-8 animate-spin rounded-full border-4 border-primary border-r-transparent"></div>
+          <p class="text-sm text-muted-foreground">Refreshing...</p>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+
+      // Short delay to ensure the overlay is visible
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      window.location.reload();
     } finally {
       setIsUpdating(false);
     }

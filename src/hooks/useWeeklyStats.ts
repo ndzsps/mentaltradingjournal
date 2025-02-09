@@ -24,13 +24,7 @@ export const useWeeklyStats = (selectedDate: Date) => {
     queryFn: async () => {
       if (!user) return [];
 
-      const { data: entries, error } = await supabase
-        .from('journal_entries')
-        .select('*')
-        .eq('user_id', user.id);
-
-      if (error) throw error;
-
+      // Initialize weeks array
       const weeks: WeekSummary[] = Array.from({ length: 5 }, (_, i) => ({
         weekNumber: i + 1,
         totalPnL: 0,
@@ -41,16 +35,23 @@ export const useWeeklyStats = (selectedDate: Date) => {
       // Track processed trade IDs for each week
       const processedTradeIds: Set<string>[] = Array.from({ length: 5 }, () => new Set());
 
+      const { data: entries, error } = await supabase
+        .from('journal_entries')
+        .select('*')
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
       // Filter and process entries
       (entries as JournalEntryType[])?.forEach(entry => {
-        const trades = (entry.trades || []) as Trade[];
+        if (!entry.trades || !Array.isArray(entry.trades)) return;
         
-        trades.forEach(trade => {
+        entry.trades.forEach(trade => {
           if (!trade.entryDate) return;
           
           const tradeDate = new Date(trade.entryDate);
           
-          // Check if the trade falls within the selected month
+          // Strictly check if the trade falls within the selected month's interval
           if (!isWithinInterval(tradeDate, { start: monthStart, end: monthEnd })) {
             return;
           }
@@ -69,16 +70,11 @@ export const useWeeklyStats = (selectedDate: Date) => {
               
               if (!isNaN(numericPnL)) {
                 weeks[weekIndex].totalPnL += numericPnL;
-                weeks[weekIndex].tradingDays += 1;
+                weeks[weekIndex].tradeCount++;
               }
             }
           }
         });
-      });
-
-      // After processing all entries, set the trade count based on unique trade IDs
-      weeks.forEach((week, index) => {
-        week.tradeCount = processedTradeIds[index].size;
       });
 
       return weeks;

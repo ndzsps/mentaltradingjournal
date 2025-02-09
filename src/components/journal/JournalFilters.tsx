@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Plus, PlusCircle } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { TradeFormDialog } from "@/components/analytics/trade-form/TradeFormDialog";
@@ -71,13 +71,6 @@ export const JournalFilters = () => {
         onClick={() => navigate('/journal-entry')}
       >
         Post-Session
-      </Button>
-      <Button 
-        variant="outline"
-        onClick={() => console.log("Add Weekly Review clicked")}
-        className="gap-1"
-      >
-        <PlusCircle className="h-4 w-4" /> Add Weekly Review
       </Button>
 
       <TradeFormDialog

@@ -1,9 +1,10 @@
+
 import { DayProps } from "react-day-picker";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { calculateDayStats, formatCurrency, getEmotionStyle } from "./calendarUtils";
 import { Trade } from "@/types/trade";
 
-interface CalendarDayProps extends DayProps {
+interface CalendarDayProps extends Omit<DayProps, 'displayMonth'> {
   entries: Array<{
     date: Date;
     emotion: string;

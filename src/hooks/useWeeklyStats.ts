@@ -1,9 +1,10 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Trade } from "@/types/trade";
 import { JournalEntryType } from "@/types/journal";
-import { getWeek } from "date-fns";
+import { getWeek, startOfMonth, endOfMonth, isWithinInterval } from "date-fns";
 
 interface WeekSummary {
   weekNumber: number;
@@ -15,20 +16,19 @@ interface WeekSummary {
 export const useWeeklyStats = () => {
   const { user } = useAuth();
   const currentDate = new Date();
-  const monthStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+  const monthStart = startOfMonth(currentDate);
+  const monthEnd = endOfMonth(currentDate);
   const firstWeekOfMonth = getWeek(monthStart);
 
   return useQuery({
-    queryKey: ['weekly-performance'],
+    queryKey: ['weekly-performance', currentDate.getMonth(), currentDate.getFullYear()],
     queryFn: async () => {
       if (!user) return [];
 
       const { data: entries, error } = await supabase
         .from('journal_entries')
         .select('*')
-        .eq('user_id', user.id)
-        .gte('created_at', monthStart.toISOString())
-        .lte('created_at', currentDate.toISOString());
+        .eq('user_id', user.id);
 
       if (error) throw error;
 
@@ -42,17 +42,26 @@ export const useWeeklyStats = () => {
       // Track processed trade IDs for each week
       const processedTradeIds: Set<string>[] = Array.from({ length: 5 }, () => new Set());
 
+      // Filter and process entries
       (entries as JournalEntryType[])?.forEach(entry => {
-        const entryDate = new Date(entry.created_at);
-        const entryWeek = getWeek(entryDate);
-        const weekNumber = entryWeek - firstWeekOfMonth + 1;
+        const trades = (entry.trades || []) as Trade[];
+        
+        trades.forEach(trade => {
+          if (!trade.entryDate) return;
+          
+          const tradeDate = new Date(trade.entryDate);
+          
+          // Check if the trade falls within the current month
+          if (!isWithinInterval(tradeDate, { start: monthStart, end: monthEnd })) {
+            return;
+          }
+          
+          const tradeWeek = getWeek(tradeDate);
+          const weekNumber = tradeWeek - firstWeekOfMonth + 1;
 
-        if (weekNumber >= 1 && weekNumber <= 5) {
-          const weekIndex = weekNumber - 1;
-          const trades = (entry.trades || []) as Trade[];
-          let hasTrades = false;
-
-          trades.forEach(trade => {
+          if (weekNumber >= 1 && weekNumber <= 5) {
+            const weekIndex = weekNumber - 1;
+            
             // Only process each trade once per week using its ID
             if (trade.id && !processedTradeIds[weekIndex].has(trade.id)) {
               processedTradeIds[weekIndex].add(trade.id);
@@ -61,15 +70,11 @@ export const useWeeklyStats = () => {
               
               if (!isNaN(numericPnL)) {
                 weeks[weekIndex].totalPnL += numericPnL;
-                hasTrades = true;
+                weeks[weekIndex].tradingDays += 1;
               }
             }
-          });
-
-          if (hasTrades) {
-            weeks[weekIndex].tradingDays += 1;
           }
-        }
+        });
       });
 
       // After processing all entries, set the trade count based on unique trade IDs

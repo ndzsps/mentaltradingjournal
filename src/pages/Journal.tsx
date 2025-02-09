@@ -13,7 +13,7 @@ import { useJournalFilters } from "@/hooks/useJournalFilters";
 import { JournalEntryType } from "@/types/journal";
 import { StatsHeader } from "@/components/journal/stats/StatsHeader";
 import { TimeFilterProvider } from "@/contexts/TimeFilterContext";
-import { startOfDay, endOfDay, parseISO, format } from "date-fns";
+import { startOfDay, parseISO, format, isSameDay } from "date-fns";
 import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";
 
 const Journal = () => {
@@ -73,46 +73,34 @@ const Journal = () => {
   // Filter entries based on selected date
   const displayedEntries = selectedDate
     ? filteredEntries.filter(entry => {
-        const start = startOfDay(selectedDate);
-        const end = endOfDay(selectedDate);
-        
-        // For entries with trades, check if any trade's entry date falls within the selected date
+        // For entries with trades
         if (entry.trades && entry.trades.length > 0) {
-          const hasMatchingTrade = entry.trades.some(trade => {
+          return entry.trades.some(trade => {
             if (!trade.entryDate) return false;
             
-            const tradeDate = new Date(trade.entryDate);
-            const tradeStart = startOfDay(tradeDate);
+            const tradeDate = parseISO(trade.entryDate);
             
             // Debug logging
             console.log('Trade date comparison:', {
-              tradeDate: format(tradeDate, 'yyyy-MM-dd HH:mm:ss'),
-              selectedDate: format(selectedDate, 'yyyy-MM-dd HH:mm:ss'),
-              start: format(start, 'yyyy-MM-dd HH:mm:ss'),
-              end: format(end, 'yyyy-MM-dd HH:mm:ss'),
-              isWithinRange: tradeStart.getTime() === start.getTime()
+              tradeDate: format(tradeDate, 'yyyy-MM-dd'),
+              selectedDate: format(selectedDate, 'yyyy-MM-dd'),
+              isSameDay: isSameDay(tradeDate, selectedDate)
             });
 
-            // Compare only the dates (ignoring time)
-            return tradeStart.getTime() === start.getTime();
+            return isSameDay(tradeDate, selectedDate);
           });
-
-          if (hasMatchingTrade) {
-            return true;
-          }
         }
         
-        // For non-trade entries, check if the entry was created on the selected date
+        // For non-trade entries
         const entryDate = parseISO(entry.created_at);
-        const entryStart = startOfDay(entryDate);
-        return entryStart.getTime() === start.getTime();
+        return isSameDay(entryDate, selectedDate);
       })
     : filteredEntries;
 
   const calendarEntries = entries.flatMap(entry => {
     if (entry.trades && entry.trades.length > 0) {
       return entry.trades.map(trade => ({
-        date: new Date(trade.entryDate || entry.created_at),
+        date: parseISO(trade.entryDate || entry.created_at),
         emotion: entry.emotion,
         trades: entry.trades
       }));
@@ -185,4 +173,3 @@ const Journal = () => {
 };
 
 export default Journal;
-

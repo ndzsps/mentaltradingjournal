@@ -75,59 +75,57 @@ export const useWeeklyStats = (selectedDate: Date) => {
 
         if (error) throw error;
 
-        const tradingDaysByWeek = new Map<number, Set<string>>();
+        // Process entries by date first to avoid double counting
+        const dailyStats = new Map<string, { pnl: number, tradeCount: number }>();
         
-        // Process each entry sequentially
-        for (const entry of entries || []) {
-          const entryDate = parseISO(entry.created_at);
+        // Calculate daily totals first
+        (entries || []).forEach(entry => {
+          const entryDate = format(parseISO(entry.created_at), 'yyyy-MM-dd');
           
           // Skip weekends
-          if (isWeekend(entryDate)) {
-            continue;
+          if (isWeekend(parseISO(entry.created_at))) {
+            return;
           }
 
-          // Get week number
-          const { data: weekNumber, error: weekError } = await supabase
-            .rpc('get_week_number_in_month', {
-              check_date: format(entryDate, 'yyyy-MM-dd')
-            });
-
-          if (weekError || weekNumber === null) {
-            console.error('Error getting week number:', weekError);
-            continue;
+          if (!dailyStats.has(entryDate)) {
+            dailyStats.set(entryDate, { pnl: 0, tradeCount: 0 });
           }
 
-          // Initialize tracking for this week if needed
-          if (!tradingDaysByWeek.has(weekNumber)) {
-            tradingDaysByWeek.set(weekNumber, new Set());
-          }
+          const dailyStat = dailyStats.get(entryDate)!;
 
-          // Add trading day
-          tradingDaysByWeek.get(weekNumber)?.add(format(entryDate, 'yyyy-MM-dd'));
-
-          // Calculate total P&L from trades array
+          // Process trades array
           if (entry.trades && Array.isArray(entry.trades)) {
-            const dayTotalPnL = entry.trades.reduce((total, trade) => {
-              const pnlValue = (trade as any).pnl || (trade as any).profit_loss || 0;
+            entry.trades.forEach(trade => {
+              // Handle different PnL field formats
+              const pnlValue = trade.pnl || trade.profit_loss || 0;
               const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
-              return !isNaN(numericPnL) ? total + numericPnL : total;
-            }, 0);
-
-            const weekIndex = allWeeks.findIndex(w => w.weekNumber === weekNumber);
-            if (weekIndex !== -1) {
-              allWeeks[weekIndex].totalPnL += dayTotalPnL;
-              allWeeks[weekIndex].tradeCount += entry.trades.length;
-            }
-          }
-        }
-
-        // Update trading days count
-        tradingDaysByWeek.forEach((tradingDays, weekNumber) => {
-          const weekIndex = allWeeks.findIndex(w => w.weekNumber === weekNumber);
-          if (weekIndex !== -1) {
-            allWeeks[weekIndex].tradingDays = tradingDays.size;
+              if (!isNaN(numericPnL)) {
+                dailyStat.pnl += numericPnL;
+                dailyStat.tradeCount += 1;
+              }
+            });
           }
         });
+
+        // Now process daily stats into weekly stats
+        for (const [dateStr, stats] of dailyStats.entries()) {
+          const date = parseISO(dateStr);
+          
+          // Get week number for this date
+          const { data: weekNumber } = await supabase
+            .rpc('get_week_number_in_month', {
+              check_date: dateStr
+            });
+
+          if (weekNumber === null) continue;
+
+          const weekIndex = allWeeks.findIndex(w => w.weekNumber === weekNumber);
+          if (weekIndex !== -1) {
+            allWeeks[weekIndex].totalPnL += stats.pnl;
+            allWeeks[weekIndex].tradeCount += stats.tradeCount;
+            allWeeks[weekIndex].tradingDays += 1;
+          }
+        }
 
         // Store the calculated stats
         for (const week of allWeeks) {

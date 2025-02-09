@@ -4,7 +4,6 @@ import { Card } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { JournalCalendar } from "@/components/journal/JournalCalendar";
-import { WeeklyPerformance } from "@/components/journal/WeeklyPerformance";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { JournalEntry } from "@/components/journal/JournalEntry";
@@ -103,17 +102,12 @@ const Journal = () => {
           <div className="max-w-7xl mx-auto space-y-8 px-4">
             <StatsHeader />
 
-            <div className="flex gap-6">
-              <div className="flex-1">
-                <JournalCalendar 
-                  date={selectedDate}
-                  onDateSelect={setSelectedDate}
-                  entries={calendarEntries}
-                />
-              </div>
-              <div className="w-64">
-                <WeeklyPerformance />
-              </div>
+            <div>
+              <JournalCalendar 
+                date={selectedDate}
+                onDateSelect={setSelectedDate}
+                entries={calendarEntries}
+              />
             </div>
 
             <Card id="journal-entries" className="p-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">

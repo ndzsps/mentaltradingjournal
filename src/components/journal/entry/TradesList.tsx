@@ -1,3 +1,4 @@
+
 import { Trade } from "@/types/trade";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
@@ -116,7 +117,7 @@ export const TradesList = ({ trades }: TradesListProps) => {
                   <span className={`font-medium ${
                     Number(trade.pnl) >= 0 ? 'text-green-500' : 'text-red-500'
                   }`}>
-                    {Number(trade.pnl) >= 0 ? '+$' : '-$'}{Math.abs(Number(trade.pnl)).toLocaleString()}
+                    {trade.direction?.toUpperCase()} ${Math.abs(Number(trade.pnl)).toLocaleString()}
                   </span>
                 </div>
               </div>

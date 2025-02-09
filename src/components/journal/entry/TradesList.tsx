@@ -1,4 +1,3 @@
-
 import { Trade } from "@/types/trade";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useState } from "react";
@@ -103,28 +102,14 @@ export const TradesList = ({ trades }: TradesListProps) => {
     const loadingToast = toast.loading('Updating trade...');
     
     try {
-      console.log('Starting trade update for trade:', updatedTrade);
-
-      const { data: entries, error: fetchError } = await supabase
+      const { data: entries } = await supabase
         .from('journal_entries')
         .select('*')
         .eq('user_id', user.id);
 
-      if (fetchError) {
-        console.error('Error fetching entries:', fetchError);
-        throw new Error(`Failed to fetch entries: ${fetchError.message}`);
-      }
-
       const entryWithTrade = entries?.find(entry => 
         entry.trades?.some((trade: Trade) => trade.id === updatedTrade.id)
       );
-
-      if (!entryWithTrade) {
-        console.error('No entry found containing the trade:', updatedTrade.id);
-        throw new Error('Could not find the journal entry containing this trade');
-      }
-
-      console.log('Found entry with trade:', entryWithTrade);
 
       const updatedTradeObject = {
         id: updatedTrade.id,
@@ -145,21 +130,14 @@ export const TradesList = ({ trades }: TradesListProps) => {
         htfBias: updatedTrade.htfBias
       };
 
-      const updatedTrades = entryWithTrade.trades.map((trade: Trade) => 
+      const updatedTrades = entryWithTrade?.trades.map((trade: Trade) => 
         trade.id === updatedTrade.id ? updatedTradeObject : trade
       );
 
-      console.log('Updating entry with trades:', updatedTrades);
-
-      const { error: updateError } = await supabase
+      await supabase
         .from('journal_entries')
         .update({ trades: updatedTrades })
-        .eq('id', entryWithTrade.id);
-
-      if (updateError) {
-        console.error('Error updating entry:', updateError);
-        throw new Error(`Failed to update entry: ${updateError.message}`);
-      }
+        .eq('id', entryWithTrade?.id);
 
       toast.dismiss(loadingToast);
       toast.success('Trade updated successfully!', {
@@ -171,10 +149,6 @@ export const TradesList = ({ trades }: TradesListProps) => {
       setTimeout(() => {
         window.location.reload();
       }, 1000);
-    } catch (error) {
-      console.error('Error updating trade:', error);
-      toast.dismiss(loadingToast);
-      toast.error(error instanceof Error ? error.message : 'Failed to update trade');
     } finally {
       setIsUpdating(false);
     }

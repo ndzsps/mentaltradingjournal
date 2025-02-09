@@ -13,7 +13,7 @@ import { useJournalFilters } from "@/hooks/useJournalFilters";
 import { JournalEntryType } from "@/types/journal";
 import { StatsHeader } from "@/components/journal/stats/StatsHeader";
 import { TimeFilterProvider } from "@/contexts/TimeFilterContext";
-import { startOfDay, parseISO, format, isSameDay } from "date-fns";
+import { startOfDay, parseISO, isSameDay } from "date-fns";
 import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";
 
 const Journal = () => {
@@ -70,51 +70,25 @@ const Journal = () => {
     };
   }, [user]);
 
-  // Create a map of entries by date
-  const entriesByDate = new Map<string, JournalEntryType[]>();
-  
-  // First, handle regular journal entries
-  filteredEntries.forEach(entry => {
-    if (selectedDate && isSameDay(parseISO(entry.created_at), selectedDate)) {
-      const dateKey = format(parseISO(entry.created_at), 'yyyy-MM-dd');
-      if (!entriesByDate.has(dateKey)) {
-        entriesByDate.set(dateKey, []);
-      }
-      // Only add the entry if it has no trades or if its trades are from a different date
-      const entryWithoutMatchingTrades = {
-        ...entry,
-        trades: entry.trades?.filter(trade => 
-          !trade.entryDate || !isSameDay(parseISO(trade.entryDate), selectedDate)
-        ) || []
-      };
-      if (!entry.trades || entryWithoutMatchingTrades.trades.length > 0) {
-        entriesByDate.get(dateKey)?.push(entryWithoutMatchingTrades);
-      }
-    }
-  });
+  // Filter entries to show only trades for the selected date
+  const displayedEntries = filteredEntries
+    .filter(entry => entry.trades && entry.trades.length > 0)
+    .map(entry => {
+      // Filter trades for the selected date
+      const matchingTrades = entry.trades?.filter(trade => 
+        trade.entryDate && selectedDate && isSameDay(parseISO(trade.entryDate), selectedDate)
+      );
 
-  // Then, handle trades separately
-  filteredEntries.forEach(entry => {
-    if (entry.trades) {
-      entry.trades.forEach(trade => {
-        if (trade.entryDate && selectedDate && isSameDay(parseISO(trade.entryDate), selectedDate)) {
-          const dateKey = format(parseISO(trade.entryDate), 'yyyy-MM-dd');
-          if (!entriesByDate.has(dateKey)) {
-            entriesByDate.set(dateKey, []);
-          }
-          // Create a new entry just for this trade
-          entriesByDate.get(dateKey)?.push({
-            ...entry,
-            trades: [trade]
-          });
-        }
-      });
-    }
-  });
-
-  // Convert the map to an array and sort by date
-  const displayedEntries = Array.from(entriesByDate.values())
-    .flat()
+      // Only include entries that have trades on the selected date
+      if (matchingTrades && matchingTrades.length > 0) {
+        return {
+          ...entry,
+          trades: matchingTrades
+        };
+      }
+      return null;
+    })
+    .filter((entry): entry is JournalEntryType => entry !== null)
     .sort((a, b) => {
       const dateA = a.trades?.[0]?.entryDate || a.created_at;
       const dateB = b.trades?.[0]?.entryDate || b.created_at;

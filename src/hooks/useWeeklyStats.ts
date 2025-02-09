@@ -7,13 +7,10 @@ import {
   startOfMonth, 
   endOfMonth,
   isWithinInterval,
-  startOfWeek,
-  endOfWeek,
-  eachWeekOfInterval,
-  isSameWeek,
-  getYear,
-  getMonth,
-  format
+  format,
+  getDay,
+  parseISO,
+  isWeekend
 } from "date-fns";
 
 interface WeekSummary {
@@ -27,8 +24,8 @@ export const useWeeklyStats = (selectedDate: Date) => {
   const { user } = useAuth();
   const monthStart = startOfMonth(selectedDate);
   const monthEnd = endOfMonth(selectedDate);
-  const year = getYear(selectedDate);
-  const month = getMonth(selectedDate) + 1; // getMonth is 0-based
+  const year = selectedDate.getFullYear();
+  const month = selectedDate.getMonth() + 1; // getMonth is 0-based
 
   return useQuery({
     queryKey: ['weekly-performance', month, year],
@@ -51,7 +48,6 @@ export const useWeeklyStats = (selectedDate: Date) => {
 
       // If we have stats for this month, return them
       if (weekStats && weekStats.length > 0) {
-        console.log('Found existing week stats:', weekStats);
         return weekStats.map(stat => ({
           weekNumber: stat.week_number,
           totalPnL: Number(stat.total_pnl),
@@ -68,75 +64,94 @@ export const useWeeklyStats = (selectedDate: Date) => {
 
       if (error) throw error;
 
-      // Get all weeks in the month
-      const weeksInMonth = eachWeekOfInterval(
-        { start: monthStart, end: monthEnd },
-        { weekStartsOn: 1 } // Week starts on Monday
-      );
-
-      // Initialize weeks array based on actual weeks in the month
-      const weeks: WeekSummary[] = weeksInMonth.map((_, index) => ({
-        weekNumber: index + 1,
-        totalPnL: 0,
-        tradingDays: 0,
-        tradeCount: 0,
-      }));
+      // Initialize weeks map to store data by week number
+      const weekData = new Map<number, WeekSummary>();
 
       // Track unique dates for trading days count
-      const tradingDays: Set<string>[] = weeksInMonth.map(() => new Set());
+      const tradingDaysByWeek = new Map<number, Set<string>>();
 
       // For debugging: store trades by week
-      const tradesByWeek: { date: string; pnl: number; }[][] = weeksInMonth.map(() => []);
+      const tradesByWeek = new Map<number, { date: string; pnl: number; }[]>();
+
+      // Get week number for each trade date using the Supabase function
+      const processTrade = async (tradeDate: Date) => {
+        const { data: weekNumberResult } = await supabase
+          .rpc('get_week_number_in_month', {
+            check_date: format(tradeDate, 'yyyy-MM-dd')
+          });
+        
+        return weekNumberResult;
+      };
 
       // Filter and process entries
-      (entries as JournalEntryType[])?.forEach(entry => {
-        if (!entry.trades || !Array.isArray(entry.trades)) return;
+      for (const entry of (entries as JournalEntryType[] || [])) {
+        if (!entry.trades || !Array.isArray(entry.trades)) continue;
         
-        entry.trades.forEach(trade => {
-          if (!trade.entryDate) return;
+        for (const trade of entry.trades) {
+          if (!trade.entryDate) continue;
           
-          const tradeDate = new Date(trade.entryDate);
+          const tradeDate = parseISO(trade.entryDate);
           
-          // Check if trade falls within the selected month
-          if (!isWithinInterval(tradeDate, { start: monthStart, end: monthEnd })) {
-            return;
+          // Skip if not in current month or is weekend
+          if (!isWithinInterval(tradeDate, { start: monthStart, end: monthEnd }) || isWeekend(tradeDate)) {
+            continue;
           }
 
-          // Find which week of the month this trade belongs to
-          const weekIndex = weeksInMonth.findIndex(weekStart => 
-            isSameWeek(tradeDate, weekStart, { weekStartsOn: 1 })
-          );
+          // Get week number from Supabase function
+          const weekNumber = await processTrade(tradeDate);
+          
+          if (weekNumber === null) continue; // Skip trades before first Monday
 
-          if (weekIndex !== -1) {
-            // Add trading day
-            tradingDays[weekIndex].add(tradeDate.toISOString().split('T')[0]);
-            
-            const pnlValue = trade.pnl || trade.profit_loss || 0;
-            const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
-            
-            if (!isNaN(numericPnL)) {
-              weeks[weekIndex].totalPnL += numericPnL;
-              weeks[weekIndex].tradeCount++;
-
-              // Store trade details for debugging
-              tradesByWeek[weekIndex].push({
-                date: format(tradeDate, 'yyyy-MM-dd'),
-                pnl: numericPnL
-              });
-            }
+          // Initialize week data if not exists
+          if (!weekData.has(weekNumber)) {
+            weekData.set(weekNumber, {
+              weekNumber,
+              totalPnL: 0,
+              tradingDays: 0,
+              tradeCount: 0
+            });
+            tradingDaysByWeek.set(weekNumber, new Set());
+            tradesByWeek.set(weekNumber, []);
           }
-        });
-      });
 
-      // Set trading days count for each week
-      weeks.forEach((week, index) => {
-        week.tradingDays = tradingDays[index].size;
-      });
+          // Add trading day
+          tradingDaysByWeek.get(weekNumber)?.add(format(tradeDate, 'yyyy-MM-dd'));
+          
+          const pnlValue = trade.pnl || trade.profit_loss || 0;
+          const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
+          
+          if (!isNaN(numericPnL)) {
+            const weekStats = weekData.get(weekNumber)!;
+            weekStats.totalPnL += numericPnL;
+            weekStats.tradeCount++;
 
-      // Log detailed breakdown for week 2
-      console.log('Week 2 Trade Breakdown:', 
-        tradesByWeek[1]?.sort((a, b) => a.date.localeCompare(b.date))
-      );
+            // Store trade details for debugging
+            tradesByWeek.get(weekNumber)?.push({
+              date: format(tradeDate, 'yyyy-MM-dd'),
+              pnl: numericPnL
+            });
+          }
+        }
+      }
+
+      // Update trading days count
+      for (const [weekNumber, tradingDays] of tradingDaysByWeek.entries()) {
+        const weekStats = weekData.get(weekNumber);
+        if (weekStats) {
+          weekStats.tradingDays = tradingDays.size;
+        }
+      }
+
+      // Convert map to array and sort by week number
+      const weeks = Array.from(weekData.values()).sort((a, b) => a.weekNumber - b.weekNumber);
+
+      // Log detailed breakdown for debugging
+      weeks.forEach(week => {
+        const trades = tradesByWeek.get(week.weekNumber) || [];
+        console.log(`Week ${week.weekNumber} Trade Breakdown:`, 
+          trades.sort((a, b) => a.date.localeCompare(b.date))
+        );
+      });
 
       // Store the calculated stats in the week_stats table
       const promises = weeks.map(week => 

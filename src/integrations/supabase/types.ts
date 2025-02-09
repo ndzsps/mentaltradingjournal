@@ -508,12 +508,25 @@ export type Database = {
         }
         Returns: number
       }
+      get_first_monday_of_month: {
+        Args: {
+          year: number
+          month: number
+        }
+        Returns: string
+      }
       get_trade_duration: {
         Args: {
           entry_date: string
           exit_date: string
         }
         Returns: unknown
+      }
+      get_week_number_in_month: {
+        Args: {
+          check_date: string
+        }
+        Returns: number
       }
     }
     Enums: {

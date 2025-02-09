@@ -43,22 +43,13 @@ export const useWeeklyStats = (selectedDate: Date) => {
 
       const firstMonday = new Date(firstMondayResult);
       
-      // Calculate how many weeks are in the month
-      let currentWeekStart = firstMonday;
-      const weeks = new Set<number>();
-      
-      while (isBefore(currentWeekStart, monthEnd)) {
-        const { data: weekNumber } = await supabase
-          .rpc('get_week_number_in_month', {
-            check_date: format(currentWeekStart, 'yyyy-MM-dd')
-          });
-        
-        if (weekNumber !== null) {
-          weeks.add(weekNumber);
-        }
-        
-        currentWeekStart = addWeeks(currentWeekStart, 1);
-      }
+      // Always initialize 5 weeks
+      const allWeeks: WeekSummary[] = Array.from({ length: 5 }, (_, i) => ({
+        weekNumber: i + 1,
+        totalPnL: 0,
+        tradingDays: 0,
+        tradeCount: 0
+      }));
 
       // Get existing stats from week_stats table
       const { data: weekStats, error: weekStatsError } = await supabase
@@ -73,14 +64,6 @@ export const useWeeklyStats = (selectedDate: Date) => {
         console.error('Error fetching week stats:', weekStatsError);
         throw weekStatsError;
       }
-
-      // Initialize empty weeks with 0 values
-      const allWeeks = Array.from(weeks).map(weekNumber => ({
-        weekNumber,
-        totalPnL: 0,
-        tradingDays: 0,
-        tradeCount: 0
-      }));
 
       // If we have stats, update the corresponding weeks
       if (weekStats && weekStats.length > 0) {

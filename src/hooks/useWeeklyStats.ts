@@ -9,12 +9,18 @@ import {
   parseISO,
   isWeekend
 } from "date-fns";
+import { Trade } from "@/types/trade";
 
 interface WeekSummary {
   weekNumber: number;
   totalPnL: number;
   tradingDays: number;
   tradeCount: number;
+}
+
+interface JournalEntry {
+  created_at: string;
+  trades?: Trade[];
 }
 
 export const useWeeklyStats = (selectedDate: Date) => {
@@ -79,7 +85,7 @@ export const useWeeklyStats = (selectedDate: Date) => {
         const dailyStats = new Map<string, { pnl: number, tradeCount: number }>();
         
         // Calculate daily totals first
-        (entries || []).forEach(entry => {
+        (entries || []).forEach((entry: JournalEntry) => {
           const entryDate = format(parseISO(entry.created_at), 'yyyy-MM-dd');
           
           // Skip weekends
@@ -95,7 +101,7 @@ export const useWeeklyStats = (selectedDate: Date) => {
 
           // Process trades array
           if (entry.trades && Array.isArray(entry.trades)) {
-            entry.trades.forEach(trade => {
+            entry.trades.forEach((trade: Trade) => {
               // Handle different PnL field formats
               const pnlValue = trade.pnl || trade.profit_loss || 0;
               const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;

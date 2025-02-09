@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -97,7 +98,15 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
 
       await onSubmit(tradeData as Trade, !!editTrade);
       onOpenChange(false);
-      toast.success(editTrade ? "Trade updated successfully!" : "Trade saved successfully!");
+      
+      if (!editTrade) {
+        toast.success("Trade Successfully Added!", {
+          description: "Every trade is a lesson. Win or lose, you're growing stronger.",
+          duration: 5000,
+        });
+      } else {
+        toast.success("Trade updated successfully!");
+      }
     } catch (error: any) {
       console.error(editTrade ? "Error updating trade:" : "Error saving trade:", error);
       toast.error(editTrade ? "Failed to update trade" : "Failed to save trade");

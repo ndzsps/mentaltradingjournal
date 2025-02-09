@@ -6,7 +6,6 @@ import { JournalEntryType } from "@/types/journal";
 import { 
   startOfMonth, 
   endOfMonth,
-  isWithinInterval,
   format,
   parseISO,
   isWeekend
@@ -49,22 +48,14 @@ export const useWeeklyStats = (selectedDate: Date) => {
         .order('week_number', { ascending: true });
 
       if (weekStatsError) {
-        console.error('Error fetching week stats:', weekStatsError);
         throw weekStatsError;
       }
 
-      console.log('Fetched week stats:', weekStats);
-
-      // If we have stats, update the corresponding weeks
+      // If we have stats, use them
       if (weekStats && weekStats.length > 0) {
         weekStats.forEach(stat => {
           const weekIndex = allWeeks.findIndex(w => w.weekNumber === stat.week_number);
           if (weekIndex !== -1) {
-            console.log(`Using existing stats for week ${stat.week_number}:`, {
-              totalPnL: stat.total_pnl,
-              tradingDays: stat.trading_days,
-              tradeCount: stat.trade_count
-            });
             allWeeks[weekIndex] = {
               weekNumber: stat.week_number,
               totalPnL: Number(stat.total_pnl),
@@ -85,71 +76,51 @@ export const useWeeklyStats = (selectedDate: Date) => {
 
         if (error) throw error;
 
-        console.log('Total entries fetched:', entries?.length);
-        console.log('Processing entries for month:', format(monthStart, 'MMMM yyyy'));
-        console.log('Date range:', format(monthStart, 'yyyy-MM-dd'), 'to', format(monthEnd, 'yyyy-MM-dd'));
-
-        // Track unique dates for trading days count
         const tradingDaysByWeek = new Map<number, Set<string>>();
         
-        // Process each entry
-        entries?.forEach(entry => {
+        // Process each entry sequentially
+        for (const entry of entries || []) {
           const entryDate = parseISO(entry.created_at);
-          console.log(`Processing entry from ${format(entryDate, 'yyyy-MM-dd')}:`, entry);
           
           // Skip weekends
           if (isWeekend(entryDate)) {
-            console.log(`Skipping weekend entry: ${format(entryDate, 'yyyy-MM-dd')}`);
-            return;
+            continue;
           }
 
           // Get week number
-          supabase
+          const { data: weekNumber, error: weekError } = await supabase
             .rpc('get_week_number_in_month', {
               check_date: format(entryDate, 'yyyy-MM-dd')
-            })
-            .then(({ data: weekNumber, error: weekError }) => {
-              if (weekError || weekNumber === null) {
-                console.error('Error getting week number:', weekError);
-                return;
-              }
-
-              console.log(`Entry from ${format(entryDate, 'yyyy-MM-dd')} belongs to week ${weekNumber}`);
-
-              // Initialize tracking for this week if needed
-              if (!tradingDaysByWeek.has(weekNumber)) {
-                tradingDaysByWeek.set(weekNumber, new Set());
-              }
-
-              // Add trading day
-              tradingDaysByWeek.get(weekNumber)?.add(format(entryDate, 'yyyy-MM-dd'));
-
-              // Calculate total P&L from trades array
-              if (entry.trades && Array.isArray(entry.trades)) {
-                const dayTotalPnL = entry.trades.reduce((total, trade) => {
-                  const pnlValue = (trade as any).pnl || (trade as any).profit_loss || 0;
-                  const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
-                  return !isNaN(numericPnL) ? total + numericPnL : total;
-                }, 0);
-
-                const weekIndex = allWeeks.findIndex(w => w.weekNumber === weekNumber);
-                if (weekIndex !== -1) {
-                  allWeeks[weekIndex].totalPnL += dayTotalPnL;
-                  allWeeks[weekIndex].tradeCount += entry.trades.length;
-
-                  console.log(`Added to week ${weekNumber}:`, {
-                    date: format(entryDate, 'yyyy-MM-dd'),
-                    dayTotalPnL,
-                    weekTotal: allWeeks[weekIndex].totalPnL,
-                    trades: entry.trades.length
-                  });
-                }
-              }
             });
-        });
 
-        // Wait a bit for all the async operations to complete
-        await new Promise(resolve => setTimeout(resolve, 1000));
+          if (weekError || weekNumber === null) {
+            console.error('Error getting week number:', weekError);
+            continue;
+          }
+
+          // Initialize tracking for this week if needed
+          if (!tradingDaysByWeek.has(weekNumber)) {
+            tradingDaysByWeek.set(weekNumber, new Set());
+          }
+
+          // Add trading day
+          tradingDaysByWeek.get(weekNumber)?.add(format(entryDate, 'yyyy-MM-dd'));
+
+          // Calculate total P&L from trades array
+          if (entry.trades && Array.isArray(entry.trades)) {
+            const dayTotalPnL = entry.trades.reduce((total, trade) => {
+              const pnlValue = (trade as any).pnl || (trade as any).profit_loss || 0;
+              const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
+              return !isNaN(numericPnL) ? total + numericPnL : total;
+            }, 0);
+
+            const weekIndex = allWeeks.findIndex(w => w.weekNumber === weekNumber);
+            if (weekIndex !== -1) {
+              allWeeks[weekIndex].totalPnL += dayTotalPnL;
+              allWeeks[weekIndex].tradeCount += entry.trades.length;
+            }
+          }
+        }
 
         // Update trading days count
         tradingDaysByWeek.forEach((tradingDays, weekNumber) => {
@@ -158,9 +129,6 @@ export const useWeeklyStats = (selectedDate: Date) => {
             allWeeks[weekIndex].tradingDays = tradingDays.size;
           }
         });
-
-        // Log final stats
-        console.log('Final weekly stats:', allWeeks);
 
         // Store the calculated stats
         for (const week of allWeeks) {

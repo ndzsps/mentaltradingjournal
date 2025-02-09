@@ -55,33 +55,50 @@ export const TradesList = ({ trades }: TradesListProps) => {
     if (!selectedTrade) return;
 
     try {
+      console.log('Deleting trade:', selectedTrade);
+      
       const entryDate = new Date(selectedTrade.entryDate || new Date());
       const startOfDay = new Date(entryDate.setHours(0, 0, 0, 0));
       const endOfDay = new Date(entryDate.setHours(23, 59, 59, 999));
 
+      console.log('Fetching entries between:', startOfDay, 'and', endOfDay);
+
       const { data: entries, error: fetchError } = await supabase
         .from('journal_entries')
-        .select()
+        .select('*')
         .gte('created_at', startOfDay.toISOString())
         .lte('created_at', endOfDay.toISOString());
 
-      if (fetchError) throw fetchError;
+      if (fetchError) {
+        console.error('Error fetching entries:', fetchError);
+        throw fetchError;
+      }
+
+      console.log('Found entries:', entries);
+
       if (!entries || entries.length === 0) {
         throw new Error('Journal entry not found');
       }
 
       const entry = entries[0];
+      console.log('Current entry trades:', entry.trades);
+      
       const updatedTrades = entry.trades.filter((trade: Trade) => trade.id !== selectedTrade.id);
+      console.log('Updated trades after filter:', updatedTrades);
 
       const { error: updateError } = await supabase
         .from('journal_entries')
         .update({ trades: updatedTrades })
         .eq('id', entry.id);
 
-      if (updateError) throw updateError;
+      if (updateError) {
+        console.error('Error updating entry:', updateError);
+        throw updateError;
+      }
 
       toast.success('Trade deleted successfully');
       setIsDeleteDialogOpen(false);
+      // Force a page reload to update the UI
       window.location.reload();
     } catch (error) {
       console.error('Error deleting trade:', error);
@@ -128,7 +145,7 @@ export const TradesList = ({ trades }: TradesListProps) => {
         htfBias: updatedTrade.htfBias
       };
 
-      const updatedTrades = currentTrades.map((trade: any) => 
+      const updatedTrades = currentTrades.map((trade: Trade) => 
         trade.id === updatedTrade.id ? updatedTradeObject : trade
       );
 

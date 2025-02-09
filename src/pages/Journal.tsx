@@ -13,7 +13,7 @@ import { useJournalFilters } from "@/hooks/useJournalFilters";
 import { JournalEntryType } from "@/types/journal";
 import { StatsHeader } from "@/components/journal/stats/StatsHeader";
 import { TimeFilterProvider } from "@/contexts/TimeFilterContext";
-import { startOfDay, endOfDay, parseISO, isWithinInterval } from "date-fns";
+import { startOfDay, endOfDay, parseISO } from "date-fns";
 import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";
 
 const Journal = () => {
@@ -80,8 +80,13 @@ const Journal = () => {
         // For entries with trades, check if any trade's entry date falls within the selected date
         if (entry.trades && entry.trades.length > 0) {
           const hasTrade = entry.trades.some(trade => {
-            const tradeDate = trade.entryDate ? parseISO(trade.entryDate) : parseISO(entry.created_at);
-            const isWithin = isWithinInterval(tradeDate, { start, end });
+            // Convert the trade date to the user's local timezone for comparison
+            const tradeDate = trade.entryDate 
+              ? new Date(trade.entryDate)
+              : new Date(entry.created_at);
+            
+            // Use local timezone comparison
+            const isWithin = tradeDate >= start && tradeDate <= end;
             console.log('Trade date:', tradeDate, 'Is within interval:', isWithin);
             return isWithin;
           });
@@ -89,9 +94,9 @@ const Journal = () => {
           return hasTrade;
         }
         
-        // For non-trade entries, check the entry creation date
-        const entryDate = parseISO(entry.created_at);
-        const isWithin = isWithinInterval(entryDate, { start, end });
+        // For non-trade entries, check the entry creation date in local timezone
+        const entryDate = new Date(entry.created_at);
+        const isWithin = entryDate >= start && entryDate <= end;
         console.log('Entry date:', entryDate, 'Is within interval:', isWithin);
         return isWithin;
       })
@@ -99,8 +104,8 @@ const Journal = () => {
 
   const calendarEntries = entries.map(entry => ({
     date: entry.trades && entry.trades.length > 0 && entry.trades[0].entryDate
-      ? parseISO(entry.trades[0].entryDate)  // Use trade date for trade entries
-      : parseISO(entry.created_at),
+      ? new Date(entry.trades[0].entryDate)  // Convert to local timezone
+      : new Date(entry.created_at),
     emotion: entry.emotion,
     trades: entry.trades
   }));

@@ -1,3 +1,4 @@
+
 import { Calendar } from "@/components/ui/calendar";
 import { Card } from "@/components/ui/card";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -34,13 +35,27 @@ export const JournalCalendar = ({ date, onDateSelect, entries }: JournalCalendar
         },
         async (payload) => {
           console.log('Real-time update received:', payload);
-          // Immediately refetch data when changes occur
-          await Promise.all([
-            queryClient.invalidateQueries({ queryKey: ['journal-entries'] }),
-            queryClient.invalidateQueries({ queryKey: ['analytics'] }),
-            queryClient.invalidateQueries({ queryKey: ['weekly-performance'] })
-          ]);
-          await queryClient.refetchQueries({ queryKey: ['journal-entries'] });
+          // Immediately invalidate and refetch all relevant queries
+          const queries = ['journal-entries', 'analytics', 'weekly-performance'];
+          await Promise.all(
+            queries.map(query => 
+              queryClient.invalidateQueries({
+                queryKey: [query],
+                refetchType: 'active',
+                exact: true
+              })
+            )
+          );
+          // Force an immediate refetch
+          await Promise.all(
+            queries.map(query => 
+              queryClient.refetchQueries({
+                queryKey: [query],
+                type: 'active',
+                exact: true
+              })
+            )
+          );
         }
       )
       .subscribe();

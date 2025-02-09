@@ -1,3 +1,4 @@
+
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { useEffect, useState } from "react";
@@ -67,7 +68,7 @@ const Journal = () => {
     };
   }, [user]);
 
-  // Filter entries based on selected date, including trades
+  // Filter entries based on selected date, focusing on trade entry dates
   const displayedEntries = selectedDate
     ? filteredEntries.filter(entry => {
         const start = startOfDay(selectedDate);
@@ -76,8 +77,7 @@ const Journal = () => {
         // For entries with trades, check if any trade's entry date falls within the selected date
         if (entry.trades && entry.trades.length > 0) {
           return entry.trades.some(trade => {
-            if (!trade.entryDate) return false;
-            const tradeDate = parseISO(trade.entryDate);
+            const tradeDate = trade.entryDate ? parseISO(trade.entryDate) : parseISO(entry.created_at);
             return isWithinInterval(tradeDate, { start, end });
           });
         }

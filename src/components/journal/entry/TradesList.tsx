@@ -9,6 +9,7 @@ import { TradeActions } from "./trade-item/TradeActions";
 import { TradeDetails } from "./trade-item/TradeDetails";
 import { TradeHeader } from "./trade-item/TradeHeader";
 import { TradeDeleteDialog } from "./trade-item/TradeDeleteDialog";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface TradesListProps {
   trades: Trade[];
@@ -32,6 +33,7 @@ export const TradesList = ({ trades }: TradesListProps) => {
   const [selectedTrade, setSelectedTrade] = useState<Trade | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const { user } = useAuth();
 
   const handleEditClick = (trade: Trade) => {
     setSelectedTrade(trade);
@@ -44,14 +46,15 @@ export const TradesList = ({ trades }: TradesListProps) => {
   };
 
   const handleDeleteConfirm = async () => {
-    if (!selectedTrade) return;
+    if (!selectedTrade || !user) return;
 
     try {
       console.log('Deleting trade:', selectedTrade);
       
       const { data: entries, error: fetchError } = await supabase
         .from('journal_entries')
-        .select('*');
+        .select('*')
+        .eq('user_id', user.id);
 
       if (fetchError) {
         console.error('Error fetching entries:', fetchError);
@@ -91,11 +94,18 @@ export const TradesList = ({ trades }: TradesListProps) => {
   };
 
   const handleTradeUpdate = async (updatedTrade: Trade) => {
+    if (!user) {
+      toast.error('You must be logged in to update trades');
+      return;
+    }
+
     setIsUpdating(true);
+    
     try {
       const { data: entries, error: fetchError } = await supabase
         .from('journal_entries')
-        .select('*');
+        .select('*')
+        .eq('user_id', user.id);
 
       if (fetchError) throw fetchError;
 
@@ -106,8 +116,6 @@ export const TradesList = ({ trades }: TradesListProps) => {
       if (!entryWithTrade) {
         throw new Error('Journal entry not found');
       }
-
-      const currentTrades = entryWithTrade.trades || [];
 
       const updatedTradeObject = {
         id: updatedTrade.id,
@@ -128,7 +136,7 @@ export const TradesList = ({ trades }: TradesListProps) => {
         htfBias: updatedTrade.htfBias
       };
 
-      const updatedTrades = currentTrades.map((trade: Trade) => 
+      const updatedTrades = entryWithTrade.trades.map((trade: Trade) => 
         trade.id === updatedTrade.id ? updatedTradeObject : trade
       );
 
@@ -141,12 +149,11 @@ export const TradesList = ({ trades }: TradesListProps) => {
 
       toast.success('Trade updated successfully', {
         description: 'Refreshing page to show latest changes...',
-        duration: 2000,
       });
       
       setIsEditDialogOpen(false);
       
-      // Add a small delay before refresh for better UX
+      // Add a delay before refresh for better UX
       setTimeout(() => {
         window.location.reload();
       }, 1000);

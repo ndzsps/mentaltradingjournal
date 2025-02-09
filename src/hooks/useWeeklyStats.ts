@@ -9,7 +9,8 @@ import {
   isWithinInterval,
   format,
   parseISO,
-  isWeekend
+  isWeekend,
+  eachDayOfInterval
 } from "date-fns";
 
 interface WeekSummary {
@@ -82,8 +83,16 @@ export const useWeeklyStats = (selectedDate: Date) => {
         // For debugging: store trades by week
         const tradesByWeek = new Map<number, { date: string; pnl: number; entryId: string }[]>();
 
+        // Log the date range we're analyzing
         console.log('Processing trades for month:', format(monthStart, 'MMMM yyyy'));
         console.log('Date range:', format(monthStart, 'yyyy-MM-dd'), 'to', format(monthEnd, 'yyyy-MM-dd'));
+        
+        // Log all days in Week 1 (1st-7th)
+        const week1Days = eachDayOfInterval({
+          start: monthStart,
+          end: new Date(year, month - 1, 7)
+        });
+        console.log('Week 1 dates being checked:', week1Days.map(d => format(d, 'yyyy-MM-dd')));
         
         // Process each trade
         for (const entry of (entries as JournalEntryType[] || [])) {

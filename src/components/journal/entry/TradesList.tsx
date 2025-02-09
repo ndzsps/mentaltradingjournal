@@ -37,7 +37,6 @@ export const TradesList = ({ trades }: TradesListProps) => {
 
   const handleTradeUpdate = async (updatedTrade: Trade) => {
     try {
-      // Get all journal entries for the day of the trade
       const entryDate = new Date(updatedTrade.entryDate || new Date());
       const startOfDay = new Date(entryDate.setHours(0, 0, 0, 0));
       const endOfDay = new Date(entryDate.setHours(23, 59, 59, 999));
@@ -56,7 +55,6 @@ export const TradesList = ({ trades }: TradesListProps) => {
       const entry = entries[0];
       const currentTrades = entry.trades || [];
 
-      // Create a plain object for the updated trade
       const updatedTradeObject = {
         id: updatedTrade.id,
         instrument: updatedTrade.instrument,
@@ -76,12 +74,10 @@ export const TradesList = ({ trades }: TradesListProps) => {
         htfBias: updatedTrade.htfBias
       };
 
-      // Update the trades array
       const updatedTrades = currentTrades.map((trade: any) => 
         trade.id === updatedTrade.id ? updatedTradeObject : trade
       );
 
-      // Update the journal entry
       const { error: updateError } = await supabase
         .from('journal_entries')
         .update({ trades: updatedTrades })
@@ -91,7 +87,7 @@ export const TradesList = ({ trades }: TradesListProps) => {
 
       toast.success('Trade updated successfully');
       setIsEditDialogOpen(false);
-      window.location.reload(); // Refresh to show updated data
+      window.location.reload();
     } catch (error) {
       console.error('Error updating trade:', error);
       toast.error('Failed to update trade');

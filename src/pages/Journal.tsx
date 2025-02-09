@@ -74,17 +74,26 @@ const Journal = () => {
         const start = startOfDay(selectedDate);
         const end = endOfDay(selectedDate);
         
+        console.log('Filtering entry:', entry);
+        console.log('Selected date range:', start, end);
+        
         // For entries with trades, check if any trade's entry date falls within the selected date
         if (entry.trades && entry.trades.length > 0) {
-          return entry.trades.some(trade => {
+          const hasTrade = entry.trades.some(trade => {
             const tradeDate = trade.entryDate ? parseISO(trade.entryDate) : parseISO(entry.created_at);
-            return isWithinInterval(tradeDate, { start, end });
+            const isWithin = isWithinInterval(tradeDate, { start, end });
+            console.log('Trade date:', tradeDate, 'Is within interval:', isWithin);
+            return isWithin;
           });
+          console.log('Entry has matching trade:', hasTrade);
+          return hasTrade;
         }
         
         // For non-trade entries, check the entry creation date
         const entryDate = parseISO(entry.created_at);
-        return isWithinInterval(entryDate, { start, end });
+        const isWithin = isWithinInterval(entryDate, { start, end });
+        console.log('Entry date:', entryDate, 'Is within interval:', isWithin);
+        return isWithin;
       })
     : filteredEntries;
 

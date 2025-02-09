@@ -13,28 +13,46 @@ export const WeeklyPerformance = () => {
   const currentDate = selectedDate || new Date();
   const { data: weeklyStats, isLoading } = useWeeklyStats(currentDate);
 
-  // Subscribe to real-time updates
+  // Subscribe to real-time updates for both journal entries and week_stats
   useEffect(() => {
-    const channel = supabase
-      .channel('journal_entries_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'journal_entries',
-        },
-        async () => {
-          // Immediately refetch the data when changes occur
-          await queryClient.invalidateQueries({ 
-            queryKey: ['weekly-performance', currentDate.getMonth(), currentDate.getFullYear()]
-          });
-        }
-      )
-      .subscribe();
+    const channels = [
+      supabase
+        .channel('journal_entries_changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'journal_entries',
+          },
+          async () => {
+            await queryClient.invalidateQueries({ 
+              queryKey: ['weekly-performance', currentDate.getMonth() + 1, currentDate.getFullYear()]
+            });
+          }
+        )
+        .subscribe(),
+
+      supabase
+        .channel('week_stats_changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'week_stats',
+          },
+          async () => {
+            await queryClient.invalidateQueries({ 
+              queryKey: ['weekly-performance', currentDate.getMonth() + 1, currentDate.getFullYear()]
+            });
+          }
+        )
+        .subscribe()
+    ];
 
     return () => {
-      supabase.removeChannel(channel);
+      channels.forEach(channel => supabase.removeChannel(channel));
     };
   }, [queryClient, currentDate]);
 

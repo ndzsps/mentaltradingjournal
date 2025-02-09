@@ -458,6 +458,45 @@ export type Database = {
         }
         Relationships: []
       }
+      week_stats: {
+        Row: {
+          created_at: string
+          id: string
+          month: number
+          total_pnl: number | null
+          trade_count: number | null
+          trading_days: number | null
+          updated_at: string
+          user_id: string
+          week_number: number
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          month: number
+          total_pnl?: number | null
+          trade_count?: number | null
+          trading_days?: number | null
+          updated_at?: string
+          user_id: string
+          week_number: number
+          year: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          month?: number
+          total_pnl?: number | null
+          trade_count?: number | null
+          trading_days?: number | null
+          updated_at?: string
+          user_id?: string
+          week_number?: number
+          year?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

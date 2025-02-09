@@ -5,12 +5,14 @@ import { useAuth } from "@/contexts/AuthContext";
 import { JournalEntryType } from "@/types/journal";
 import { 
   startOfMonth, 
-  endOfMonth, 
+  endOfMonth,
   isWithinInterval,
   startOfWeek,
   endOfWeek,
   eachWeekOfInterval,
-  isSameWeek
+  isSameWeek,
+  getYear,
+  getMonth
 } from "date-fns";
 
 interface WeekSummary {
@@ -24,11 +26,46 @@ export const useWeeklyStats = (selectedDate: Date) => {
   const { user } = useAuth();
   const monthStart = startOfMonth(selectedDate);
   const monthEnd = endOfMonth(selectedDate);
+  const year = getYear(selectedDate);
+  const month = getMonth(selectedDate) + 1; // getMonth is 0-based
 
   return useQuery({
-    queryKey: ['weekly-performance', selectedDate.getMonth(), selectedDate.getFullYear()],
+    queryKey: ['weekly-performance', month, year],
     queryFn: async () => {
       if (!user) return [];
+
+      // Get existing stats from week_stats table
+      const { data: weekStats, error: weekStatsError } = await supabase
+        .from('week_stats')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('year', year)
+        .eq('month', month)
+        .order('week_number', { ascending: true });
+
+      if (weekStatsError) {
+        console.error('Error fetching week stats:', weekStatsError);
+        throw weekStatsError;
+      }
+
+      // If we have stats for this month, return them
+      if (weekStats && weekStats.length > 0) {
+        console.log('Found existing week stats:', weekStats);
+        return weekStats.map(stat => ({
+          weekNumber: stat.week_number,
+          totalPnL: Number(stat.total_pnl),
+          tradingDays: stat.trading_days,
+          tradeCount: stat.trade_count
+        }));
+      }
+
+      // If no stats exist, calculate them from journal entries
+      const { data: entries, error } = await supabase
+        .from('journal_entries')
+        .select('*')
+        .eq('user_id', user.id);
+
+      if (error) throw error;
 
       // Get all weeks in the month
       const weeksInMonth = eachWeekOfInterval(
@@ -46,18 +83,6 @@ export const useWeeklyStats = (selectedDate: Date) => {
 
       // Track unique dates for trading days count
       const tradingDays: Set<string>[] = weeksInMonth.map(() => new Set());
-
-      const { data: entries, error } = await supabase
-        .from('journal_entries')
-        .select('*')
-        .eq('user_id', user.id);
-
-      if (error) throw error;
-
-      console.log('Selected Month Range:', {
-        start: monthStart.toISOString(),
-        end: monthEnd.toISOString()
-      });
 
       // Filter and process entries
       (entries as JournalEntryType[])?.forEach(entry => {
@@ -98,9 +123,27 @@ export const useWeeklyStats = (selectedDate: Date) => {
         week.tradingDays = tradingDays[index].size;
       });
 
-      console.log('Processed weekly stats:', {
+      // Store the calculated stats in the week_stats table
+      const promises = weeks.map(week => 
+        supabase
+          .from('week_stats')
+          .upsert({
+            user_id: user.id,
+            year,
+            month,
+            week_number: week.weekNumber,
+            total_pnl: week.totalPnL,
+            trading_days: week.tradingDays,
+            trade_count: week.tradeCount
+          })
+          .select()
+      );
+
+      await Promise.all(promises);
+
+      console.log('Processed and stored weekly stats:', {
         month: selectedDate.toLocaleString('default', { month: 'long' }),
-        year: selectedDate.getFullYear(),
+        year,
         weeks
       });
 

@@ -102,9 +102,6 @@ export const TradesList = ({ trades }: TradesListProps) => {
     setIsUpdating(true);
     
     try {
-      // Show loading toast
-      toast.loading('Updating trade...');
-
       const { data: entries, error: fetchError } = await supabase
         .from('journal_entries')
         .select('*')
@@ -150,24 +147,16 @@ export const TradesList = ({ trades }: TradesListProps) => {
 
       if (updateError) throw updateError;
 
-      // Dismiss any existing toasts
-      toast.dismiss();
-      
-      // Show success toast
-      toast.success('Trade updated successfully', {
-        description: 'Refreshing page to show latest changes...',
+      toast.success('Trade updated successfully!', {
+        description: 'Your changes have been saved.',
       });
-      
+
       setIsEditDialogOpen(false);
       
-      // Add a delay before refresh for better UX
       setTimeout(() => {
         window.location.reload();
-      }, 1500);
+      }, 2000);
     } catch (error) {
-      // Dismiss any existing toasts
-      toast.dismiss();
-      
       console.error('Error updating trade:', error);
       toast.error('Failed to update trade');
     } finally {

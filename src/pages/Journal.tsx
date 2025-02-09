@@ -1,3 +1,4 @@
+
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { useEffect, useState } from "react";
@@ -14,10 +15,12 @@ import { StatsHeader } from "@/components/journal/stats/StatsHeader";
 import { TimeFilterProvider } from "@/contexts/TimeFilterContext";
 import { startOfDay, endOfDay, parseISO, isWithinInterval } from "date-fns";
 import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Journal = () => {
   const [entries, setEntries] = useState<JournalEntryType[]>([]);
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const {
     selectedDate,
     setSelectedDate,
@@ -46,7 +49,7 @@ const Journal = () => {
     fetchEntries();
 
     // Subscribe to real-time updates
-    const subscription = supabase
+    const channel = supabase
       .channel('journal_entries_changes')
       .on(
         'postgres_changes',
@@ -55,17 +58,24 @@ const Journal = () => {
           schema: 'public',
           table: 'journal_entries',
         },
-        (payload) => {
-          console.log('Realtime update received:', payload);
-          fetchEntries();
+        async (payload) => {
+          console.log('Realtime update received in Journal.tsx:', payload);
+          // Immediately refetch entries when changes occur
+          await fetchEntries();
+          // Also invalidate related queries
+          await Promise.all([
+            queryClient.invalidateQueries({ queryKey: ['journal-entries'] }),
+            queryClient.invalidateQueries({ queryKey: ['analytics'] }),
+            queryClient.invalidateQueries({ queryKey: ['weekly-performance'] })
+          ]);
         }
       )
       .subscribe();
 
     return () => {
-      subscription.unsubscribe();
+      supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user, queryClient]);
 
   // Filter entries based on selected date, including trades
   const displayedEntries = selectedDate

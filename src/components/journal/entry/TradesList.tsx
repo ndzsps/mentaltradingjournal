@@ -2,12 +2,22 @@
 import { Trade } from "@/types/trade";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Pencil } from "lucide-react";
+import { ExternalLink, Pencil, Trash2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { useState } from "react";
 import { AddTradeDialog } from "@/components/analytics/AddTradeDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface TradesListProps {
   trades: Trade[];
@@ -29,10 +39,54 @@ const formatDate = (dateString: string) => {
 export const TradesList = ({ trades }: TradesListProps) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedTrade, setSelectedTrade] = useState<Trade | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const handleEditClick = (trade: Trade) => {
     setSelectedTrade(trade);
     setIsEditDialogOpen(true);
+  };
+
+  const handleDeleteClick = (trade: Trade) => {
+    setSelectedTrade(trade);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!selectedTrade) return;
+
+    try {
+      const entryDate = new Date(selectedTrade.entryDate || new Date());
+      const startOfDay = new Date(entryDate.setHours(0, 0, 0, 0));
+      const endOfDay = new Date(entryDate.setHours(23, 59, 59, 999));
+
+      const { data: entries, error: fetchError } = await supabase
+        .from('journal_entries')
+        .select()
+        .gte('created_at', startOfDay.toISOString())
+        .lte('created_at', endOfDay.toISOString());
+
+      if (fetchError) throw fetchError;
+      if (!entries || entries.length === 0) {
+        throw new Error('Journal entry not found');
+      }
+
+      const entry = entries[0];
+      const updatedTrades = entry.trades.filter((trade: Trade) => trade.id !== selectedTrade.id);
+
+      const { error: updateError } = await supabase
+        .from('journal_entries')
+        .update({ trades: updatedTrades })
+        .eq('id', entry.id);
+
+      if (updateError) throw updateError;
+
+      toast.success('Trade deleted successfully');
+      setIsDeleteDialogOpen(false);
+      window.location.reload();
+    } catch (error) {
+      console.error('Error deleting trade:', error);
+      toast.error('Failed to delete trade');
+    }
   };
 
   const handleTradeUpdate = async (updatedTrade: Trade) => {
@@ -113,7 +167,7 @@ export const TradesList = ({ trades }: TradesListProps) => {
             </AccordionTrigger>
             <AccordionContent className="pb-4">
               <div className="space-y-6 pt-2">
-                <div className="flex justify-end">
+                <div className="flex justify-end gap-2">
                   <Button
                     variant="outline"
                     size="sm"
@@ -121,6 +175,14 @@ export const TradesList = ({ trades }: TradesListProps) => {
                     className="flex items-center gap-2"
                   >
                     <Pencil className="h-4 w-4" /> Edit Trade
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleDeleteClick(trade)}
+                    className="flex items-center gap-2 text-destructive hover:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4" /> Delete
                   </Button>
                 </div>
 
@@ -194,6 +256,26 @@ export const TradesList = ({ trades }: TradesListProps) => {
         onSubmit={handleTradeUpdate}
         editTrade={selectedTrade}
       />
+
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure you want to delete this entry?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Yes, Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };

@@ -1,3 +1,4 @@
+
 import {
   LineChart,
   Line,
@@ -58,7 +59,17 @@ export const EquityCurveChart = ({ data, initialBalance }: EquityCurveChartProps
               valueFormatter={(value) => `$${value.toLocaleString()}`}
             />}
           />
-          <ReferenceLine y={initialBalance} stroke="hsl(var(--muted-foreground))" strokeDasharray="3 3" />
+          <ReferenceLine 
+            y={initialBalance} 
+            stroke="hsl(var(--muted-foreground))" 
+            strokeDasharray="3 3"
+            ifOverflow="extendDomain"
+            label={{
+              value: 'Initial Balance',
+              position: 'right',
+              style: { fill: 'hsl(var(--muted-foreground))' }
+            }}
+          />
           <Line
             type="monotone"
             dataKey="balance"

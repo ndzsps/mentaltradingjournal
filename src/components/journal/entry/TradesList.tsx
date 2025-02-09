@@ -100,25 +100,31 @@ export const TradesList = ({ trades }: TradesListProps) => {
     }
 
     setIsUpdating(true);
+    const loadingToast = toast.loading('Updating trade...');
     
     try {
-      // Show loading toast
-      const loadingToast = toast.loading('Updating trade...');
+      console.log('Starting trade update for trade:', updatedTrade);
 
       const { data: entries, error: fetchError } = await supabase
         .from('journal_entries')
         .select('*')
         .eq('user_id', user.id);
 
-      if (fetchError) throw fetchError;
+      if (fetchError) {
+        console.error('Error fetching entries:', fetchError);
+        throw new Error(`Failed to fetch entries: ${fetchError.message}`);
+      }
 
       const entryWithTrade = entries?.find(entry => 
         entry.trades?.some((trade: Trade) => trade.id === updatedTrade.id)
       );
 
       if (!entryWithTrade) {
-        throw new Error('Journal entry not found');
+        console.error('No entry found containing the trade:', updatedTrade.id);
+        throw new Error('Could not find the journal entry containing this trade');
       }
+
+      console.log('Found entry with trade:', entryWithTrade);
 
       const updatedTradeObject = {
         id: updatedTrade.id,
@@ -143,30 +149,32 @@ export const TradesList = ({ trades }: TradesListProps) => {
         trade.id === updatedTrade.id ? updatedTradeObject : trade
       );
 
+      console.log('Updating entry with trades:', updatedTrades);
+
       const { error: updateError } = await supabase
         .from('journal_entries')
         .update({ trades: updatedTrades })
         .eq('id', entryWithTrade.id);
 
-      if (updateError) throw updateError;
+      if (updateError) {
+        console.error('Error updating entry:', updateError);
+        throw new Error(`Failed to update entry: ${updateError.message}`);
+      }
 
-      // Dismiss loading toast
       toast.dismiss(loadingToast);
-
-      // Show success toast
       toast.success('Trade updated successfully!', {
         description: 'Your changes have been saved. Refreshing page...'
       });
 
       setIsEditDialogOpen(false);
       
-      // Ensure the success message is visible before refresh
       setTimeout(() => {
         window.location.reload();
       }, 1000);
     } catch (error) {
       console.error('Error updating trade:', error);
-      toast.error('Failed to update trade');
+      toast.dismiss(loadingToast);
+      toast.error(error instanceof Error ? error.message : 'Failed to update trade');
     } finally {
       setIsUpdating(false);
     }

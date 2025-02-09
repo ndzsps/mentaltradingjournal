@@ -70,50 +70,63 @@ const Journal = () => {
     };
   }, [user]);
 
-  // Create an array of entries and individual trades for the selected date
-  const displayedEntries = selectedDate
-    ? filteredEntries.reduce<JournalEntryType[]>((acc, entry) => {
-        // Check if entry has trades
-        if (entry.trades && entry.trades.length > 0) {
-          // Filter trades for the selected date
-          const matchingTrades = entry.trades.filter(trade => {
-            if (!trade.entryDate) return false;
-            return isSameDay(parseISO(trade.entryDate), selectedDate);
-          });
+  // Create a map of entries by date
+  const entriesByDate = new Map<string, JournalEntryType[]>();
+  
+  // First, handle regular journal entries
+  filteredEntries.forEach(entry => {
+    if (selectedDate && isSameDay(parseISO(entry.created_at), selectedDate)) {
+      const dateKey = format(parseISO(entry.created_at), 'yyyy-MM-dd');
+      if (!entriesByDate.has(dateKey)) {
+        entriesByDate.set(dateKey, []);
+      }
+      // Only add the entry if it has no trades or if its trades are from a different date
+      const entryWithoutMatchingTrades = {
+        ...entry,
+        trades: entry.trades?.filter(trade => 
+          !trade.entryDate || !isSameDay(parseISO(trade.entryDate), selectedDate)
+        ) || []
+      };
+      if (!entry.trades || entryWithoutMatchingTrades.trades.length > 0) {
+        entriesByDate.get(dateKey)?.push(entryWithoutMatchingTrades);
+      }
+    }
+  });
 
-          // If there are matching trades, create a new entry with just those trades
-          if (matchingTrades.length > 0) {
-            acc.push({
-              ...entry,
-              trades: matchingTrades
-            });
+  // Then, handle trades separately
+  filteredEntries.forEach(entry => {
+    if (entry.trades) {
+      entry.trades.forEach(trade => {
+        if (trade.entryDate && selectedDate && isSameDay(parseISO(trade.entryDate), selectedDate)) {
+          const dateKey = format(parseISO(trade.entryDate), 'yyyy-MM-dd');
+          if (!entriesByDate.has(dateKey)) {
+            entriesByDate.set(dateKey, []);
           }
-        }
-        
-        // Also include the entry itself if it was created on the selected date
-        if (isSameDay(parseISO(entry.created_at), selectedDate)) {
-          // Don't duplicate trades that were already added
-          const entryWithoutMatchingTrades = {
+          // Create a new entry just for this trade
+          entriesByDate.get(dateKey)?.push({
             ...entry,
-            trades: entry.trades?.filter(trade => 
-              !trade.entryDate || !isSameDay(parseISO(trade.entryDate), selectedDate)
-            ) || []
-          };
-          if (!entry.trades || entryWithoutMatchingTrades.trades.length > 0) {
-            acc.push(entryWithoutMatchingTrades);
-          }
+            trades: [trade]
+          });
         }
+      });
+    }
+  });
 
-        return acc;
-      }, [])
-    : filteredEntries;
+  // Convert the map to an array and sort by date
+  const displayedEntries = Array.from(entriesByDate.values())
+    .flat()
+    .sort((a, b) => {
+      const dateA = a.trades?.[0]?.entryDate || a.created_at;
+      const dateB = b.trades?.[0]?.entryDate || b.created_at;
+      return new Date(dateB).getTime() - new Date(dateA).getTime();
+    });
 
   const calendarEntries = entries.flatMap(entry => {
     if (entry.trades && entry.trades.length > 0) {
       return entry.trades.map(trade => ({
         date: parseISO(trade.entryDate || entry.created_at),
         emotion: entry.emotion,
-        trades: [trade] // Each trade gets its own calendar entry
+        trades: [trade]
       }));
     }
     return [{
@@ -162,8 +175,8 @@ const Journal = () => {
               <ScrollArea className="h-[600px] pr-4">
                 {displayedEntries.length > 0 ? (
                   <div className="space-y-4">
-                    {displayedEntries.map((entry) => (
-                      <JournalEntry key={entry.id} entry={entry} />
+                    {displayedEntries.map((entry, index) => (
+                      <JournalEntry key={`${entry.id}-${index}`} entry={entry} />
                     ))}
                   </div>
                 ) : (

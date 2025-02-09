@@ -92,9 +92,11 @@ export const useWeeklyStats = (selectedDate: Date) => {
         const tradingDaysByWeek = new Map<number, Set<string>>();
         
         // For debugging: store trades by week
-        const tradesByWeek = new Map<number, { date: string; pnl: number; }[]>();
+        const tradesByWeek = new Map<number, { date: string; pnl: number; entryId: string }[]>();
 
         console.log('First Monday of month:', format(firstMonday, 'yyyy-MM-dd'));
+        console.log('Month start:', format(monthStart, 'yyyy-MM-dd'));
+        console.log('Month end:', format(monthEnd, 'yyyy-MM-dd'));
         
         // Process each trade
         for (const entry of (entries as JournalEntryType[] || [])) {
@@ -116,6 +118,13 @@ export const useWeeklyStats = (selectedDate: Date) => {
                 check_date: format(tradeDate, 'yyyy-MM-dd')
               });
             
+            console.log('Trade Processing:', {
+              date: format(tradeDate, 'yyyy-MM-dd'),
+              weekNumber,
+              pnl: trade.pnl || trade.profit_loss || 0,
+              entryId: entry.id
+            });
+
             if (weekNumber === null) continue;
 
             // Initialize tracking for this week if needed
@@ -138,21 +147,13 @@ export const useWeeklyStats = (selectedDate: Date) => {
                 allWeeks[weekIndex].totalPnL += numericPnL;
                 allWeeks[weekIndex].tradeCount++;
 
-                // Log each trade being added to week 1
-                if (weekNumber === 1) {
-                  console.log(`Adding trade to Week 1:`, {
-                    date: format(tradeDate, 'yyyy-MM-dd'),
-                    pnl: numericPnL,
-                    entryId: entry.id
-                  });
-                }
+                // Store trade details for debugging
+                tradesByWeek.get(weekNumber)?.push({
+                  date: format(tradeDate, 'yyyy-MM-dd'),
+                  pnl: numericPnL,
+                  entryId: entry.id
+                });
               }
-
-              // Store trade details for debugging
-              tradesByWeek.get(weekNumber)?.push({
-                date: format(tradeDate, 'yyyy-MM-dd'),
-                pnl: numericPnL
-              });
             }
           }
         }
@@ -182,8 +183,12 @@ export const useWeeklyStats = (selectedDate: Date) => {
             });
         }
 
-        // Log detailed breakdown for debugging
-        console.log('Week 1 Trades:', tradesByWeek.get(1)?.sort((a, b) => a.date.localeCompare(b.date)));
+        // Log final breakdown for debugging
+        console.log('Week 1 Final Trades:', 
+          tradesByWeek.get(1)?.sort((a, b) => a.date.localeCompare(b.date))
+        );
+        
+        console.log('All Weeks Final Results:', allWeeks);
       }
 
       return allWeeks.sort((a, b) => a.weekNumber - b.weekNumber);
@@ -193,3 +198,4 @@ export const useWeeklyStats = (selectedDate: Date) => {
     staleTime: 0,
   });
 };
+

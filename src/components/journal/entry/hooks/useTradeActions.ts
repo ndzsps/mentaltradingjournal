@@ -124,7 +124,7 @@ export const useTradeActions = (user: User | null) => {
       overlay.innerHTML = `
         <div class="flex flex-col items-center gap-2">
           <div class="h-8 w-8 animate-spin rounded-full border-4 border-primary border-r-transparent"></div>
-          <p class="text-sm text-muted-foreground">Refreshing...</p>
+          <p class="text-sm text-muted-foreground">Updating...</p>
         </div>
       `;
       document.body.appendChild(overlay);

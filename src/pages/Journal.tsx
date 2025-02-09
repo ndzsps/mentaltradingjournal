@@ -13,7 +13,7 @@ import { useJournalFilters } from "@/hooks/useJournalFilters";
 import { JournalEntryType } from "@/types/journal";
 import { StatsHeader } from "@/components/journal/stats/StatsHeader";
 import { TimeFilterProvider } from "@/contexts/TimeFilterContext";
-import { startOfDay, parseISO, isSameDay } from "date-fns";
+import { startOfDay, parseISO, format, isSameDay } from "date-fns";
 import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";
 
 const Journal = () => {
@@ -70,37 +70,50 @@ const Journal = () => {
     };
   }, [user]);
 
-  // Filter entries to show only trades for the selected date
-  const displayedEntries = filteredEntries
-    .filter(entry => entry.trades && entry.trades.length > 0)
-    .map(entry => {
-      // Filter trades for the selected date
-      const matchingTrades = entry.trades?.filter(trade => 
-        trade.entryDate && selectedDate && isSameDay(parseISO(trade.entryDate), selectedDate)
-      );
+  // Create an array of entries and individual trades for the selected date
+  const displayedEntries = selectedDate
+    ? filteredEntries.reduce<JournalEntryType[]>((acc, entry) => {
+        // Check if entry has trades
+        if (entry.trades && entry.trades.length > 0) {
+          // Filter trades for the selected date
+          const matchingTrades = entry.trades.filter(trade => {
+            if (!trade.entryDate) return false;
+            return isSameDay(parseISO(trade.entryDate), selectedDate);
+          });
 
-      // Only include entries that have trades on the selected date
-      if (matchingTrades && matchingTrades.length > 0) {
-        return {
-          ...entry,
-          trades: matchingTrades
-        };
-      }
-      return null;
-    })
-    .filter((entry): entry is JournalEntryType => entry !== null)
-    .sort((a, b) => {
-      const dateA = a.trades?.[0]?.entryDate || a.created_at;
-      const dateB = b.trades?.[0]?.entryDate || b.created_at;
-      return new Date(dateB).getTime() - new Date(dateA).getTime();
-    });
+          // If there are matching trades, create a new entry with just those trades
+          if (matchingTrades.length > 0) {
+            acc.push({
+              ...entry,
+              trades: matchingTrades
+            });
+          }
+        }
+        
+        // Also include the entry itself if it was created on the selected date
+        if (isSameDay(parseISO(entry.created_at), selectedDate)) {
+          // Don't duplicate trades that were already added
+          const entryWithoutMatchingTrades = {
+            ...entry,
+            trades: entry.trades?.filter(trade => 
+              !trade.entryDate || !isSameDay(parseISO(trade.entryDate), selectedDate)
+            ) || []
+          };
+          if (!entry.trades || entryWithoutMatchingTrades.trades.length > 0) {
+            acc.push(entryWithoutMatchingTrades);
+          }
+        }
+
+        return acc;
+      }, [])
+    : filteredEntries;
 
   const calendarEntries = entries.flatMap(entry => {
     if (entry.trades && entry.trades.length > 0) {
       return entry.trades.map(trade => ({
         date: parseISO(trade.entryDate || entry.created_at),
         emotion: entry.emotion,
-        trades: [trade]
+        trades: [trade] // Each trade gets its own calendar entry
       }));
     }
     return [{
@@ -149,8 +162,8 @@ const Journal = () => {
               <ScrollArea className="h-[600px] pr-4">
                 {displayedEntries.length > 0 ? (
                   <div className="space-y-4">
-                    {displayedEntries.map((entry, index) => (
-                      <JournalEntry key={`${entry.id}-${index}`} entry={entry} />
+                    {displayedEntries.map((entry) => (
+                      <JournalEntry key={entry.id} entry={entry} />
                     ))}
                   </div>
                 ) : (

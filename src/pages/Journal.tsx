@@ -13,7 +13,7 @@ import { useJournalFilters } from "@/hooks/useJournalFilters";
 import { JournalEntryType } from "@/types/journal";
 import { StatsHeader } from "@/components/journal/stats/StatsHeader";
 import { TimeFilterProvider } from "@/contexts/TimeFilterContext";
-import { startOfDay, endOfDay, parseISO, isWithinInterval } from "date-fns";
+import { startOfDay, endOfDay, parseISO } from "date-fns";
 import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";
 
 const Journal = () => {
@@ -80,21 +80,30 @@ const Journal = () => {
         if (entry.trades && entry.trades.length > 0) {
           return entry.trades.some(trade => {
             if (!trade.entryDate) return false;
-            // Parse the trade entry date
-            const tradeDate = new Date(trade.entryDate);
-            console.log('Comparing trade date:', {
+            
+            // Convert the trade entry date string to a Date object
+            const tradeDateStr = trade.entryDate;
+            const tradeDate = new Date(tradeDateStr);
+            
+            // Debug logging
+            console.log('Trade date comparison:', {
+              tradeDateStr,
               tradeDate,
-              start,
-              end,
-              isWithin: isWithinInterval(tradeDate, { start, end })
+              selectedDate,
+              start: start.toISOString(),
+              end: end.toISOString(),
+              isStartBeforeOrEqual: start <= tradeDate,
+              isEndAfterOrEqual: end >= tradeDate,
+              isWithinRange: start <= tradeDate && tradeDate <= end
             });
-            return isWithinInterval(tradeDate, { start, end });
+
+            return start <= tradeDate && tradeDate <= end;
           });
         }
         
         // For non-trade entries, check the entry creation date
         const entryDate = parseISO(entry.created_at);
-        return isWithinInterval(entryDate, { start, end });
+        return start <= entryDate && entryDate <= end;
       })
     : filteredEntries;
 

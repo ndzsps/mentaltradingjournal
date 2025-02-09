@@ -78,10 +78,11 @@ const Journal = () => {
         
         // For entries with trades, check if any trade's entry date falls within the selected date
         if (entry.trades && entry.trades.length > 0) {
-          return entry.trades.some(trade => {
+          const hasMatchingTrade = entry.trades.some(trade => {
             if (!trade.entryDate) return false;
             
             const tradeDate = new Date(trade.entryDate);
+            const tradeStart = startOfDay(tradeDate);
             
             // Debug logging
             console.log('Trade date comparison:', {
@@ -89,17 +90,22 @@ const Journal = () => {
               selectedDate: format(selectedDate, 'yyyy-MM-dd HH:mm:ss'),
               start: format(start, 'yyyy-MM-dd HH:mm:ss'),
               end: format(end, 'yyyy-MM-dd HH:mm:ss'),
-              isWithinRange: tradeDate >= start && tradeDate <= end
+              isWithinRange: tradeStart.getTime() === start.getTime()
             });
 
-            // Only compare the trade's entry date with the selected date
-            return tradeDate >= start && tradeDate <= end;
+            // Compare only the dates (ignoring time)
+            return tradeStart.getTime() === start.getTime();
           });
+
+          if (hasMatchingTrade) {
+            return true;
+          }
         }
         
         // For non-trade entries, check if the entry was created on the selected date
         const entryDate = parseISO(entry.created_at);
-        return entryDate >= start && entryDate <= end;
+        const entryStart = startOfDay(entryDate);
+        return entryStart.getTime() === start.getTime();
       })
     : filteredEntries;
 
@@ -179,3 +185,4 @@ const Journal = () => {
 };
 
 export default Journal;
+

@@ -48,3 +48,4 @@ export const NoteTags = ({ tags, onAddTag, onRemoveTag }: NoteTagsProps) => {
     </div>
   );
 };
+

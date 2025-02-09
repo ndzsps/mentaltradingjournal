@@ -1,22 +1,14 @@
+
 import { Trade } from "@/types/trade";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Button } from "@/components/ui/button";
-import { ExternalLink, Pencil, Trash2 } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
 import { useState } from "react";
 import { AddTradeDialog } from "@/components/analytics/AddTradeDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { TradeActions } from "./trade-item/TradeActions";
+import { TradeDetails } from "./trade-item/TradeDetails";
+import { TradeHeader } from "./trade-item/TradeHeader";
+import { TradeDeleteDialog } from "./trade-item/TradeDeleteDialog";
 
 interface TradesListProps {
   trades: Trade[];
@@ -74,13 +66,9 @@ export const TradesList = ({ trades }: TradesListProps) => {
         throw new Error('Journal entry not found');
       }
 
-      console.log('Found entry:', entryWithTrade);
-
       const updatedTrades = entryWithTrade.trades.filter(
         (trade: Trade) => trade.id !== selectedTrade.id
       );
-
-      console.log('Updated trades after filter:', updatedTrades);
 
       const { error: updateError } = await supabase
         .from('journal_entries')
@@ -164,97 +152,15 @@ export const TradesList = ({ trades }: TradesListProps) => {
         {trades.map((trade, index) => (
           <AccordionItem key={trade.id || index} value={`trade-${index}`} className="border rounded-lg px-4">
             <AccordionTrigger className="hover:no-underline py-3">
-              <div className="flex items-center justify-between w-full pr-4">
-                <span className="font-medium">{trade.instrument}</span>
-                <div className="flex items-center gap-3">
-                  <span className={`font-medium ${
-                    Number(trade.pnl) >= 0 ? 'text-green-500' : 'text-red-500'
-                  }`}>
-                    {Number(trade.pnl) >= 0 ? '+' : '-'}${Math.abs(Number(trade.pnl)).toLocaleString()}
-                  </span>
-                </div>
-              </div>
+              <TradeHeader trade={trade} />
             </AccordionTrigger>
             <AccordionContent className="pb-4">
-              <div className="space-y-6 pt-2">
-                <div className="flex justify-end gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleEditClick(trade)}
-                    className="flex items-center gap-2"
-                  >
-                    <Pencil className="h-4 w-4" /> Edit Trade
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleDeleteClick(trade)}
-                    className="flex items-center gap-2 text-destructive hover:text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4" /> Delete
-                  </Button>
-                </div>
-
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="space-y-3">
-                    <h4 className="text-sm font-medium text-muted-foreground">Entry Details</h4>
-                    <div className="space-y-2">
-                      <p className="text-sm">Date: {formatDate(trade.entryDate || '')}</p>
-                      <p className="text-sm">Price: {trade.entryPrice}</p>
-                      <p className="text-sm">Stop Loss: {trade.stopLoss}</p>
-                      <p className="text-sm">Take Profit: {trade.takeProfit}</p>
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <h4 className="text-sm font-medium text-muted-foreground">Exit Details</h4>
-                    <div className="space-y-2">
-                      <p className="text-sm">Date: {formatDate(trade.exitDate || '')}</p>
-                      <p className="text-sm">Price: {trade.exitPrice}</p>
-                      <p className="text-sm">Quantity: {trade.quantity}</p>
-                      <p className="text-sm">Fees: {trade.fees}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {(trade.forecastScreenshot || trade.resultScreenshot) && (
-                  <>
-                    <Separator />
-                    <div className="space-y-3">
-                      <h4 className="text-sm font-medium text-muted-foreground">Trade Screenshots</h4>
-                      <div className="flex gap-4">
-                        {trade.forecastScreenshot && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="flex items-center gap-2"
-                            onClick={() => window.open(trade.forecastScreenshot, '_blank')}
-                          >
-                            View Forecast <ExternalLink className="h-4 w-4" />
-                          </Button>
-                        )}
-                        {trade.resultScreenshot && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="flex items-center gap-2"
-                            onClick={() => window.open(trade.resultScreenshot, '_blank')}
-                          >
-                            View Result <ExternalLink className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                {trade.setup && (
-                  <div className="space-y-2">
-                    <h4 className="text-sm font-medium text-muted-foreground">Setup</h4>
-                    <p className="text-sm">{trade.setup}</p>
-                  </div>
-                )}
-              </div>
+              <TradeActions
+                trade={trade}
+                onEdit={handleEditClick}
+                onDelete={handleDeleteClick}
+              />
+              <TradeDetails trade={trade} formatDate={formatDate} />
             </AccordionContent>
           </AccordionItem>
         ))}
@@ -267,25 +173,11 @@ export const TradesList = ({ trades }: TradesListProps) => {
         editTrade={selectedTrade}
       />
 
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure you want to delete this entry?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDeleteConfirm}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Yes, Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <TradeDeleteDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onConfirm={handleDeleteConfirm}
+      />
     </>
   );
 };

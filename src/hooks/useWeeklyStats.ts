@@ -53,11 +53,18 @@ export const useWeeklyStats = (selectedDate: Date) => {
         throw weekStatsError;
       }
 
+      console.log('Fetched week stats:', weekStats);
+
       // If we have stats, update the corresponding weeks
       if (weekStats && weekStats.length > 0) {
         weekStats.forEach(stat => {
           const weekIndex = allWeeks.findIndex(w => w.weekNumber === stat.week_number);
           if (weekIndex !== -1) {
+            console.log(`Using existing stats for week ${stat.week_number}:`, {
+              totalPnL: stat.total_pnl,
+              tradingDays: stat.trading_days,
+              tradeCount: stat.trade_count
+            });
             allWeeks[weekIndex] = {
               weekNumber: stat.week_number,
               totalPnL: Number(stat.total_pnl),
@@ -88,6 +95,7 @@ export const useWeeklyStats = (selectedDate: Date) => {
         // Process each entry
         entries?.forEach(entry => {
           const entryDate = parseISO(entry.created_at);
+          console.log(`Processing entry from ${format(entryDate, 'yyyy-MM-dd')}:`, entry);
           
           // Skip weekends
           if (isWeekend(entryDate)) {
@@ -105,6 +113,8 @@ export const useWeeklyStats = (selectedDate: Date) => {
                 console.error('Error getting week number:', weekError);
                 return;
               }
+
+              console.log(`Entry from ${format(entryDate, 'yyyy-MM-dd')} belongs to week ${weekNumber}`);
 
               // Initialize tracking for this week if needed
               if (!tradingDaysByWeek.has(weekNumber)) {

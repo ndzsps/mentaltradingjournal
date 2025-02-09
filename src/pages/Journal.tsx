@@ -1,4 +1,3 @@
-
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { useEffect, useState } from "react";
@@ -15,12 +14,10 @@ import { StatsHeader } from "@/components/journal/stats/StatsHeader";
 import { TimeFilterProvider } from "@/contexts/TimeFilterContext";
 import { startOfDay, endOfDay, parseISO, isWithinInterval } from "date-fns";
 import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";
-import { useQueryClient } from "@tanstack/react-query";
 
 const Journal = () => {
   const [entries, setEntries] = useState<JournalEntryType[]>([]);
   const { user } = useAuth();
-  const queryClient = useQueryClient();
   const {
     selectedDate,
     setSelectedDate,
@@ -49,7 +46,7 @@ const Journal = () => {
     fetchEntries();
 
     // Subscribe to real-time updates
-    const channel = supabase
+    const subscription = supabase
       .channel('journal_entries_changes')
       .on(
         'postgres_changes',
@@ -58,24 +55,17 @@ const Journal = () => {
           schema: 'public',
           table: 'journal_entries',
         },
-        async (payload) => {
-          console.log('Realtime update received in Journal.tsx:', payload);
-          // Immediately refetch entries when changes occur
-          await fetchEntries();
-          // Also invalidate related queries
-          await Promise.all([
-            queryClient.invalidateQueries({ queryKey: ['journal-entries'] }),
-            queryClient.invalidateQueries({ queryKey: ['analytics'] }),
-            queryClient.invalidateQueries({ queryKey: ['weekly-performance'] })
-          ]);
+        (payload) => {
+          console.log('Realtime update received:', payload);
+          fetchEntries();
         }
       )
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      subscription.unsubscribe();
     };
-  }, [user, queryClient]);
+  }, [user]);
 
   // Filter entries based on selected date, including trades
   const displayedEntries = selectedDate
@@ -86,8 +76,8 @@ const Journal = () => {
         // For entries with trades, check if any trade's entry date falls within the selected date
         if (entry.trades && entry.trades.length > 0) {
           return entry.trades.some(trade => {
-            // If trade doesn't have an entryDate, fall back to entry creation date
-            const tradeDate = trade.entryDate ? parseISO(trade.entryDate) : parseISO(entry.created_at);
+            if (!trade.entryDate) return false;
+            const tradeDate = parseISO(trade.entryDate);
             return isWithinInterval(tradeDate, { start, end });
           });
         }
@@ -98,24 +88,13 @@ const Journal = () => {
       })
     : filteredEntries;
 
-  const calendarEntries = entries.map(entry => {
-    // Default to entry creation date
-    let entryDate = parseISO(entry.created_at);
-    
-    // If there are trades with entry dates, use the first valid trade date
-    if (entry.trades && entry.trades.length > 0) {
-      const validTradeDate = entry.trades.find(trade => trade.entryDate)?.entryDate;
-      if (validTradeDate) {
-        entryDate = parseISO(validTradeDate);
-      }
-    }
-
-    return {
-      date: entryDate,
-      emotion: entry.emotion,
-      trades: entry.trades
-    };
-  });
+  const calendarEntries = entries.map(entry => ({
+    date: entry.trades && entry.trades.length > 0 && entry.trades[0].entryDate
+      ? parseISO(entry.trades[0].entryDate)  // Use trade date for trade entries
+      : parseISO(entry.created_at),
+    emotion: entry.emotion,
+    trades: entry.trades
+  }));
 
   return (
     <AppLayout>

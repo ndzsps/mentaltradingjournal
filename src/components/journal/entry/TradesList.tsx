@@ -1,4 +1,3 @@
-
 import { Trade } from "@/types/trade";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
@@ -57,39 +56,36 @@ export const TradesList = ({ trades }: TradesListProps) => {
     try {
       console.log('Deleting trade:', selectedTrade);
       
-      const entryDate = new Date(selectedTrade.entryDate || new Date());
-      const startOfDay = new Date(entryDate.setHours(0, 0, 0, 0));
-      const endOfDay = new Date(entryDate.setHours(23, 59, 59, 999));
-
-      console.log('Fetching entries between:', startOfDay, 'and', endOfDay);
-
       const { data: entries, error: fetchError } = await supabase
         .from('journal_entries')
-        .select('*')
-        .gte('created_at', startOfDay.toISOString())
-        .lte('created_at', endOfDay.toISOString());
+        .select('*');
 
       if (fetchError) {
         console.error('Error fetching entries:', fetchError);
         throw fetchError;
       }
 
-      console.log('Found entries:', entries);
+      const entryWithTrade = entries?.find(entry => 
+        entry.trades?.some((trade: Trade) => trade.id === selectedTrade.id)
+      );
 
-      if (!entries || entries.length === 0) {
+      if (!entryWithTrade) {
+        console.error('No entry found containing the trade');
         throw new Error('Journal entry not found');
       }
 
-      const entry = entries[0];
-      console.log('Current entry trades:', entry.trades);
-      
-      const updatedTrades = entry.trades.filter((trade: Trade) => trade.id !== selectedTrade.id);
+      console.log('Found entry:', entryWithTrade);
+
+      const updatedTrades = entryWithTrade.trades.filter(
+        (trade: Trade) => trade.id !== selectedTrade.id
+      );
+
       console.log('Updated trades after filter:', updatedTrades);
 
       const { error: updateError } = await supabase
         .from('journal_entries')
         .update({ trades: updatedTrades })
-        .eq('id', entry.id);
+        .eq('id', entryWithTrade.id);
 
       if (updateError) {
         console.error('Error updating entry:', updateError);
@@ -98,7 +94,6 @@ export const TradesList = ({ trades }: TradesListProps) => {
 
       toast.success('Trade deleted successfully');
       setIsDeleteDialogOpen(false);
-      // Force a page reload to update the UI
       window.location.reload();
     } catch (error) {
       console.error('Error deleting trade:', error);
@@ -108,23 +103,21 @@ export const TradesList = ({ trades }: TradesListProps) => {
 
   const handleTradeUpdate = async (updatedTrade: Trade) => {
     try {
-      const entryDate = new Date(updatedTrade.entryDate || new Date());
-      const startOfDay = new Date(entryDate.setHours(0, 0, 0, 0));
-      const endOfDay = new Date(entryDate.setHours(23, 59, 59, 999));
-
       const { data: entries, error: fetchError } = await supabase
         .from('journal_entries')
-        .select()
-        .gte('created_at', startOfDay.toISOString())
-        .lte('created_at', endOfDay.toISOString());
+        .select('*');
 
       if (fetchError) throw fetchError;
-      if (!entries || entries.length === 0) {
+
+      const entryWithTrade = entries?.find(entry => 
+        entry.trades?.some((trade: Trade) => trade.id === updatedTrade.id)
+      );
+
+      if (!entryWithTrade) {
         throw new Error('Journal entry not found');
       }
 
-      const entry = entries[0];
-      const currentTrades = entry.trades || [];
+      const currentTrades = entryWithTrade.trades || [];
 
       const updatedTradeObject = {
         id: updatedTrade.id,
@@ -152,7 +145,7 @@ export const TradesList = ({ trades }: TradesListProps) => {
       const { error: updateError } = await supabase
         .from('journal_entries')
         .update({ trades: updatedTrades })
-        .eq('id', entry.id);
+        .eq('id', entryWithTrade.id);
 
       if (updateError) throw updateError;
 

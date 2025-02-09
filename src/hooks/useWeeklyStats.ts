@@ -82,8 +82,8 @@ export const useWeeklyStats = (selectedDate: Date) => {
         // For debugging: store trades by week
         const tradesByWeek = new Map<number, { date: string; pnl: number; entryId: string }[]>();
 
-        console.log('Month start:', format(monthStart, 'yyyy-MM-dd'));
-        console.log('Month end:', format(monthEnd, 'yyyy-MM-dd'));
+        console.log('Processing trades for month:', format(monthStart, 'MMMM yyyy'));
+        console.log('Date range:', format(monthStart, 'yyyy-MM-dd'), 'to', format(monthEnd, 'yyyy-MM-dd'));
         
         // Process each trade
         for (const entry of (entries as JournalEntryType[] || [])) {
@@ -105,12 +105,15 @@ export const useWeeklyStats = (selectedDate: Date) => {
                 check_date: format(tradeDate, 'yyyy-MM-dd')
               });
             
-            console.log('Trade Processing:', {
-              date: format(tradeDate, 'yyyy-MM-dd'),
-              weekNumber,
-              pnl: trade.pnl || trade.profit_loss || 0,
-              entryId: entry.id
-            });
+            // Detailed logging for Week 1 trades
+            if (weekNumber === 1) {
+              console.log('Week 1 Trade:', {
+                date: format(tradeDate, 'yyyy-MM-dd'),
+                dayOfMonth: tradeDate.getDate(),
+                pnl: trade.pnl || trade.profit_loss || 0,
+                entryId: entry.id
+              });
+            }
 
             if (weekNumber === null) continue;
 
@@ -153,6 +156,14 @@ export const useWeeklyStats = (selectedDate: Date) => {
           }
         });
 
+        // Log Week 1 final breakdown
+        console.log('Week 1 Final Summary:', {
+          totalPnL: allWeeks[0].totalPnL,
+          tradingDays: allWeeks[0].tradingDays,
+          tradeCount: allWeeks[0].tradeCount,
+          trades: tradesByWeek.get(1)?.sort((a, b) => a.date.localeCompare(b.date))
+        });
+
         // Store the calculated stats in the week_stats table
         for (const week of allWeeks) {
           await supabase
@@ -169,13 +180,6 @@ export const useWeeklyStats = (selectedDate: Date) => {
               onConflict: 'user_id,year,month,week_number'
             });
         }
-
-        // Log final breakdown for debugging
-        console.log('Week 1 Final Trades:', 
-          tradesByWeek.get(1)?.sort((a, b) => a.date.localeCompare(b.date))
-        );
-        
-        console.log('All Weeks Final Results:', allWeeks);
       }
 
       return allWeeks.sort((a, b) => a.weekNumber - b.weekNumber);

@@ -12,7 +12,8 @@ import {
   eachWeekOfInterval,
   isSameWeek,
   getYear,
-  getMonth
+  getMonth,
+  format
 } from "date-fns";
 
 interface WeekSummary {
@@ -84,6 +85,9 @@ export const useWeeklyStats = (selectedDate: Date) => {
       // Track unique dates for trading days count
       const tradingDays: Set<string>[] = weeksInMonth.map(() => new Set());
 
+      // For debugging: store trades by week
+      const tradesByWeek: { date: string; pnl: number; }[][] = weeksInMonth.map(() => []);
+
       // Filter and process entries
       (entries as JournalEntryType[])?.forEach(entry => {
         if (!entry.trades || !Array.isArray(entry.trades)) return;
@@ -113,6 +117,12 @@ export const useWeeklyStats = (selectedDate: Date) => {
             if (!isNaN(numericPnL)) {
               weeks[weekIndex].totalPnL += numericPnL;
               weeks[weekIndex].tradeCount++;
+
+              // Store trade details for debugging
+              tradesByWeek[weekIndex].push({
+                date: format(tradeDate, 'yyyy-MM-dd'),
+                pnl: numericPnL
+              });
             }
           }
         });
@@ -122,6 +132,11 @@ export const useWeeklyStats = (selectedDate: Date) => {
       weeks.forEach((week, index) => {
         week.tradingDays = tradingDays[index].size;
       });
+
+      // Log detailed breakdown for week 2
+      console.log('Week 2 Trade Breakdown:', 
+        tradesByWeek[1]?.sort((a, b) => a.date.localeCompare(b.date))
+      );
 
       // Store the calculated stats in the week_stats table
       const promises = weeks.map(week => 
@@ -140,12 +155,6 @@ export const useWeeklyStats = (selectedDate: Date) => {
       );
 
       await Promise.all(promises);
-
-      console.log('Processed and stored weekly stats:', {
-        month: selectedDate.toLocaleString('default', { month: 'long' }),
-        year,
-        weeks
-      });
 
       return weeks;
     },

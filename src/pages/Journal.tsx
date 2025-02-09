@@ -1,4 +1,3 @@
-
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { useEffect, useState } from "react";
@@ -33,7 +32,6 @@ const Journal = () => {
       const { data, error } = await supabase
         .from('journal_entries')
         .select('*')
-        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -56,7 +54,6 @@ const Journal = () => {
           event: '*',
           schema: 'public',
           table: 'journal_entries',
-          filter: `user_id=eq.${user.id}`,
         },
         (payload) => {
           console.log('Realtime update received:', payload);
@@ -70,45 +67,34 @@ const Journal = () => {
     };
   }, [user]);
 
-  // Filter entries based on selected date, ensuring we use local timezone for comparison
+  // Filter entries based on selected date, including trades
   const displayedEntries = selectedDate
     ? filteredEntries.filter(entry => {
         const start = startOfDay(selectedDate);
         const end = endOfDay(selectedDate);
         
-        // For entries with trades, check each trade's entry date
+        // For entries with trades, check if any trade's entry date falls within the selected date
         if (entry.trades && entry.trades.length > 0) {
           return entry.trades.some(trade => {
-            // Convert trade date to local timezone for comparison
-            const tradeDate = trade.entryDate 
-              ? new Date(trade.entryDate)
-              : new Date(entry.created_at);
+            if (!trade.entryDate) return false;
+            const tradeDate = parseISO(trade.entryDate);
             return isWithinInterval(tradeDate, { start, end });
           });
         }
         
         // For non-trade entries, check the entry creation date
-        const entryDate = new Date(entry.created_at);
+        const entryDate = parseISO(entry.created_at);
         return isWithinInterval(entryDate, { start, end });
       })
     : filteredEntries;
 
-  // Map all trades to their respective dates for the calendar, ensuring consistent timezone handling
-  const calendarEntries = entries.flatMap(entry => 
-    entry.trades && entry.trades.length > 0
-      ? entry.trades.map(trade => ({
-          date: trade.entryDate 
-            ? new Date(trade.entryDate)
-            : new Date(entry.created_at),
-          emotion: entry.emotion,
-          trades: [trade]
-        }))
-      : [{
-          date: new Date(entry.created_at),
-          emotion: entry.emotion,
-          trades: entry.trades || []
-        }]
-  );
+  const calendarEntries = entries.map(entry => ({
+    date: entry.trades && entry.trades.length > 0 && entry.trades[0].entryDate
+      ? parseISO(entry.trades[0].entryDate)  // Use trade date for trade entries
+      : parseISO(entry.created_at),
+    emotion: entry.emotion,
+    trades: entry.trades
+  }));
 
   return (
     <AppLayout>

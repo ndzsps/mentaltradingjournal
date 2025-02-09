@@ -1,4 +1,3 @@
-
 import { Folder, Plus, MoreVertical, Trash2, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -199,13 +198,14 @@ export const FolderList = ({
             value={newFolderName}
             onChange={(e) => setNewFolderName(e.target.value)}
             placeholder="Folder name"
-            className="h-8"
+            className="h-8 focus-visible:ring-0 focus-visible:ring-offset-0 border-0 bg-muted/50"
             autoFocus
           />
           <div className="flex gap-2">
             <Button 
               size="sm" 
-              className="w-full"
+              variant="secondary"
+              className="w-full h-8"
               onClick={() => createFolder.mutate()}
               disabled={!newFolderName.trim()}
             >
@@ -213,8 +213,8 @@ export const FolderList = ({
             </Button>
             <Button 
               size="sm" 
-              variant="outline" 
-              className="w-full"
+              variant="ghost" 
+              className="w-full h-8"
               onClick={() => {
                 setIsCreating(false);
                 setNewFolderName("");
@@ -234,11 +234,11 @@ export const FolderList = ({
               className="group relative"
             >
               {editingFolderId === folder.id ? (
-                <div className="flex gap-2">
+                <div className="flex gap-2 px-2">
                   <Input
                     value={editingFolderName}
                     onChange={(e) => setEditingFolderName(e.target.value)}
-                    className="h-8"
+                    className="h-8 focus-visible:ring-0 focus-visible:ring-offset-0 border-0 bg-muted/50"
                     autoFocus
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
@@ -251,7 +251,8 @@ export const FolderList = ({
                   />
                   <Button 
                     size="sm"
-                    className="h-8"
+                    variant="secondary"
+                    className="h-8 px-3"
                     onClick={() => handleRenameSubmit(folder.id)}
                     disabled={!editingFolderName.trim()}
                   >
@@ -259,8 +260,8 @@ export const FolderList = ({
                   </Button>
                   <Button 
                     size="sm"
-                    variant="outline"
-                    className="h-8"
+                    variant="ghost"
+                    className="h-8 px-3"
                     onClick={() => {
                       setEditingFolderId(null);
                       setEditingFolderName("");
@@ -292,15 +293,16 @@ export const FolderList = ({
                       <DropdownMenuContent align="end" className="w-[160px]">
                         <DropdownMenuItem 
                           onClick={() => handleStartRename(folder)}
+                          className="gap-2"
                         >
-                          <Pencil className="mr-2 h-4 w-4" />
+                          <Pencil className="h-4 w-4" />
                           Rename
                         </DropdownMenuItem>
                         <DropdownMenuItem 
                           onClick={() => deleteFolder.mutate(folder.id)}
-                          className="text-destructive focus:text-destructive"
+                          className="text-destructive focus:text-destructive gap-2"
                         >
-                          <Trash2 className="mr-2 h-4 w-4" />
+                          <Trash2 className="h-4 w-4" />
                           Delete
                         </DropdownMenuItem>
                       </DropdownMenuContent>

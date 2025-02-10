@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -15,6 +16,7 @@ import Backtesting from "./pages/Backtesting";
 import BlueprintSessions from "./pages/BlueprintSessions";
 import Notebook from "./pages/Notebook";
 import Login from "./pages/Login";
+import MfeMae from "./pages/MfeMae";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 
 const queryClient = new QueryClient({
@@ -88,6 +90,14 @@ const App = () => {
                     element={
                       <ProtectedRoute>
                         <Backtesting />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/mfe-mae"
+                    element={
+                      <ProtectedRoute>
+                        <MfeMae />
                       </ProtectedRoute>
                     }
                   />

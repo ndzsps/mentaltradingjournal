@@ -28,8 +28,8 @@ interface Stats {
 
 interface ChartData {
   id: string;
-  updraw: number;
-  drawdown: number;
+  mfeRelativeToTp: number;
+  maeRelativeToSl: number;
   instrument?: string;
 }
 
@@ -74,6 +74,7 @@ export function MfeMaeChart() {
             lowestPrice: trade.lowestPrice,
             entryPrice: trade.entryPrice,
             takeProfit: trade.takeProfit,
+            stopLoss: trade.stopLoss,
             direction: trade.direction,
             id: trade.id
           });
@@ -83,6 +84,7 @@ export function MfeMaeChart() {
             trade.lowestPrice &&
             trade.entryPrice &&
             trade.takeProfit &&
+            trade.stopLoss &&
             trade.id
           ) {
             console.log('Trade passed validation checks');
@@ -90,30 +92,45 @@ export function MfeMaeChart() {
             const highestPrice = Number(trade.highestPrice);
             const lowestPrice = Number(trade.lowestPrice);
             const takeProfit = Number(trade.takeProfit);
+            const stopLoss = Number(trade.stopLoss);
             
             // Determine direction based on take profit
             const isBuy = takeProfit > entryPrice;
             console.log('Determined direction:', isBuy ? 'buy' : 'sell');
 
-            // Calculate MFE and MAE based on trade direction
-            const updraw = isBuy 
+            // Step 1: Calculate Updraw and Drawdown
+            const updraw = ((takeProfit - entryPrice) / entryPrice) * 100;
+            const drawdown = ((entryPrice - stopLoss) / entryPrice) * 100;
+
+            console.log('Base calculations:', {
+              updraw,
+              drawdown
+            });
+
+            // Calculate raw MFE and MAE based on trade direction
+            const mfe = isBuy 
               ? ((highestPrice - entryPrice) / entryPrice) * 100  // Buy MFE
               : ((entryPrice - lowestPrice) / entryPrice) * 100;  // Sell MFE
 
-            const drawdown = isBuy
+            const mae = isBuy
               ? ((lowestPrice - entryPrice) / entryPrice) * 100   // Buy MAE
               : ((highestPrice - entryPrice) / entryPrice) * 100; // Sell MAE
 
-            console.log('Calculated values:', {
-              updraw,
-              drawdown,
-              isBuy
+            // Step 2: Calculate relative percentages
+            const mfeRelativeToTp = (mfe / updraw) * 100;
+            const maeRelativeToSl = (mae / drawdown) * 100;
+
+            console.log('Final calculations:', {
+              mfe,
+              mae,
+              mfeRelativeToTp,
+              maeRelativeToSl
             });
 
             processedData.push({
               id: trade.id,
-              updraw,
-              drawdown,
+              mfeRelativeToTp,
+              maeRelativeToSl,
               instrument: trade.instrument
             });
           } else {
@@ -122,6 +139,7 @@ export function MfeMaeChart() {
               hasLowestPrice: !!trade.lowestPrice,
               hasEntryPrice: !!trade.entryPrice,
               hasTakeProfit: !!trade.takeProfit,
+              hasStopLoss: !!trade.stopLoss,
               hasId: !!trade.id
             });
           }
@@ -207,7 +225,7 @@ export function MfeMaeChart() {
                 dataKey="id" 
                 label={{ value: 'Trade ID', position: 'bottom' }}
               />
-              <YAxis domain={[-100, 100]} />
+              <YAxis domain={[0, 100]} label={{ value: 'Percentage (%)', angle: -90, position: 'insideLeft' }} />
               <Tooltip 
                 formatter={(value: number, name: string, props: { payload: ChartData }) => [
                   `${value.toFixed(2)}%`,
@@ -215,8 +233,16 @@ export function MfeMaeChart() {
                 ]}
               />
               <Legend />
-              <Bar dataKey="updraw" fill="#4ade80" name="MFE (Maximum Favorable Excursion)" />
-              <Bar dataKey="drawdown" fill="#f43f5e" name="MAE (Maximum Adverse Excursion)" />
+              <Bar 
+                dataKey="mfeRelativeToTp" 
+                fill="#4ade80" 
+                name="MFE Relative to TP (%)" 
+              />
+              <Bar 
+                dataKey="maeRelativeToSl" 
+                fill="#f43f5e" 
+                name="MAE Relative to SL (%)" 
+              />
             </BarChart>
           </ResponsiveContainer>
         </div>

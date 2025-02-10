@@ -48,14 +48,15 @@ export const CalendarDay = ({
   };
 
   const getWeekNumber = (date: Date) => {
-    // Get the first day of the month
-    const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
-    // Get the day of the week of the first day (0-6, where 0 is Sunday)
-    const firstDayOfWeek = firstDayOfMonth.getDay();
-    // Calculate the day of the month (1-31)
+    const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+    // How many days we need to pad from the previous month
+    const monthStartsOn = startOfMonth.getDay();
+    // The day of the month (1-31)
     const dayOfMonth = date.getDate();
-    // Calculate which row of the calendar this date falls into
-    return Math.ceil((dayOfMonth + firstDayOfWeek) / 7);
+    // Calculate which row this date falls into
+    // We add monthStartsOn to account for padding days, then subtract 1 to make it 0-based
+    // Then divide by 7 and add 1 to get the row number (1-based)
+    return Math.floor((dayOfMonth + monthStartsOn - 1) / 7) + 1;
   };
 
   const dayButton = (
@@ -136,3 +137,4 @@ export const CalendarDay = ({
     </div>
   );
 };
+

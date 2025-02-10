@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import {
   PieChart,
@@ -80,6 +81,44 @@ export const MistakeAnalysis = () => {
       label: category.label
     }));
 
+  // If there are no mistakes, show empty state
+  if (totalMistakes === 0) {
+    const emptyData = [{ name: "No Data", value: 100, loss: 0 }];
+    return (
+      <Card className="p-4 md:p-6 space-y-4">
+        <div className="space-y-2">
+          <h3 className="text-xl md:text-2xl font-bold">Behavioral Slippage</h3>
+          <p className="text-sm text-muted-foreground">
+            Analysis of trading mistakes and their impact
+          </p>
+        </div>
+
+        <div className="h-[250px] md:h-[300px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={emptyData}
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={80}
+                fill="#6E59A5"
+                dataKey="value"
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="space-y-2 bg-accent/10 p-3 md:p-4 rounded-lg">
+          <h4 className="font-semibold text-sm md:text-base">AI Insight</h4>
+          <p className="text-xs md:text-sm text-muted-foreground">
+            Start logging your trading mistakes to get insights on areas for improvement.
+          </p>
+        </div>
+      </Card>
+    );
+  }
+
   // Create data array including all possible mistakes and ensure specific ordering
   const data = allMistakeCategories.map(category => {
     const mistakeData = analytics.mistakeFrequencies[category.value] || { count: 0, loss: 0 };
@@ -109,12 +148,16 @@ export const MistakeAnalysis = () => {
   const renderCustomizedLegend = (props: any) => {
     const { payload } = props;
     
+    if (!payload || !Array.isArray(payload)) {
+      return null;
+    }
+
     // Find revenge trading and moving stop loss items
     const revengeIndex = payload.findIndex((item: any) => 
-      item.payload.categoryValue === 'revenge_trading'
+      item.payload && item.payload.categoryValue === 'revenge_trading'
     );
     const stopLossIndex = payload.findIndex((item: any) => 
-      item.payload.categoryValue === 'moving_stop_loss'
+      item.payload && item.payload.categoryValue === 'moving_stop_loss'
     );
 
     // Group these items if both exist
@@ -124,7 +167,9 @@ export const MistakeAnalysis = () => {
         color: payload[revengeIndex].color,
         type: payload[revengeIndex].type
       };
-      payload.splice(revengeIndex, 2, combinedItem);
+      const newPayload = [...payload];
+      newPayload.splice(revengeIndex, 2, combinedItem);
+      payload = newPayload;
     }
 
     return (

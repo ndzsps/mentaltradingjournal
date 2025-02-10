@@ -9,7 +9,6 @@ import { NoteViewSkeleton } from "./NoteViewSkeleton";
 import { EmptyNoteState } from "./EmptyNoteState";
 import { useNote } from "@/hooks/useNote";
 import { useState } from "react";
-import { LinkDialog } from "./LinkDialog";
 import { ColorPickerDialog } from "./ColorPickerDialog";
 
 interface NoteViewProps {
@@ -18,7 +17,6 @@ interface NoteViewProps {
 
 export const NoteView = ({ noteId }: NoteViewProps) => {
   const { user } = useAuth();
-  const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
   const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
   const {
     isLoading,
@@ -53,14 +51,6 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
     execCommand('strikeThrough');
   };
 
-  const handleLink = () => {
-    setIsLinkDialogOpen(true);
-  };
-
-  const handleLinkSubmit = (url: string) => {
-    execCommand('createLink', url);
-  };
-
   const handleColorChange = () => {
     setIsColorPickerOpen(true);
   };
@@ -93,18 +83,12 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
           onItalic={handleItalic}
           onUnderline={handleUnderline}
           onStrikethrough={handleStrikethrough}
-          onLink={handleLink}
           onColorChange={handleColorChange}
         />
         <Separator className="my-4" />
         <NoteContent 
           content={content} 
           onContentChange={handleContentChange} 
-        />
-        <LinkDialog 
-          isOpen={isLinkDialogOpen}
-          onClose={() => setIsLinkDialogOpen(false)}
-          onSubmit={handleLinkSubmit}
         />
         <ColorPickerDialog
           isOpen={isColorPickerOpen}

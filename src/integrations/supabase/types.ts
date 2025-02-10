@@ -207,6 +207,7 @@ export type Database = {
       notebook_notes: {
         Row: {
           content: string | null
+          content_type: string | null
           created_at: string
           emoji: string | null
           folder_id: string | null
@@ -219,6 +220,7 @@ export type Database = {
         }
         Insert: {
           content?: string | null
+          content_type?: string | null
           created_at?: string
           emoji?: string | null
           folder_id?: string | null
@@ -231,6 +233,7 @@ export type Database = {
         }
         Update: {
           content?: string | null
+          content_type?: string | null
           created_at?: string
           emoji?: string | null
           folder_id?: string | null

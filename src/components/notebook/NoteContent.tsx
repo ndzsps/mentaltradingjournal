@@ -52,7 +52,11 @@ export const NoteContent = ({ content, onContentChange }: NoteContentProps) => {
     <div
       ref={editorRef}
       contentEditable
-      className="min-h-[calc(100vh-300px)] focus:outline-none focus-visible:outline-none text-lg leading-relaxed transition-colors duration-200 prose prose-sm max-w-none dark:prose-invert prose-a:text-blue-600 hover:prose-a:text-blue-500 prose-a:cursor-pointer"
+      className="min-h-[calc(100vh-300px)] focus:outline-none focus-visible:outline-none text-lg leading-relaxed transition-colors duration-200 prose prose-sm max-w-none dark:prose-invert prose-p:my-0 prose-a:text-blue-600 hover:prose-a:text-blue-500 prose-a:no-underline hover:prose-a:underline prose-a:cursor-pointer"
+      style={{
+        wordWrap: 'break-word',
+        overflowWrap: 'break-word'
+      }}
       role="textbox"
       aria-multiline="true"
       onKeyDown={(e) => {

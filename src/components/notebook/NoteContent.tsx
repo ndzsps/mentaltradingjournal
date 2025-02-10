@@ -16,6 +16,14 @@ export const NoteContent = ({ content, onContentChange }: NoteContentProps) => {
     // Only set the content if it has changed and the editor isn't focused
     if (!editor.isEqualNode(document.activeElement)) {
       editor.innerHTML = content || '';
+      
+      // Add click handlers to all links
+      const links = editor.getElementsByTagName('a');
+      Array.from(links).forEach(link => {
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+      });
+      
       console.log('Setting content:', content); // Debug log
     }
   }, [content]);
@@ -28,6 +36,14 @@ export const NoteContent = ({ content, onContentChange }: NoteContentProps) => {
       const newContent = editor.innerHTML;
       console.log('Content changed to:', newContent); // Debug log
       onContentChange(newContent);
+    };
+
+    const handlePaste = (e: ClipboardEvent) => {
+      e.preventDefault();
+      const text = e.clipboardData?.getData('text/plain');
+      if (text) {
+        document.execCommand('insertText', false, text);
+      }
     };
 
     const handleClick = (e: MouseEvent) => {
@@ -44,10 +60,12 @@ export const NoteContent = ({ content, onContentChange }: NoteContentProps) => {
     };
 
     editor.addEventListener('input', handleInput);
+    editor.addEventListener('paste', handlePaste);
     editor.addEventListener('click', handleClick);
     
     return () => {
       editor.removeEventListener('input', handleInput);
+      editor.removeEventListener('paste', handlePaste);
       editor.removeEventListener('click', handleClick);
     };
   }, [onContentChange]);

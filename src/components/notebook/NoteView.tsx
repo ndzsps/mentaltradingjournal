@@ -63,12 +63,13 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
     const range = selection.getRangeAt(0);
     const formattedUrl = url.trim().startsWith('http') ? url.trim() : `https://${url.trim()}`;
     
+    const linkElement = document.createElement('a');
+    linkElement.href = formattedUrl;
+    linkElement.target = '_blank';
+    linkElement.rel = 'noopener noreferrer';
+    
     if (range.collapsed) {
-      const linkElement = document.createElement('a');
-      linkElement.href = formattedUrl;
       linkElement.textContent = formattedUrl;
-      linkElement.target = '_blank';
-      linkElement.rel = 'noopener noreferrer';
       range.insertNode(linkElement);
     } else {
       execCommand('createLink', formattedUrl);

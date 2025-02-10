@@ -196,8 +196,10 @@ export const NotebookContent = () => {
     <div className="flex h-[calc(100vh-4rem)]">
       {/* Folders Section (20%) */}
       <div className="w-1/5 min-w-[200px] border-r bg-background/50 flex flex-col">
-        <div className="p-4 space-y-4">
+        <div className="p-4 border-b bg-background/50">
           <h2 className="text-lg font-semibold">Folders</h2>
+        </div>
+        <div className="p-4">
           <FolderList 
             folders={folders || []} 
             isLoading={isLoadingFolders}

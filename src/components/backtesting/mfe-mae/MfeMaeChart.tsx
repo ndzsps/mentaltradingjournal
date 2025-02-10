@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import {
   BarChart,
@@ -171,7 +170,7 @@ export function MfeMaeChart() {
                 label={{ value: 'Trade #', position: 'bottom' }}
               />
               <YAxis 
-                domain={[-100, 100]} 
+                domain={[-200, 200]} 
                 tickFormatter={(value) => `${value} pips`}
                 label={{ value: 'Pips', angle: -90, position: 'insideLeft' }}
               />
@@ -232,4 +231,3 @@ export function MfeMaeChart() {
     </div>
   );
 }
-

@@ -73,6 +73,7 @@ export function MfeMaeChart() {
             highestPrice: trade.highestPrice,
             lowestPrice: trade.lowestPrice,
             entryPrice: trade.entryPrice,
+            takeProfit: trade.takeProfit,
             direction: trade.direction,
             id: trade.id
           });
@@ -81,14 +82,18 @@ export function MfeMaeChart() {
             trade.highestPrice &&
             trade.lowestPrice &&
             trade.entryPrice &&
-            trade.direction &&
+            trade.takeProfit &&
             trade.id
           ) {
             console.log('Trade passed validation checks');
             const entryPrice = Number(trade.entryPrice);
             const highestPrice = Number(trade.highestPrice);
             const lowestPrice = Number(trade.lowestPrice);
-            const isBuy = trade.direction === 'buy';
+            const takeProfit = Number(trade.takeProfit);
+            
+            // Determine direction based on take profit
+            const isBuy = takeProfit > entryPrice;
+            console.log('Determined direction:', isBuy ? 'buy' : 'sell');
 
             // Calculate MFE and MAE based on trade direction
             const updraw = isBuy 
@@ -116,7 +121,7 @@ export function MfeMaeChart() {
               hasHighestPrice: !!trade.highestPrice,
               hasLowestPrice: !!trade.lowestPrice,
               hasEntryPrice: !!trade.entryPrice,
-              hasDirection: !!trade.direction,
+              hasTakeProfit: !!trade.takeProfit,
               hasId: !!trade.id
             });
           }

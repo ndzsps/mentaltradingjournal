@@ -1,3 +1,4 @@
+
 import { Folder, Plus, MoreVertical, Trash2, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -174,6 +175,11 @@ export const FolderList = ({
     setEditingFolderName(folder.name);
   };
 
+  const handleRenameSubmit = (folderId: string) => {
+    if (!editingFolderName.trim()) return;
+    renameFolder.mutate({ folderId, newName: editingFolderName });
+  };
+
   const handleDeleteFolder = (folder: Folder) => {
     if (folder.is_default) {
       toast({
@@ -305,9 +311,6 @@ export const FolderList = ({
                   >
                     <Folder className="mr-2 h-4 w-4" />
                     {folder.name}
-                    {folder.is_default && (
-                      <span className="ml-2 text-xs text-muted-foreground">(Default)</span>
-                    )}
                   </Button>
                   {!folder.is_default && (
                     <div className="absolute top-1/2 right-2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity folder-actions">
@@ -350,3 +353,4 @@ export const FolderList = ({
     </div>
   );
 };
+

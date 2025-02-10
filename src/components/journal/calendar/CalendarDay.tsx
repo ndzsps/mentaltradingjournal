@@ -48,8 +48,16 @@ export const CalendarDay = ({
   };
 
   const getWeekNumber = (date: Date) => {
-    const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
-    const monthStartsOn = startOfMonth.getDay();
+    // Get the first day of the displayed month
+    const displayedMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+    const displayedMonthNumber = displayedMonth.getMonth();
+
+    // Only calculate week numbers for dates in the displayed month
+    if (date.getMonth() !== displayedMonthNumber) {
+      return null; // Return null for dates from adjacent months
+    }
+
+    const monthStartsOn = displayedMonth.getDay();
     const dayOfMonth = date.getDate();
     
     // Calculate row position in calendar grid (0-based)
@@ -117,7 +125,7 @@ export const CalendarDay = ({
       ) : (
         dayButton
       )}
-      {isSaturday && (
+      {isSaturday && weekNumber && (
         <div className="absolute -right-8 top-1/2 -translate-y-1/2">
           <Tooltip>
             <TooltipTrigger asChild>
@@ -138,8 +146,9 @@ export const CalendarDay = ({
       <WeeklyReviewDialog 
         open={isWeeklyReviewOpen}
         onOpenChange={setIsWeeklyReviewOpen}
-        weekNumber={weekNumber}
+        weekNumber={weekNumber || 0}
       />
     </div>
   );
 };
+

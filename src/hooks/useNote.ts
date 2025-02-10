@@ -36,7 +36,11 @@ export const useNote = (noteId: string | null, user: any) => {
       setTitle(note.title || "");
       setContent(note.content || "");
       setTags(note.tags || []);
-      setTagColors(note.tag_colors || {});
+      // Ensure tag_colors is a valid object before setting it
+      const colors = typeof note.tag_colors === 'object' && note.tag_colors !== null 
+        ? note.tag_colors as Record<string, string>
+        : {};
+      setTagColors(colors);
     }
   }, [noteId, note]);
 

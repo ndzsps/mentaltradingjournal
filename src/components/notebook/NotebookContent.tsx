@@ -36,7 +36,12 @@ export const NotebookContent = () => {
 
       const { data, error } = await query;
       if (error) throw error;
-      return data;
+      
+      // Transform the tag_colors to ensure it's Record<string, string>
+      return data.map(note => ({
+        ...note,
+        tag_colors: (note.tag_colors || {}) as Record<string, string>
+      }));
     },
     enabled: !!user,
   });

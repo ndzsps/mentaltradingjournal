@@ -12,6 +12,9 @@ interface Note {
   tags: string[];
   tag_colors: Record<string, string>;
   emoji: string;
+  folder_id?: string;
+  updated_at: string;
+  user_id: string;
 }
 
 interface NotesListProps {

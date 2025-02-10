@@ -94,7 +94,6 @@ export function MfeMaeChart() {
             const highestPrice = Number(trade.highestPrice);
             const lowestPrice = Number(trade.lowestPrice);
 
-            // Calculate pip values (assuming 5 decimal places for forex)
             const mfePips = ((highestPrice - entryPrice) * 10000);
             const maePips = ((entryPrice - lowestPrice) * 10000);
 
@@ -109,7 +108,7 @@ export function MfeMaeChart() {
               tradeNumber: tradeNumber++,
               instrument: trade.instrument,
               updraw: Number(mfePips.toFixed(1)),
-              drawdown: -Number(maePips.toFixed(1)), // Negative to show below 0
+              drawdown: -Number(maePips.toFixed(1)),
             });
           }
         });
@@ -185,11 +184,13 @@ export function MfeMaeChart() {
                 dataKey="updraw" 
                 fill="#4ade80" 
                 name="MFE (Maximum Favorable Excursion)"
+                stackId="a"
               />
               <Bar 
                 dataKey="drawdown" 
                 fill="#f43f5e" 
                 name="MAE (Maximum Adverse Excursion)"
+                stackId="a"
               />
             </BarChart>
           </ResponsiveContainer>

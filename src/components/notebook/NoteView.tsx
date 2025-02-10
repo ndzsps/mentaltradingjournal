@@ -3,6 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { NoteTitle } from "./NoteTitle";
 import { NoteTags } from "./NoteTags";
 import { NoteContent } from "./NoteContent";
+import { FormatToolbar } from "./FormatToolbar";
 import { Separator } from "@/components/ui/separator";
 import { NoteViewSkeleton } from "./NoteViewSkeleton";
 import { EmptyNoteState } from "./EmptyNoteState";
@@ -27,6 +28,36 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
     handleUpdateTagColor,
   } = useNote(noteId, user);
 
+  const handleBold = () => {
+    // TODO: Implement bold formatting
+    console.log("Bold clicked");
+  };
+
+  const handleItalic = () => {
+    // TODO: Implement italic formatting
+    console.log("Italic clicked");
+  };
+
+  const handleUnderline = () => {
+    // TODO: Implement underline formatting
+    console.log("Underline clicked");
+  };
+
+  const handleStrikethrough = () => {
+    // TODO: Implement strikethrough formatting
+    console.log("Strikethrough clicked");
+  };
+
+  const handleLink = () => {
+    // TODO: Implement link formatting
+    console.log("Link clicked");
+  };
+
+  const handleColorChange = () => {
+    // TODO: Implement color change
+    console.log("Color change clicked");
+  };
+
   if (!noteId) {
     return <EmptyNoteState />;
   }
@@ -45,6 +76,14 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
           onAddTag={handleAddTag} 
           onRemoveTag={handleRemoveTag} 
           onUpdateTagColor={handleUpdateTagColor}
+        />
+        <FormatToolbar 
+          onBold={handleBold}
+          onItalic={handleItalic}
+          onUnderline={handleUnderline}
+          onStrikethrough={handleStrikethrough}
+          onLink={handleLink}
+          onColorChange={handleColorChange}
         />
         <Separator className="my-4" />
         <NoteContent 

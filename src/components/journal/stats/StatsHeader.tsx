@@ -1,9 +1,10 @@
+
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { TradeWinPercentage } from "./TradeWinPercentage";
 import { useTimeFilter } from "@/contexts/TimeFilterContext";
-import { startOfMonth, subMonths, isWithinInterval, endOfMonth } from "date-fns";
+import { startOfMonth, subMonths, isWithinInterval, endOfMonth, startOfDay, endOfDay } from "date-fns";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -52,18 +53,18 @@ export const StatsHeader = () => {
     switch (timeFilter) {
       case "this-month":
         return {
-          start: startOfMonth(now),
-          end: now
+          start: startOfDay(subMonths(now, 1)),
+          end: endOfDay(now)
         };
       case "last-month":
         return {
-          start: startOfMonth(subMonths(now, 1)),
-          end: endOfMonth(subMonths(now, 1))
+          start: startOfDay(subMonths(now, 3)),
+          end: endOfDay(now)
         };
       case "last-three-months":
         return {
-          start: startOfMonth(subMonths(now, 3)),
-          end: now
+          start: startOfDay(subMonths(now, 12)),
+          end: endOfDay(now)
         };
       default:
         return null;
@@ -76,6 +77,17 @@ export const StatsHeader = () => {
 
     return entries.filter(entry => {
       const entryDate = new Date(entry.created_at);
+      
+      // Check if the entry has trades
+      if (entry.trades && entry.trades.length > 0) {
+        // For entries with trades, check if any trade's exit date falls within the interval
+        return entry.trades.some((trade: any) => {
+          const exitDate = trade.exitDate ? new Date(trade.exitDate) : new Date(entry.created_at);
+          return isWithinInterval(exitDate, interval);
+        });
+      }
+      
+      // For entries without trades, use the created_at date
       return isWithinInterval(entryDate, interval);
     });
   };

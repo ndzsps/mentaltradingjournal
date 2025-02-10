@@ -55,14 +55,11 @@ export const CalendarDay = ({
     // Get the total number of days in the month
     const lastDayOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
     
-    // Calculate the total number of weeks in the month
-    const totalWeeks = Math.ceil((lastDayOfMonth + monthStartsOn) / 7);
+    // Calculate row position in calendar grid (0-based)
+    const rowPosition = Math.floor((dayOfMonth + monthStartsOn - 1) / 7);
     
-    // Calculate which week this date falls into (1-based)
-    const weekNumber = Math.ceil((dayOfMonth + monthStartsOn) / 7);
-    
-    // Ensure the week number doesn't exceed the total number of weeks
-    return Math.min(weekNumber, totalWeeks);
+    // Add 1 to convert to 1-based week number
+    return rowPosition + 1;
   };
 
   const dayButton = (
@@ -143,3 +140,4 @@ export const CalendarDay = ({
     </div>
   );
 };
+

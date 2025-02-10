@@ -109,7 +109,7 @@ export function MfeMaeChart() {
               tradeNumber: tradeNumber++,
               instrument: trade.instrument,
               updraw: Number(mfePips.toFixed(1)), // MFE in pips
-              drawdown: Number(maePips.toFixed(1)), // MAE in pips (positive for stacking)
+              drawdown: -Number(maePips.toFixed(1)), // MAE in pips, negative to show below 0
             });
           }
         });
@@ -171,12 +171,12 @@ export function MfeMaeChart() {
                 label={{ value: 'Trade #', position: 'bottom' }}
               />
               <YAxis 
-                domain={[0, 100]} 
+                domain={[-100, 100]} 
                 tickFormatter={(value) => `${value} pips`}
                 label={{ value: 'Pips', angle: -90, position: 'insideLeft' }}
               />
               <Tooltip 
-                formatter={(value: number) => [`${value} pips`]}
+                formatter={(value: number) => [`${Math.abs(value)} pips`, value < 0 ? 'MAE' : 'MFE']}
                 labelFormatter={(label) => `Trade #${label}`}
               />
               <Legend />
@@ -184,13 +184,11 @@ export function MfeMaeChart() {
                 dataKey="updraw" 
                 fill="#4ade80" 
                 name="MFE (Maximum Favorable Excursion)"
-                stackId="a"
               />
               <Bar 
                 dataKey="drawdown" 
                 fill="#f43f5e" 
                 name="MAE (Maximum Adverse Excursion)"
-                stackId="a"
               />
             </BarChart>
           </ResponsiveContainer>
@@ -234,3 +232,4 @@ export function MfeMaeChart() {
     </div>
   );
 }
+

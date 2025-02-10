@@ -28,10 +28,8 @@ interface Stats {
 
 interface ChartData {
   id: string;
-  tradeNumber: number;
   updraw: number;
   drawdown: number;
-  instrument?: string;
 }
 
 export function MfeMaeChart() {
@@ -52,139 +50,67 @@ export function MfeMaeChart() {
     const fetchTrades = async () => {
       if (!user) return;
 
-      const { data: entries, error } = await supabase
+      const { data: entries } = await supabase
         .from('journal_entries')
         .select('*')
         .eq('user_id', user.id);
 
-      if (error) {
-        console.error('Error fetching entries:', error);
-        return;
-      }
-
-      console.log('Fetched entries:', entries);
-
       if (!entries) return;
 
       const processedData: ChartData[] = [];
-      let tradeNumber = 1;
       
       entries.forEach(entry => {
         const trades = entry.trades as Trade[];
-        console.log('Processing trades from entry:', trades);
-        
         if (!trades) return;
         
         trades.forEach(trade => {
-          console.log('Processing trade:', trade);
           if (
             trade.highestPrice &&
             trade.lowestPrice &&
             trade.entryPrice &&
-            trade.direction &&
             trade.id
           ) {
-            console.log('Trade data for calculation:', {
-              highestPrice: trade.highestPrice,
-              lowestPrice: trade.lowestPrice,
-              entryPrice: trade.entryPrice,
-              direction: trade.direction,
-              instrument: trade.instrument
-            });
-            
             const entryPrice = Number(trade.entryPrice);
             const highestPrice = Number(trade.highestPrice);
             const lowestPrice = Number(trade.lowestPrice);
-            const isBuy = trade.direction === 'buy';
 
-            // Calculate MFE and MAE based on trade direction
-            let mfePips, maePips;
-
-            if (isBuy) {
-              // For long trades
-              mfePips = ((highestPrice - entryPrice) * 10000).toFixed(1);  // MFE is highest - entry
-              maePips = ((lowestPrice - entryPrice) * 10000).toFixed(1);   // MAE is lowest - entry (naturally negative)
-            } else {
-              // For short trades
-              mfePips = ((entryPrice - lowestPrice) * 10000).toFixed(1);   // MFE is entry - lowest
-              maePips = ((entryPrice - highestPrice) * 10000).toFixed(1);  // MAE is entry - highest (naturally negative)
-            }
-
-            console.log('Calculated pips:', {
-              mfePips,
-              maePips,
-              direction: trade.direction,
-              instrument: trade.instrument
-            });
+            const updraw = ((highestPrice - entryPrice) / entryPrice) * 100;
+            const drawdown = ((lowestPrice - entryPrice) / entryPrice) * 100;
 
             processedData.push({
               id: trade.id,
-              tradeNumber: tradeNumber++,
-              instrument: trade.instrument,
-              updraw: Number(mfePips),
-              drawdown: Number(maePips),
+              updraw,
+              drawdown,
             });
           }
         });
       });
 
-      console.log('Processed chart data:', processedData);
       setData(processedData);
 
       // Calculate statistics
       const allTrades = entries.flatMap(entry => entry.trades || []) as Trade[];
-      console.log('All trades for stats:', allTrades);
-      
-      const winners = allTrades.filter(t => {
-        if (!t.direction || !t.exitPrice || !t.entryPrice) return false;
-        const isLong = t.direction === 'buy';
-        return isLong ? 
-          Number(t.exitPrice) > Number(t.entryPrice) : 
-          Number(t.exitPrice) < Number(t.entryPrice);
-      });
-
-      const losers = allTrades.filter(t => {
-        if (!t.direction || !t.exitPrice || !t.entryPrice) return false;
-        const isLong = t.direction === 'buy';
-        return isLong ? 
-          Number(t.exitPrice) <= Number(t.entryPrice) : 
-          Number(t.exitPrice) >= Number(t.entryPrice);
-      });
+      const winners = allTrades.filter(t => 
+        Number(t.exitPrice) > Number(t.entryPrice)
+      );
+      const losers = allTrades.filter(t => 
+        Number(t.exitPrice) <= Number(t.entryPrice)
+      );
 
       const calculateAverage = (trades: Trade[], fn: (t: Trade) => number) => 
         trades.length ? trades.reduce((acc, curr) => acc + fn(curr), 0) / trades.length : 0;
 
-      const getMfe = (t: Trade) => {
-        if (!t.direction) return 0;
-        const isLong = t.direction === 'buy';
-        return isLong ?
-          ((Number(t.highestPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100 :
-          ((Number(t.entryPrice) - Number(t.lowestPrice)) / Number(t.entryPrice)) * 100;
-      };
-
-      const getMae = (t: Trade) => {
-        if (!t.direction) return 0;
-        const isLong = t.direction === 'buy';
-        return isLong ?
-          ((Number(t.lowestPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100 :
-          ((Number(t.entryPrice) - Number(t.highestPrice)) / Number(t.entryPrice)) * 100;
-      };
-
-      const getExit = (t: Trade) => {
-        if (!t.direction) return 0;
-        const isLong = t.direction === 'buy';
-        return isLong ?
-          ((Number(t.exitPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100 :
-          ((Number(t.entryPrice) - Number(t.exitPrice)) / Number(t.entryPrice)) * 100;
-      };
+      const getUpdraw = (t: Trade) => ((Number(t.highestPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100;
+      const getDrawdown = (t: Trade) => ((Number(t.lowestPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100;
+      const getExit = (t: Trade) => ((Number(t.exitPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100;
 
       setStats({
-        tradesHitTp: winners.length > 0 ? (winners.length / allTrades.length) * 100 : 0,
-        tradesHitSl: losers.length > 0 ? (losers.length / allTrades.length) * 100 : 0,
-        avgUpdrawWinner: calculateAverage(winners, getMfe),
-        avgUpdrawLoser: calculateAverage(losers, getMfe),
-        avgDrawdownWinner: calculateAverage(winners, getMae),
-        avgDrawdownLoser: calculateAverage(losers, getMae),
+        tradesHitTp: (winners.length / allTrades.length) * 100,
+        tradesHitSl: (losers.length / allTrades.length) * 100,
+        avgUpdrawWinner: calculateAverage(winners, getUpdraw),
+        avgUpdrawLoser: calculateAverage(losers, getUpdraw),
+        avgDrawdownWinner: calculateAverage(winners, getDrawdown),
+        avgDrawdownLoser: calculateAverage(losers, getDrawdown),
         avgExitWinner: calculateAverage(winners, getExit),
         avgExitLoser: calculateAverage(losers, getExit),
       });
@@ -208,32 +134,12 @@ export function MfeMaeChart() {
               }}
             >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis 
-                dataKey="tradeNumber" 
-                label={{ value: 'Trade #', position: 'bottom' }}
-              />
-              <YAxis 
-                domain={[-100, 100]} 
-                tickFormatter={(value) => `${value} pips`}
-                label={{ value: 'Pips', angle: -90, position: 'insideLeft' }}
-              />
-              <Tooltip 
-                formatter={(value: number) => [`${Math.abs(value)} pips`, value < 0 ? 'MAE' : 'MFE']}
-                labelFormatter={(label) => `Trade #${label}`}
-              />
+              <XAxis dataKey="id" />
+              <YAxis domain={[-100, 100]} />
+              <Tooltip />
               <Legend />
-              <Bar 
-                dataKey="updraw" 
-                fill="#4ade80" 
-                name="MFE (Maximum Favorable Excursion)"
-                stackId="a"
-              />
-              <Bar 
-                dataKey="drawdown" 
-                fill="#f43f5e" 
-                name="MAE (Maximum Adverse Excursion)"
-                stackId="a"
-              />
+              <Bar dataKey="updraw" fill="#4ade80" name="MFE (Maximum Favorable Excursion)" />
+              <Bar dataKey="drawdown" fill="#f43f5e" name="MAE (Maximum Adverse Excursion)" />
             </BarChart>
           </ResponsiveContainer>
         </div>

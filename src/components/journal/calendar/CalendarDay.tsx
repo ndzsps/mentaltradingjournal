@@ -48,9 +48,12 @@ export const CalendarDay = ({
   };
 
   const getWeekNumber = (date: Date) => {
-    const startOfYear = new Date(date.getFullYear(), 0, 1);
-    const days = Math.floor((date.getTime() - startOfYear.getTime()) / (24 * 60 * 60 * 1000));
-    return Math.ceil((days + startOfYear.getDay() + 1) / 7);
+    // Get the first day of the month
+    const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+    // Calculate days from the start of the month
+    const days = Math.floor((date.getTime() - firstDayOfMonth.getTime()) / (24 * 60 * 60 * 1000));
+    // Get the week number within the month
+    return Math.ceil((days + firstDayOfMonth.getDay() + 1) / 7);
   };
 
   const dayButton = (

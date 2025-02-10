@@ -22,9 +22,16 @@ export const CalendarDay = ({
   ...props 
 }: CalendarDayProps) => {
   const stats = calculateDayStats(
-    entries.filter(entry => 
-      new Date(entry.date).toDateString() === dayDate.toDateString()
-    )
+    entries.filter(entry => {
+      // Filter trades that were closed on this day
+      const hasClosedTradesOnThisDay = entry.trades?.some(trade => {
+        const exitDate = trade.exitDate ? new Date(trade.exitDate) : null;
+        return exitDate?.toDateString() === dayDate.toDateString();
+      });
+      
+      return hasClosedTradesOnThisDay || 
+             new Date(entry.date).toDateString() === dayDate.toDateString();
+    })
   );
   
   const style = getEmotionStyle(stats);

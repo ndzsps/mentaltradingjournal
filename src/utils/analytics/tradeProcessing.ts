@@ -1,3 +1,4 @@
+
 import { JournalEntry, Trade } from "@/types/analytics";
 
 export const normalizeTradePnL = (trade: Trade): Trade => {
@@ -14,7 +15,13 @@ export const normalizeTradePnL = (trade: Trade): Trade => {
 
 export const processJournalTrades = (journalEntries: JournalEntry[]): Trade[] => {
   return journalEntries.flatMap(entry => 
-    (entry.trades || []).map(normalizeTradePnL)
+    (entry.trades || [])
+      .map(normalizeTradePnL)
+      .map(trade => ({
+        ...trade,
+        // Use exitDate instead of entryDate for date-based calculations
+        effectiveDate: trade.exitDate || trade.entryDate
+      }))
   );
 };
 

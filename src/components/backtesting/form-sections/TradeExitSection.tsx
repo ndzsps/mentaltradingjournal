@@ -1,4 +1,3 @@
-
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
@@ -7,8 +6,7 @@ interface TradeExitSectionProps {
     exitDate: string;
     exitPrice: number;
     pnl: number;
-    highestPrice: number;
-    lowestPrice: number;
+    fees: number;
   };
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
@@ -54,23 +52,11 @@ export function TradeExitSection({ formData, onInputChange }: TradeExitSectionPr
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="highestPrice">Highest Price</Label>
+        <Label htmlFor="fees">Fees</Label>
         <Input
           type="number"
-          id="highestPrice"
-          value={formData.highestPrice || ''}
-          onChange={onInputChange}
-          placeholder="0.00"
-          step="0.01"
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="lowestPrice">Lowest Price</Label>
-        <Input
-          type="number"
-          id="lowestPrice"
-          value={formData.lowestPrice || ''}
+          id="fees"
+          value={formData.fees || ''}
           onChange={onInputChange}
           placeholder="0.00"
           step="0.01"

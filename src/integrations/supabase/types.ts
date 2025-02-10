@@ -21,11 +21,12 @@ export type Database = {
           entry_date: string | null
           entry_price: number | null
           exit_price: number | null
-          fees: number | null
           four_hour_url: string | null
+          highest_price: number | null
           id: string
           instrument: string | null
           leverage: number | null
+          lowest_price: number | null
           market_type: string
           name: string
           one_hour_url: string | null
@@ -54,11 +55,12 @@ export type Database = {
           entry_date?: string | null
           entry_price?: number | null
           exit_price?: number | null
-          fees?: number | null
           four_hour_url?: string | null
+          highest_price?: number | null
           id?: string
           instrument?: string | null
           leverage?: number | null
+          lowest_price?: number | null
           market_type: string
           name: string
           one_hour_url?: string | null
@@ -87,11 +89,12 @@ export type Database = {
           entry_date?: string | null
           entry_price?: number | null
           exit_price?: number | null
-          fees?: number | null
           four_hour_url?: string | null
+          highest_price?: number | null
           id?: string
           instrument?: string | null
           leverage?: number | null
+          lowest_price?: number | null
           market_type?: string
           name?: string
           one_hour_url?: string | null

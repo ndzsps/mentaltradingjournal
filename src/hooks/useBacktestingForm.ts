@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -16,7 +17,8 @@ interface FormData {
   exitDuration: number;
   exitPrice: number;
   pnl: number;
-  fees: number;
+  highestPrice: number;
+  lowestPrice: number;
   beforeUrl: string;
   afterUrl: string;
   weeklyUrl: string;
@@ -45,7 +47,8 @@ export function useBacktestingForm(userId: string | undefined, navigate: (path: 
     exitDuration: 0,
     exitPrice: 0,
     pnl: 0,
-    fees: 0,
+    highestPrice: 0,
+    lowestPrice: 0,
     beforeUrl: '',
     afterUrl: '',
     weeklyUrl: '',
@@ -134,7 +137,8 @@ export function useBacktestingForm(userId: string | undefined, navigate: (path: 
           stop_loss: formData.stopLoss,
           take_profit: formData.takeProfit,
           pnl: formData.pnl,
-          fees: formData.fees,
+          highest_price: formData.highestPrice,
+          lowest_price: formData.lowestPrice,
           before_url: formData.beforeUrl,
           after_url: formData.afterUrl,
           weekly_url: formData.weeklyUrl,

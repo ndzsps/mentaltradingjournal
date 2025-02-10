@@ -1,3 +1,4 @@
+
 export interface Session {
   id: string;
   entryDate: string;
@@ -10,6 +11,8 @@ export interface Session {
   stopLoss: number;
   takeProfit: number;
   pnl: number;
+  highestPrice: number;
+  lowestPrice: number;
   weeklyUrl: string | null;
   dailyUrl: string | null;
   fourHourUrl: string | null;

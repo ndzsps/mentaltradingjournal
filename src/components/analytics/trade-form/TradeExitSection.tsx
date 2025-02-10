@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -58,11 +59,21 @@ export const TradeExitSection = () => {
           />
         </div>
         <div className="grid w-full items-center gap-1.5">
-          <Label htmlFor="fees">Fees</Label>
+          <Label htmlFor="highestPrice">Highest Price</Label>
           <Input
             type="number"
-            id="fees"
-            name="fees"
+            id="highestPrice"
+            name="highestPrice"
+            placeholder="0.00"
+            step="0.01"
+          />
+        </div>
+        <div className="grid w-full items-center gap-1.5">
+          <Label htmlFor="lowestPrice">Lowest Price</Label>
+          <Input
+            type="number"
+            id="lowestPrice"
+            name="lowestPrice"
             placeholder="0.00"
             step="0.01"
           />

@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import {
   BarChart,
@@ -94,8 +93,8 @@ export function MfeMaeChart() {
             const highestPrice = Number(trade.highestPrice);
             const lowestPrice = Number(trade.lowestPrice);
 
-            const mfePips = ((highestPrice - entryPrice) * 10000);
-            const maePips = ((entryPrice - lowestPrice) * 10000);
+            const mfePips = Math.abs((highestPrice - entryPrice) * 10000);
+            const maePips = -Math.abs((entryPrice - lowestPrice) * 10000); // Ensure MAE is always negative
 
             console.log('Calculated pips:', {
               mfePips,
@@ -108,7 +107,7 @@ export function MfeMaeChart() {
               tradeNumber: tradeNumber++,
               instrument: trade.instrument,
               updraw: Number(mfePips.toFixed(1)),
-              drawdown: -Number(maePips.toFixed(1)),
+              drawdown: Number(maePips.toFixed(1)),
             });
           }
         });
@@ -163,7 +162,6 @@ export function MfeMaeChart() {
                 left: 20,
                 bottom: 5,
               }}
-              barGap={0}
             >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis 

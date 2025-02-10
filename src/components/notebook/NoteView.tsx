@@ -10,6 +10,7 @@ import { EmptyNoteState } from "./EmptyNoteState";
 import { useNote } from "@/hooks/useNote";
 import { useState } from "react";
 import { LinkDialog } from "./LinkDialog";
+import { ColorPickerDialog } from "./ColorPickerDialog";
 
 interface NoteViewProps {
   noteId: string | null;
@@ -18,6 +19,7 @@ interface NoteViewProps {
 export const NoteView = ({ noteId }: NoteViewProps) => {
   const { user } = useAuth();
   const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
+  const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
   const {
     isLoading,
     title,
@@ -60,10 +62,11 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
   };
 
   const handleColorChange = () => {
-    const color = window.prompt('Enter color (e.g. #000000, red, blue):');
-    if (color) {
-      execCommand('foreColor', color);
-    }
+    setIsColorPickerOpen(true);
+  };
+
+  const handleColorSelect = (color: string) => {
+    execCommand('foreColor', color);
   };
 
   if (!noteId) {
@@ -102,6 +105,11 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
           isOpen={isLinkDialogOpen}
           onClose={() => setIsLinkDialogOpen(false)}
           onSubmit={handleLinkSubmit}
+        />
+        <ColorPickerDialog
+          isOpen={isColorPickerOpen}
+          onClose={() => setIsColorPickerOpen(false)}
+          onColorSelect={handleColorSelect}
         />
       </div>
     </div>

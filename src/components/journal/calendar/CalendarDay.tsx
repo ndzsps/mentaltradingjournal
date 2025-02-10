@@ -52,15 +52,14 @@ export const CalendarDay = ({
     const monthStartsOn = startOfMonth.getDay();
     const dayOfMonth = date.getDate();
     
-    // Get the total number of days in the month
-    const lastDayOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
-    
     // Calculate row position in calendar grid (0-based)
     const rowPosition = Math.floor((dayOfMonth + monthStartsOn - 1) / 7);
     
     // Add 1 to convert to 1-based week number
     return rowPosition + 1;
   };
+
+  const weekNumber = getWeekNumber(dayDate);
 
   const dayButton = (
     <button 
@@ -127,7 +126,7 @@ export const CalendarDay = ({
               />
             </TooltipTrigger>
             <TooltipContent>
-              <p>Weekly Review</p>
+              <p>Week {weekNumber} Review</p>
             </TooltipContent>
           </Tooltip>
         </div>
@@ -135,7 +134,7 @@ export const CalendarDay = ({
       <WeeklyReviewDialog 
         open={isWeeklyReviewOpen}
         onOpenChange={setIsWeeklyReviewOpen}
-        weekNumber={getWeekNumber(dayDate)}
+        weekNumber={weekNumber}
       />
     </div>
   );

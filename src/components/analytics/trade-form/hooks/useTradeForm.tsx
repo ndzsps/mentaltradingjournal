@@ -98,6 +98,20 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
 
       await onSubmit(tradeData as Trade, !!editTrade);
       onOpenChange(false);
+
+      // Create a full-screen loading overlay
+      const overlay = document.createElement('div');
+      overlay.className = 'fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center';
+      overlay.innerHTML = `
+        <div class="flex flex-col items-center gap-2">
+          <div class="h-8 w-8 animate-spin rounded-full border-4 border-primary border-r-transparent"></div>
+          <p class="text-sm text-muted-foreground">Updating...</p>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+
+      // Short delay to ensure the overlay is visible
+      await new Promise(resolve => setTimeout(resolve, 500));
       
       if (!editTrade) {
         // Store success message in sessionStorage before refresh
@@ -120,3 +134,4 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
     isSubmitting,
   };
 };
+

@@ -163,7 +163,7 @@ const Pricing = () => {
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-2xl font-bold text-white">Yearly Plan</h3>
                 <div className="text-right">
-                  <span className="text-2xl font-bold text-white">$99</span>
+                  <span className="text-2xl font-bold text-white">$90</span>
                   <span className="text-gray-300 text-sm">/year</span>
                 </div>
               </div>

@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { generateAnalytics } from "@/utils/analyticsUtils";
@@ -148,19 +147,19 @@ export const StatsHeader = () => {
           variant={timeFilter === "this-month" ? "default" : "outline"}
           onClick={() => setTimeFilter("this-month")}
         >
-          This Month
+          Last 30 Days
         </Button>
         <Button 
           variant={timeFilter === "last-month" ? "default" : "outline"}
           onClick={() => setTimeFilter("last-month")}
         >
-          Last Month
+          Last Quarter
         </Button>
         <Button 
           variant={timeFilter === "last-three-months" ? "default" : "outline"}
           onClick={() => setTimeFilter("last-three-months")}
         >
-          Last Quarter
+          Last Year
         </Button>
       </div>
 
@@ -209,4 +208,3 @@ export const StatsHeader = () => {
     </div>
   );
 };
-

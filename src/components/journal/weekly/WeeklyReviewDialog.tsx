@@ -7,6 +7,7 @@ import { NotepadText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { startOfWeek } from "date-fns";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface WeeklyReviewDialogProps {
   open: boolean;
@@ -24,6 +25,7 @@ export const WeeklyReviewDialog = ({
   const [improvement, setImprovement] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const loadReview = async () => {
     try {
@@ -34,6 +36,7 @@ export const WeeklyReviewDialog = ({
         .from('weekly_reviews')
         .select('*')
         .eq('week_start_date', weekStart.toISOString().split('T')[0])
+        .eq('user_id', user?.id)
         .single();
 
       if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned"
@@ -58,12 +61,21 @@ export const WeeklyReviewDialog = ({
   };
 
   useEffect(() => {
-    if (open) {
+    if (open && user) {
       loadReview();
     }
-  }, [open]);
+  }, [open, user]);
 
   const handleSave = async () => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "You must be logged in to save a review.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       setLoading(true);
       const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
@@ -71,6 +83,7 @@ export const WeeklyReviewDialog = ({
       const { error } = await supabase
         .from('weekly_reviews')
         .upsert({
+          user_id: user.id,
           week_start_date: weekStart.toISOString().split('T')[0],
           strength,
           weakness,

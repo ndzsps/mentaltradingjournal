@@ -14,9 +14,9 @@ export const FormatToolbar = ({ onFormat, position }: FormatToolbarProps) => {
     <div 
       className="fixed z-50 flex gap-1 p-1 rounded-md bg-gray-900/90 backdrop-blur-sm shadow-lg border border-gray-800"
       style={{ 
-        top: `${position.y - 40}px`, // Position 40px above the selection
+        top: `${Math.max(position.y - 40, 10)}px`, // Position 40px above, with min 10px from top
         left: `${position.x}px`,
-        transform: 'translateX(-50%)', // Center horizontally relative to the cursor
+        transform: 'translateX(-50%)', // Center horizontally
       }}
     >
       <Button

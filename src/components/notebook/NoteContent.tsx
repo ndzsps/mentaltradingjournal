@@ -24,8 +24,8 @@ export const NoteContent = ({ content, onContentChange }: NoteContentProps) => {
     const rect = range.getBoundingClientRect();
     
     setToolbarPosition({
-      x: rect.left + (rect.width / 2),
-      y: rect.top + window.scrollY
+      x: rect.left + (rect.width / 2), // Center horizontally
+      y: rect.top, // Use the top position of the selection
     });
   }, []);
 

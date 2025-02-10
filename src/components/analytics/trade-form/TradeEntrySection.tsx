@@ -14,8 +14,8 @@ export const TradeEntrySection = () => {
             type="number"
             id="entryPrice"
             name="entryPrice"
-            placeholder="0.00"
-            step="0.01"
+            placeholder="0.000000"
+            step="0.000001"
           />
         </div>
         <div className="grid w-full items-center gap-1.5">
@@ -25,7 +25,7 @@ export const TradeEntrySection = () => {
             id="quantity"
             name="quantity"
             placeholder="Enter lot size or contracts"
-            step="0.01"
+            step="0.000001"
           />
         </div>
         <div className="grid w-full items-center gap-1.5">
@@ -34,8 +34,8 @@ export const TradeEntrySection = () => {
             type="number"
             id="stopLoss"
             name="stopLoss"
-            placeholder="0.00"
-            step="0.01"
+            placeholder="0.000000"
+            step="0.000001"
           />
         </div>
         <div className="grid w-full items-center gap-1.5">
@@ -44,8 +44,8 @@ export const TradeEntrySection = () => {
             type="number"
             id="takeProfit"
             name="takeProfit"
-            placeholder="0.00"
-            step="0.01"
+            placeholder="0.000000"
+            step="0.000001"
           />
         </div>
         <div className="grid w-full items-center gap-1.5">
@@ -61,3 +61,4 @@ export const TradeEntrySection = () => {
     </div>
   );
 };
+

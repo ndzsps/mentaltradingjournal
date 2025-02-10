@@ -44,8 +44,8 @@ export const TradeExitSection = () => {
             type="number"
             id="exitPrice"
             name="exitPrice"
-            placeholder="0.00"
-            step="0.01"
+            placeholder="0.000000"
+            step="0.000001"
           />
         </div>
         <div className="grid w-full items-center gap-1.5">
@@ -54,8 +54,8 @@ export const TradeExitSection = () => {
             type="number"
             id="pnl"
             name="pnl"
-            placeholder="0.00"
-            step="0.01"
+            placeholder="0.000000"
+            step="0.000001"
           />
         </div>
         <div className="grid w-full items-center gap-1.5">
@@ -64,8 +64,8 @@ export const TradeExitSection = () => {
             type="number"
             id="highestPrice"
             name="highestPrice"
-            placeholder="0.00"
-            step="0.01"
+            placeholder="0.000000"
+            step="0.000001"
           />
         </div>
         <div className="grid w-full items-center gap-1.5">
@@ -74,8 +74,8 @@ export const TradeExitSection = () => {
             type="number"
             id="lowestPrice"
             name="lowestPrice"
-            placeholder="0.00"
-            step="0.01"
+            placeholder="0.000000"
+            step="0.000001"
           />
         </div>
         <div className="grid w-full items-center gap-1.5">
@@ -91,3 +91,4 @@ export const TradeExitSection = () => {
     </div>
   );
 };
+

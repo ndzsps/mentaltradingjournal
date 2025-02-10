@@ -24,29 +24,31 @@ const Journal = () => {
     filteredEntries
   } = useJournalFilters(entries);
 
+  const fetchEntries = async () => {
+    if (!user) return;
+    
+    console.log('Fetching entries for user:', user.id);
+    const { data, error } = await supabase
+      .from('journal_entries')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching journal entries:', error);
+      return;
+    }
+
+    console.log('Fetched entries:', data);
+    setEntries(data || []);
+  };
+
   useEffect(() => {
     if (!user) return;
-
-    const fetchEntries = async () => {
-      console.log('Fetching entries for user:', user.id);
-      const { data, error } = await supabase
-        .from('journal_entries')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error fetching journal entries:', error);
-        return;
-      }
-
-      console.log('Fetched entries:', data);
-      setEntries(data || []);
-    };
 
     fetchEntries();
 
     // Subscribe to real-time updates
-    const subscription = supabase
+    const channel = supabase
       .channel('journal_entries_changes')
       .on(
         'postgres_changes',
@@ -57,13 +59,23 @@ const Journal = () => {
         },
         (payload) => {
           console.log('Realtime update received:', payload);
-          fetchEntries();
+          // Immediately update the local state based on the change type
+          if (payload.eventType === 'UPDATE') {
+            setEntries(currentEntries => 
+              currentEntries.map(entry => 
+                entry.id === payload.new.id ? { ...entry, ...payload.new } : entry
+              )
+            );
+          } else {
+            // For other changes (INSERT, DELETE), fetch all entries again
+            fetchEntries();
+          }
         }
       )
       .subscribe();
 
     return () => {
-      subscription.unsubscribe();
+      supabase.removeChannel(channel);
     };
   }, [user]);
 

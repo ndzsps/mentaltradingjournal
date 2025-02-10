@@ -5,7 +5,7 @@ import { Trade } from "@/types/trade";
 import { TradingRules } from "../entry/TradingRules";
 import { TradesList } from "../entry/TradesList";
 import { ExternalLink, Edit2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -40,6 +40,11 @@ export const EntryContent = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editedNotes, setEditedNotes] = useState(notes);
   const hasObservationLinks = weeklyUrl || dailyUrl || fourHourUrl || oneHourUrl;
+
+  // Update local state when props change
+  useEffect(() => {
+    setEditedNotes(notes);
+  }, [notes]);
 
   const handleSave = async () => {
     try {
@@ -102,7 +107,7 @@ export const EntryContent = ({
               className="min-h-[100px]"
             />
           ) : (
-            <p className="text-muted-foreground whitespace-pre-wrap">{notes}</p>
+            <p className="text-muted-foreground whitespace-pre-wrap">{editedNotes}</p>
           )}
         </div>
       )}

@@ -78,15 +78,20 @@ export const useTradeActions = (user: User | null) => {
     setIsUpdating(true);
     
     try {
+      // Get all journal entries for trades
       const { data: entries } = await supabase
         .from('journal_entries')
         .select('*')
         .eq('user_id', user.id);
 
+      // Find the entry containing our trade
       const entryWithTrade = entries?.find(entry => 
         entry.trades?.some((trade: Trade) => trade.id === updatedTrade.id)
       );
 
+      if (!entryWithTrade) throw new Error('Journal entry not found');
+
+      // Create a clean trade object for the update
       const updatedTradeObject = {
         id: updatedTrade.id,
         instrument: updatedTrade.instrument,
@@ -107,16 +112,20 @@ export const useTradeActions = (user: User | null) => {
         lowestPrice: updatedTrade.lowestPrice
       };
 
-      const updatedTrades = entryWithTrade?.trades.map((trade: Trade) => 
+      // Update the trades array
+      const updatedTrades = entryWithTrade.trades.map((trade: Trade) => 
         trade.id === updatedTrade.id ? updatedTradeObject : trade
       );
 
-      await supabase
+      // Update the journal entry with the modified trades array
+      const { error: updateError } = await supabase
         .from('journal_entries')
         .update({ trades: updatedTrades })
-        .eq('id', entryWithTrade?.id);
+        .eq('id', entryWithTrade.id);
 
-      toast.success('Trade updated successfully!');
+      if (updateError) throw updateError;
+
+      toast.success('Trade updated successfully');
       setIsEditDialogOpen(false);
       
       // Create a full-screen loading overlay
@@ -134,6 +143,9 @@ export const useTradeActions = (user: User | null) => {
       await new Promise(resolve => setTimeout(resolve, 500));
       
       window.location.reload();
+    } catch (error) {
+      console.error('Error updating trade:', error);
+      toast.error('Failed to update trade');
     } finally {
       setIsUpdating(false);
     }

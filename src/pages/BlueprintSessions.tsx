@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
@@ -51,6 +52,8 @@ export default function BlueprintSessions() {
         stopLoss: session.stop_loss || 0,
         takeProfit: session.take_profit || 0,
         pnl: session.pnl || 0,
+        highestPrice: session.highest_price || 0,
+        lowestPrice: session.lowest_price || 0,
         weeklyUrl: session.weekly_url,
         dailyUrl: session.daily_url,
         fourHourUrl: session.four_hour_url,

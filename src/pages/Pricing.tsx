@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -131,10 +132,14 @@ const Pricing = () => {
               <p className="text-gray-300 mb-6">Perfect for getting started with trading journaling</p>
               <ul className="space-y-4 mb-8">
                 {[
-                  "Basic trading journal",
-                  "Emotion tracking",
-                  "Simple analytics",
-                  "Community access",
+                  "Live Trading Journal",
+                  "Backtesting Journal",
+                  "Detailed Emotion Analysis",
+                  "Unlimited Trades",
+                  "Psychological Pattern Diagnosis",
+                  "MFE / MAE",
+                  "AI-Powered Analytics",
+                  "Best Price In the Market (By Far)",
                 ].map((feature) => (
                   <li key={feature} className="flex items-center text-gray-300">
                     <Check className="h-5 w-5 text-primary mr-2" />
@@ -165,13 +170,14 @@ const Pricing = () => {
               <p className="text-gray-300 mb-6">Everything you need to become a better trader</p>
               <ul className="space-y-4 mb-8">
                 {[
-                  "Advanced trading journal",
-                  "Detailed emotion analysis",
-                  "Advanced analytics & insights",
-                  "Priority support",
-                  "Trading blueprints",
-                  "Backtesting tools",
-                  "Custom notifications",
+                  "Live Trading Journal",
+                  "Backtesting Journal",
+                  "Detailed Emotion Analysis",
+                  "Unlimited Trades",
+                  "Psychological Pattern Diagnosis",
+                  "MFE / MAE",
+                  "AI-Powered Analytics",
+                  "Best Price In the Market (By Far)",
                 ].map((feature) => (
                   <li key={feature} className="flex items-center text-gray-300">
                     <Check className="h-5 w-5 text-primary mr-2" />

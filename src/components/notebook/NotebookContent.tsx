@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { PenLine, Search } from "lucide-react";
+import { PenLine, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NotesList } from "./NotesList";
 import { NoteView } from "./NoteView";
@@ -16,6 +16,7 @@ export const NotebookContent = () => {
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [showSearch, setShowSearch] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { user } = useAuth();
@@ -184,6 +185,13 @@ export const NotebookContent = () => {
     );
   }) || [];
 
+  const toggleSearch = () => {
+    setShowSearch(!showSearch);
+    if (!showSearch) {
+      setSearchQuery(""); // Clear search when hiding
+    }
+  };
+
   return (
     <div className="flex h-[calc(100vh-4rem)]">
       {/* Folders Section (20%) */}
@@ -219,19 +227,23 @@ export const NotebookContent = () => {
               <Button 
                 variant="ghost" 
                 size="icon"
-                className="hover:bg-primary/10"
+                onClick={toggleSearch}
+                className={`hover:bg-primary/10 ${showSearch ? 'bg-primary/10' : ''}`}
               >
-                <Search className="h-4 w-4" />
+                {showSearch ? <X className="h-4 w-4" /> : <Search className="h-4 w-4" />}
               </Button>
             </div>
           </div>
-          <Input
-            type="search"
-            placeholder="Search notes..."
-            className="w-full"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+          {showSearch && (
+            <Input
+              type="search"
+              placeholder="Search notes..."
+              className="w-full"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              autoFocus
+            />
+          )}
         </div>
         <NotesList 
           notes={filteredNotes} 

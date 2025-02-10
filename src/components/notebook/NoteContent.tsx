@@ -22,10 +22,11 @@ export const NoteContent = ({ content, onContentChange }: NoteContentProps) => {
 
     const range = selection.getRangeAt(0);
     const rect = range.getBoundingClientRect();
+    const scrollY = window.scrollY || window.pageYOffset;
     
     setToolbarPosition({
       x: rect.left + (rect.width / 2), // Center horizontally
-      y: rect.top, // Use the top position of the selection
+      y: rect.top + scrollY, // Add scroll position to get absolute position
     });
   }, []);
 

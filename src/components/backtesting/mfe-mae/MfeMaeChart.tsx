@@ -81,26 +81,39 @@ export function MfeMaeChart() {
             trade.highestPrice &&
             trade.lowestPrice &&
             trade.entryPrice &&
+            trade.direction &&
             trade.id
           ) {
             console.log('Trade data for calculation:', {
               highestPrice: trade.highestPrice,
               lowestPrice: trade.lowestPrice,
               entryPrice: trade.entryPrice,
+              direction: trade.direction,
               instrument: trade.instrument
             });
             
             const entryPrice = Number(trade.entryPrice);
             const highestPrice = Number(trade.highestPrice);
             const lowestPrice = Number(trade.lowestPrice);
+            const isBuy = trade.direction === 'buy';
 
-            // Updated calculation logic for MFE and MAE
-            const mfePips = ((highestPrice - entryPrice) * 10000).toFixed(1);
-            const maePips = ((lowestPrice - entryPrice) * 10000).toFixed(1); // This will naturally be negative when price goes below entry
+            // Calculate MFE and MAE based on trade direction
+            let mfePips, maePips;
+
+            if (isBuy) {
+              // For long trades
+              mfePips = ((highestPrice - entryPrice) * 10000).toFixed(1);  // MFE is highest - entry
+              maePips = ((lowestPrice - entryPrice) * 10000).toFixed(1);   // MAE is lowest - entry (naturally negative)
+            } else {
+              // For short trades
+              mfePips = ((entryPrice - lowestPrice) * 10000).toFixed(1);   // MFE is entry - lowest
+              maePips = ((entryPrice - highestPrice) * 10000).toFixed(1);  // MAE is entry - highest (naturally negative)
+            }
 
             console.log('Calculated pips:', {
               mfePips,
               maePips,
+              direction: trade.direction,
               instrument: trade.instrument
             });
 
@@ -122,19 +135,48 @@ export function MfeMaeChart() {
       const allTrades = entries.flatMap(entry => entry.trades || []) as Trade[];
       console.log('All trades for stats:', allTrades);
       
-      const winners = allTrades.filter(t => 
-        Number(t.exitPrice) > Number(t.entryPrice)
-      );
-      const losers = allTrades.filter(t => 
-        Number(t.exitPrice) <= Number(t.entryPrice)
-      );
+      const winners = allTrades.filter(t => {
+        if (!t.direction || !t.exitPrice || !t.entryPrice) return false;
+        const isLong = t.direction === 'buy';
+        return isLong ? 
+          Number(t.exitPrice) > Number(t.entryPrice) : 
+          Number(t.exitPrice) < Number(t.entryPrice);
+      });
+
+      const losers = allTrades.filter(t => {
+        if (!t.direction || !t.exitPrice || !t.entryPrice) return false;
+        const isLong = t.direction === 'buy';
+        return isLong ? 
+          Number(t.exitPrice) <= Number(t.entryPrice) : 
+          Number(t.exitPrice) >= Number(t.entryPrice);
+      });
 
       const calculateAverage = (trades: Trade[], fn: (t: Trade) => number) => 
         trades.length ? trades.reduce((acc, curr) => acc + fn(curr), 0) / trades.length : 0;
 
-      const getMfe = (t: Trade) => ((Number(t.highestPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100;
-      const getMae = (t: Trade) => ((Number(t.lowestPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100;
-      const getExit = (t: Trade) => ((Number(t.exitPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100;
+      const getMfe = (t: Trade) => {
+        if (!t.direction) return 0;
+        const isLong = t.direction === 'buy';
+        return isLong ?
+          ((Number(t.highestPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100 :
+          ((Number(t.entryPrice) - Number(t.lowestPrice)) / Number(t.entryPrice)) * 100;
+      };
+
+      const getMae = (t: Trade) => {
+        if (!t.direction) return 0;
+        const isLong = t.direction === 'buy';
+        return isLong ?
+          ((Number(t.lowestPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100 :
+          ((Number(t.entryPrice) - Number(t.highestPrice)) / Number(t.entryPrice)) * 100;
+      };
+
+      const getExit = (t: Trade) => {
+        if (!t.direction) return 0;
+        const isLong = t.direction === 'buy';
+        return isLong ?
+          ((Number(t.exitPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100 :
+          ((Number(t.entryPrice) - Number(t.exitPrice)) / Number(t.entryPrice)) * 100;
+      };
 
       setStats({
         tradesHitTp: winners.length > 0 ? (winners.length / allTrades.length) * 100 : 0,

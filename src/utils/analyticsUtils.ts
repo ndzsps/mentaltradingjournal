@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { AnalyticsInsight, JournalEntry } from "@/types/analytics";
 import { calculateDataRequirements } from "./dataRequirements";
@@ -7,6 +8,8 @@ import { calculateMistakeFrequencies } from "./analytics/mistakeAnalysis";
 import { analyzeTradeDurations } from "./analytics/tradeDurationAnalysis";
 
 export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
+  console.log('Fetching journal entries...');
+  
   const { data: entries, error } = await supabase
     .from('journal_entries')
     .select('*')
@@ -16,6 +19,8 @@ export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
     console.error('Error fetching journal entries:', error);
     throw error;
   }
+
+  console.log('Fetched journal entries:', entries);
 
   // Cast the entries to the correct type and ensure session_type is 'pre' or 'post'
   const journalEntries = (entries || []).map(entry => ({

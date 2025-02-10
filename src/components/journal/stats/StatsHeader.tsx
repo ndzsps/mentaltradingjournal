@@ -28,7 +28,8 @@ export const StatsHeader = () => {
           schema: 'public',
           table: 'journal_entries',
         },
-        () => {
+        (payload) => {
+          console.log('Real-time update received:', payload);
           // Invalidate and refetch analytics when journal entries change
           queryClient.invalidateQueries({ queryKey: ['analytics'] });
         }
@@ -44,6 +45,16 @@ export const StatsHeader = () => {
     queryKey: ['analytics'],
     queryFn: generateAnalytics,
   });
+
+  // Log analytics data for debugging
+  useEffect(() => {
+    if (analytics) {
+      console.log('Fetched analytics data:', {
+        entriesCount: analytics.journalEntries?.length,
+        entries: analytics.journalEntries
+      });
+    }
+  }, [analytics]);
 
   const { stats } = useProgressTracking();
   const { timeFilter, setTimeFilter } = useTimeFilter();
@@ -75,7 +86,9 @@ export const StatsHeader = () => {
     const interval = getTimeInterval();
     if (!interval) return entries;
 
-    return entries.filter(entry => {
+    console.log('Filtering entries with interval:', interval);
+
+    const filteredEntries = entries.filter(entry => {
       const entryDate = new Date(entry.created_at);
       
       // Check if the entry has trades
@@ -90,6 +103,14 @@ export const StatsHeader = () => {
       // For entries without trades, use the created_at date
       return isWithinInterval(entryDate, interval);
     });
+
+    console.log('Filtered entries:', {
+      beforeFilter: entries.length,
+      afterFilter: filteredEntries.length,
+      entries: filteredEntries
+    });
+
+    return filteredEntries;
   };
 
   const filteredEntries = analytics ? filterEntriesByTime(analytics.journalEntries) : [];

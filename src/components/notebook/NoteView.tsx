@@ -57,28 +57,32 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
   };
 
   const handleLinkSubmit = (url: string) => {
-    // Get the current selection
     const selection = window.getSelection();
-    if (!selection || selection.rangeCount === 0) {
-      return;
-    }
+    if (!selection || selection.rangeCount === 0) return;
 
-    // Format URL if needed
+    const range = selection.getRangeAt(0);
     const formattedUrl = url.trim().startsWith('http') ? url.trim() : `https://${url.trim()}`;
     
-    // Store the selection range
-    const range = selection.getRangeAt(0);
-    
-    // If no text is selected, insert the URL as text
     if (range.collapsed) {
-      const textNode = document.createTextNode(formattedUrl);
-      range.insertNode(textNode);
-      range.selectNode(textNode);
+      const linkElement = document.createElement('a');
+      linkElement.href = formattedUrl;
+      linkElement.textContent = formattedUrl;
+      linkElement.target = '_blank';
+      linkElement.rel = 'noopener noreferrer';
+      range.insertNode(linkElement);
+    } else {
+      execCommand('createLink', formattedUrl);
+      const links = document.querySelectorAll('a[href="' + formattedUrl + '"]');
+      links.forEach(link => {
+        link.setAttribute('target', '_blank');
+        link.setAttribute('rel', 'noopener noreferrer');
+      });
     }
     
-    // Create the link
-    execCommand('createLink', formattedUrl);
-    console.log('Creating link with URL:', formattedUrl);
+    const editor = document.querySelector('[contenteditable="true"]');
+    if (editor) {
+      handleContentChange(editor.innerHTML);
+    }
   };
 
   const handleColorChange = () => {
@@ -118,7 +122,7 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
         />
         <Separator className="my-4" />
         <NoteContent 
-          content={content} 
+          content={content || ''} 
           onContentChange={handleContentChange} 
         />
         <LinkDialog 

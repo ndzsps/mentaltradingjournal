@@ -13,9 +13,9 @@ export const NoteContent = ({ content, onContentChange }: NoteContentProps) => {
     const editor = editorRef.current;
     if (!editor) return;
 
-    // Only set the innerHTML if the content has changed and the editor isn't focused
+    // Only set the content if it has changed and the editor isn't focused
     if (!editor.isEqualNode(document.activeElement)) {
-      editor.innerHTML = content;
+      editor.innerHTML = content || '';
       console.log('Setting content:', content); // Debug log
     }
   }, [content]);
@@ -70,6 +70,7 @@ export const NoteContent = ({ content, onContentChange }: NoteContentProps) => {
           document.execCommand('insertHTML', false, '<br><br>');
         }
       }}
+      dangerouslySetInnerHTML={{ __html: content || '' }}
     />
   );
 };

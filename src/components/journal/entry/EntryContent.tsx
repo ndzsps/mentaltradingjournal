@@ -1,9 +1,14 @@
+
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Trade } from "@/types/trade";
 import { TradingRules } from "../entry/TradingRules";
 import { TradesList } from "../entry/TradesList";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Edit2 } from "lucide-react";
+import { useState } from "react";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 interface EntryContentProps {
   id: string;
@@ -20,6 +25,7 @@ interface EntryContentProps {
 }
 
 export const EntryContent = ({
+  id,
   marketConditions,
   notes,
   followedRules,
@@ -31,7 +37,26 @@ export const EntryContent = ({
   fourHourUrl,
   oneHourUrl,
 }: EntryContentProps) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedNotes, setEditedNotes] = useState(notes);
   const hasObservationLinks = weeklyUrl || dailyUrl || fourHourUrl || oneHourUrl;
+
+  const handleSave = async () => {
+    try {
+      const { error } = await supabase
+        .from('journal_entries')
+        .update({ notes: editedNotes })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast.success("Notes updated successfully");
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error updating notes:', error);
+      toast.error("Failed to update notes");
+    }
+  };
 
   const renderChartButton = (url: string | undefined | null, label: string) => {
     if (!url) return null;
@@ -52,8 +77,33 @@ export const EntryContent = ({
     <div className="space-y-6">
       {notes && (
         <div className="space-y-2">
-          <h3 className="text-lg font-medium">Notes</h3>
-          <p className="text-muted-foreground whitespace-pre-wrap">{notes}</p>
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-medium">Notes</h3>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                if (isEditing) {
+                  handleSave();
+                } else {
+                  setIsEditing(true);
+                }
+              }}
+              className="flex items-center gap-2"
+            >
+              <Edit2 className="h-4 w-4" />
+              {isEditing ? "Save" : "Edit"}
+            </Button>
+          </div>
+          {isEditing ? (
+            <Textarea
+              value={editedNotes}
+              onChange={(e) => setEditedNotes(e.target.value)}
+              className="min-h-[100px]"
+            />
+          ) : (
+            <p className="text-muted-foreground whitespace-pre-wrap">{notes}</p>
+          )}
         </div>
       )}
 

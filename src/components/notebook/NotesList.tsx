@@ -1,3 +1,4 @@
+
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { NoteItem } from "./notes-list/NoteItem";
 import { NotesLoadingSkeleton } from "./notes-list/NotesLoadingSkeleton";
@@ -9,6 +10,7 @@ interface Note {
   content: string;
   created_at: string;
   tags: string[];
+  tag_colors: Record<string, string>;
   emoji: string;
 }
 

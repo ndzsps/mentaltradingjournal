@@ -1,3 +1,4 @@
+
 import { useAuth } from "@/contexts/AuthContext";
 import { NoteTitle } from "./NoteTitle";
 import { NoteTags } from "./NoteTags";
@@ -18,10 +19,12 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
     title,
     content,
     tags,
+    tagColors,
     handleTitleChange,
     handleContentChange,
     handleAddTag,
     handleRemoveTag,
+    handleUpdateTagColor,
   } = useNote(noteId, user);
 
   if (!noteId) {
@@ -38,8 +41,10 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
         <NoteTitle title={title} onTitleChange={handleTitleChange} />
         <NoteTags 
           tags={tags} 
+          tagColors={tagColors}
           onAddTag={handleAddTag} 
           onRemoveTag={handleRemoveTag} 
+          onUpdateTagColor={handleUpdateTagColor}
         />
         <Separator className="my-4" />
         <NoteContent 

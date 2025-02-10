@@ -36,7 +36,7 @@ export const useNote = (noteId: string | null, user: any) => {
       setTitle(note.title || "");
       setContent(note.content || "");
       setTags(note.tags || []);
-      setTagColors(note.tag_colors || {});
+      setTagColors(note.tag_colors as Record<string, string> || {});
     }
   }, [noteId, note]);
 

@@ -67,33 +67,21 @@ const Journal = () => {
     };
   }, [user]);
 
-  // Filter entries for the selected date based on trade exit dates
+  // Display all entries if no date is selected, otherwise filter by date
   const displayedEntries = selectedDate
     ? entries.filter(entry => {
-        // If this is a trade entry, check the trade exit dates
-        if (entry.trades && entry.trades.length > 0) {
-          return entry.trades.some(trade => {
-            if (!trade.exitDate) return false;
-            const tradeDate = new Date(trade.exitDate);
-            const start = startOfDay(selectedDate);
-            const end = endOfDay(selectedDate);
-            return tradeDate >= start && tradeDate <= end;
-          });
-        }
-        return false; // If no trades, don't show the entry
+        const entryDate = new Date(entry.created_at);
+        return entryDate >= startOfDay(selectedDate) && 
+               entryDate <= endOfDay(selectedDate);
       })
     : filteredEntries;
 
-  // Map entries for calendar display based on exit dates
-  const calendarEntries = entries
-    .filter(entry => entry.trades && entry.trades.length > 0)
-    .flatMap(entry => 
-      entry.trades.map(trade => ({
-        date: trade.exitDate ? new Date(trade.exitDate) : new Date(entry.created_at),
-        emotion: entry.emotion,
-        trades: [trade]
-      }))
-    );
+  // Map entries for calendar display
+  const calendarEntries = entries.map(entry => ({
+    date: new Date(entry.created_at),
+    emotion: entry.emotion,
+    trades: entry.trades || []
+  }));
 
   return (
     <AppLayout>

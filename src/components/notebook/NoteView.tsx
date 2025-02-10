@@ -37,7 +37,7 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
 
   return (
     <div className="h-full bg-background p-8">
-      <div className="max-w-3xl mx-auto space-y-6">
+      <div className="max-w-3xl mx-auto space-y-4">
         <NoteTitle title={title} onTitleChange={handleTitleChange} />
         <NoteTags 
           tags={tags} 

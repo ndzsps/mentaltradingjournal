@@ -28,6 +28,7 @@ interface Stats {
 
 interface ChartData {
   id: string;
+  tradeNumber: number;
   updraw: number;
   drawdown: number;
   instrument?: string;
@@ -66,6 +67,7 @@ export function MfeMaeChart() {
       if (!entries) return;
 
       const processedData: ChartData[] = [];
+      let tradeNumber = 1;
       
       entries.forEach(entry => {
         const trades = entry.trades as Trade[];
@@ -104,9 +106,10 @@ export function MfeMaeChart() {
 
             processedData.push({
               id: trade.id,
+              tradeNumber: tradeNumber++,
               instrument: trade.instrument,
               updraw: Number(mfePips.toFixed(1)), // MFE in pips
-              drawdown: -Number(maePips.toFixed(1)), // MAE in pips, negative to show below 0
+              drawdown: Number(maePips.toFixed(1)), // MAE in pips (positive for stacking)
             });
           }
         });
@@ -164,28 +167,30 @@ export function MfeMaeChart() {
             >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis 
-                dataKey="instrument" 
-                label={{ value: 'Instrument', position: 'bottom' }}
+                dataKey="tradeNumber" 
+                label={{ value: 'Trade #', position: 'bottom' }}
               />
               <YAxis 
-                domain={[-100, 100]} 
+                domain={[0, 100]} 
                 tickFormatter={(value) => `${value} pips`}
                 label={{ value: 'Pips', angle: -90, position: 'insideLeft' }}
               />
               <Tooltip 
-                formatter={(value: number) => [`${Math.abs(value)} pips`, value < 0 ? 'MAE' : 'MFE']}
-                labelFormatter={(label) => `Instrument: ${label}`}
+                formatter={(value: number) => [`${value} pips`]}
+                labelFormatter={(label) => `Trade #${label}`}
               />
               <Legend />
               <Bar 
                 dataKey="updraw" 
                 fill="#4ade80" 
-                name="MFE (Maximum Favorable Excursion)" 
+                name="MFE (Maximum Favorable Excursion)"
+                stackId="a"
               />
               <Bar 
                 dataKey="drawdown" 
                 fill="#f43f5e" 
-                name="MAE (Maximum Adverse Excursion)" 
+                name="MAE (Maximum Adverse Excursion)"
+                stackId="a"
               />
             </BarChart>
           </ResponsiveContainer>

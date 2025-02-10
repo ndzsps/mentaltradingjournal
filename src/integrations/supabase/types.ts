@@ -208,7 +208,6 @@ export type Database = {
           emoji: string | null
           folder_id: string | null
           id: string
-          tag_colors: Json | null
           tags: string[] | null
           title: string
           updated_at: string
@@ -220,7 +219,6 @@ export type Database = {
           emoji?: string | null
           folder_id?: string | null
           id?: string
-          tag_colors?: Json | null
           tags?: string[] | null
           title: string
           updated_at?: string
@@ -232,7 +230,6 @@ export type Database = {
           emoji?: string | null
           folder_id?: string | null
           id?: string
-          tag_colors?: Json | null
           tags?: string[] | null
           title?: string
           updated_at?: string

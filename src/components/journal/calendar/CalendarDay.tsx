@@ -50,10 +50,12 @@ export const CalendarDay = ({
   const getWeekNumber = (date: Date) => {
     // Get the first day of the month
     const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
-    // Calculate days from the start of the month
-    const days = Math.floor((date.getTime() - firstDayOfMonth.getTime()) / (24 * 60 * 60 * 1000));
-    // Get the week number within the month
-    return Math.ceil((days + firstDayOfMonth.getDay() + 1) / 7);
+    // Get the day of the week of the first day (0-6, where 0 is Sunday)
+    const firstDayOfWeek = firstDayOfMonth.getDay();
+    // Calculate the day of the month (1-31)
+    const dayOfMonth = date.getDate();
+    // Calculate which row of the calendar this date falls into
+    return Math.ceil((dayOfMonth + firstDayOfWeek) / 7);
   };
 
   const dayButton = (
@@ -134,4 +136,3 @@ export const CalendarDay = ({
     </div>
   );
 };
-

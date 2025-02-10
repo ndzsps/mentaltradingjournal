@@ -47,21 +47,6 @@ export const CalendarDay = ({
     return amount > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400';
   };
 
-  const getWeekNumber = (date: Date) => {
-    const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
-    const monthStartsOn = startOfMonth.getDay();
-    const dayOfMonth = date.getDate();
-    
-    // Calculate row position in calendar grid (0-based)
-    const rowPosition = Math.floor((dayOfMonth + monthStartsOn - 1) / 7);
-    
-    // Add 1 to convert to 1-based week number
-    return rowPosition + 1;
-  };
-
-  const weekNumber = getWeekNumber(dayDate);
-  console.log('Week number for date:', dayDate, 'is:', weekNumber); // Debug log
-
   const dayButton = (
     <button 
       onClick={() => onSelect(dayDate)}
@@ -124,13 +109,12 @@ export const CalendarDay = ({
               <Circle 
                 className="h-4 w-4 text-primary cursor-pointer hover:text-primary-dark transition-colors"
                 onClick={() => {
-                  console.log('Opening weekly review for week:', weekNumber); // Debug log
                   setIsWeeklyReviewOpen(true);
                 }}
               />
             </TooltipTrigger>
             <TooltipContent>
-              <p>Week {weekNumber} Review</p>
+              <p>Weekly Review</p>
             </TooltipContent>
           </Tooltip>
         </div>
@@ -138,7 +122,7 @@ export const CalendarDay = ({
       <WeeklyReviewDialog 
         open={isWeeklyReviewOpen}
         onOpenChange={setIsWeeklyReviewOpen}
-        weekNumber={weekNumber}
+        weekNumber={1}
       />
     </div>
   );

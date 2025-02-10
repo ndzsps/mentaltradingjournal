@@ -36,7 +36,9 @@ export const useNote = (noteId: string | null, user: any) => {
       setTitle(note.title || "");
       setContent(note.content || "");
       setTags(note.tags || []);
-      setTagColors(note.tag_colors || {});
+      // Properly type and handle tag_colors from the database
+      const tagColorsData = note.tag_colors as Record<string, string> | null;
+      setTagColors(tagColorsData || {});
     }
   }, [noteId, note]);
 

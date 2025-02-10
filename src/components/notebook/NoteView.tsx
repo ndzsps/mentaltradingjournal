@@ -28,34 +28,38 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
     handleUpdateTagColor,
   } = useNote(noteId, user);
 
+  const execCommand = (command: string, value: string | undefined = undefined) => {
+    document.execCommand(command, false, value);
+  };
+
   const handleBold = () => {
-    // TODO: Implement bold formatting
-    console.log("Bold clicked");
+    execCommand('bold');
   };
 
   const handleItalic = () => {
-    // TODO: Implement italic formatting
-    console.log("Italic clicked");
+    execCommand('italic');
   };
 
   const handleUnderline = () => {
-    // TODO: Implement underline formatting
-    console.log("Underline clicked");
+    execCommand('underline');
   };
 
   const handleStrikethrough = () => {
-    // TODO: Implement strikethrough formatting
-    console.log("Strikethrough clicked");
+    execCommand('strikeThrough');
   };
 
   const handleLink = () => {
-    // TODO: Implement link formatting
-    console.log("Link clicked");
+    const url = window.prompt('Enter URL:');
+    if (url) {
+      execCommand('createLink', url);
+    }
   };
 
   const handleColorChange = () => {
-    // TODO: Implement color change
-    console.log("Color change clicked");
+    const color = window.prompt('Enter color (e.g. #000000, red, blue):');
+    if (color) {
+      execCommand('foreColor', color);
+    }
   };
 
   if (!noteId) {

@@ -16,6 +16,7 @@ export const NoteContent = ({ content, onContentChange }: NoteContentProps) => {
     // Only set the innerHTML if the content has changed and the editor isn't focused
     if (!editor.isEqualNode(document.activeElement)) {
       editor.innerHTML = content;
+      console.log('Setting content:', content); // Debug log
     }
   }, [content]);
 
@@ -24,7 +25,9 @@ export const NoteContent = ({ content, onContentChange }: NoteContentProps) => {
     if (!editor) return;
 
     const handleInput = () => {
-      onContentChange(editor.innerHTML);
+      const newContent = editor.innerHTML;
+      console.log('Content changed to:', newContent); // Debug log
+      onContentChange(newContent);
     };
 
     const handleClick = (e: MouseEvent) => {

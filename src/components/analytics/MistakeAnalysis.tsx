@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import {
   PieChart,
@@ -118,73 +119,19 @@ export const MistakeAnalysis = () => {
     );
   }
 
-  // Create data array including all possible mistakes and ensure specific ordering
+  // Create data array including all possible mistakes
   const data = allMistakeCategories.map(category => {
     const mistakeData = analytics.mistakeFrequencies[category.value] || { count: 0, loss: 0 };
     return {
       name: category.label,
       value: (mistakeData.count / totalMistakes) * 100,
       loss: mistakeData.loss,
-      categoryValue: category.value
     };
   }).filter(item => item.value > 0)
-    .sort((a, b) => {
-      // Custom sorting to keep "revenge_trading" and "moving_stop_loss" together
-      if (a.categoryValue === 'revenge_trading' && b.categoryValue === 'moving_stop_loss') {
-        return -1;
-      }
-      if (a.categoryValue === 'moving_stop_loss' && b.categoryValue === 'revenge_trading') {
-        return 1;
-      }
-      // For other items, sort by loss impact
-      return b.loss - a.loss;
-    })
-    .slice(0, 6);  // Show top 6 mistakes
+    .sort((a, b) => b.loss - a.loss)
+    .slice(0, 6);  // Show top 6 mistakes by loss impact
 
   const COLORS = ['#6E59A5', '#0EA5E9', '#FEC6A1', '#F87171', '#A78BFA', '#34D399'];
-
-  // Custom legend formatter to group Revenge Trading and Moving Stop-Loss
-  const renderCustomizedLegend = (props: any) => {
-    if (!props || !props.payload || !Array.isArray(props.payload)) {
-      return null;
-    }
-
-    let legendItems = [...props.payload];
-
-    // Find revenge trading and moving stop loss items
-    const revengeIndex = legendItems.findIndex((item: any) => 
-      item.payload?.categoryValue === 'revenge_trading'
-    );
-    const stopLossIndex = legendItems.findIndex((item: any) => 
-      item.payload?.categoryValue === 'moving_stop_loss'
-    );
-
-    // Group these items if both exist
-    if (revengeIndex !== -1 && stopLossIndex !== -1) {
-      const combinedItem = {
-        value: `${legendItems[revengeIndex].value} / ${legendItems[stopLossIndex].value}`,
-        color: legendItems[revengeIndex].color,
-        type: legendItems[revengeIndex].type
-      };
-      legendItems.splice(revengeIndex, 2, combinedItem);
-    }
-
-    return (
-      <ul className="flex flex-wrap gap-4 justify-center mt-4">
-        {legendItems.map((entry: any, index: number) => (
-          <li key={`item-${index}`} className="flex items-center gap-2">
-            <div
-              className="w-3 h-3 rounded-full"
-              style={{ backgroundColor: entry.color }}
-            />
-            <span className="text-sm text-muted-foreground">
-              {entry.value}
-            </span>
-          </li>
-        ))}
-      </ul>
-    );
-  };
 
   return (
     <Card className="p-4 md:p-6 space-y-4">
@@ -213,7 +160,7 @@ export const MistakeAnalysis = () => {
               ))}
             </Pie>
             <Tooltip content={<CustomTooltip />} />
-            <Legend content={renderCustomizedLegend} />
+            <Legend />
           </PieChart>
         </ResponsiveContainer>
       </div>
@@ -238,3 +185,4 @@ export const MistakeAnalysis = () => {
     </Card>
   );
 };
+

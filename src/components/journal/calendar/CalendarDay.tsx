@@ -109,7 +109,7 @@ export const CalendarDay = ({
         dayButton
       )}
       {isSaturday && (
-        <div className="absolute -right-6 top-1/2 -translate-y-1/2">
+        <div className="absolute -right-8 top-1/2 -translate-y-1/2">
           <Tooltip>
             <TooltipTrigger asChild>
               <Circle 

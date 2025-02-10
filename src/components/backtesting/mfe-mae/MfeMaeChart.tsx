@@ -50,10 +50,17 @@ export function MfeMaeChart() {
     const fetchTrades = async () => {
       if (!user) return;
 
-      const { data: entries } = await supabase
+      const { data: entries, error } = await supabase
         .from('journal_entries')
         .select('*')
         .eq('user_id', user.id);
+
+      if (error) {
+        console.error('Error fetching entries:', error);
+        return;
+      }
+
+      console.log('Fetched entries:', entries);
 
       if (!entries) return;
 
@@ -61,15 +68,24 @@ export function MfeMaeChart() {
       
       entries.forEach(entry => {
         const trades = entry.trades as Trade[];
+        console.log('Processing trades from entry:', trades);
+        
         if (!trades) return;
         
         trades.forEach(trade => {
+          console.log('Processing trade:', trade);
           if (
             trade.highestPrice &&
             trade.lowestPrice &&
             trade.entryPrice &&
             trade.id
           ) {
+            console.log('Trade data for calculation:', {
+              highestPrice: trade.highestPrice,
+              lowestPrice: trade.lowestPrice,
+              entryPrice: trade.entryPrice
+            });
+            
             const entryPrice = Number(trade.entryPrice);
             const highestPrice = Number(trade.highestPrice);
             const lowestPrice = Number(trade.lowestPrice);
@@ -89,10 +105,13 @@ export function MfeMaeChart() {
         });
       });
 
+      console.log('Processed chart data:', processedData);
       setData(processedData);
 
       // Calculate statistics
       const allTrades = entries.flatMap(entry => entry.trades || []) as Trade[];
+      console.log('All trades for stats:', allTrades);
+      
       const winners = allTrades.filter(t => 
         Number(t.exitPrice) > Number(t.entryPrice)
       );

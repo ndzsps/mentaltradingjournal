@@ -56,15 +56,27 @@ export function MfeMaeChart() {
         .select('*')
         .eq('user_id', user.id);
 
+      console.log('Fetched journal entries:', entries);
+
       if (!entries) return;
 
       const processedData: ChartData[] = [];
       
       entries.forEach(entry => {
+        console.log('Processing entry:', entry);
         const trades = entry.trades as Trade[];
         if (!trades) return;
         
         trades.forEach(trade => {
+          console.log('Processing trade:', trade);
+          console.log('Trade fields:', {
+            highestPrice: trade.highestPrice,
+            lowestPrice: trade.lowestPrice,
+            entryPrice: trade.entryPrice,
+            direction: trade.direction,
+            id: trade.id
+          });
+
           if (
             trade.highestPrice &&
             trade.lowestPrice &&
@@ -72,6 +84,7 @@ export function MfeMaeChart() {
             trade.direction &&
             trade.id
           ) {
+            console.log('Trade passed validation checks');
             const entryPrice = Number(trade.entryPrice);
             const highestPrice = Number(trade.highestPrice);
             const lowestPrice = Number(trade.lowestPrice);
@@ -86,16 +99,31 @@ export function MfeMaeChart() {
               ? ((lowestPrice - entryPrice) / entryPrice) * 100   // Buy MAE
               : ((highestPrice - entryPrice) / entryPrice) * 100; // Sell MAE
 
+            console.log('Calculated values:', {
+              updraw,
+              drawdown,
+              isBuy
+            });
+
             processedData.push({
               id: trade.id,
               updraw,
               drawdown,
               instrument: trade.instrument
             });
+          } else {
+            console.log('Trade missing required fields:', {
+              hasHighestPrice: !!trade.highestPrice,
+              hasLowestPrice: !!trade.lowestPrice,
+              hasEntryPrice: !!trade.entryPrice,
+              hasDirection: !!trade.direction,
+              hasId: !!trade.id
+            });
           }
         });
       });
 
+      console.log('Final processed data:', processedData);
       setData(processedData);
 
       // Calculate statistics

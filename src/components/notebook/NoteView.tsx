@@ -57,9 +57,28 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
   };
 
   const handleLinkSubmit = (url: string) => {
-    const formattedUrl = url.startsWith('http') ? url : `https://${url}`;
-    console.log('Creating link with URL:', formattedUrl);
+    // Get the current selection
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) {
+      return;
+    }
+
+    // Format URL if needed
+    const formattedUrl = url.trim().startsWith('http') ? url.trim() : `https://${url.trim()}`;
+    
+    // Store the selection range
+    const range = selection.getRangeAt(0);
+    
+    // If no text is selected, insert the URL as text
+    if (range.collapsed) {
+      const textNode = document.createTextNode(formattedUrl);
+      range.insertNode(textNode);
+      range.selectNode(textNode);
+    }
+    
+    // Create the link
     execCommand('createLink', formattedUrl);
+    console.log('Creating link with URL:', formattedUrl);
   };
 
   const handleColorChange = () => {

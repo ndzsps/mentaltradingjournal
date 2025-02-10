@@ -29,9 +29,10 @@ export const NoteContent = ({ content, onContentChange }: NoteContentProps) => {
 
     const handleClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      if (target.tagName === 'A') {
+      if (target.tagName === 'A' || target.closest('a')) {
         e.preventDefault();
-        const href = target.getAttribute('href');
+        const link = target.tagName === 'A' ? target : target.closest('a');
+        const href = link?.getAttribute('href');
         if (href) {
           console.log('Opening link:', href);
           window.open(href, '_blank', 'noopener,noreferrer');

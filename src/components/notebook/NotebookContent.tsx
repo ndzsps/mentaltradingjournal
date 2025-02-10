@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,10 +10,12 @@ import { FolderList } from "./FolderList";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
 
 export const NotebookContent = () => {
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { user } = useAuth();
@@ -169,6 +172,18 @@ export const NotebookContent = () => {
     }
   };
 
+  // Filter notes based on search query
+  const filteredNotes = notes?.filter(note => {
+    if (!searchQuery) return true;
+    
+    const searchLower = searchQuery.toLowerCase();
+    return (
+      note.title.toLowerCase().includes(searchLower) ||
+      (note.content || "").toLowerCase().includes(searchLower) ||
+      note.tags?.some(tag => tag.toLowerCase().includes(searchLower))
+    );
+  }) || [];
+
   return (
     <div className="flex h-[calc(100vh-4rem)]">
       {/* Folders Section (20%) */}
@@ -210,9 +225,16 @@ export const NotebookContent = () => {
               </Button>
             </div>
           </div>
+          <Input
+            type="search"
+            placeholder="Search notes..."
+            className="w-full"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </div>
         <NotesList 
-          notes={notes || []} 
+          notes={filteredNotes} 
           isLoading={isLoadingNotes}
           selectedNoteId={selectedNoteId}
           onSelectNote={setSelectedNoteId}

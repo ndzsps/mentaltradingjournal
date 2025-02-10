@@ -15,6 +15,7 @@ interface CalendarDayProps extends Omit<DayProps, 'displayMonth'> {
   }>;
   onSelect: (date: Date) => void;
   className?: string;
+  displayMonth?: Date;
 }
 
 export const CalendarDay = ({ 
@@ -22,6 +23,7 @@ export const CalendarDay = ({
   entries,
   onSelect,
   className,
+  displayMonth,
   ...props 
 }: CalendarDayProps) => {
   const [isWeeklyReviewOpen, setIsWeeklyReviewOpen] = useState(false);
@@ -47,17 +49,19 @@ export const CalendarDay = ({
     return amount > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400';
   };
 
-  const getWeekNumber = (date: Date) => {
+  const getWeekNumber = (date: Date, displayedMonth: Date | undefined) => {
+    if (!displayedMonth) return null;
+
     // Get the first day of the displayed month
-    const displayedMonth = new Date(date.getFullYear(), date.getMonth(), 1);
-    const displayedMonthNumber = displayedMonth.getMonth();
+    const firstDayOfMonth = new Date(displayedMonth.getFullYear(), displayedMonth.getMonth(), 1);
+    const lastDayOfMonth = new Date(displayedMonth.getFullYear(), displayedMonth.getMonth() + 1, 0);
 
     // Only calculate week numbers for dates in the displayed month
-    if (date.getMonth() !== displayedMonthNumber) {
-      return null; // Return null for dates from adjacent months
+    if (date < firstDayOfMonth || date > lastDayOfMonth) {
+      return null;
     }
 
-    const monthStartsOn = displayedMonth.getDay();
+    const monthStartsOn = firstDayOfMonth.getDay();
     const dayOfMonth = date.getDate();
     
     // Calculate row position in calendar grid (0-based)
@@ -67,7 +71,7 @@ export const CalendarDay = ({
     return rowPosition + 1;
   };
 
-  const weekNumber = getWeekNumber(dayDate);
+  const weekNumber = getWeekNumber(dayDate, displayMonth);
   console.log('Week number for date:', dayDate, 'is:', weekNumber); // Debug log
 
   const dayButton = (

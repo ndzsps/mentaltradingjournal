@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,7 +29,7 @@ export const TradeEntrySection = () => {
           />
         </div>
         <div className="grid w-full items-center gap-1.5">
-          <Label htmlFor="stopLoss">Stop Loss</Label>
+          <Label htmlFor="stopLoss">Stop Loss (Pips / Points)</Label>
           <Input
             type="number"
             id="stopLoss"
@@ -38,7 +39,7 @@ export const TradeEntrySection = () => {
           />
         </div>
         <div className="grid w-full items-center gap-1.5">
-          <Label htmlFor="takeProfit">Take Profit</Label>
+          <Label htmlFor="takeProfit">Take Profit (Pips / Points)</Label>
           <Input
             type="number"
             id="takeProfit"

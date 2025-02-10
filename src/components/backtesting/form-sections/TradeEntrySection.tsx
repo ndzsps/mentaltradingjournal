@@ -1,3 +1,4 @@
+
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
@@ -40,7 +41,7 @@ export function TradeEntrySection({ formData, onInputChange }: TradeEntrySection
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="stopLoss">Stop Loss</Label>
+        <Label htmlFor="stopLoss">Stop Loss (Pips / Points)</Label>
         <Input
           type="number"
           id="stopLoss"
@@ -52,7 +53,7 @@ export function TradeEntrySection({ formData, onInputChange }: TradeEntrySection
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="takeProfit">Take Profit</Label>
+        <Label htmlFor="takeProfit">Take Profit (Pips / Points)</Label>
         <Input
           type="number"
           id="takeProfit"

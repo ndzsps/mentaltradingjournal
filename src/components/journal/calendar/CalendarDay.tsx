@@ -70,23 +70,7 @@ export const CalendarDay = ({
       `}
       {...props}
     >
-      <div className="absolute top-2 right-2 flex items-center gap-2">
-        {isSaturday && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Circle 
-                className="h-4 w-4 text-primary cursor-pointer hover:text-primary-dark transition-colors"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsWeeklyReviewOpen(true);
-                }}
-              />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Weekly Review</p>
-            </TooltipContent>
-          </Tooltip>
-        )}
+      <div className="absolute top-2 right-2">
         <span className={`
           text-sm font-medium
           ${isToday ? 'bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent' : 'text-gray-500 dark:text-gray-400'}
@@ -111,7 +95,7 @@ export const CalendarDay = ({
   );
 
   return (
-    <div className="w-full h-full p-0.5">
+    <div className="w-full h-full p-0.5 relative">
       {hasEntries ? (
         <Tooltip>
           <TooltipTrigger asChild>
@@ -123,6 +107,21 @@ export const CalendarDay = ({
         </Tooltip>
       ) : (
         dayButton
+      )}
+      {isSaturday && (
+        <div className="absolute -right-6 top-1/2 -translate-y-1/2">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Circle 
+                className="h-4 w-4 text-primary cursor-pointer hover:text-primary-dark transition-colors"
+                onClick={() => setIsWeeklyReviewOpen(true)}
+              />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Weekly Review</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
       )}
       <WeeklyReviewDialog 
         open={isWeeklyReviewOpen}

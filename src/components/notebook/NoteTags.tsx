@@ -102,7 +102,7 @@ export const NoteTags = ({
                         <DropdownMenuItem
                           key={colorKey}
                           onClick={() => onUpdateTagColor(tag, colorKey)}
-                          className={`flex items-center gap-2 ${TAG_COLORS[colorKey as keyof typeof TAG_COLORS].base}`}
+                          className={`flex items-center gap-2 cursor-pointer ${TAG_COLORS[colorKey as keyof typeof TAG_COLORS].base}`}
                         >
                           {colorValue.name}
                         </DropdownMenuItem>

@@ -78,20 +78,15 @@ export const useTradeActions = (user: User | null) => {
     setIsUpdating(true);
     
     try {
-      // Get all journal entries for trades
       const { data: entries } = await supabase
         .from('journal_entries')
         .select('*')
         .eq('user_id', user.id);
 
-      // Find the entry containing our trade
       const entryWithTrade = entries?.find(entry => 
         entry.trades?.some((trade: Trade) => trade.id === updatedTrade.id)
       );
 
-      if (!entryWithTrade) throw new Error('Journal entry not found');
-
-      // Create a clean trade object for the update
       const updatedTradeObject = {
         id: updatedTrade.id,
         instrument: updatedTrade.instrument,
@@ -103,29 +98,24 @@ export const useTradeActions = (user: User | null) => {
         stopLoss: updatedTrade.stopLoss,
         takeProfit: updatedTrade.takeProfit,
         quantity: updatedTrade.quantity,
+        fees: updatedTrade.fees,
         setup: updatedTrade.setup,
         pnl: updatedTrade.pnl,
         forecastScreenshot: updatedTrade.forecastScreenshot,
         resultScreenshot: updatedTrade.resultScreenshot,
-        htfBias: updatedTrade.htfBias,
-        highestPrice: updatedTrade.highestPrice,
-        lowestPrice: updatedTrade.lowestPrice
+        htfBias: updatedTrade.htfBias
       };
 
-      // Update the trades array
-      const updatedTrades = entryWithTrade.trades.map((trade: Trade) => 
+      const updatedTrades = entryWithTrade?.trades.map((trade: Trade) => 
         trade.id === updatedTrade.id ? updatedTradeObject : trade
       );
 
-      // Update the journal entry with the modified trades array
-      const { error: updateError } = await supabase
+      await supabase
         .from('journal_entries')
         .update({ trades: updatedTrades })
-        .eq('id', entryWithTrade.id);
+        .eq('id', entryWithTrade?.id);
 
-      if (updateError) throw updateError;
-
-      toast.success('Trade updated successfully');
+      toast.success('Trade updated successfully!');
       setIsEditDialogOpen(false);
       
       // Create a full-screen loading overlay
@@ -143,9 +133,6 @@ export const useTradeActions = (user: User | null) => {
       await new Promise(resolve => setTimeout(resolve, 500));
       
       window.location.reload();
-    } catch (error) {
-      console.error('Error updating trade:', error);
-      toast.error('Failed to update trade');
     } finally {
       setIsUpdating(false);
     }

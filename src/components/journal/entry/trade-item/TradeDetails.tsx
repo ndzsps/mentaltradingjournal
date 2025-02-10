@@ -28,7 +28,8 @@ export const TradeDetails = ({ trade, formatDate }: TradeDetailsProps) => {
             <p className="text-sm">Date: {formatDate(trade.exitDate || '')}</p>
             <p className="text-sm">Price: {trade.exitPrice}</p>
             <p className="text-sm">Quantity: {trade.quantity}</p>
-            <p className="text-sm">Fees: {trade.fees}</p>
+            <p className="text-sm">Highest Price: {trade.highestPrice}</p>
+            <p className="text-sm">Lowest Price: {trade.lowestPrice}</p>
           </div>
         </div>
       </div>

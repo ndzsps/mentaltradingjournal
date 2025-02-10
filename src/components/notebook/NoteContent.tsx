@@ -10,24 +10,16 @@ interface NoteContentProps {
 }
 
 export const NoteContent = ({ content, onContentChange }: NoteContentProps) => {
-  const [toolbarPosition, setToolbarPosition] = useState<{ x: number; y: number } | null>(null);
+  const [showToolbar, setShowToolbar] = useState(false);
   const { toast } = useToast();
 
   const handleSelectionChange = useCallback(() => {
     const selection = window.getSelection();
     if (!selection || selection.toString().trim() === '') {
-      setToolbarPosition(null);
+      setShowToolbar(false);
       return;
     }
-
-    const range = selection.getRangeAt(0);
-    const rect = range.getBoundingClientRect();
-    const scrollY = window.scrollY || window.pageYOffset;
-    
-    setToolbarPosition({
-      x: rect.left + (rect.width / 2), // Center horizontally
-      y: rect.top + scrollY, // Add scroll position to get absolute position
-    });
+    setShowToolbar(true);
   }, []);
 
   const handleFormat = (type: 'bold' | 'italic' | 'underline' | 'link') => {
@@ -71,25 +63,26 @@ export const NoteContent = ({ content, onContentChange }: NoteContentProps) => {
       onContentChange(newContent);
     }
 
-    setToolbarPosition(null);
+    setShowToolbar(false);
   };
 
   return (
-    <div className="relative">
+    <div className="relative space-y-2">
+      {showToolbar && (
+        <FormatToolbar 
+          onFormat={handleFormat}
+        />
+      )}
       <Textarea
         value={content}
         onChange={(e) => onContentChange(e.target.value)}
         onSelect={handleSelectionChange}
         onBlur={() => {
           // Small delay to allow clicking toolbar buttons
-          setTimeout(() => setToolbarPosition(null), 250);
+          setTimeout(() => setShowToolbar(false), 250);
         }}
         placeholder="Start writing..."
         className="min-h-[calc(100vh-300px)] resize-none !border-0 px-0 focus-visible:!ring-0 focus-visible:!ring-offset-0 focus:!ring-0 focus:!ring-offset-0 !outline-none focus:!outline-none focus-visible:!outline-none hover:!outline-none active:!outline-none focus-within:!outline-none placeholder:text-muted-foreground/50 bg-transparent text-lg leading-relaxed transition-colors duration-200 !shadow-none hover:!shadow-none focus:!shadow-none active:!shadow-none [&:not(:disabled)]:!border-0 [&:not(:disabled)]:!outline-0 [&:not(:disabled)]:!ring-0 [&:not(:disabled)]:!shadow-none"
-      />
-      <FormatToolbar 
-        position={toolbarPosition}
-        onFormat={handleFormat}
       />
     </div>
   );

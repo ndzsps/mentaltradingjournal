@@ -4,21 +4,11 @@ import { Button } from "../ui/button";
 
 interface FormatToolbarProps {
   onFormat: (type: 'bold' | 'italic' | 'underline' | 'link') => void;
-  position: { x: number; y: number } | null;
 }
 
-export const FormatToolbar = ({ onFormat, position }: FormatToolbarProps) => {
-  if (!position) return null;
-
+export const FormatToolbar = ({ onFormat }: FormatToolbarProps) => {
   return (
-    <div 
-      className="fixed z-50 flex gap-1 p-1 rounded-md bg-gray-900/90 backdrop-blur-sm shadow-lg border border-gray-800"
-      style={{ 
-        top: `${Math.max(position.y - 45, 10)}px`, // Position slightly higher above text
-        left: `${position.x}px`,
-        transform: 'translate(-50%, -100%)', // Center horizontally and position above
-      }}
-    >
+    <div className="flex gap-1 p-1 rounded-md bg-gray-900/90 backdrop-blur-sm shadow-lg border border-gray-800 w-fit">
       <Button
         variant="ghost"
         size="icon"

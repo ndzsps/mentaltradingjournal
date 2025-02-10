@@ -49,14 +49,20 @@ export const CalendarDay = ({
 
   const getWeekNumber = (date: Date) => {
     const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
-    // How many days we need to pad from the previous month
     const monthStartsOn = startOfMonth.getDay();
-    // The day of the month (1-31)
     const dayOfMonth = date.getDate();
-    // Calculate which row this date falls into
-    // We add monthStartsOn to account for padding days, then subtract 1 to make it 0-based
-    // Then divide by 7 and add 1 to get the row number (1-based)
-    return Math.floor((dayOfMonth + monthStartsOn - 1) / 7) + 1;
+    
+    // Get the total number of days in the month
+    const lastDayOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+    
+    // Calculate the total number of weeks in the month
+    const totalWeeks = Math.ceil((lastDayOfMonth + monthStartsOn) / 7);
+    
+    // Calculate which week this date falls into (1-based)
+    const weekNumber = Math.ceil((dayOfMonth + monthStartsOn) / 7);
+    
+    // Ensure the week number doesn't exceed the total number of weeks
+    return Math.min(weekNumber, totalWeeks);
   };
 
   const dayButton = (
@@ -137,4 +143,3 @@ export const CalendarDay = ({
     </div>
   );
 };
-

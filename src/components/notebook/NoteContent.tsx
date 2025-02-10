@@ -33,6 +33,7 @@ export const NoteContent = ({ content, onContentChange }: NoteContentProps) => {
         e.preventDefault();
         const href = target.getAttribute('href');
         if (href) {
+          console.log('Opening link:', href);
           window.open(href, '_blank', 'noopener,noreferrer');
         }
       }
@@ -54,6 +55,13 @@ export const NoteContent = ({ content, onContentChange }: NoteContentProps) => {
       className="min-h-[calc(100vh-300px)] focus:outline-none focus-visible:outline-none text-lg leading-relaxed transition-colors duration-200 prose prose-sm max-w-none dark:prose-invert prose-a:text-blue-600 hover:prose-a:text-blue-500 prose-a:cursor-pointer"
       role="textbox"
       aria-multiline="true"
+      onKeyDown={(e) => {
+        // Prevent the default behavior of Enter key to maintain consistent formatting
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          document.execCommand('insertHTML', false, '<br><br>');
+        }
+      }}
     />
   );
 };

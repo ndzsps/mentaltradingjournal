@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/contexts/AuthContext";
 import { NoteTitle } from "./NoteTitle";
 import { NoteTags } from "./NoteTags";
@@ -58,7 +57,9 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
   };
 
   const handleLinkSubmit = (url: string) => {
-    execCommand('createLink', url);
+    const formattedUrl = url.startsWith('http') ? url : `https://${url}`;
+    console.log('Creating link with URL:', formattedUrl);
+    execCommand('createLink', formattedUrl);
   };
 
   const handleColorChange = () => {

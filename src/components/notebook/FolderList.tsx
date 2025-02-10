@@ -17,6 +17,7 @@ import {
 interface Folder {
   id: string;
   name: string;
+  is_default?: boolean;
 }
 
 interface FolderListProps {
@@ -50,7 +51,8 @@ export const FolderList = ({
         .from("notebook_folders")
         .insert([{ 
           name: newFolderName,
-          user_id: user.id
+          user_id: user.id,
+          is_default: false
         }])
         .select()
         .single();
@@ -160,14 +162,28 @@ export const FolderList = ({
   };
 
   const handleStartRename = (folder: Folder) => {
+    if (folder.is_default) {
+      toast({
+        title: "Cannot rename",
+        description: "The All Notes folder cannot be renamed",
+        variant: "destructive",
+      });
+      return;
+    }
     setEditingFolderId(folder.id);
     setEditingFolderName(folder.name);
   };
 
-  const handleRenameSubmit = (folderId: string) => {
-    if (editingFolderName.trim()) {
-      renameFolder.mutate({ folderId, newName: editingFolderName });
+  const handleDeleteFolder = (folder: Folder) => {
+    if (folder.is_default) {
+      toast({
+        title: "Cannot delete",
+        description: "The All Notes folder cannot be deleted",
+        variant: "destructive",
+      });
+      return;
     }
+    deleteFolder.mutate(folder.id);
   };
 
   if (isLoading) {
@@ -177,6 +193,13 @@ export const FolderList = ({
       ))}
     </div>;
   }
+
+  // Sort folders to put "All Notes" first
+  const sortedFolders = [...folders].sort((a, b) => {
+    if (a.is_default) return -1;
+    if (b.is_default) return 1;
+    return a.name.localeCompare(b.name);
+  });
 
   return (
     <div className="space-y-4">
@@ -228,7 +251,7 @@ export const FolderList = ({
 
       <ScrollArea className="h-[calc(100vh-12rem)]">
         <div className="space-y-1">
-          {folders.map((folder) => (
+          {sortedFolders.map((folder) => (
             <div
               key={folder.id}
               className="group relative"
@@ -282,32 +305,37 @@ export const FolderList = ({
                   >
                     <Folder className="mr-2 h-4 w-4" />
                     {folder.name}
+                    {folder.is_default && (
+                      <span className="ml-2 text-xs text-muted-foreground">(Default)</span>
+                    )}
                   </Button>
-                  <div className="absolute top-1/2 right-2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity folder-actions">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-[160px]">
-                        <DropdownMenuItem 
-                          onClick={() => handleStartRename(folder)}
-                          className="gap-2"
-                        >
-                          <Pencil className="h-4 w-4" />
-                          Rename
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onClick={() => deleteFolder.mutate(folder.id)}
-                          className="text-destructive focus:text-destructive gap-2"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
+                  {!folder.is_default && (
+                    <div className="absolute top-1/2 right-2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity folder-actions">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-[160px]">
+                          <DropdownMenuItem 
+                            onClick={() => handleStartRename(folder)}
+                            className="gap-2"
+                          >
+                            <Pencil className="h-4 w-4" />
+                            Rename
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => handleDeleteFolder(folder)}
+                            className="text-destructive focus:text-destructive gap-2"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  )}
                 </>
               )}
             </div>

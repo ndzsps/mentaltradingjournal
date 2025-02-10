@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,35 +20,6 @@ export const NotebookContent = () => {
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
-  const { data: notes, isLoading: isLoadingNotes } = useQuery({
-    queryKey: ["notes", selectedFolderId],
-    queryFn: async () => {
-      if (!user) throw new Error("No user found");
-
-      const query = supabase
-        .from("notebook_notes")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
-
-      if (selectedFolderId) {
-        query.eq("folder_id", selectedFolderId);
-      } else {
-        query.is("folder_id", null);
-      }
-
-      const { data, error } = await query;
-      if (error) throw error;
-      
-      // Transform the tag_colors to ensure it's Record<string, string>
-      return data.map(note => ({
-        ...note,
-        tag_colors: (note.tag_colors || {}) as Record<string, string>
-      }));
-    },
-    enabled: !!user,
-  });
-
   const { data: folders, isLoading: isLoadingFolders } = useQuery({
     queryKey: ["folders"],
     queryFn: async () => {
@@ -62,7 +32,43 @@ export const NotebookContent = () => {
         .order("created_at", { ascending: true });
       
       if (error) throw error;
+
+      // Set selected folder to "All Notes" if none is selected
+      if (!selectedFolderId && data.length > 0) {
+        const defaultFolder = data.find(folder => folder.is_default);
+        if (defaultFolder) {
+          setSelectedFolderId(defaultFolder.id);
+        }
+      }
       return data;
+    },
+    enabled: !!user,
+  });
+
+  const { data: notes, isLoading: isLoadingNotes } = useQuery({
+    queryKey: ["notes", selectedFolderId],
+    queryFn: async () => {
+      if (!user) throw new Error("No user found");
+
+      const defaultFolder = folders?.find(folder => folder.is_default);
+      const query = supabase
+        .from("notebook_notes")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+
+      // Only filter by folder if not viewing "All Notes"
+      if (selectedFolderId && defaultFolder?.id !== selectedFolderId) {
+        query.eq("folder_id", selectedFolderId);
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+      
+      return data.map(note => ({
+        ...note,
+        tag_colors: (note.tag_colors || {}) as Record<string, string>
+      }));
     },
     enabled: !!user,
   });

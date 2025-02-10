@@ -30,6 +30,7 @@ interface ChartData {
   id: string;
   updraw: number;
   drawdown: number;
+  instrument?: string;
 }
 
 export function MfeMaeChart() {
@@ -83,23 +84,29 @@ export function MfeMaeChart() {
             console.log('Trade data for calculation:', {
               highestPrice: trade.highestPrice,
               lowestPrice: trade.lowestPrice,
-              entryPrice: trade.entryPrice
+              entryPrice: trade.entryPrice,
+              instrument: trade.instrument
             });
             
             const entryPrice = Number(trade.entryPrice);
             const highestPrice = Number(trade.highestPrice);
             const lowestPrice = Number(trade.lowestPrice);
 
-            // Calculate MFE (Maximum Favorable Excursion) as a percentage
-            const mfe = ((highestPrice - entryPrice) / entryPrice) * 100;
-            
-            // Calculate MAE (Maximum Adverse Excursion) as a percentage
-            const mae = ((entryPrice - lowestPrice) / entryPrice) * 100;
+            // Calculate pip values (assuming 5 decimal places for forex)
+            const mfePips = ((highestPrice - entryPrice) * 10000);
+            const maePips = ((entryPrice - lowestPrice) * 10000);
+
+            console.log('Calculated pips:', {
+              mfePips,
+              maePips,
+              instrument: trade.instrument
+            });
 
             processedData.push({
               id: trade.id,
-              updraw: Number(mfe.toFixed(2)), // Round to 2 decimal places
-              drawdown: -Number(mae.toFixed(2)), // Make negative to show below 0 on chart
+              instrument: trade.instrument,
+              updraw: Number(mfePips.toFixed(1)), // MFE in pips
+              drawdown: -Number(maePips.toFixed(1)), // MAE in pips, negative to show below 0
             });
           }
         });
@@ -156,13 +163,18 @@ export function MfeMaeChart() {
               }}
             >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="id" />
+              <XAxis 
+                dataKey="instrument" 
+                label={{ value: 'Instrument', position: 'bottom' }}
+              />
               <YAxis 
                 domain={[-100, 100]} 
-                tickFormatter={(value) => `${value}%`}
+                tickFormatter={(value) => `${value} pips`}
+                label={{ value: 'Pips', angle: -90, position: 'insideLeft' }}
               />
               <Tooltip 
-                formatter={(value: number) => [`${value.toFixed(2)}%`]}
+                formatter={(value: number) => [`${Math.abs(value)} pips`, value < 0 ? 'MAE' : 'MFE']}
+                labelFormatter={(label) => `Instrument: ${label}`}
               />
               <Legend />
               <Bar 

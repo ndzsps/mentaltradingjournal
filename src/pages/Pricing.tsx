@@ -129,7 +129,7 @@ const Pricing = () => {
                   <span className="text-gray-300 text-sm">/month</span>
                 </div>
               </div>
-              <p className="text-gray-300 mb-6">Perfect for getting started with trading journaling</p>
+              <p className="text-gray-300 mb-6">Commitment-free with all the benefits of a yearly plan</p>
               <ul className="space-y-4 mb-8">
                 {[
                   "Live Trading Journal",
@@ -158,7 +158,7 @@ const Pricing = () => {
             {/* Yearly Plan */}
             <div className="relative p-8 rounded-xl backdrop-blur-sm bg-primary/10 border border-primary/20">
               <div className="absolute -top-4 right-4 bg-primary/20 text-primary-light px-4 py-1 rounded-full text-sm">
-                Save 8%
+                Save 20%
               </div>
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-2xl font-bold text-white">Yearly Plan</h3>
@@ -167,7 +167,7 @@ const Pricing = () => {
                   <span className="text-gray-300 text-sm">/year</span>
                 </div>
               </div>
-              <p className="text-gray-300 mb-6">Everything you need to become a better trader</p>
+              <p className="text-gray-300 mb-6">The premiere trading journal that focuses on essential features and eliminates the rest</p>
               <ul className="space-y-4 mb-8">
                 {[
                   "Live Trading Journal",
@@ -254,3 +254,4 @@ const Pricing = () => {
 };
 
 export default Pricing;
+

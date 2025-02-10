@@ -60,6 +60,7 @@ export const CalendarDay = ({
   };
 
   const weekNumber = getWeekNumber(dayDate);
+  console.log('Week number for date:', dayDate, 'is:', weekNumber); // Debug log
 
   const dayButton = (
     <button 
@@ -122,7 +123,10 @@ export const CalendarDay = ({
             <TooltipTrigger asChild>
               <Circle 
                 className="h-4 w-4 text-primary cursor-pointer hover:text-primary-dark transition-colors"
-                onClick={() => setIsWeeklyReviewOpen(true)}
+                onClick={() => {
+                  console.log('Opening weekly review for week:', weekNumber); // Debug log
+                  setIsWeeklyReviewOpen(true);
+                }}
               />
             </TooltipTrigger>
             <TooltipContent>
@@ -139,4 +143,3 @@ export const CalendarDay = ({
     </div>
   );
 };
-

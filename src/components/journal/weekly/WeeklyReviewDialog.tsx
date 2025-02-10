@@ -1,6 +1,6 @@
 
-import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useState, useEffect } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { NotepadText } from "lucide-react";
@@ -22,6 +22,11 @@ export const WeeklyReviewDialog = ({
   const [improvement, setImprovement] = useState("");
   const { toast } = useToast();
 
+  useEffect(() => {
+    // Debug log to verify the week number is being received correctly
+    console.log('WeeklyReviewDialog received week number:', weekNumber);
+  }, [weekNumber]);
+
   const handleSave = () => {
     // In a future implementation, this could save to the database
     toast({
@@ -39,6 +44,9 @@ export const WeeklyReviewDialog = ({
             <NotepadText className="h-5 w-5" />
             Week {weekNumber} Review
           </DialogTitle>
+          <DialogDescription>
+            Review your trading performance and set goals for improvement
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 py-4">
@@ -94,4 +102,3 @@ export const WeeklyReviewDialog = ({
     </Dialog>
   );
 };
-

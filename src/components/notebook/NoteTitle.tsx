@@ -12,7 +12,7 @@ export const NoteTitle = ({ title, onTitleChange }: NoteTitleProps) => {
       value={title}
       onChange={(e) => onTitleChange(e.target.value)}
       placeholder="Untitled"
-      className="[&:not(:disabled)]:text-4xl font-semibold bg-transparent border-none px-0 focus-visible:ring-0 focus:outline-none focus-visible:outline-none placeholder:text-muted-foreground/50 transition-colors duration-200"
+      className="[&:not(:disabled)]:text-4xl font-semibold bg-transparent border-none px-0 focus-visible:ring-0 focus:outline-none focus-visible:outline-none outline-none placeholder:text-muted-foreground/50 transition-colors duration-200"
     />
   );
 };

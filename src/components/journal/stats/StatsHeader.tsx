@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { generateAnalytics } from "@/utils/analyticsUtils";
@@ -9,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSidebar } from "@/components/ui/sidebar";
 import { Card } from "@/components/ui/card";
-import { DollarSign, Percent, Smile, Flame, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { DollarSign, Smile, Flame, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { useProgressTracking } from "@/hooks/useProgressTracking";
 
 export const StatsHeader = () => {
@@ -98,23 +99,6 @@ export const StatsHeader = () => {
     }, 0);
   }, 0);
 
-  // Calculate profit factor
-  const { profits, losses } = filteredEntries.reduce((acc, entry) => {
-    (entry.trades || []).forEach(trade => {
-      if (trade?.id && !processedTradeIds.has(`pf-${trade.id}`)) {
-        processedTradeIds.add(`pf-${trade.id}`);
-        const pnl = Number(trade.pnl) || 0;
-        if (pnl > 0) acc.profits += pnl;
-        if (pnl < 0) acc.losses += Math.abs(pnl);
-      }
-    });
-    return acc;
-  }, { profits: 0, losses: 0 });
-
-  const profitFactorValue = losses === 0 ? 
-    profits > 0 ? "∞" : "0" : 
-    (profits / losses).toFixed(2);
-
   // Calculate emotion score
   const emotionStats = filteredEntries.reduce((acc, entry) => {
     if (entry.emotion?.toLowerCase().includes('positive')) acc.positive++;
@@ -133,8 +117,8 @@ export const StatsHeader = () => {
           <div className="h-10 w-32 bg-muted animate-pulse rounded-md" />
           <div className="h-10 w-32 bg-muted animate-pulse rounded-md" />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          {[...Array(5)].map((_, i) => (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {[...Array(4)].map((_, i) => (
             <Card key={i} className="p-4 animate-pulse">
               <div className="h-16 bg-muted rounded"></div>
             </Card>
@@ -180,7 +164,7 @@ export const StatsHeader = () => {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="p-4 hover:shadow-lg transition-shadow">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-muted-foreground">Net P&L</span>
@@ -191,19 +175,6 @@ export const StatsHeader = () => {
           </div>
           <div className={`text-sm ${netPnL >= 0 ? 'text-green-500' : 'text-red-500'}`}>
             {netPnL >= 0 ? '▲' : '▼'} {netPnL >= 0 ? 'Profit' : 'Loss'}
-          </div>
-        </Card>
-
-        <Card className="p-4 hover:shadow-lg transition-shadow">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-muted-foreground">Profit Factor</span>
-            <Percent className="h-4 w-4 text-secondary" />
-          </div>
-          <div className="text-2xl font-bold text-foreground">
-            {profitFactorValue}
-          </div>
-          <div className="text-sm text-muted-foreground">
-            Profit/Loss Ratio
           </div>
         </Card>
 
@@ -238,3 +209,4 @@ export const StatsHeader = () => {
     </div>
   );
 };
+

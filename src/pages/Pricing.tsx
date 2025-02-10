@@ -129,7 +129,7 @@ const Pricing = () => {
                   <span className="text-gray-300 text-sm">/month</span>
                 </div>
               </div>
-              <p className="text-gray-300 mb-6">Commitment-free with all the benefits of a yearly plan</p>
+              <p className="text-gray-300 mb-6">Get all the exclusive benefits of a yearly plan—without any long-term commitment or hidden fees</p>
               <ul className="space-y-4 mb-8">
                 {[
                   "Live Trading Journal",

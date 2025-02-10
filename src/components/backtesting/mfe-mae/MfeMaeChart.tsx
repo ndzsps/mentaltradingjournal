@@ -74,13 +74,16 @@ export function MfeMaeChart() {
             const highestPrice = Number(trade.highestPrice);
             const lowestPrice = Number(trade.lowestPrice);
 
-            const updraw = ((highestPrice - entryPrice) / entryPrice) * 100;
-            const drawdown = ((lowestPrice - entryPrice) / entryPrice) * 100;
+            // Calculate MFE (Maximum Favorable Excursion)
+            const mfe = ((highestPrice - entryPrice) / entryPrice) * 100;
+            
+            // Calculate MAE (Maximum Adverse Excursion)
+            const mae = ((entryPrice - lowestPrice) / entryPrice) * 100;
 
             processedData.push({
               id: trade.id,
-              updraw,
-              drawdown,
+              updraw: mfe,
+              drawdown: -mae, // Make negative to show below 0 on chart
             });
           }
         });
@@ -100,17 +103,17 @@ export function MfeMaeChart() {
       const calculateAverage = (trades: Trade[], fn: (t: Trade) => number) => 
         trades.length ? trades.reduce((acc, curr) => acc + fn(curr), 0) / trades.length : 0;
 
-      const getUpdraw = (t: Trade) => ((Number(t.highestPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100;
-      const getDrawdown = (t: Trade) => ((Number(t.lowestPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100;
+      const getMfe = (t: Trade) => ((Number(t.highestPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100;
+      const getMae = (t: Trade) => ((Number(t.entryPrice) - Number(t.lowestPrice)) / Number(t.entryPrice)) * 100;
       const getExit = (t: Trade) => ((Number(t.exitPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100;
 
       setStats({
-        tradesHitTp: (winners.length / allTrades.length) * 100,
-        tradesHitSl: (losers.length / allTrades.length) * 100,
-        avgUpdrawWinner: calculateAverage(winners, getUpdraw),
-        avgUpdrawLoser: calculateAverage(losers, getUpdraw),
-        avgDrawdownWinner: calculateAverage(winners, getDrawdown),
-        avgDrawdownLoser: calculateAverage(losers, getDrawdown),
+        tradesHitTp: winners.length > 0 ? (winners.length / allTrades.length) * 100 : 0,
+        tradesHitSl: losers.length > 0 ? (losers.length / allTrades.length) * 100 : 0,
+        avgUpdrawWinner: calculateAverage(winners, getMfe),
+        avgUpdrawLoser: calculateAverage(losers, getMfe),
+        avgDrawdownWinner: calculateAverage(winners, getMae),
+        avgDrawdownLoser: calculateAverage(losers, getMae),
         avgExitWinner: calculateAverage(winners, getExit),
         avgExitLoser: calculateAverage(losers, getExit),
       });

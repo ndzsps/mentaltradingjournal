@@ -20,7 +20,7 @@ export const FormatToolbar = ({
   onColorChange
 }: FormatToolbarProps) => {
   return (
-    <div className="flex items-center gap-1 mb-4 opacity-70 hover:opacity-100 transition-opacity duration-200">
+    <div className="flex items-center gap-1 mt-2 opacity-70 hover:opacity-100 transition-opacity duration-200">
       <Toggle size="sm" onClick={onBold} aria-label="Toggle bold">
         <Bold className="h-4 w-4" />
       </Toggle>
@@ -42,3 +42,4 @@ export const FormatToolbar = ({
     </div>
   );
 };
+

@@ -49,7 +49,7 @@ export const NoteTags = ({
   };
 
   return (
-    <div className="flex flex-wrap gap-2 items-center min-h-[32px] opacity-70 hover:opacity-100 transition-opacity duration-200">
+    <div className="flex flex-wrap gap-2 items-center min-h-[32px] opacity-70 hover:opacity-100 transition-opacity duration-200 mb-0">
       {tags.map((tag) => (
         <div key={tag} className="group relative">
           <Badge 

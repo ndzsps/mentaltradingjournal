@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import {
   PieChart,
@@ -119,17 +118,28 @@ export const MistakeAnalysis = () => {
     );
   }
 
-  // Create data array including all possible mistakes
+  // Create data array including all possible mistakes and ensure specific ordering
   const data = allMistakeCategories.map(category => {
     const mistakeData = analytics.mistakeFrequencies[category.value] || { count: 0, loss: 0 };
     return {
       name: category.label,
       value: (mistakeData.count / totalMistakes) * 100,
       loss: mistakeData.loss,
+      categoryValue: category.value // Keep track of the category value for sorting
     };
   }).filter(item => item.value > 0)
-    .sort((a, b) => b.loss - a.loss)
-    .slice(0, 6);  // Show top 6 mistakes by loss impact
+    .sort((a, b) => {
+      // Custom sorting to keep "revenge_trading" and "moving_stop_loss" together
+      if (a.categoryValue === 'revenge_trading' && b.categoryValue === 'moving_stop_loss') {
+        return -1;
+      }
+      if (a.categoryValue === 'moving_stop_loss' && b.categoryValue === 'revenge_trading') {
+        return 1;
+      }
+      // For other items, sort by loss impact
+      return b.loss - a.loss;
+    })
+    .slice(0, 6);  // Show top 6 mistakes
 
   const COLORS = ['#6E59A5', '#0EA5E9', '#FEC6A1', '#F87171', '#A78BFA', '#34D399'];
 
@@ -185,4 +195,3 @@ export const MistakeAnalysis = () => {
     </Card>
   );
 };
-

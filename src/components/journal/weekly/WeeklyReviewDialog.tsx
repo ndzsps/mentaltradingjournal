@@ -28,6 +28,8 @@ export const WeeklyReviewDialog = ({
   const { user } = useAuth();
 
   const loadReview = async () => {
+    if (!user) return;
+    
     try {
       setLoading(true);
       const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 }); // Start week on Monday
@@ -36,12 +38,10 @@ export const WeeklyReviewDialog = ({
         .from('weekly_reviews')
         .select('*')
         .eq('week_start_date', weekStart.toISOString().split('T')[0])
-        .eq('user_id', user?.id)
-        .single();
+        .eq('user_id', user.id)
+        .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned"
-        throw error;
-      }
+      if (error) throw error;
 
       if (data) {
         setStrength(data.strength || '');

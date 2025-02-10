@@ -48,15 +48,12 @@ export const CalendarDay = ({
   };
 
   const getWeekNumber = (date: Date) => {
-    const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
-    const monthStartsOn = startOfMonth.getDay();
-    const dayOfMonth = date.getDate();
-    
-    // Calculate row position in calendar grid (0-based)
-    const rowPosition = Math.floor((dayOfMonth + monthStartsOn - 1) / 7);
-    
-    // Add 1 to convert to 1-based week number
-    return rowPosition + 1;
+    // Create a new date object for January 1st of the same year
+    const startOfYear = new Date(date.getFullYear(), 0, 1);
+    // Calculate the number of days since January 1st
+    const days = Math.floor((date.getTime() - startOfYear.getTime()) / (24 * 60 * 60 * 1000));
+    // Get the week number by adding 1 to account for partial first week
+    return Math.ceil((days + startOfYear.getDay() + 1) / 7);
   };
 
   const weekNumber = getWeekNumber(dayDate);

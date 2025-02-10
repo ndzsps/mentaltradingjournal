@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,6 +8,7 @@ export const useNote = (noteId: string | null, user: any) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [tags, setTags] = useState<string[]>([]);
+  const [tagColors, setTagColors] = useState<Record<string, string>>({});
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const updateTimeoutRef = useRef<NodeJS.Timeout>();
@@ -34,16 +36,27 @@ export const useNote = (noteId: string | null, user: any) => {
       setTitle(note.title || "");
       setContent(note.content || "");
       setTags(note.tags || []);
+      setTagColors(note.tag_colors || {});
     }
   }, [noteId, note]);
 
   const updateNote = useMutation({
-    mutationFn: async ({ title, content, tags }: { title: string; content: string; tags: string[] }) => {
+    mutationFn: async ({ 
+      title, 
+      content, 
+      tags,
+      tagColors,
+    }: { 
+      title: string; 
+      content: string; 
+      tags: string[];
+      tagColors: Record<string, string>;
+    }) => {
       if (!noteId || !user) throw new Error("No note selected or user not found");
 
       const { data, error } = await supabase
         .from("notebook_notes")
-        .update({ title, content, tags })
+        .update({ title, content, tags, tag_colors: tagColors })
         .eq("id", noteId)
         .eq("user_id", user.id)
         .select()
@@ -54,7 +67,12 @@ export const useNote = (noteId: string | null, user: any) => {
     },
   });
 
-  const debouncedUpdate = useCallback((title: string, content: string, tags: string[]) => {
+  const debouncedUpdate = useCallback((
+    title: string, 
+    content: string, 
+    tags: string[], 
+    tagColors: Record<string, string>
+  ) => {
     if (updateTimeoutRef.current) {
       clearTimeout(updateTimeoutRef.current);
     }
@@ -64,11 +82,12 @@ export const useNote = (noteId: string | null, user: any) => {
       title,
       content,
       tags,
+      tag_colors: tagColors,
     }));
 
     updateTimeoutRef.current = setTimeout(() => {
       updateNote.mutate(
-        { title, content, tags },
+        { title, content, tags, tagColors },
         {
           onSuccess: (data) => {
             queryClient.setQueryData(["note", noteId], data);
@@ -96,18 +115,18 @@ export const useNote = (noteId: string | null, user: any) => {
 
   const handleTitleChange = (newTitle: string) => {
     setTitle(newTitle);
-    debouncedUpdate(newTitle, content, tags);
+    debouncedUpdate(newTitle, content, tags, tagColors);
   };
 
   const handleContentChange = (newContent: string) => {
     setContent(newContent);
-    debouncedUpdate(title, newContent, tags);
+    debouncedUpdate(title, newContent, tags, tagColors);
   };
 
   const handleAddTag = (newTag: string) => {
     const updatedTags = [...tags, newTag];
     setTags(updatedTags);
-    debouncedUpdate(title, content, updatedTags);
+    debouncedUpdate(title, content, updatedTags, tagColors);
     toast({
       title: "Tag added",
       description: `Added tag: ${newTag}`,
@@ -116,11 +135,24 @@ export const useNote = (noteId: string | null, user: any) => {
 
   const handleRemoveTag = (tagToRemove: string) => {
     const updatedTags = tags.filter(tag => tag !== tagToRemove);
+    const updatedTagColors = { ...tagColors };
+    delete updatedTagColors[tagToRemove];
     setTags(updatedTags);
-    debouncedUpdate(title, content, updatedTags);
+    setTagColors(updatedTagColors);
+    debouncedUpdate(title, content, updatedTags, updatedTagColors);
     toast({
       title: "Tag removed",
       description: `Removed tag: ${tagToRemove}`,
+    });
+  };
+
+  const handleUpdateTagColor = (tag: string, color: string) => {
+    const updatedTagColors = { ...tagColors, [tag]: color };
+    setTagColors(updatedTagColors);
+    debouncedUpdate(title, content, tags, updatedTagColors);
+    toast({
+      title: "Tag color updated",
+      description: `Updated color for tag: ${tag}`,
     });
   };
 
@@ -130,9 +162,11 @@ export const useNote = (noteId: string | null, user: any) => {
     title,
     content,
     tags,
+    tagColors,
     handleTitleChange,
     handleContentChange,
     handleAddTag,
     handleRemoveTag,
+    handleUpdateTagColor,
   };
 };

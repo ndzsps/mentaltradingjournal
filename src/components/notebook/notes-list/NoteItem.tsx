@@ -12,6 +12,7 @@ import {
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { EmojiPicker } from "./EmojiPicker";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 interface Note {
   id: string;
@@ -19,6 +20,7 @@ interface Note {
   content: string;
   created_at: string;
   tags: string[];
+  tag_colors: Record<string, string>;
   emoji: string;
 }
 
@@ -28,6 +30,15 @@ interface NoteItemProps {
   onSelect: (id: string) => void;
   onDelete: (id: string) => void;
 }
+
+const TAG_COLORS = {
+  purple: "bg-purple-100 hover:bg-purple-200 text-purple-800 dark:bg-purple-900/30 dark:hover:bg-purple-900/50 dark:text-purple-300",
+  blue: "bg-blue-100 hover:bg-blue-200 text-blue-800 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 dark:text-blue-300",
+  green: "bg-green-100 hover:bg-green-200 text-green-800 dark:bg-green-900/30 dark:hover:bg-green-900/50 dark:text-green-300",
+  yellow: "bg-yellow-100 hover:bg-yellow-200 text-yellow-800 dark:bg-yellow-900/30 dark:hover:bg-yellow-900/50 dark:text-yellow-300",
+  red: "bg-red-100 hover:bg-red-200 text-red-800 dark:bg-red-900/30 dark:hover:bg-red-900/50 dark:text-red-300",
+  pink: "bg-pink-100 hover:bg-pink-200 text-pink-800 dark:bg-pink-900/30 dark:hover:bg-pink-900/50 dark:text-pink-300",
+};
 
 export const NoteItem = ({ 
   note, 
@@ -50,6 +61,10 @@ export const NoteItem = ({
 
   const handleEmojiSelect = () => {
     setShowEmojiPicker(false);
+  };
+
+  const getTagColorClass = (tag: string) => {
+    return note.tag_colors?.[tag] ? TAG_COLORS[note.tag_colors[tag] as keyof typeof TAG_COLORS] : TAG_COLORS.purple;
   };
 
   return (
@@ -108,7 +123,7 @@ export const NoteItem = ({
             <Badge 
               key={tag} 
               variant="secondary" 
-              className="text-xs bg-purple-100 hover:bg-purple-200 text-purple-800 dark:bg-purple-900/30 dark:hover:bg-purple-900/50 dark:text-purple-300"
+              className={cn("text-xs transition-colors duration-200", getTagColorClass(tag))}
             >
               {tag}
             </Badge>

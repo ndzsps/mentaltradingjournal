@@ -8,6 +8,8 @@ import { Separator } from "@/components/ui/separator";
 import { NoteViewSkeleton } from "./NoteViewSkeleton";
 import { EmptyNoteState } from "./EmptyNoteState";
 import { useNote } from "@/hooks/useNote";
+import { useState } from "react";
+import { LinkDialog } from "./LinkDialog";
 
 interface NoteViewProps {
   noteId: string | null;
@@ -15,6 +17,7 @@ interface NoteViewProps {
 
 export const NoteView = ({ noteId }: NoteViewProps) => {
   const { user } = useAuth();
+  const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
   const {
     isLoading,
     title,
@@ -49,10 +52,11 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
   };
 
   const handleLink = () => {
-    const url = window.prompt('Enter URL:');
-    if (url) {
-      execCommand('createLink', url);
-    }
+    setIsLinkDialogOpen(true);
+  };
+
+  const handleLinkSubmit = (url: string) => {
+    execCommand('createLink', url);
   };
 
   const handleColorChange = () => {
@@ -93,6 +97,11 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
         <NoteContent 
           content={content} 
           onContentChange={handleContentChange} 
+        />
+        <LinkDialog 
+          isOpen={isLinkDialogOpen}
+          onClose={() => setIsLinkDialogOpen(false)}
+          onSubmit={handleLinkSubmit}
         />
       </div>
     </div>

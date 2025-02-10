@@ -1,3 +1,4 @@
+
 import { DayProps } from "react-day-picker";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { calculateDayStats, formatCurrency, getEmotionStyle } from "./calendarUtils";
@@ -14,7 +15,6 @@ interface CalendarDayProps extends Omit<DayProps, 'displayMonth'> {
   }>;
   onSelect: (date: Date) => void;
   className?: string;
-  displayMonth?: Date;
 }
 
 export const CalendarDay = ({ 
@@ -22,7 +22,6 @@ export const CalendarDay = ({
   entries,
   onSelect,
   className,
-  displayMonth,
   ...props 
 }: CalendarDayProps) => {
   const [isWeeklyReviewOpen, setIsWeeklyReviewOpen] = useState(false);
@@ -48,35 +47,19 @@ export const CalendarDay = ({
     return amount > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400';
   };
 
-  const getWeekNumber = (date: Date, displayedMonth: Date | undefined) => {
-    if (!displayedMonth) return null;
-
-    // Get the first day of the displayed month
-    const firstDayOfMonth = new Date(displayedMonth.getFullYear(), displayedMonth.getMonth(), 1);
-    const lastDayOfMonth = new Date(displayedMonth.getFullYear(), displayedMonth.getMonth() + 1, 0);
-
-    // Only calculate week numbers for dates in the displayed month
-    if (date < firstDayOfMonth || date > lastDayOfMonth) {
-      return null;
-    }
-
-    const monthStartsOn = firstDayOfMonth.getDay();
+  const getWeekNumber = (date: Date) => {
+    const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+    const monthStartsOn = startOfMonth.getDay();
     const dayOfMonth = date.getDate();
     
     // Calculate row position in calendar grid (0-based)
     const rowPosition = Math.floor((dayOfMonth + monthStartsOn - 1) / 7);
     
-    // If this is the last row of the month, always return 5
-    const totalRows = Math.ceil((lastDayOfMonth.getDate() + monthStartsOn) / 7);
-    if (rowPosition === totalRows - 1) {
-      return 5;
-    }
-    
-    // Otherwise, return the regular week number (1-based)
+    // Add 1 to convert to 1-based week number
     return rowPosition + 1;
   };
 
-  const weekNumber = getWeekNumber(dayDate, displayMonth);
+  const weekNumber = getWeekNumber(dayDate);
   console.log('Week number for date:', dayDate, 'is:', weekNumber); // Debug log
 
   const dayButton = (
@@ -134,7 +117,7 @@ export const CalendarDay = ({
       ) : (
         dayButton
       )}
-      {isSaturday && weekNumber && (
+      {isSaturday && (
         <div className="absolute -right-8 top-1/2 -translate-y-1/2">
           <Tooltip>
             <TooltipTrigger asChild>
@@ -155,7 +138,7 @@ export const CalendarDay = ({
       <WeeklyReviewDialog 
         open={isWeeklyReviewOpen}
         onOpenChange={setIsWeeklyReviewOpen}
-        weekNumber={weekNumber || 0}
+        weekNumber={weekNumber}
       />
     </div>
   );

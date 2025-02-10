@@ -13,18 +13,28 @@ import {
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { Trade } from "@/types/trade";
 
-interface TradeData {
+interface Stats {
+  tradesHitTp: number;
+  tradesHitSl: number;
+  avgUpdrawWinner: number;
+  avgUpdrawLoser: number;
+  avgDrawdownWinner: number;
+  avgDrawdownLoser: number;
+  avgExitWinner: number;
+  avgExitLoser: number;
+}
+
+interface ChartData {
   id: string;
-  highestPrice: number;
-  lowestPrice: number;
-  entryPrice: number;
-  exitPrice: number;
+  updraw: number;
+  drawdown: number;
 }
 
 export function MfeMaeChart() {
-  const [data, setData] = useState<any[]>([]);
-  const [stats, setStats] = useState({
+  const [data, setData] = useState<ChartData[]>([]);
+  const [stats, setStats] = useState<Stats>({
     tradesHitTp: 0,
     tradesHitSl: 0,
     avgUpdrawWinner: 0,
@@ -47,59 +57,63 @@ export function MfeMaeChart() {
 
       if (!entries) return;
 
-      const trades = entries.flatMap(entry => entry.trades || []);
+      const processedData: ChartData[] = [];
       
-      const processedData = trades.map((trade: TradeData) => {
-        const entryPrice = Number(trade.entryPrice);
-        const exitPrice = Number(trade.exitPrice);
-        const highestPrice = Number(trade.highestPrice);
-        const lowestPrice = Number(trade.lowestPrice);
+      entries.forEach(entry => {
+        const trades = entry.trades as Trade[];
+        if (!trades) return;
+        
+        trades.forEach(trade => {
+          if (
+            trade.highestPrice &&
+            trade.lowestPrice &&
+            trade.entryPrice &&
+            trade.id
+          ) {
+            const entryPrice = Number(trade.entryPrice);
+            const highestPrice = Number(trade.highestPrice);
+            const lowestPrice = Number(trade.lowestPrice);
 
-        const updraw = ((highestPrice - entryPrice) / entryPrice) * 100;
-        const drawdown = ((lowestPrice - entryPrice) / entryPrice) * 100;
+            const updraw = ((highestPrice - entryPrice) / entryPrice) * 100;
+            const drawdown = ((lowestPrice - entryPrice) / entryPrice) * 100;
 
-        return {
-          id: trade.id,
-          updraw: updraw.toFixed(2),
-          drawdown: drawdown.toFixed(2),
-        };
-      });
-
-      // Calculate statistics
-      const winners = trades.filter((t: TradeData) => 
-        Number(t.exitPrice) > Number(t.entryPrice)
-      );
-      const losers = trades.filter((t: TradeData) => 
-        Number(t.exitPrice) <= Number(t.entryPrice)
-      );
-
-      const calculateAverage = (arr: any[], prop: string) => 
-        arr.length ? arr.reduce((acc, curr) => acc + Number(curr[prop]), 0) / arr.length : 0;
-
-      setStats({
-        tradesHitTp: (winners.length / trades.length * 100).toFixed(2),
-        tradesHitSl: (losers.length / trades.length * 100).toFixed(2),
-        avgUpdrawWinner: calculateAverage(winners.map(t => ({
-          updraw: ((Number(t.highestPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100
-        })), 'updraw').toFixed(2),
-        avgUpdrawLoser: calculateAverage(losers.map(t => ({
-          updraw: ((Number(t.highestPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100
-        })), 'updraw').toFixed(2),
-        avgDrawdownWinner: calculateAverage(winners.map(t => ({
-          drawdown: ((Number(t.lowestPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100
-        })), 'drawdown').toFixed(2),
-        avgDrawdownLoser: calculateAverage(losers.map(t => ({
-          drawdown: ((Number(t.lowestPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100
-        })), 'drawdown').toFixed(2),
-        avgExitWinner: calculateAverage(winners.map(t => ({
-          exit: ((Number(t.exitPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100
-        })), 'exit').toFixed(2),
-        avgExitLoser: calculateAverage(losers.map(t => ({
-          exit: ((Number(t.exitPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100
-        })), 'exit').toFixed(2),
+            processedData.push({
+              id: trade.id,
+              updraw,
+              drawdown,
+            });
+          }
+        });
       });
 
       setData(processedData);
+
+      // Calculate statistics
+      const allTrades = entries.flatMap(entry => entry.trades || []) as Trade[];
+      const winners = allTrades.filter(t => 
+        Number(t.exitPrice) > Number(t.entryPrice)
+      );
+      const losers = allTrades.filter(t => 
+        Number(t.exitPrice) <= Number(t.entryPrice)
+      );
+
+      const calculateAverage = (trades: Trade[], fn: (t: Trade) => number) => 
+        trades.length ? trades.reduce((acc, curr) => acc + fn(curr), 0) / trades.length : 0;
+
+      const getUpdraw = (t: Trade) => ((Number(t.highestPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100;
+      const getDrawdown = (t: Trade) => ((Number(t.lowestPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100;
+      const getExit = (t: Trade) => ((Number(t.exitPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100;
+
+      setStats({
+        tradesHitTp: (winners.length / allTrades.length) * 100,
+        tradesHitSl: (losers.length / allTrades.length) * 100,
+        avgUpdrawWinner: calculateAverage(winners, getUpdraw),
+        avgUpdrawLoser: calculateAverage(losers, getUpdraw),
+        avgDrawdownWinner: calculateAverage(winners, getDrawdown),
+        avgDrawdownLoser: calculateAverage(losers, getDrawdown),
+        avgExitWinner: calculateAverage(winners, getExit),
+        avgExitLoser: calculateAverage(losers, getExit),
+      });
     };
 
     fetchTrades();
@@ -121,11 +135,11 @@ export function MfeMaeChart() {
             >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="id" />
-              <YAxis />
+              <YAxis domain={[-100, 100]} />
               <Tooltip />
               <Legend />
-              <Bar dataKey="updraw" fill="#4ade80" name="Updraw" />
-              <Bar dataKey="drawdown" fill="#f43f5e" name="Drawdown" />
+              <Bar dataKey="updraw" fill="#4ade80" name="MFE (Maximum Favorable Excursion)" />
+              <Bar dataKey="drawdown" fill="#f43f5e" name="MAE (Maximum Adverse Excursion)" />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -134,35 +148,35 @@ export function MfeMaeChart() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="p-4">
           <div className="text-sm text-muted-foreground">Trades Hit TP</div>
-          <div className="text-2xl font-bold text-green-500">{stats.tradesHitTp}%</div>
+          <div className="text-2xl font-bold text-green-500">{stats.tradesHitTp.toFixed(2)}%</div>
         </Card>
         <Card className="p-4">
           <div className="text-sm text-muted-foreground">Trades Hit SL</div>
-          <div className="text-2xl font-bold text-red-500">{stats.tradesHitSl}%</div>
+          <div className="text-2xl font-bold text-red-500">{stats.tradesHitSl.toFixed(2)}%</div>
         </Card>
         <Card className="p-4">
-          <div className="text-sm text-muted-foreground">Avg. Updraw Winner</div>
-          <div className="text-2xl font-bold text-green-500">{stats.avgUpdrawWinner}%</div>
+          <div className="text-sm text-muted-foreground">Avg. MFE Winner</div>
+          <div className="text-2xl font-bold text-green-500">{stats.avgUpdrawWinner.toFixed(2)}%</div>
         </Card>
         <Card className="p-4">
-          <div className="text-sm text-muted-foreground">Avg. Updraw Loser</div>
-          <div className="text-2xl font-bold">{stats.avgUpdrawLoser}%</div>
+          <div className="text-sm text-muted-foreground">Avg. MFE Loser</div>
+          <div className="text-2xl font-bold">{stats.avgUpdrawLoser.toFixed(2)}%</div>
         </Card>
         <Card className="p-4">
-          <div className="text-sm text-muted-foreground">Avg. Drawdown Winner</div>
-          <div className="text-2xl font-bold">{stats.avgDrawdownWinner}%</div>
+          <div className="text-sm text-muted-foreground">Avg. MAE Winner</div>
+          <div className="text-2xl font-bold">{stats.avgDrawdownWinner.toFixed(2)}%</div>
         </Card>
         <Card className="p-4">
-          <div className="text-sm text-muted-foreground">Avg. Drawdown Loser</div>
-          <div className="text-2xl font-bold text-red-500">{stats.avgDrawdownLoser}%</div>
+          <div className="text-sm text-muted-foreground">Avg. MAE Loser</div>
+          <div className="text-2xl font-bold text-red-500">{stats.avgDrawdownLoser.toFixed(2)}%</div>
         </Card>
         <Card className="p-4">
           <div className="text-sm text-muted-foreground">Avg. Exit Winner</div>
-          <div className="text-2xl font-bold text-green-500">{stats.avgExitWinner}%</div>
+          <div className="text-2xl font-bold text-green-500">{stats.avgExitWinner.toFixed(2)}%</div>
         </Card>
         <Card className="p-4">
           <div className="text-sm text-muted-foreground">Avg. Exit Loser</div>
-          <div className="text-2xl font-bold text-red-500">{stats.avgExitLoser}%</div>
+          <div className="text-2xl font-bold text-red-500">{stats.avgExitLoser.toFixed(2)}%</div>
         </Card>
       </div>
     </div>

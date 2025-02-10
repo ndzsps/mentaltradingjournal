@@ -51,47 +51,50 @@ export const NoteTags = ({
   return (
     <div className="flex flex-wrap gap-2 items-center min-h-[32px] opacity-70 hover:opacity-100 transition-opacity duration-200">
       {tags.map((tag) => (
-        <div key={tag} className="group relative flex items-center gap-1">
+        <div key={tag} className="group relative">
           <Badge 
             variant="secondary" 
-            className={cn("transition-colors duration-200", getTagColorClass(tag))}
+            className={cn(
+              "transition-colors duration-200 flex items-center gap-1 pr-1", 
+              getTagColorClass(tag)
+            )}
           >
-            {tag}
-          </Badge>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-secondary/20 transition-all">
-                <MoreHorizontal className="h-3 w-3" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-[180px]">
-              <DropdownMenuItem 
-                onClick={() => onRemoveTag(tag)}
-                className="text-destructive focus:text-destructive cursor-pointer"
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <div className="w-full">
-                  <p className="text-xs text-muted-foreground mb-2">Colors</p>
-                  <div className="flex flex-wrap gap-1">
-                    {Object.keys(TAG_COLORS).map((color) => (
-                      <button
-                        key={color}
-                        onClick={() => onUpdateTagColor(tag, color)}
-                        className={cn(
-                          "w-5 h-5 rounded-full transition-all",
-                          TAG_COLORS[color as keyof typeof TAG_COLORS],
-                          tagColors[tag] === color && "ring-2 ring-offset-2 ring-primary"
-                        )}
-                      />
-                    ))}
+            <span>{tag}</span>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="opacity-0 group-hover:opacity-100 hover:bg-black/5 dark:hover:bg-white/5 p-0.5 rounded transition-all">
+                  <MoreHorizontal className="h-3 w-3" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-[180px]">
+                <DropdownMenuItem 
+                  onClick={() => onRemoveTag(tag)}
+                  className="text-destructive focus:text-destructive cursor-pointer"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <div className="w-full">
+                    <p className="text-xs text-muted-foreground mb-2">Colors</p>
+                    <div className="flex flex-wrap gap-1">
+                      {Object.keys(TAG_COLORS).map((color) => (
+                        <button
+                          key={color}
+                          onClick={() => onUpdateTagColor(tag, color)}
+                          className={cn(
+                            "w-5 h-5 rounded-full transition-all",
+                            TAG_COLORS[color as keyof typeof TAG_COLORS],
+                            tagColors[tag] === color && "ring-2 ring-offset-2 ring-primary"
+                          )}
+                        />
+                      ))}
+                    </div>
                   </div>
-                </div>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </Badge>
         </div>
       ))}
       <div className="flex items-center gap-2 group">

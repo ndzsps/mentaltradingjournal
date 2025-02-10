@@ -1,4 +1,3 @@
-
 import { DayProps } from "react-day-picker";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { calculateDayStats, formatCurrency, getEmotionStyle } from "./calendarUtils";
@@ -67,7 +66,13 @@ export const CalendarDay = ({
     // Calculate row position in calendar grid (0-based)
     const rowPosition = Math.floor((dayOfMonth + monthStartsOn - 1) / 7);
     
-    // Add 1 to convert to 1-based week number
+    // If this is the last row of the month, always return 5
+    const totalRows = Math.ceil((lastDayOfMonth.getDate() + monthStartsOn) / 7);
+    if (rowPosition === totalRows - 1) {
+      return 5;
+    }
+    
+    // Otherwise, return the regular week number (1-based)
     return rowPosition + 1;
   };
 
@@ -155,4 +160,3 @@ export const CalendarDay = ({
     </div>
   );
 };
-

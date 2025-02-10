@@ -67,14 +67,14 @@ const Journal = () => {
     };
   }, [user]);
 
-  // Filter entries for the selected date based on trade entry dates
+  // Filter entries for the selected date based on trade exit dates
   const displayedEntries = selectedDate
     ? entries.filter(entry => {
-        // If this is a trade entry, check the trade entry dates
+        // If this is a trade entry, check the trade exit dates
         if (entry.trades && entry.trades.length > 0) {
           return entry.trades.some(trade => {
-            if (!trade.entryDate) return false;
-            const tradeDate = new Date(trade.entryDate);
+            if (!trade.exitDate) return false;
+            const tradeDate = new Date(trade.exitDate);
             const start = startOfDay(selectedDate);
             const end = endOfDay(selectedDate);
             return tradeDate >= start && tradeDate <= end;
@@ -84,12 +84,12 @@ const Journal = () => {
       })
     : filteredEntries;
 
-  // Map entries for calendar display
+  // Map entries for calendar display based on exit dates
   const calendarEntries = entries
     .filter(entry => entry.trades && entry.trades.length > 0)
     .flatMap(entry => 
       entry.trades.map(trade => ({
-        date: trade.entryDate ? new Date(trade.entryDate) : new Date(entry.created_at),
+        date: trade.exitDate ? new Date(trade.exitDate) : new Date(entry.created_at),
         emotion: entry.emotion,
         trades: [trade]
       }))

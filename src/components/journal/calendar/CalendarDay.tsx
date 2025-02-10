@@ -3,6 +3,9 @@ import { DayProps } from "react-day-picker";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { calculateDayStats, formatCurrency, getEmotionStyle } from "./calendarUtils";
 import { Trade } from "@/types/trade";
+import { Circle } from "lucide-react";
+import { useState } from "react";
+import { WeeklyReviewDialog } from "../weekly/WeeklyReviewDialog";
 
 interface CalendarDayProps extends Omit<DayProps, 'displayMonth'> {
   entries: Array<{
@@ -21,9 +24,9 @@ export const CalendarDay = ({
   className,
   ...props 
 }: CalendarDayProps) => {
+  const [isWeeklyReviewOpen, setIsWeeklyReviewOpen] = useState(false);
   const stats = calculateDayStats(
     entries.filter(entry => {
-      // Filter trades that were closed on this day
       const hasClosedTradesOnThisDay = entry.trades?.some(trade => {
         const exitDate = trade.exitDate ? new Date(trade.exitDate) : null;
         return exitDate?.toDateString() === dayDate.toDateString();
@@ -37,10 +40,17 @@ export const CalendarDay = ({
   const style = getEmotionStyle(stats);
   const isToday = dayDate.toDateString() === new Date().toDateString();
   const hasEntries = stats !== null;
+  const isSaturday = dayDate.getDay() === 6;
 
   const getPnLColor = (amount: number) => {
     if (amount === 0) return 'text-gray-500 dark:text-gray-400';
     return amount > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400';
+  };
+
+  const getWeekNumber = (date: Date) => {
+    const startOfYear = new Date(date.getFullYear(), 0, 1);
+    const days = Math.floor((date.getTime() - startOfYear.getTime()) / (24 * 60 * 60 * 1000));
+    return Math.ceil((days + startOfYear.getDay() + 1) / 7);
   };
 
   const dayButton = (
@@ -60,7 +70,23 @@ export const CalendarDay = ({
       `}
       {...props}
     >
-      <div className="absolute top-2 right-2">
+      <div className="absolute top-2 right-2 flex items-center gap-2">
+        {isSaturday && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Circle 
+                className="h-4 w-4 text-primary cursor-pointer hover:text-primary-dark transition-colors"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsWeeklyReviewOpen(true);
+                }}
+              />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Weekly Review</p>
+            </TooltipContent>
+          </Tooltip>
+        )}
         <span className={`
           text-sm font-medium
           ${isToday ? 'bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent' : 'text-gray-500 dark:text-gray-400'}
@@ -98,6 +124,12 @@ export const CalendarDay = ({
       ) : (
         dayButton
       )}
+      <WeeklyReviewDialog 
+        open={isWeeklyReviewOpen}
+        onOpenChange={setIsWeeklyReviewOpen}
+        weekNumber={getWeekNumber(dayDate)}
+      />
     </div>
   );
 };
+

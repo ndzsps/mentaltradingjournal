@@ -90,16 +90,16 @@ export function MfeMaeChart() {
             const highestPrice = Number(trade.highestPrice);
             const lowestPrice = Number(trade.lowestPrice);
 
-            // Calculate MFE (Maximum Favorable Excursion)
+            // Calculate MFE (Maximum Favorable Excursion) as a percentage
             const mfe = ((highestPrice - entryPrice) / entryPrice) * 100;
             
-            // Calculate MAE (Maximum Adverse Excursion)
+            // Calculate MAE (Maximum Adverse Excursion) as a percentage
             const mae = ((entryPrice - lowestPrice) / entryPrice) * 100;
 
             processedData.push({
               id: trade.id,
-              updraw: mfe,
-              drawdown: -mae, // Make negative to show below 0 on chart
+              updraw: Number(mfe.toFixed(2)), // Round to 2 decimal places
+              drawdown: -Number(mae.toFixed(2)), // Make negative to show below 0 on chart
             });
           }
         });
@@ -157,11 +157,24 @@ export function MfeMaeChart() {
             >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="id" />
-              <YAxis domain={[-100, 100]} />
-              <Tooltip />
+              <YAxis 
+                domain={[-100, 100]} 
+                tickFormatter={(value) => `${value}%`}
+              />
+              <Tooltip 
+                formatter={(value: number) => [`${value.toFixed(2)}%`]}
+              />
               <Legend />
-              <Bar dataKey="updraw" fill="#4ade80" name="MFE (Maximum Favorable Excursion)" />
-              <Bar dataKey="drawdown" fill="#f43f5e" name="MAE (Maximum Adverse Excursion)" />
+              <Bar 
+                dataKey="updraw" 
+                fill="#4ade80" 
+                name="MFE (Maximum Favorable Excursion)" 
+              />
+              <Bar 
+                dataKey="drawdown" 
+                fill="#f43f5e" 
+                name="MAE (Maximum Adverse Excursion)" 
+              />
             </BarChart>
           </ResponsiveContainer>
         </div>

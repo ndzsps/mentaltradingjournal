@@ -38,7 +38,7 @@ export const NotesList = ({
 
   return (
     <ScrollArea className="flex-1">
-      <div className="p-4 space-y-2 bg-background/80 dark:bg-zinc-900/50">
+      <div className="p-4 space-y-2">
         {notes.map((note) => (
           <NoteItem
             key={note.id}

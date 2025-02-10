@@ -172,7 +172,7 @@ export const NotebookContent = () => {
   return (
     <div className="flex h-[calc(100vh-4rem)]">
       {/* Folders Section (20%) */}
-      <div className="w-1/5 min-w-[200px] border-r border-white/10 bg-background/50 dark:bg-zinc-900/50 flex flex-col">
+      <div className="w-1/5 min-w-[200px] border-r bg-background/50 flex flex-col">
         <div className="p-4 space-y-4">
           <h2 className="text-lg font-semibold">Folders</h2>
           <FolderList 
@@ -185,11 +185,11 @@ export const NotebookContent = () => {
         </div>
       </div>
 
-      <Separator orientation="vertical" className="mx-0 dark:bg-white/10" />
+      <Separator orientation="vertical" className="mx-0" />
 
       {/* Notes Section (30%) */}
-      <div className="w-[30%] min-w-[280px] border-r border-white/10 bg-background/30 dark:bg-zinc-800/50 flex flex-col">
-        <div className="p-4 border-b border-white/10 bg-background/50 dark:bg-zinc-900/50">
+      <div className="w-[30%] min-w-[280px] border-r bg-background/30 flex flex-col">
+        <div className="p-4 border-b bg-background/50">
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-lg font-semibold">Notes</h2>
             <div className="flex gap-2">
@@ -197,14 +197,14 @@ export const NotebookContent = () => {
                 variant="ghost"
                 size="icon"
                 onClick={() => createNote.mutate()}
-                className="hover:bg-white/10 dark:text-white/90"
+                className="hover:bg-primary/10"
               >
                 <PenLine className="h-4 w-4" />
               </Button>
               <Button 
                 variant="ghost" 
                 size="icon"
-                className="hover:bg-white/10 dark:text-white/90"
+                className="hover:bg-primary/10"
               >
                 <Search className="h-4 w-4" />
               </Button>
@@ -220,10 +220,10 @@ export const NotebookContent = () => {
         />
       </div>
 
-      <Separator orientation="vertical" className="mx-0 dark:bg-white/10" />
+      <Separator orientation="vertical" className="mx-0" />
 
       {/* Editor Section (50%) */}
-      <div className="flex-1 bg-background dark:bg-zinc-900/90">
+      <div className="flex-1 bg-background">
         <NoteView noteId={selectedNoteId} />
       </div>
     </div>

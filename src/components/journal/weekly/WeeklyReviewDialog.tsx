@@ -5,6 +5,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { NotepadText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { startOfWeek } from "date-fns";
 
 interface WeeklyReviewDialogProps {
   open: boolean;
@@ -20,15 +22,78 @@ export const WeeklyReviewDialog = ({
   const [strength, setStrength] = useState("");
   const [weakness, setWeakness] = useState("");
   const [improvement, setImprovement] = useState("");
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleSave = () => {
-    // In a future implementation, this could save to the database
-    toast({
-      title: "Weekly Review Saved",
-      description: "Your weekly review has been saved successfully.",
-    });
-    onOpenChange(false);
+  const loadReview = async () => {
+    try {
+      setLoading(true);
+      const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 }); // Start week on Monday
+      
+      const { data, error } = await supabase
+        .from('weekly_reviews')
+        .select('*')
+        .eq('week_start_date', weekStart.toISOString().split('T')[0])
+        .single();
+
+      if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned"
+        throw error;
+      }
+
+      if (data) {
+        setStrength(data.strength || '');
+        setWeakness(data.weakness || '');
+        setImprovement(data.improvement || '');
+      }
+    } catch (error) {
+      console.error('Error loading review:', error);
+      toast({
+        title: "Error Loading Review",
+        description: "There was an error loading your weekly review.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (open) {
+      loadReview();
+    }
+  }, [open]);
+
+  const handleSave = async () => {
+    try {
+      setLoading(true);
+      const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
+
+      const { error } = await supabase
+        .from('weekly_reviews')
+        .upsert({
+          week_start_date: weekStart.toISOString().split('T')[0],
+          strength,
+          weakness,
+          improvement,
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Weekly Review Saved",
+        description: "Your weekly review has been saved successfully.",
+      });
+      onOpenChange(false);
+    } catch (error) {
+      console.error('Error saving review:', error);
+      toast({
+        title: "Error Saving Review",
+        description: "There was an error saving your weekly review.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -55,6 +120,7 @@ export const WeeklyReviewDialog = ({
               onChange={(e) => setStrength(e.target.value)}
               className="min-h-[120px] bg-card/50 border-primary/10 focus-visible:ring-primary/30"
               placeholder="Write about your strengths..."
+              disabled={loading}
             />
           </div>
 
@@ -68,6 +134,7 @@ export const WeeklyReviewDialog = ({
               onChange={(e) => setWeakness(e.target.value)}
               className="min-h-[120px] bg-card/50 border-primary/10 focus-visible:ring-primary/30"
               placeholder="Write about your area of improvement..."
+              disabled={loading}
             />
           </div>
 
@@ -81,6 +148,7 @@ export const WeeklyReviewDialog = ({
               onChange={(e) => setImprovement(e.target.value)}
               className="min-h-[120px] bg-card/50 border-primary/10 focus-visible:ring-primary/30"
               placeholder="Write your improvement plan..."
+              disabled={loading}
             />
           </div>
 
@@ -88,8 +156,9 @@ export const WeeklyReviewDialog = ({
             <Button
               onClick={handleSave}
               className="bg-primary hover:bg-primary/90"
+              disabled={loading}
             >
-              Save Review
+              {loading ? "Saving..." : "Save Review"}
             </Button>
           </div>
         </div>
@@ -97,4 +166,3 @@ export const WeeklyReviewDialog = ({
     </Dialog>
   );
 };
-

@@ -500,6 +500,36 @@ export type Database = {
         }
         Relationships: []
       }
+      weekly_reviews: {
+        Row: {
+          created_at: string | null
+          id: string
+          improvement: string | null
+          strength: string | null
+          user_id: string
+          weakness: string | null
+          week_start_date: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          improvement?: string | null
+          strength?: string | null
+          user_id: string
+          weakness?: string | null
+          week_start_date: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          improvement?: string | null
+          strength?: string | null
+          user_id?: string
+          weakness?: string | null
+          week_start_date?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

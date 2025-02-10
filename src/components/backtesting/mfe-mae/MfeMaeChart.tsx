@@ -30,6 +30,7 @@ interface ChartData {
   id: string;
   updraw: number;
   drawdown: number;
+  instrument?: string;
 }
 
 export function MfeMaeChart() {
@@ -68,19 +69,28 @@ export function MfeMaeChart() {
             trade.highestPrice &&
             trade.lowestPrice &&
             trade.entryPrice &&
+            trade.direction &&
             trade.id
           ) {
             const entryPrice = Number(trade.entryPrice);
             const highestPrice = Number(trade.highestPrice);
             const lowestPrice = Number(trade.lowestPrice);
+            const isBuy = trade.direction === 'buy';
 
-            const updraw = ((highestPrice - entryPrice) / entryPrice) * 100;
-            const drawdown = ((lowestPrice - entryPrice) / entryPrice) * 100;
+            // Calculate MFE and MAE based on trade direction
+            const updraw = isBuy 
+              ? ((highestPrice - entryPrice) / entryPrice) * 100  // Buy MFE
+              : ((entryPrice - lowestPrice) / entryPrice) * 100;  // Sell MFE
+
+            const drawdown = isBuy
+              ? ((lowestPrice - entryPrice) / entryPrice) * 100   // Buy MAE
+              : ((highestPrice - entryPrice) / entryPrice) * 100; // Sell MAE
 
             processedData.push({
               id: trade.id,
               updraw,
               drawdown,
+              instrument: trade.instrument
             });
           }
         });
@@ -90,19 +100,45 @@ export function MfeMaeChart() {
 
       // Calculate statistics
       const allTrades = entries.flatMap(entry => entry.trades || []) as Trade[];
-      const winners = allTrades.filter(t => 
-        Number(t.exitPrice) > Number(t.entryPrice)
-      );
-      const losers = allTrades.filter(t => 
-        Number(t.exitPrice) <= Number(t.entryPrice)
-      );
+      const winners = allTrades.filter(t => {
+        if (!t.direction || !t.entryPrice || !t.exitPrice) return false;
+        const isWinner = t.direction === 'buy' 
+          ? Number(t.exitPrice) > Number(t.entryPrice)
+          : Number(t.exitPrice) < Number(t.entryPrice);
+        return isWinner;
+      });
+      
+      const losers = allTrades.filter(t => {
+        if (!t.direction || !t.entryPrice || !t.exitPrice) return false;
+        const isLoser = t.direction === 'buy'
+          ? Number(t.exitPrice) <= Number(t.entryPrice)
+          : Number(t.exitPrice) >= Number(t.entryPrice);
+        return isLoser;
+      });
 
       const calculateAverage = (trades: Trade[], fn: (t: Trade) => number) => 
         trades.length ? trades.reduce((acc, curr) => acc + fn(curr), 0) / trades.length : 0;
 
-      const getUpdraw = (t: Trade) => ((Number(t.highestPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100;
-      const getDrawdown = (t: Trade) => ((Number(t.lowestPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100;
-      const getExit = (t: Trade) => ((Number(t.exitPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100;
+      const getUpdraw = (t: Trade) => {
+        const isBuy = t.direction === 'buy';
+        return isBuy
+          ? ((Number(t.highestPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100
+          : ((Number(t.entryPrice) - Number(t.lowestPrice)) / Number(t.entryPrice)) * 100;
+      };
+
+      const getDrawdown = (t: Trade) => {
+        const isBuy = t.direction === 'buy';
+        return isBuy
+          ? ((Number(t.lowestPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100
+          : ((Number(t.highestPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100;
+      };
+
+      const getExit = (t: Trade) => {
+        const isBuy = t.direction === 'buy';
+        return isBuy
+          ? ((Number(t.exitPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100
+          : ((Number(t.entryPrice) - Number(t.exitPrice)) / Number(t.entryPrice)) * 100;
+      };
 
       setStats({
         tradesHitTp: (winners.length / allTrades.length) * 100,
@@ -134,9 +170,17 @@ export function MfeMaeChart() {
               }}
             >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="id" />
+              <XAxis 
+                dataKey="id" 
+                label={{ value: 'Trade ID', position: 'bottom' }}
+              />
               <YAxis domain={[-100, 100]} />
-              <Tooltip />
+              <Tooltip 
+                formatter={(value: number, name: string, props: { payload: ChartData }) => [
+                  `${value.toFixed(2)}%`,
+                  `${name} - ${props.payload.instrument || 'Unknown'}`
+                ]}
+              />
               <Legend />
               <Bar dataKey="updraw" fill="#4ade80" name="MFE (Maximum Favorable Excursion)" />
               <Bar dataKey="drawdown" fill="#f43f5e" name="MAE (Maximum Adverse Excursion)" />

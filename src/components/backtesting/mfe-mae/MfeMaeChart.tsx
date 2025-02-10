@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import {
   BarChart,
@@ -93,8 +94,9 @@ export function MfeMaeChart() {
             const highestPrice = Number(trade.highestPrice);
             const lowestPrice = Number(trade.lowestPrice);
 
-            const mfePips = Math.abs((highestPrice - entryPrice) * 10000);
-            const maePips = -Math.abs((entryPrice - lowestPrice) * 10000); // Ensure MAE is always negative
+            // Updated calculation logic for MFE and MAE
+            const mfePips = ((highestPrice - entryPrice) * 10000).toFixed(1);
+            const maePips = ((lowestPrice - entryPrice) * 10000).toFixed(1); // This will naturally be negative when price goes below entry
 
             console.log('Calculated pips:', {
               mfePips,
@@ -106,8 +108,8 @@ export function MfeMaeChart() {
               id: trade.id,
               tradeNumber: tradeNumber++,
               instrument: trade.instrument,
-              updraw: Number(mfePips.toFixed(1)),
-              drawdown: Number(maePips.toFixed(1)),
+              updraw: Number(mfePips),
+              drawdown: Number(maePips),
             });
           }
         });
@@ -131,7 +133,7 @@ export function MfeMaeChart() {
         trades.length ? trades.reduce((acc, curr) => acc + fn(curr), 0) / trades.length : 0;
 
       const getMfe = (t: Trade) => ((Number(t.highestPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100;
-      const getMae = (t: Trade) => ((Number(t.entryPrice) - Number(t.lowestPrice)) / Number(t.entryPrice)) * 100;
+      const getMae = (t: Trade) => ((Number(t.lowestPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100;
       const getExit = (t: Trade) => ((Number(t.exitPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100;
 
       setStats({

@@ -32,10 +32,11 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
         stopLoss: parseFloat(formData.get("stopLoss") as string),
         takeProfit: parseFloat(formData.get("takeProfit") as string),
         pnl: parseFloat(formData.get("pnl") as string),
-        fees: parseFloat(formData.get("fees") as string),
         exitDate: formData.get("exitDate") as string,
         forecastScreenshot: formData.get("forecastScreenshot") as string,
         resultUrl: formData.get("resultUrl") as string,
+        highestPrice: parseFloat(formData.get("highestPrice") as string),
+        lowestPrice: parseFloat(formData.get("lowestPrice") as string)
       };
 
       if (editTrade) {
@@ -134,4 +135,3 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
     isSubmitting,
   };
 };
-

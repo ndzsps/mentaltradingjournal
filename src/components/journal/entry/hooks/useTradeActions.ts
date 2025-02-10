@@ -46,21 +46,18 @@ export const useTradeActions = (user: User | null) => {
         throw new Error('Journal entry not found');
       }
 
-      const updatedTrades = entryWithTrade.trades.filter(
-        (trade: Trade) => trade.id !== selectedTrade.id
-      );
-
-      const { error: updateError } = await supabase
+      // Instead of updating the trades array, delete the entire journal entry
+      const { error: deleteError } = await supabase
         .from('journal_entries')
-        .update({ trades: updatedTrades })
+        .delete()
         .eq('id', entryWithTrade.id);
 
-      if (updateError) {
-        console.error('Error updating entry:', updateError);
-        throw updateError;
+      if (deleteError) {
+        console.error('Error deleting entry:', deleteError);
+        throw deleteError;
       }
 
-      toast.success('Trade deleted successfully');
+      toast.success('Entry deleted successfully');
       setIsDeleteDialogOpen(false);
       window.location.reload();
     } catch (error) {

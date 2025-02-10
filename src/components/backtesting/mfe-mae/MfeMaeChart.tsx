@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import {
   BarChart,
@@ -107,8 +108,8 @@ export function MfeMaeChart() {
               id: trade.id,
               tradeNumber: tradeNumber++,
               instrument: trade.instrument,
-              updraw: Number(mfePips.toFixed(1)), // MFE in pips
-              drawdown: -Number(maePips.toFixed(1)), // MAE in pips, negative to show below 0
+              updraw: Number(mfePips.toFixed(1)),
+              drawdown: -Number(maePips.toFixed(1)), // Negative to show below 0
             });
           }
         });
@@ -163,6 +164,7 @@ export function MfeMaeChart() {
                 left: 20,
                 bottom: 5,
               }}
+              barGap={0}
             >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis 
@@ -170,7 +172,7 @@ export function MfeMaeChart() {
                 label={{ value: 'Trade #', position: 'bottom' }}
               />
               <YAxis 
-                domain={[-200, 200]} 
+                domain={[-100, 100]} 
                 tickFormatter={(value) => `${value} pips`}
                 label={{ value: 'Pips', angle: -90, position: 'insideLeft' }}
               />

@@ -1,3 +1,4 @@
+
 import { useAuth } from "@/contexts/AuthContext";
 import { NoteTitle } from "./NoteTitle";
 import { NoteTags } from "./NoteTags";
@@ -57,33 +58,7 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
   };
 
   const handleLinkSubmit = (url: string) => {
-    const selection = window.getSelection();
-    if (!selection || selection.rangeCount === 0) return;
-
-    const range = selection.getRangeAt(0);
-    const formattedUrl = url.trim().startsWith('http') ? url.trim() : `https://${url.trim()}`;
-    
-    const linkElement = document.createElement('a');
-    linkElement.href = formattedUrl;
-    linkElement.target = '_blank';
-    linkElement.rel = 'noopener noreferrer';
-    
-    if (range.collapsed) {
-      linkElement.textContent = formattedUrl;
-      range.insertNode(linkElement);
-    } else {
-      execCommand('createLink', formattedUrl);
-      const links = document.querySelectorAll('a[href="' + formattedUrl + '"]');
-      links.forEach(link => {
-        link.setAttribute('target', '_blank');
-        link.setAttribute('rel', 'noopener noreferrer');
-      });
-    }
-    
-    const editor = document.querySelector('[contenteditable="true"]');
-    if (editor) {
-      handleContentChange(editor.innerHTML);
-    }
+    execCommand('createLink', url);
   };
 
   const handleColorChange = () => {
@@ -123,7 +98,7 @@ export const NoteView = ({ noteId }: NoteViewProps) => {
         />
         <Separator className="my-4" />
         <NoteContent 
-          content={content || ''} 
+          content={content} 
           onContentChange={handleContentChange} 
         />
         <LinkDialog 

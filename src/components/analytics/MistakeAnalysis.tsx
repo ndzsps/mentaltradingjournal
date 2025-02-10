@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import {
   PieChart,
@@ -146,35 +145,33 @@ export const MistakeAnalysis = () => {
 
   // Custom legend formatter to group Revenge Trading and Moving Stop-Loss
   const renderCustomizedLegend = (props: any) => {
-    const { payload } = props;
-    
-    if (!payload || !Array.isArray(payload)) {
+    if (!props || !props.payload || !Array.isArray(props.payload)) {
       return null;
     }
 
+    let legendItems = [...props.payload];
+
     // Find revenge trading and moving stop loss items
-    const revengeIndex = payload.findIndex((item: any) => 
-      item.payload && item.payload.categoryValue === 'revenge_trading'
+    const revengeIndex = legendItems.findIndex((item: any) => 
+      item.payload?.categoryValue === 'revenge_trading'
     );
-    const stopLossIndex = payload.findIndex((item: any) => 
-      item.payload && item.payload.categoryValue === 'moving_stop_loss'
+    const stopLossIndex = legendItems.findIndex((item: any) => 
+      item.payload?.categoryValue === 'moving_stop_loss'
     );
 
     // Group these items if both exist
     if (revengeIndex !== -1 && stopLossIndex !== -1) {
       const combinedItem = {
-        value: `${payload[revengeIndex].value} / ${payload[stopLossIndex].value}`,
-        color: payload[revengeIndex].color,
-        type: payload[revengeIndex].type
+        value: `${legendItems[revengeIndex].value} / ${legendItems[stopLossIndex].value}`,
+        color: legendItems[revengeIndex].color,
+        type: legendItems[revengeIndex].type
       };
-      const newPayload = [...payload];
-      newPayload.splice(revengeIndex, 2, combinedItem);
-      payload = newPayload;
+      legendItems.splice(revengeIndex, 2, combinedItem);
     }
 
     return (
       <ul className="flex flex-wrap gap-4 justify-center mt-4">
-        {payload.map((entry: any, index: number) => (
+        {legendItems.map((entry: any, index: number) => (
           <li key={`item-${index}`} className="flex items-center gap-2">
             <div
               className="w-3 h-3 rounded-full"

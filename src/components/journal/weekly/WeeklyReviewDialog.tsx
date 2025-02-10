@@ -22,16 +22,11 @@ export const WeeklyReviewDialog = ({
   const [improvement, setImprovement] = useState("");
   const { toast } = useToast();
 
-  useEffect(() => {
-    // Debug log to verify the week number is being received correctly
-    console.log('WeeklyReviewDialog received week number:', weekNumber);
-  }, [weekNumber]);
-
   const handleSave = () => {
     // In a future implementation, this could save to the database
     toast({
       title: "Weekly Review Saved",
-      description: `Week ${weekNumber} review has been saved successfully.`,
+      description: "Your weekly review has been saved successfully.",
     });
     onOpenChange(false);
   };
@@ -42,7 +37,7 @@ export const WeeklyReviewDialog = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
             <NotepadText className="h-5 w-5" />
-            Week {weekNumber} Review
+            Weekly Review
           </DialogTitle>
           <DialogDescription>
             Review your trading performance and set goals for improvement
@@ -102,3 +97,4 @@ export const WeeklyReviewDialog = ({
     </Dialog>
   );
 };
+

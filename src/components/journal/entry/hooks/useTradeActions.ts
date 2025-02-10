@@ -98,12 +98,13 @@ export const useTradeActions = (user: User | null) => {
         stopLoss: updatedTrade.stopLoss,
         takeProfit: updatedTrade.takeProfit,
         quantity: updatedTrade.quantity,
-        fees: updatedTrade.fees,
         setup: updatedTrade.setup,
         pnl: updatedTrade.pnl,
         forecastScreenshot: updatedTrade.forecastScreenshot,
         resultScreenshot: updatedTrade.resultScreenshot,
-        htfBias: updatedTrade.htfBias
+        htfBias: updatedTrade.htfBias,
+        highestPrice: updatedTrade.highestPrice,
+        lowestPrice: updatedTrade.lowestPrice
       };
 
       const updatedTrades = entryWithTrade?.trades.map((trade: Trade) => 
@@ -133,6 +134,9 @@ export const useTradeActions = (user: User | null) => {
       await new Promise(resolve => setTimeout(resolve, 500));
       
       window.location.reload();
+    } catch (error) {
+      console.error('Error updating trade:', error);
+      toast.error('Failed to update trade');
     } finally {
       setIsUpdating(false);
     }

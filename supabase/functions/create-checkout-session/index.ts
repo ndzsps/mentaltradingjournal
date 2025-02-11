@@ -16,11 +16,6 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders })
   }
 
-  const supabaseClient = createClient(
-    Deno.env.get('SUPABASE_URL') ?? '',
-    Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-  )
-
   try {
     console.log('Getting auth token...');
     // Get the session or user object
@@ -29,6 +24,11 @@ serve(async (req) => {
       console.error('No authorization header found');
       throw new Error('No authorization header')
     }
+    
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+    )
     
     const token = authHeader.replace('Bearer ', '')
     console.log('Authenticating user...');
@@ -60,33 +60,26 @@ serve(async (req) => {
       )
     }
 
-    // Log first and last few characters of the key for debugging (never log the full key!)
-    console.log('Stripe key format check:', {
-      keyLength: stripeSecretKey.length,
-      startsWithSkTest: stripeSecretKey.startsWith('sk_test_'),
-      hasValidFormat: /^sk_test_\w+$/.test(stripeSecretKey)
-    });
-
     try {
       console.log('Initializing Stripe...');
       const stripe = new Stripe(stripeSecretKey, {
         apiVersion: '2023-10-16',
       })
 
-      console.log('Checking for existing customer...');
+      console.log('Finding or creating customer for:', user.email);
+      let customer;
       const customers = await stripe.customers.list({
         email: user.email,
         limit: 1
       })
 
-      let customer_id = undefined
       if (customers.data.length > 0) {
-        customer_id = customers.data[0].id
-        console.log('Found existing customer:', customer_id);
+        customer = customers.data[0]
+        console.log('Found existing customer:', customer.id);
         
         console.log('Checking for active subscriptions...');
         const subscriptions = await stripe.subscriptions.list({
-          customer: customers.data[0].id,
+          customer: customer.id,
           status: 'active',
           limit: 1
         })
@@ -105,12 +98,20 @@ serve(async (req) => {
             }
           )
         }
+      } else {
+        console.log('Creating new customer...');
+        customer = await stripe.customers.create({
+          email: user.email,
+          metadata: {
+            supabase_user_id: user.id
+          }
+        })
+        console.log('Created new customer:', customer.id);
       }
 
       console.log('Creating checkout session...');
       const session = await stripe.checkout.sessions.create({
-        customer: customer_id,
-        customer_email: customer_id ? undefined : user.email,
+        customer: customer.id,
         line_items: [
           {
             price: 'price_1QiK8SI2A6O6E8LHKlfvakdi',
@@ -123,7 +124,7 @@ serve(async (req) => {
         cancel_url: `${req.headers.get('origin')}/`,
       })
 
-      console.log('Checkout session created successfully:', { sessionId: session.id });
+      console.log('Checkout session created successfully:', { sessionId: session.id, url: session.url });
       return new Response(
         JSON.stringify({ url: session.url }),
         { 
@@ -141,20 +142,19 @@ serve(async (req) => {
         raw: stripeError
       });
 
-      if (stripeError instanceof Stripe.errors.StripeError) {
-        return new Response(
-          JSON.stringify({ 
-            error: stripeError.message,
-            type: stripeError.type,
-            code: stripeError.code 
-          }),
-          { 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            status: stripeError.statusCode || 500,
-          }
-        )
-      }
-      throw stripeError // Re-throw if not a Stripe error
+      // Return detailed error information for debugging
+      return new Response(
+        JSON.stringify({ 
+          error: stripeError.message,
+          type: stripeError.type,
+          code: stripeError.code,
+          raw: stripeError
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: stripeError.statusCode || 500,
+        }
+      )
     }
   } catch (error) {
     console.error('General error:', {
@@ -180,4 +180,3 @@ serve(async (req) => {
     )
   }
 })
-

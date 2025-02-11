@@ -10,12 +10,12 @@ export const AnalyticsSection = () => {
   
   const analyticsTools = [
     {
-      title: "Emotional Intelligence Mastery",
+      title: "Emotional Mastery",
       description: "Transform emotions from trading obstacles into strategic advantages",
       icon: Brain,
       features: [
-        "Identify emotional triggers affecting trades",
-        "Track mood-performance correlation",
+        "Identify hidden emotions affecting your trades",
+        "Discover your mood-performance correlation",
         "Build emotional resilience"
       ],
       gradient: "from-primary/10 via-primary/5 to-transparent"
@@ -33,12 +33,12 @@ export const AnalyticsSection = () => {
     },
     {
       title: "Performance Analytics",
-      description: "Comprehensive analysis of your trading decisions",
+      description: "Gain a true understanding of your trading strategy",
       icon: LineChart,
       features: [
-        "Win/loss pattern analysis",
-        "Risk management tracking",
-        "Performance metrics"
+        "Win/loss pattern examination",
+        "Discover hidden leaks in your strategy",
+        "Double down on your strongest setups"
       ],
       gradient: "from-primary/10 via-primary/5 to-transparent"
     },
@@ -67,15 +67,15 @@ export const AnalyticsSection = () => {
       
       <div className="relative container mx-auto px-4">
         <div className="text-center mb-20 space-y-6">
-          <div className="relative py-4"> {/* Added padding to prevent text cutoff */}
+          <div className="relative py-4">
             {/* Enhanced Glow Effect */}
             <div className="absolute -inset-2 bg-gradient-to-r from-primary/40 via-[#9b87f5]/30 to-[#7E69AB]/40 rounded-lg blur-3xl opacity-75" />
-            <h2 className="relative text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#9b87f5] via-[#D6BCFA] to-[#7E69AB] bg-clip-text text-transparent pb-4 leading-relaxed"> {/* Increased padding-bottom and added leading-relaxed */}
+            <h2 className="relative text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#9b87f5] via-[#D6BCFA] to-[#7E69AB] bg-clip-text text-transparent pb-4 leading-relaxed">
               Trading Psychology Analytics
             </h2>
           </div>
           <p className="text-xl text-gray-300/90 max-w-3xl mx-auto">
-            Transform your trading mindset with our comprehensive suite of psychological analysis tools
+            Evolve your trading mindset with our suite of psychological analysis tools
           </p>
         </div>
 
@@ -133,3 +133,4 @@ export const AnalyticsSection = () => {
     </section>
   );
 };
+

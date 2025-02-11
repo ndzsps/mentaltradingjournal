@@ -58,17 +58,30 @@ export const AnalyticsSection = () => {
   return (
     <section className="relative py-32">
       <div className="absolute inset-0">
-        {/* Updated gradient background for better blending */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#1A1F2C] via-[#1A1F2C]/95 to-[#1A1F2C]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-accent/5 to-transparent opacity-20" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,_var(--tw-gradient-stops))] from-[#7E69AB]/10 via-background/60 to-transparent opacity-30" />
-        <div className="absolute inset-0 backdrop-blur-[50px]" />
+        {/* Base dark background layer */}
+        <div className="absolute inset-0 bg-[#1A1F2C]" />
+        
+        {/* Gradient overlays for seamless blending */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10 opacity-40" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent opacity-30" />
+        
+        {/* Animated glow effects */}
+        <div className="absolute inset-0">
+          <div className="absolute top-0 -left-40 w-80 h-80 bg-primary/30 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" />
+          <div className="absolute top-0 -right-40 w-80 h-80 bg-accent/30 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse delay-1000" />
+        </div>
+        
+        {/* Noise texture overlay */}
+        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.02]" />
+        
+        {/* Glass effect base */}
+        <div className="absolute inset-0 backdrop-blur-[100px]" />
       </div>
       
       <div className="relative container mx-auto px-4">
         <div className="text-center mb-20 space-y-6">
           <div className="relative py-4">
-            <div className="absolute -inset-2 bg-gradient-to-r from-primary/30 via-[#9b87f5]/20 to-[#7E69AB]/30 rounded-lg blur-3xl opacity-75" />
+            <div className="absolute -inset-2 bg-gradient-to-r from-primary/20 via-[#9b87f5]/10 to-[#7E69AB]/20 rounded-lg blur-3xl opacity-50" />
             <h2 className="relative text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#9b87f5] via-[#D6BCFA] to-[#7E69AB] bg-clip-text text-transparent pb-4 leading-relaxed">
               Trading Psychology Analytics
             </h2>

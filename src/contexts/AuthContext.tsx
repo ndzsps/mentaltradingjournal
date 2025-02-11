@@ -22,9 +22,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
+  // Clear auth state
+  const clearAuthState = () => {
+    setUser(null);
+    setSession(null);
+    // Clear any persisted session
+    supabase.auth.signOut();
+  };
+
   useEffect(() => {
     // Initialize auth state from any existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (error) {
+        console.error("Error getting session:", error);
+        clearAuthState();
+        return;
+      }
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
@@ -34,6 +47,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      console.log("Auth state changed:", _event, session?.user?.id);
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
@@ -54,6 +68,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return "No account found with this email address.";
       case "Invalid email or password":
         return "The email or password you entered is incorrect. Please try again.";
+      case "User from sub claim in JWT does not exist":
+        return "Your session has expired. Please sign in again.";
       default:
         return error.message;
     }
@@ -71,6 +87,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           title: "Error signing in",
           description: getErrorMessage(error),
         });
+        if (error.message === "User from sub claim in JWT does not exist") {
+          clearAuthState();
+        }
         throw error;
       }
     } catch (error) {
@@ -121,14 +140,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           description: getErrorMessage(error),
         });
       }
-      // Clear session and user state regardless of error
-      setSession(null);
-      setUser(null);
+      clearAuthState();
     } catch (error) {
       console.error("Sign out error:", error);
-      // Clear session and user state on error too
-      setSession(null);
-      setUser(null);
+      clearAuthState();
     }
   };
 
@@ -144,6 +159,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           title: "Error updating username",
           description: getErrorMessage(error),
         });
+        if (error.message === "User from sub claim in JWT does not exist") {
+          clearAuthState();
+        }
         throw error;
       }
     } catch (error) {

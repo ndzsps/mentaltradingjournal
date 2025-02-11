@@ -16,13 +16,14 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { session } = useAuth();
+  const { session, signOut } = useAuth();
 
   useEffect(() => {
     if (session?.access_token) {
       checkSubscription();
     } else {
       setLoading(false);
+      navigate('/login');
     }
   }, [session]);
 
@@ -30,6 +31,7 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
     try {
       if (!session?.access_token) {
         setLoading(false);
+        navigate('/login');
         return;
       }
 
@@ -40,6 +42,17 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
       });
       
       if (error) {
+        // Check if error is due to invalid session
+        if (error.message.includes("User from sub claim in JWT does not exist")) {
+          toast({
+            variant: "destructive",
+            title: "Session expired",
+            description: "Your session has expired. Please sign in again.",
+          });
+          await signOut();
+          navigate('/login');
+          return;
+        }
         console.error('Subscription check error:', error);
         throw error;
       }
@@ -48,6 +61,18 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
       setIsSubscribed(data.subscribed);
     } catch (error) {
       console.error('Error checking subscription:', error);
+      // Handle specific error cases
+      if (typeof error === 'object' && error !== null && 'message' in error && 
+          error.message.includes("User from sub claim in JWT does not exist")) {
+        toast({
+          variant: "destructive",
+          title: "Session expired",
+          description: "Your session has expired. Please sign in again.",
+        });
+        await signOut();
+        navigate('/login');
+        return;
+      }
       toast({
         variant: "destructive",
         title: "Error checking subscription",
@@ -82,6 +107,17 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
           // Refresh subscription status and redirect
           await checkSubscription();
           navigate('/dashboard');
+          return;
+        }
+        // Check if error is due to invalid session
+        if (error.message.includes("User from sub claim in JWT does not exist")) {
+          toast({
+            variant: "destructive",
+            title: "Session expired",
+            description: "Your session has expired. Please sign in again.",
+          });
+          await signOut();
+          navigate('/login');
           return;
         }
         throw error;

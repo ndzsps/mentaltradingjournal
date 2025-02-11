@@ -56,17 +56,17 @@ export const AnalyticsSection = () => {
   ];
 
   return (
-    <section className="relative py-32">
-      {/* Matching background effects from the upper section */}
-      <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-[#1A1F2C]" />
+    <section className="relative -mt-32 pt-64 pb-32">
+      {/* Background effects that blend with the upper section */}
+      <div className="absolute inset-0 -top-64">
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1A1F2C] via-[#1A1F2C] to-[#1A1F2C]" />
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10 opacity-40" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent opacity-30" />
         
         {/* Animated glow effects */}
         <div className="absolute inset-0">
-          <div className="absolute top-0 -left-40 w-80 h-80 bg-primary/30 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" />
-          <div className="absolute top-0 -right-40 w-80 h-80 bg-accent/30 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-1000" />
+          <div className="absolute top-1/3 -left-40 w-80 h-80 bg-primary/30 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" />
+          <div className="absolute top-1/3 -right-40 w-80 h-80 bg-accent/30 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-1000" />
         </div>
         
         {/* Noise texture overlay */}

@@ -8,6 +8,7 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  ReferenceLine,
 } from "recharts";
 import { ChartData } from "../types";
 
@@ -49,25 +50,9 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           strokeWidth={1}
           opacity={0.2}
         />
-        {/* Special lines for 100 and -100 */}
-        <CartesianGrid
-          horizontal={true}
-          vertical={false}
-          y={100}
-          stroke="#4ade80"
-          strokeWidth={2}
-          opacity={1}
-          strokeDasharray="0"
-        />
-        <CartesianGrid
-          horizontal={true}
-          vertical={false}
-          y={-100}
-          stroke="#f43f5e"
-          strokeWidth={2}
-          opacity={1}
-          strokeDasharray="0"
-        />
+        {/* Reference lines for 100 and -100 */}
+        <ReferenceLine y={100} stroke="#4ade80" strokeWidth={2} />
+        <ReferenceLine y={-100} stroke="#f43f5e" strokeWidth={2} />
         <XAxis 
           dataKey="tradeNum" 
           label={{ value: 'Trade', position: 'bottom' }}

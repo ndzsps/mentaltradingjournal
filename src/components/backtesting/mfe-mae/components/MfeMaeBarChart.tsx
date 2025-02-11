@@ -57,7 +57,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
             angle: -90, 
             position: 'insideLeft',
             offset: 0,
-            dy: 60  // Add vertical offset to center the label
+            dy: 60
           }} 
         />
         <Tooltip 
@@ -66,8 +66,8 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
             if (!active || !payload || !payload.length) return null;
 
             const data = payload[0].payload;
-            const updrawValue = payload.find(p => p.dataKey === 'mfeRelativeToTp')?.value;
-            const drawdownValue = payload.find(p => p.dataKey === 'maeRelativeToSl')?.value;
+            const updrawValue = data.mfeRelativeToTp;
+            const drawdownValue = data.maeRelativeToSl;
 
             return (
               <div className="bg-background border border-border rounded-lg shadow-lg p-3">
@@ -76,11 +76,11 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
                   <p className="text-lg">{data.instrument || 'Unknown'}</p>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-[#4ade80]" />
-                    <span>Updraw: {typeof updrawValue === 'number' ? updrawValue.toFixed(2) : '0'}%</span>
+                    <span>Updraw: {updrawValue?.toFixed(2)}%</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-[#f43f5e]" />
-                    <span>Drawdown: {typeof drawdownValue === 'number' ? Math.abs(drawdownValue).toFixed(2) : '0'}%</span>
+                    <span>Drawdown: {Math.abs(drawdownValue)?.toFixed(2)}%</span>
                   </div>
                   <p>R-Multiple: {data.rMultiple?.toFixed(2) || '0'}</p>
                 </div>

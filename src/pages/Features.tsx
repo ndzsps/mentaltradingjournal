@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { 
@@ -39,6 +40,34 @@ const Features = () => {
       "Running P/L",
       "Identify setups and mistakes",
       "Trade rating and scale"
+    ]
+  };
+
+  const thirdFeature = {
+    icon: Brain,
+    title: "Understand your emotional patterns",
+    description: "Gain deep insights into your trading psychology and emotional responses to market events.",
+    capabilities: [
+      "Emotion tracking",
+      "Behavioral analytics",
+      "Pattern recognition",
+      "Stress indicators",
+      "Performance correlation",
+      "Mindset optimization"
+    ]
+  };
+
+  const fourthFeature = {
+    icon: LineChart,
+    title: "Advanced Performance Analysis",
+    description: "Leverage powerful analytics to understand your trading performance and identify areas for improvement.",
+    capabilities: [
+      "Equity curve analysis",
+      "Win rate tracking",
+      "Risk-reward ratios",
+      "Drawdown monitoring",
+      "Trading consistency",
+      "Market correlation"
     ]
   };
 
@@ -157,6 +186,76 @@ const Features = () => {
             <p className="text-lg text-muted-foreground">{secondFeature.description}</p>
             <div className="grid grid-cols-2 gap-4">
               {secondFeature.capabilities.map((capability, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <div className="flex-shrink-0 rounded-full p-1 bg-primary/10">
+                    <Check className="h-4 w-4 text-primary" />
+                  </div>
+                  <span className="text-sm">{capability}</span>
+                </div>
+              ))}
+            </div>
+            <Button className="group" size="lg" asChild>
+              <Link to="/login">
+                Learn More
+                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+
+        {/* Third Feature Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-32">
+          <div className="space-y-8">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10">
+              <thirdFeature.icon className="h-6 w-6 text-primary" />
+            </div>
+            <h2 className="text-4xl font-bold leading-tight">{thirdFeature.title}</h2>
+            <p className="text-lg text-muted-foreground">{thirdFeature.description}</p>
+            <div className="grid grid-cols-2 gap-4">
+              {thirdFeature.capabilities.map((capability, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <div className="flex-shrink-0 rounded-full p-1 bg-primary/10">
+                    <Check className="h-4 w-4 text-primary" />
+                  </div>
+                  <span className="text-sm">{capability}</span>
+                </div>
+              ))}
+            </div>
+            <Button className="group" size="lg" asChild>
+              <Link to="/login">
+                Learn More
+                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </Button>
+          </div>
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 rounded-3xl blur-xl" />
+            <img 
+              src="/lovable-uploads/14938247-d3b1-4e45-bf1c-9c9e6fc6f8b6.png" 
+              alt="Emotional Analysis Dashboard" 
+              className="relative rounded-3xl shadow-xl w-full"
+            />
+          </div>
+        </div>
+
+        {/* Fourth Feature Section - Flipped Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-32">
+          <div className="relative order-2 lg:order-1">
+            <div className="absolute inset-0 bg-gradient-to-br from-accent/20 to-primary/20 rounded-3xl blur-xl" />
+            <img 
+              src="/lovable-uploads/13d2dda7-1923-4c1f-9a2d-bde3724fd8bb.png" 
+              alt="Performance Analytics Dashboard" 
+              className="relative rounded-3xl shadow-xl w-full"
+            />
+          </div>
+          <div className="space-y-8 order-1 lg:order-2">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10">
+              <fourthFeature.icon className="h-6 w-6 text-primary" />
+            </div>
+            <h2 className="text-4xl font-bold leading-tight">{fourthFeature.title}</h2>
+            <p className="text-lg text-muted-foreground">{fourthFeature.description}</p>
+            <div className="grid grid-cols-2 gap-4">
+              {fourthFeature.capabilities.map((capability, index) => (
                 <div key={index} className="flex items-center gap-2">
                   <div className="flex-shrink-0 rounded-full p-1 bg-primary/10">
                     <Check className="h-4 w-4 text-primary" />

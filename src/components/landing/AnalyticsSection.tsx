@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -57,7 +56,6 @@ export const AnalyticsSection = () => {
 
   return (
     <section className="relative py-32">
-      {/* Enhanced Background Effects */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-[#1A1F2C]/95" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/20 via-accent/5 to-transparent opacity-30" />
@@ -68,7 +66,6 @@ export const AnalyticsSection = () => {
       <div className="relative container mx-auto px-4">
         <div className="text-center mb-20 space-y-6">
           <div className="relative py-4">
-            {/* Enhanced Glow Effect */}
             <div className="absolute -inset-2 bg-gradient-to-r from-primary/40 via-[#9b87f5]/30 to-[#7E69AB]/40 rounded-lg blur-3xl opacity-75" />
             <h2 className="relative text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#9b87f5] via-[#D6BCFA] to-[#7E69AB] bg-clip-text text-transparent pb-4 leading-relaxed">
               Trading Psychology Analytics
@@ -117,14 +114,13 @@ export const AnalyticsSection = () => {
 
         <div className="mt-16 text-center">
           <div className="relative inline-block group">
-            {/* Enhanced Button Glow Effect */}
             <div className="absolute -inset-1 bg-gradient-to-r from-[#9b87f5]/30 via-[#7E69AB]/20 to-[#9b87f5]/30 rounded-lg blur-xl opacity-75 group-hover:opacity-100 transition-all duration-300 group-hover:scale-105" />
             <Button 
               onClick={() => navigate("/login")} 
               size="lg"
               className="relative bg-[#1A1F2C] hover:bg-[#1A1F2C]/80 text-gray-200 px-8 py-6 text-lg border border-white/10 hover:border-primary/20 shadow-lg shadow-primary/10 hover:shadow-xl hover:shadow-primary/20 transition-all duration-300"
             >
-              Start Your Psychology Journey
+              Start Going Mental
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
             </Button>
           </div>
@@ -133,4 +129,3 @@ export const AnalyticsSection = () => {
     </section>
   );
 };
-

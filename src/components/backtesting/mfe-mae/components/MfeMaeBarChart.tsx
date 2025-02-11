@@ -54,7 +54,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
               : 'Drawdown';
             return [
               `${value.toFixed(2)}%`,
-              `${label} - ${props.payload.instrument || 'Unknown'}\nR-Multiple: ${props.payload.rMultiple?.toFixed(2)}`
+              `Trade #${props.payload.tradeNumber}\n${props.payload.instrument || 'Unknown'}\n${label}: ${value.toFixed(2)}%\nR-Multiple: ${props.payload.rMultiple?.toFixed(2)}`
             ];
           }}
         />
@@ -78,3 +78,4 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
     </ResponsiveContainer>
   );
 }
+

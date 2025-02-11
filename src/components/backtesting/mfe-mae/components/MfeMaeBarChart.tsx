@@ -52,16 +52,16 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           vertical={false}
           y={100}
           stroke="#4ade80"
-          strokeWidth={1}
-          opacity={0.3}
+          strokeWidth={2}
+          opacity={0.5}
         />
         <CartesianGrid
           horizontal={true}
           vertical={false}
           y={-100}
           stroke="#f43f5e"
-          strokeWidth={1}
-          opacity={0.3}
+          strokeWidth={2}
+          opacity={0.5}
         />
         <XAxis 
           dataKey="tradeNum" 

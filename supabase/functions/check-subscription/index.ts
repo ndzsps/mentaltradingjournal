@@ -20,7 +20,7 @@ serve(async (req) => {
       throw new Error('No authorization header')
     }
 
-    // Initialize Supabase client
+    // Initialize Supabase client with service role key for full access
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
@@ -34,14 +34,13 @@ serve(async (req) => {
       throw new Error('Error getting user: ' + userError?.message)
     }
 
-    console.log('Checking subscription for user:', user.id);
+    console.log('Checking subscription for user:', user.id, 'email:', user.email);
 
     // Check if user has an active subscription
     const { data: subscription, error: subError } = await supabaseClient
       .from('subscriptions')
-      .select('*')
+      .select('*, stripe_subscription_id, stripe_customer_id')
       .eq('user_id', user.id)
-      .eq('status', 'active')
       .maybeSingle();
 
     if (subError) {
@@ -49,11 +48,40 @@ serve(async (req) => {
       throw new Error('Error fetching subscription: ' + subError.message);
     }
 
-    console.log('Subscription status:', subscription ? 'Active' : 'No active subscription found');
+    console.log('Found subscription:', subscription);
+
+    // Check if there's a subscription but it's not marked as active
+    if (subscription && subscription.stripe_subscription_id && subscription.status !== 'active') {
+      console.log('Found subscription but status is not active, updating status...');
+      
+      // Update subscription status to active
+      const { error: updateError } = await supabaseClient
+        .from('subscriptions')
+        .update({ status: 'active' })
+        .eq('id', subscription.id);
+
+      if (updateError) {
+        console.error('Error updating subscription status:', updateError);
+        throw new Error('Error updating subscription status: ' + updateError.message);
+      }
+
+      // Return success with updated subscription status
+      return new Response(
+        JSON.stringify({ 
+          subscribed: true,
+          userId: user.id,
+          subscription: { ...subscription, status: 'active' }
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
+        }
+      );
+    }
 
     return new Response(
       JSON.stringify({ 
-        subscribed: !!subscription,
+        subscribed: subscription?.status === 'active',
         userId: user.id,
         subscription: subscription // Include subscription details for debugging
       }),

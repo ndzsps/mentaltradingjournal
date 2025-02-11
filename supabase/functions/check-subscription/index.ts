@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.1'
 
@@ -33,10 +34,20 @@ serve(async (req) => {
       throw new Error('Error getting user: ' + userError?.message)
     }
 
-    // For now, return true as subscription check is not implemented yet
+    // Check subscription status
+    const { data: subscription, error: subscriptionError } = await supabaseClient
+      .from('subscriptions')
+      .select('is_active')
+      .eq('user_id', user.id)
+      .single()
+
+    if (subscriptionError) {
+      console.error('Error checking subscription:', subscriptionError)
+    }
+
     return new Response(
       JSON.stringify({ 
-        subscribed: true,
+        subscribed: subscription?.is_active ?? false,
         userId: user.id 
       }),
       {

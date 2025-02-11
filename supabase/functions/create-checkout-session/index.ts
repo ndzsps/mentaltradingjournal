@@ -28,6 +28,7 @@ serve(async (req) => {
     const email = user?.email
 
     if (!email) {
+      console.error('No email found for user');
       return new Response(
         JSON.stringify({ error: 'No email found' }),
         { 
@@ -37,24 +38,27 @@ serve(async (req) => {
       )
     }
 
+    console.log('Processing checkout for user:', user.id);
+
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
     })
 
-    // First check for existing subscriptions
-    const { data: subscriptions, error: subError } = await supabaseClient
+    // First check for existing subscriptions in database
+    const { data: dbSubscription, error: dbError } = await supabaseClient
       .from('subscriptions')
       .select('*')
       .eq('user_id', user.id)
       .eq('is_active', true)
       .maybeSingle()
 
-    if (subError) {
-      console.error('Error checking existing subscription:', subError)
-      throw subError
+    if (dbError) {
+      console.error('Error checking existing subscription in database:', dbError)
+      throw dbError
     }
 
-    if (subscriptions) {
+    if (dbSubscription) {
+      console.log('Found active subscription in database:', dbSubscription)
       return new Response(
         JSON.stringify({ error: 'You already have an active subscription' }),
         { 
@@ -65,6 +69,7 @@ serve(async (req) => {
     }
 
     // Check Stripe customers
+    console.log('Checking Stripe customers for email:', email);
     const customers = await stripe.customers.list({
       email: email,
       limit: 1
@@ -73,6 +78,8 @@ serve(async (req) => {
     let customer_id = undefined
     if (customers.data.length > 0) {
       customer_id = customers.data[0].id
+      console.log('Found existing Stripe customer:', customer_id);
+      
       // Check active subscriptions in Stripe
       const stripeSubscriptions = await stripe.subscriptions.list({
         customer: customers.data[0].id,
@@ -81,6 +88,22 @@ serve(async (req) => {
       })
 
       if (stripeSubscriptions.data.length > 0) {
+        console.log('Found active Stripe subscription:', stripeSubscriptions.data[0].id);
+        
+        // Update our database to reflect the active subscription
+        const { error: updateError } = await supabaseClient
+          .from('subscriptions')
+          .upsert({
+            user_id: user.id,
+            stripe_customer_id: customer_id,
+            stripe_subscription_id: stripeSubscriptions.data[0].id,
+            is_active: true
+          })
+
+        if (updateError) {
+          console.error('Error updating subscription in database:', updateError)
+        }
+
         return new Response(
           JSON.stringify({ error: 'You already have an active subscription' }),
           { 

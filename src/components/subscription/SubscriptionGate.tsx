@@ -30,6 +30,7 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
         return;
       }
 
+      console.log('Checking subscription status...');
       const { data, error } = await supabase.functions.invoke('check-subscription', {
         headers: {
           Authorization: `Bearer ${session.access_token}`,
@@ -76,17 +77,16 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
         return;
       }
 
-      const { data: subscriptionData, error: subscriptionError } = await supabase.functions.invoke('check-subscription', {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        }
-      });
+      // First check subscription status
+      const { data: subData } = await supabase
+        .from('subscriptions')
+        .select('*')
+        .eq('user_id', session.user.id)
+        .eq('is_active', true)
+        .maybeSingle();
 
-      if (subscriptionError) {
-        throw subscriptionError;
-      }
-
-      if (subscriptionData.subscribed) {
+      if (subData) {
+        console.log('Found active subscription in database:', subData);
         setIsSubscribed(true);
         toast({
           title: "Subscription Active",
@@ -95,6 +95,7 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
         return;
       }
 
+      console.log('Creating checkout session...');
       const { data, error } = await supabase.functions.invoke('create-checkout-session', {
         headers: {
           Authorization: `Bearer ${session.access_token}`,
@@ -102,6 +103,7 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
       });
       
       if (error) {
+        console.error('Create checkout session error:', error);
         // Check if the error indicates an active subscription
         const errorMessage = error.message || '';
         const errorBody = error.body ? JSON.parse(error.body) : {};

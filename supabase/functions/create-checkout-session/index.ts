@@ -31,11 +31,14 @@ serve(async (req) => {
     }
     
     const token = authHeader.replace('Bearer ', '')
-    const { data } = await supabaseClient.auth.getUser(token)
-    const user = data.user
-    const email = user?.email
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(token)
+    
+    if (userError) {
+      console.error('Error getting user:', userError);
+      throw userError;
+    }
 
-    if (!email) {
+    if (!user?.email) {
       console.error('No email found in user data');
       throw new Error('No email found')
     }
@@ -59,8 +62,8 @@ serve(async (req) => {
     // Log first and last few characters of the key for debugging (never log the full key!)
     console.log('Stripe key format check:', {
       keyLength: stripeSecretKey.length,
-      startsWithSk: stripeSecretKey.startsWith('sk_'),
-      hasValidFormat: /^sk_\w+$/.test(stripeSecretKey)
+      startsWithSkTest: stripeSecretKey.startsWith('sk_test_'),
+      hasValidFormat: /^sk_test_\w+$/.test(stripeSecretKey)
     });
 
     try {
@@ -71,20 +74,19 @@ serve(async (req) => {
 
       console.log('Checking for existing customer...');
       const customers = await stripe.customers.list({
-        email: email,
+        email: user.email,
         limit: 1
       })
 
       let customer_id = undefined
       if (customers.data.length > 0) {
         customer_id = customers.data[0].id
-        console.log('Found existing customer');
+        console.log('Found existing customer:', customer_id);
         
         console.log('Checking for active subscriptions...');
         const subscriptions = await stripe.subscriptions.list({
           customer: customers.data[0].id,
           status: 'active',
-          price: 'price_1QiK8SI2A6O6E8LHKlfvakdi',
           limit: 1
         })
 
@@ -107,7 +109,7 @@ serve(async (req) => {
       console.log('Creating checkout session...');
       const session = await stripe.checkout.sessions.create({
         customer: customer_id,
-        customer_email: customer_id ? undefined : email,
+        customer_email: customer_id ? undefined : user.email,
         line_items: [
           {
             price: 'price_1QiK8SI2A6O6E8LHKlfvakdi',
@@ -120,7 +122,7 @@ serve(async (req) => {
         cancel_url: `${req.headers.get('origin')}/`,
       })
 
-      console.log('Checkout session created successfully');
+      console.log('Checkout session created successfully:', { sessionId: session.id });
       return new Response(
         JSON.stringify({ url: session.url }),
         { 
@@ -130,12 +132,13 @@ serve(async (req) => {
       )
     } catch (stripeError) {
       console.error('Stripe API Error:', {
+        name: stripeError.name,
         type: stripeError.type,
         message: stripeError.message,
         code: stripeError.code,
         statusCode: stripeError.statusCode,
         raw: stripeError
-      })
+      });
 
       if (stripeError instanceof Stripe.errors.StripeError) {
         return new Response(
@@ -160,7 +163,7 @@ serve(async (req) => {
       type: error.type,
       code: error.code,
       raw: error
-    })
+    });
     
     return new Response(
       JSON.stringify({ 

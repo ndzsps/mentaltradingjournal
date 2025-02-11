@@ -63,7 +63,6 @@ serve(async (req) => {
 
       if (subscriptions.data.length > 0) {
         console.log('Found active subscription')
-        // Return a 409 Conflict status code for existing subscription
         return new Response(
           JSON.stringify({ 
             error: "already_subscribed",
@@ -113,6 +112,17 @@ serve(async (req) => {
       code: error.code,
       raw: error
     })
+
+    // Handle Stripe errors specifically
+    if (error instanceof Stripe.errors.StripeError) {
+      return new Response(
+        JSON.stringify({ error: error.message }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: error.statusCode || 500,
+        }
+      )
+    }
     
     return new Response(
       JSON.stringify({ 

@@ -72,7 +72,20 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
         }
       });
       
-      if (error) throw error;
+      if (error) {
+        // Check if the error is due to existing subscription
+        if (error.message.includes("already have an active subscription")) {
+          toast({
+            title: "Already Subscribed",
+            description: "You already have an active subscription. Redirecting to dashboard...",
+          });
+          // Refresh subscription status and redirect
+          await checkSubscription();
+          navigate('/dashboard');
+          return;
+        }
+        throw error;
+      }
       
       if (data.url) {
         window.location.href = data.url;
@@ -82,7 +95,9 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
       toast({
         variant: "destructive",
         title: "Error creating checkout session",
-        description: "Please try again later",
+        description: typeof error === 'object' && error !== null && 'message' in error 
+          ? error.message 
+          : "Please try again later",
       });
     } finally {
       setLoading(false);

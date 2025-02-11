@@ -34,22 +34,28 @@ serve(async (req) => {
       throw new Error('Error getting user: ' + userError?.message)
     }
 
+    console.log('Checking subscription for user:', user.id);
+
     // Check if user has an active subscription
     const { data: subscription, error: subError } = await supabaseClient
       .from('subscriptions')
       .select('*')
       .eq('user_id', user.id)
       .eq('status', 'active')
-      .single();
+      .maybeSingle();
 
     if (subError) {
       console.error('Error fetching subscription:', subError);
+      throw new Error('Error fetching subscription: ' + subError.message);
     }
+
+    console.log('Subscription status:', subscription ? 'Active' : 'No active subscription found');
 
     return new Response(
       JSON.stringify({ 
         subscribed: !!subscription,
-        userId: user.id 
+        userId: user.id,
+        subscription: subscription // Include subscription details for debugging
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

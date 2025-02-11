@@ -38,6 +38,24 @@ export const calculateMfeRelativeToTp = (
   return mfeValue;
 };
 
+export const calculateCapturedMove = (
+  entryPrice: number,
+  exitPrice: number,
+  highestPrice: number,
+  lowestPrice: number,
+  isLong: boolean
+): number => {
+  if (isLong) {
+    const totalMove = highestPrice - entryPrice;
+    const capturedMove = exitPrice - entryPrice;
+    return totalMove !== 0 ? (capturedMove / totalMove) * 100 : 0;
+  } else {
+    const totalMove = entryPrice - lowestPrice;
+    const capturedMove = entryPrice - exitPrice;
+    return totalMove !== 0 ? (capturedMove / totalMove) * 100 : 0;
+  }
+};
+
 export const calculateRMultiple = (
   entryPrice: number,
   takeProfit: number,
@@ -53,12 +71,14 @@ export const processTrade = (trade: Trade) => {
     !trade.entryPrice ||
     !trade.takeProfit ||
     !trade.stopLoss ||
+    !trade.exitPrice ||
     !trade.id
   ) {
     return null;
   }
 
   const entryPrice = Number(trade.entryPrice);
+  const exitPrice = Number(trade.exitPrice);
   const highestPrice = Number(trade.highestPrice);
   const lowestPrice = Number(trade.lowestPrice);
   const takeProfit = Number(trade.takeProfit);
@@ -68,6 +88,7 @@ export const processTrade = (trade: Trade) => {
     id: trade.id,
     instrument: trade.instrument,
     entryPrice,
+    exitPrice,
     highestPrice,
     lowestPrice,
     takeProfit,
@@ -99,6 +120,14 @@ export const processTrade = (trade: Trade) => {
     isLongForTp
   );
 
+  const capturedMove = calculateCapturedMove(
+    entryPrice,
+    exitPrice,
+    highestPrice,
+    lowestPrice,
+    isLong
+  );
+
   const rMultiple = calculateRMultiple(entryPrice, takeProfit, stopLoss);
 
   return {
@@ -106,6 +135,7 @@ export const processTrade = (trade: Trade) => {
     mfeRelativeToTp,
     maeRelativeToSl,
     instrument: trade.instrument,
-    rMultiple
+    rMultiple,
+    capturedMove
   };
 };

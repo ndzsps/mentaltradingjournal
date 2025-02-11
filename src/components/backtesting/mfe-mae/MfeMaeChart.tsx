@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import {
   BarChart,
@@ -94,37 +93,27 @@ export function MfeMaeChart() {
             const takeProfit = Number(trade.takeProfit);
             const stopLoss = Number(trade.stopLoss);
             
-            // Determine direction based on take profit
-            const isBuy = takeProfit > entryPrice;
-            console.log('Determined direction:', isBuy ? 'buy' : 'sell');
+            // Step 1: Identify Trade Direction based on Stop Loss
+            const isLong = stopLoss < entryPrice;
+            console.log('Determined direction based on SL:', isLong ? 'long' : 'short');
 
-            // Step 1: Calculate Updraw and Drawdown
+            // Step 2: Calculate MAE relative to SL based on trade direction
+            const maeRelativeToSl = isLong 
+              ? ((lowestPrice - entryPrice) / (stopLoss - entryPrice)) * 100
+              : ((highestPrice - entryPrice) / (stopLoss - entryPrice)) * 100;
+
+            // Calculate MFE relative to TP (keeping existing logic)
+            const isBuyForTp = takeProfit > entryPrice;
             const updraw = ((takeProfit - entryPrice) / entryPrice) * 100;
-            const drawdown = ((entryPrice - stopLoss) / entryPrice) * 100;
-
-            console.log('Base calculations:', {
-              updraw,
-              drawdown
-            });
-
-            // Calculate raw MFE and MAE based on trade direction
-            const mfe = isBuy 
-              ? ((highestPrice - entryPrice) / entryPrice) * 100  // Buy MFE
-              : ((entryPrice - lowestPrice) / entryPrice) * 100;  // Sell MFE
-
-            const mae = isBuy
-              ? ((lowestPrice - entryPrice) / entryPrice) * 100   // Buy MAE
-              : ((highestPrice - entryPrice) / entryPrice) * 100; // Sell MAE
-
-            // Step 2: Calculate relative percentages
+            const mfe = isBuyForTp 
+              ? ((highestPrice - entryPrice) / entryPrice) * 100
+              : ((entryPrice - lowestPrice) / entryPrice) * 100;
             const mfeRelativeToTp = (mfe / updraw) * 100;
-            const maeRelativeToSl = (mae / drawdown) * 100;
 
             console.log('Final calculations:', {
-              mfe,
-              mae,
-              mfeRelativeToTp,
-              maeRelativeToSl
+              isLong,
+              maeRelativeToSl,
+              mfeRelativeToTp
             });
 
             processedData.push({

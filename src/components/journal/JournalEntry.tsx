@@ -1,7 +1,11 @@
+
 import { Card } from "@/components/ui/card";
 import { SessionHeader } from "./SessionHeader";
 import { EntryContent } from "./entry/EntryContent";
 import { Trade } from "@/types/trade";
+import { useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface JournalEntry {
   id: string;
@@ -27,6 +31,36 @@ interface JournalEntryProps {
 }
 
 export const JournalEntry = ({ entry }: JournalEntryProps) => {
+  const queryClient = useQueryClient();
+
+  // Subscribe to real-time updates for trades
+  useEffect(() => {
+    const channel = supabase
+      .channel('trades_updates')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'journal_entries',
+          filter: `id=eq.${entry.id}`,
+        },
+        async (payload) => {
+          console.log('Journal entry updated:', payload);
+          // Invalidate and refetch queries
+          await queryClient.invalidateQueries({
+            queryKey: ['journal-entries'],
+            exact: true,
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [entry.id, queryClient]);
+
   const formattedDate = new Date(entry.created_at).toLocaleDateString('en-US', { 
     weekday: 'long',
     year: 'numeric',

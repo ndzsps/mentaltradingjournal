@@ -78,7 +78,7 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[200px]">
+      <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
@@ -86,15 +86,15 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
 
   if (!isSubscribed) {
     return (
-      <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <Card className="max-w-md w-full p-8 space-y-6 text-center border-2 border-primary/20 shadow-xl animate-in fade-in-0 zoom-in-95">
-          <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-            <Lock className="w-8 h-8 text-primary" />
+      <div className="flex items-center justify-center min-h-[500px] bg-background/50 backdrop-blur-sm p-4">
+        <Card className="max-w-md w-full p-6 space-y-6 text-center border-2 border-primary/20">
+          <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+            <Lock className="w-6 h-6 text-primary" />
           </div>
           <div className="space-y-2">
-            <h2 className="text-2xl font-bold">Premium Features Locked</h2>
+            <h2 className="text-2xl font-bold">Premium Feature</h2>
             <p className="text-muted-foreground">
-              Subscribe to unlock all premium features including analytics dashboard, journal entries, and advanced trading tools.
+              Subscribe to access all premium features including advanced analytics, journal entries, and more.
             </p>
           </div>
           <Button 
@@ -103,7 +103,7 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
             disabled={loading}
             size="lg"
           >
-            {loading ? "Loading..." : "Subscribe to Access Features"}
+            {loading ? "Loading..." : "Subscribe to Access Feature"}
           </Button>
         </Card>
       </div>

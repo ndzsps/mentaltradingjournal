@@ -14,8 +14,13 @@ serve(async (req) => {
   }
 
   try {
+    // Log the raw request for debugging
+    console.log('Received webhook request');
+    console.log('Request headers:', Object.fromEntries(req.headers.entries()));
+    
     const stripeSignature = req.headers.get('stripe-signature')
     if (!stripeSignature) {
+      console.error('No Stripe signature found');
       throw new Error('No Stripe signature found')
     }
 
@@ -23,6 +28,7 @@ serve(async (req) => {
     const STRIPE_WEBHOOK_SECRET = Deno.env.get('STRIPE_WEBHOOK_SECRET')
 
     if (!STRIPE_SECRET_KEY || !STRIPE_WEBHOOK_SECRET) {
+      console.error('Missing Stripe configuration');
       throw new Error('Missing Stripe configuration')
     }
 
@@ -30,8 +36,9 @@ serve(async (req) => {
       apiVersion: '2023-10-16',
     })
 
-    // Get the raw body
+    // Get the raw body and log it
     const body = await req.text()
+    console.log('Webhook raw body:', body);
 
     // Verify the webhook signature
     let event

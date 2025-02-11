@@ -13,34 +13,56 @@ export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
   const { data: entries, error } = await supabase
     .from('journal_entries')
     .select('*')
-    .order('created_at', { ascending: false });  // Changed to descending to get newest first
+    .order('created_at', { ascending: false });
 
   if (error) {
     console.error('Error fetching journal entries:', error);
     throw error;
   }
 
+  console.log('Raw entries:', entries);
+
   if (!entries || entries.length === 0) {
     console.log('No journal entries found');
-  } else {
-    console.log(`Found ${entries.length} journal entries`);
-    console.log('Most recent entries:', entries.slice(0, 3));
+    // Return default values when no entries are found
+    return {
+      journalEntries: [],
+      performanceByEmotion: { positive: 0, neutral: 0, negative: 0 },
+      emotionalImpact: { winRate: [], dates: [] },
+      emotionTrend: [],
+      emotionTrendInsights: {
+        improvement: 'No data available',
+        impact: 'No data available',
+      },
+      mainInsight: "No journal entries found",
+      recommendedAction: "Start journaling to see analytics",
+      dataRequirements: calculateDataRequirements([]),
+      mistakeFrequencies: {},
+      assetPairStats: {},
+      emotionRecovery: {},
+      tradeDurations: [],
+      volatilityData: [],
+      riskRewardData: [],
+    };
   }
 
-  // Cast the entries to the correct type and ensure session_type is 'pre' or 'post' or 'trade'
-  const journalEntries = (entries || []).map(entry => ({
+  // Ensure trades array exists and is properly formatted
+  const journalEntries = entries.map(entry => ({
     ...entry,
+    trades: Array.isArray(entry.trades) ? entry.trades.map(trade => ({
+      ...trade,
+      pnl: typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : 
+           typeof trade.pnl === 'number' ? trade.pnl : 0
+    })) : [],
     session_type: ['pre', 'post', 'trade'].includes(entry.session_type) 
       ? entry.session_type as 'pre' | 'post' | 'trade' 
       : 'pre'
   })) as JournalEntry[];
 
+  console.log('Processed entries:', journalEntries);
+
   const dataRequirements = calculateDataRequirements(journalEntries);
-
-  // Process trades using utility functions
   const allTrades = processJournalTrades(journalEntries);
-  console.log('Processed trades:', allTrades.length);
-
   const assetPairStats = calculateAssetPairStats(allTrades);
   const mistakeFrequencies = calculateMistakeFrequencies(journalEntries);
   const emotionRecovery = calculateEmotionRecovery(journalEntries);
@@ -53,9 +75,7 @@ export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
       entry.market_conditions?.includes('medium') ? 50 : 25,
     performance: entry.trades?.reduce((sum, trade) => {
       const pnl = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : 
-                 typeof trade.pnl === 'number' ? trade.pnl : 
-                 typeof trade.profit_loss === 'string' ? parseFloat(trade.profit_loss) :
-                 typeof trade.profit_loss === 'number' ? trade.profit_loss : 0;
+                 typeof trade.pnl === 'number' ? trade.pnl : 0;
       return sum + pnl;
     }, 0) || 0,
     emotional: entry.emotion
@@ -81,9 +101,7 @@ export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
     if (entry.trades && entry.trades.length > 0) {
       const totalPnL = entry.trades.reduce((sum, trade) => {
         const pnl = typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : 
-                   typeof trade.pnl === 'number' ? trade.pnl : 
-                   typeof trade.profit_loss === 'string' ? parseFloat(trade.profit_loss) :
-                   typeof trade.profit_loss === 'number' ? trade.profit_loss : 0;
+                   typeof trade.pnl === 'number' ? trade.pnl : 0;
         return sum + pnl;
       }, 0);
 
@@ -94,13 +112,11 @@ export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
     return acc;
   }, { positive: 0, neutral: 0, negative: 0 });
 
-  console.log('Analytics generation complete');
-  console.log('Journal entries by type:', 
-    journalEntries.reduce((acc, entry) => {
-      acc[entry.session_type] = (acc[entry.session_type] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>)
-  );
+  console.log('Analytics generation complete:', {
+    entriesCount: journalEntries.length,
+    tradesCount: allTrades.length,
+    performanceByEmotion,
+  });
 
   return {
     journalEntries,

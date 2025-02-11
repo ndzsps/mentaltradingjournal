@@ -9,6 +9,8 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
+  console.log('Function started');
+  
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
@@ -20,33 +22,54 @@ serve(async (req) => {
   )
 
   try {
+    console.log('Getting auth token...');
     // Get the session or user object
     const authHeader = req.headers.get('Authorization')!
+    if (!authHeader) {
+      console.error('No authorization header found');
+      throw new Error('No authorization header')
+    }
+    
     const token = authHeader.replace('Bearer ', '')
     const { data } = await supabaseClient.auth.getUser(token)
     const user = data.user
     const email = user?.email
 
     if (!email) {
+      console.error('No email found in user data');
       throw new Error('No email found')
     }
 
-    console.log('Creating Stripe instance with secret key...')
+    console.log('Accessing Stripe secret key...');
     const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY')
     if (!stripeSecretKey) {
-      console.error('Stripe secret key not found in environment')
-      throw new Error('Stripe secret key not found in environment')
+      console.error('Stripe secret key not found in environment');
+      return new Response(
+        JSON.stringify({ 
+          error: "configuration_error",
+          message: "Stripe secret key not configured"
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 500,
+        }
+      )
     }
 
-    // Log stripe key length for debugging (don't log the actual key!)
-    console.log('Stripe key length:', stripeSecretKey.length)
+    // Log first and last few characters of the key for debugging (never log the full key!)
+    console.log('Stripe key format check:', {
+      keyLength: stripeSecretKey.length,
+      startsWithSk: stripeSecretKey.startsWith('sk_'),
+      hasValidFormat: /^sk_\w+$/.test(stripeSecretKey)
+    });
 
     try {
+      console.log('Initializing Stripe...');
       const stripe = new Stripe(stripeSecretKey, {
         apiVersion: '2023-10-16',
       })
 
-      console.log('Checking for existing customer with email:', email)
+      console.log('Checking for existing customer...');
       const customers = await stripe.customers.list({
         email: email,
         limit: 1
@@ -55,10 +78,9 @@ serve(async (req) => {
       let customer_id = undefined
       if (customers.data.length > 0) {
         customer_id = customers.data[0].id
-        console.log('Found existing customer:', customer_id)
+        console.log('Found existing customer');
         
-        // check if already subscribed to this price
-        console.log('Checking for active subscriptions...')
+        console.log('Checking for active subscriptions...');
         const subscriptions = await stripe.subscriptions.list({
           customer: customers.data[0].id,
           status: 'active',
@@ -67,7 +89,7 @@ serve(async (req) => {
         })
 
         if (subscriptions.data.length > 0) {
-          console.log('Found active subscription')
+          console.log('Found active subscription, returning conflict response');
           return new Response(
             JSON.stringify({ 
               error: "already_subscribed",
@@ -80,11 +102,9 @@ serve(async (req) => {
             }
           )
         }
-      } else {
-        console.log('No existing customer found')
       }
 
-      console.log('Creating subscription checkout session...')
+      console.log('Creating checkout session...');
       const session = await stripe.checkout.sessions.create({
         customer: customer_id,
         customer_email: customer_id ? undefined : email,
@@ -100,7 +120,7 @@ serve(async (req) => {
         cancel_url: `${req.headers.get('origin')}/`,
       })
 
-      console.log('Checkout session created:', session.id)
+      console.log('Checkout session created successfully');
       return new Response(
         JSON.stringify({ url: session.url }),
         { 

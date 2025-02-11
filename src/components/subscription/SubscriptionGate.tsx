@@ -43,13 +43,15 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
 
       console.log('Subscription check response:', data);
       
-      // If user has an active subscription, grant access
       if (data.subscribed) {
         setIsSubscribed(true);
+        toast({
+          title: "Premium Access Granted",
+          description: "You have access to all premium features",
+        });
       }
     } catch (error: any) {
       console.error('Error checking subscription:', error);
-      // Only show error toast if it's not related to an existing subscription
       if (!error.message?.includes('already have an active subscription')) {
         toast({
           variant: "destructive",
@@ -67,27 +69,31 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
       setLoading(true);
       const { data, error } = await supabase.functions.invoke('create-checkout-session');
       
-      if (error) throw error;
+      if (error) {
+        const errorMessage = error.message || JSON.parse(error.details)?.error;
+        
+        // If user already has a subscription, update state and grant access
+        if (errorMessage?.includes('already have an active subscription')) {
+          setIsSubscribed(true);
+          toast({
+            title: "Subscription Active",
+            description: "You already have an active subscription. Enjoy the premium features!",
+          });
+          return;
+        }
+        throw error;
+      }
       
-      if (data.url) {
+      if (data?.url) {
         window.location.href = data.url;
       }
     } catch (error: any) {
       console.error('Error creating checkout session:', error);
-      // If user already has a subscription, update the state and allow access
-      if (error.message?.includes('already have an active subscription')) {
-        setIsSubscribed(true);
-        toast({
-          title: "Subscription Active",
-          description: "You already have an active subscription. Enjoy the premium features!",
-        });
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Error creating checkout session",
-          description: "Please try again later",
-        });
-      }
+      toast({
+        variant: "destructive",
+        title: "Error creating checkout session",
+        description: error.message || "Please try again later",
+      });
     } finally {
       setLoading(false);
     }

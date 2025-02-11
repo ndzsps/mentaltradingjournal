@@ -112,17 +112,29 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
           Authorization: `Bearer ${session.access_token}`,
         }
       });
-      
+
       if (error) {
         console.error('Create checkout session error:', error);
         
+        // Parse the error response body if it exists
+        let errorBody;
+        try {
+          errorBody = JSON.parse(error.message);
+        } catch {
+          errorBody = null;
+        }
+        
         // Handle already subscribed case (409 Conflict)
-        if (error.status === 409) {
+        if (error.status === 409 || (errorBody?.error === "already_subscribed")) {
           toast({
             title: "Already Subscribed",
             description: "You already have an active subscription.",
           });
-          await checkSubscription(); // Refresh subscription status
+          // Refresh subscription status and redirect if specified
+          if (errorBody?.redirectTo) {
+            navigate(errorBody.redirectTo);
+          }
+          await checkSubscription();
           return;
         }
         
@@ -141,7 +153,7 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
         throw error;
       }
       
-      if (data.url) {
+      if (data?.url) {
         window.location.href = data.url;
       }
     } catch (error) {

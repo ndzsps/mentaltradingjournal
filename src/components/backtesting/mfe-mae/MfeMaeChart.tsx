@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import {
   BarChart,
@@ -115,7 +116,11 @@ export function MfeMaeChart() {
               isLong,
               maeRelativeToSl,
               mfeRelativeToTp,
-              isLongForTp
+              isLongForTp,
+              entryPrice,
+              takeProfit,
+              highestPrice,
+              lowestPrice
             });
 
             processedData.push({

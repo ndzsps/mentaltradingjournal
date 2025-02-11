@@ -1,4 +1,3 @@
-
 import { Home, BookOpen, BarChart2, Settings, UserCog, FlaskConical, BrainCircuit, Notebook, LineChart } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
@@ -22,7 +21,7 @@ import {
 import { useState } from "react";
 
 const menuItems = [
-  { title: "Journal Entry", icon: Home, url: "/journal-entry", state: { sessionType: 'pre-session' } },
+  { title: "Journal Entry", icon: Home, url: "/journal-entry" },
   { title: "Dashboard", icon: BookOpen, url: "/dashboard" },
   { title: "Analytics", icon: BarChart2, url: "/analytics" },
   { title: "Backtesting", icon: FlaskConical, url: "/backtesting" },
@@ -54,11 +53,7 @@ export function AppSidebar() {
                 {menuItems.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild>
-                      <Link 
-                        to={item.url} 
-                        state={item.state}
-                        className="flex items-center gap-1.5"
-                      >
+                      <Link to={item.url} className="flex items-center gap-1.5">
                         <item.icon className="w-4 h-4" />
                         <span>{item.title}</span>
                       </Link>

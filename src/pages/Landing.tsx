@@ -3,6 +3,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { AnalyticsSection } from "@/components/landing/AnalyticsSection";
+import { CommunitySection } from "@/components/landing/CommunitySection";
 import { User, ArrowRightCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -198,10 +199,10 @@ const Landing = () => {
         </section>
 
         <AnalyticsSection />
+        <CommunitySection />
       </div>
     </div>
   );
 };
 
 export default Landing;
-

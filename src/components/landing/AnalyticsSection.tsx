@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/card";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, Brain, Heart, Scale, LineChart, Activity } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -55,7 +55,7 @@ export const AnalyticsSection = () => {
   ];
 
   return (
-    <section className="relative py-24">
+    <section className="relative py-32"> {/* Increased padding from py-24 to py-32 */}
       {/* Enhanced Background Effects */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-[#1A1F2C]/95" />
@@ -65,11 +65,11 @@ export const AnalyticsSection = () => {
       </div>
       
       <div className="relative container mx-auto px-4">
-        <div className="text-center mb-16 space-y-4">
+        <div className="text-center mb-20 space-y-6"> {/* Increased margin-bottom from mb-16 to mb-20 and space-y from 4 to 6 */}
           <div className="relative">
             {/* Enhanced Glow Effect */}
             <div className="absolute -inset-2 bg-gradient-to-r from-primary/40 via-[#9b87f5]/30 to-[#7E69AB]/40 rounded-lg blur-3xl opacity-75" />
-            <h2 className="relative text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#9b87f5] via-[#D6BCFA] to-[#7E69AB] bg-clip-text text-transparent">
+            <h2 className="relative text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#9b87f5] via-[#D6BCFA] to-[#7E69AB] bg-clip-text text-transparent pb-2"> {/* Added pb-2 for bottom padding */}
               Trading Psychology Analytics
             </h2>
           </div>

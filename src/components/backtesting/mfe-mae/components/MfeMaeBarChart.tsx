@@ -57,7 +57,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
             return (
               <div className="bg-background border border-border rounded-lg shadow-lg p-3">
                 <div className="space-y-2">
-                  <p className="text-2xl font-bold">Trade #{data.tradeNum}</p>
+                  <p className="text-lg font-bold">Trade #{data.tradeNum}</p>
                   <p className="text-lg">{data.instrument || 'Unknown'}</p>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-[#4ade80]" />

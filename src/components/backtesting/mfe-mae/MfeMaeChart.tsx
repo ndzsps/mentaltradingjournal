@@ -105,18 +105,17 @@ export function MfeMaeChart() {
             // Make MAE always negative
             maeRelativeToSl = -Math.abs(maeRelativeToSl);
 
-            // Calculate MFE relative to TP (keeping existing logic)
-            const isBuyForTp = takeProfit > entryPrice;
-            const updraw = ((takeProfit - entryPrice) / entryPrice) * 100;
-            const mfe = isBuyForTp 
-              ? ((highestPrice - entryPrice) / entryPrice) * 100
-              : ((entryPrice - lowestPrice) / entryPrice) * 100;
-            const mfeRelativeToTp = (mfe / updraw) * 100;
+            // Step 3: Calculate MFE relative to TP based on trade direction
+            const isLongForTp = takeProfit > entryPrice;
+            let mfeRelativeToTp = isLongForTp 
+              ? ((highestPrice - entryPrice) / (takeProfit - entryPrice)) * 100
+              : ((entryPrice - lowestPrice) / (entryPrice - takeProfit)) * 100;
 
             console.log('Final calculations:', {
               isLong,
               maeRelativeToSl,
-              mfeRelativeToTp
+              mfeRelativeToTp,
+              isLongForTp
             });
 
             processedData.push({

@@ -52,29 +52,34 @@ export const StatsHeader = () => {
   const { stats } = useProgressTracking();
   const { timeFilter, setTimeFilter } = useTimeFilter();
 
-  // Simplified getAllTrades function - just get all trades without filtering
-  const getAllTrades = (entries: any[] = []): Trade[] => {
-    const allTrades: Trade[] = [];
+  // Get all trades and group them by month
+  const getAllTradesWithMonthlyTotals = (entries: any[] = []) => {
+    const tradesByMonth: { [key: string]: number } = {};
+    
     entries.forEach(entry => {
       if (entry.trades && Array.isArray(entry.trades)) {
-        allTrades.push(...entry.trades);
+        entry.trades.forEach((trade: Trade) => {
+          // Get the month from either exitDate or entry's created_at
+          const tradeDate = trade.exitDate ? new Date(trade.exitDate) : new Date(entry.created_at);
+          const monthKey = `${tradeDate.getFullYear()}-${String(tradeDate.getMonth() + 1).padStart(2, '0')}`;
+          
+          const pnlValue = trade.pnl || 0;
+          const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
+          
+          tradesByMonth[monthKey] = (tradesByMonth[monthKey] || 0) + (isNaN(numericPnL) ? 0 : numericPnL);
+        });
       }
     });
-    console.log('All trades:', allTrades);
-    return allTrades;
+
+    console.log('Trades by month:', tradesByMonth);
+    return tradesByMonth;
   };
 
-  // Get all trades without any filtering
-  const allTrades = analytics?.journalEntries ? getAllTrades(analytics.journalEntries) : [];
+  // Calculate total P&L across all months
+  const monthlyTotals = analytics?.journalEntries ? getAllTradesWithMonthlyTotals(analytics.journalEntries) : {};
+  const netPnL = Object.values(monthlyTotals).reduce((total, monthlyPnL) => total + monthlyPnL, 0);
 
-  // Calculate total P&L from all trades
-  const netPnL = allTrades.reduce((total, trade) => {
-    const pnlValue = trade.pnl || 0;
-    const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
-    return total + (isNaN(numericPnL) ? 0 : numericPnL);
-  }, 0);
-
-  // Calculate emotion score
+  // Filter entries by time (for other components that need filtered data)
   const filterEntriesByTime = (entries: any[] = []) => {
     const interval = getTimeInterval();
     console.log('Filtering entries with interval:', interval);

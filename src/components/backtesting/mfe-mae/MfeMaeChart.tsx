@@ -72,7 +72,6 @@ export function MfeMaeChart() {
 
       // Calculate averages by dividing sums by total number of trades
       const avgUpdraw = sumUpdraw / totalTrades;
-      const avgDrawdown = sumDrawdown / totalTrades;
 
       // Calculate MFE for losing trades (trades that hit stop loss)
       const losingTrades = processedData.filter(trade => Math.abs(trade.maeRelativeToSl) >= 100);
@@ -80,53 +79,21 @@ export function MfeMaeChart() {
         ? losingTrades.reduce((sum, trade) => sum + trade.mfeRelativeToTp, 0) / losingTrades.length
         : 0;
 
-      // Calculate MAE for losing trades (trades that hit stop loss)
-      const avgMaeLoser = losingTrades.length > 0
-        ? losingTrades.reduce((sum, trade) => sum + Math.abs(trade.maeRelativeToSl), 0) / losingTrades.length
-        : 0;
-
-      // Rest of the calculations
-      const allTrades = entries.flatMap(entry => entry.trades || []) as Trade[];
-      const winners = allTrades.filter(t => {
-        if (!t.direction || !t.entryPrice || !t.exitPrice) return false;
-        const isWinner = t.direction === 'buy' 
-          ? Number(t.exitPrice) > Number(t.entryPrice)
-          : Number(t.exitPrice) < Number(t.entryPrice);
-        return isWinner;
-      });
+      // Step 1 & 2: Identify winning trades and extract their drawdown values
+      const winningTrades = processedData.filter(trade => Math.abs(trade.maeRelativeToSl) < 100);
       
-      const losers = allTrades.filter(t => {
-        if (!t.direction || !t.entryPrice || !t.exitPrice) return false;
-        const isLoser = t.direction === 'buy'
-          ? Number(t.exitPrice) <= Number(t.entryPrice)
-          : Number(t.exitPrice) >= Number(t.entryPrice);
-        return isLoser;
-      });
-
-      const calculateAverage = (trades: Trade[], fn: (t: Trade) => number) => 
-        trades.length ? trades.reduce((acc, curr) => acc + fn(curr), 0) / trades.length : 0;
-
-      const getUpdraw = (t: Trade) => {
-        const isBuy = t.direction === 'buy';
-        return isBuy
-          ? ((Number(t.highestPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100
-          : ((Number(t.entryPrice) - Number(t.lowestPrice)) / Number(t.entryPrice)) * 100;
-      };
-
-      const getDrawdown = (t: Trade) => {
-        const isBuy = t.direction === 'buy';
-        return isBuy
-          ? ((Number(t.lowestPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100
-          : ((Number(t.highestPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100;
-      };
+      // Step 3 & 4: Calculate average MAE for winning trades
+      const avgMaeWinner = winningTrades.length > 0
+        ? winningTrades.reduce((sum, trade) => sum + Math.abs(trade.maeRelativeToSl), 0) / winningTrades.length
+        : 0;
 
       setStats({
         tradesHitTp: tradesHitTpPercentage,
         tradesHitSl: tradesHitSlPercentage,
-        avgUpdrawWinner: avgUpdraw, // Sum of all updraw values divided by total trades
-        avgUpdrawLoser: avgMfeLoser, // Average MFE for losing trades only
-        avgDrawdownWinner: avgDrawdown, // Sum of all drawdown values divided by total trades
-        avgDrawdownLoser: sumDrawdown / totalTrades, // Sum of all drawdown values divided by total trades
+        avgUpdrawWinner: avgUpdraw,
+        avgUpdrawLoser: avgMfeLoser,
+        avgDrawdownWinner: avgMaeWinner, // Updated with new calculation for winning trades
+        avgDrawdownLoser: sumDrawdown / totalTrades,
       });
     };
 

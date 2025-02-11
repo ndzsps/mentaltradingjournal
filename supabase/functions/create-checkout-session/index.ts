@@ -114,7 +114,8 @@ serve(async (req) => {
         customer: customer.id,
         line_items: [
           {
-            price: 'price_1QiK8SI2A6O6E8LHKlfvakdi',
+            // Using test mode price
+            price: 'price_1QiLHiI2A6O6E8LHeZz7ZZOB',
             quantity: 1,
           },
         ],
@@ -180,3 +181,4 @@ serve(async (req) => {
     )
   }
 })
+

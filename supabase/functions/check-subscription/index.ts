@@ -41,6 +41,7 @@ serve(async (req) => {
       .from('subscriptions')
       .select('*, stripe_subscription_id, stripe_customer_id')
       .eq('user_id', user.id)
+      .eq('status', 'active')  // Only get active subscriptions
       .maybeSingle();
 
     if (subError) {
@@ -50,40 +51,12 @@ serve(async (req) => {
 
     console.log('Found subscription:', subscription);
 
-    // Check if there's a subscription but it's not marked as active
-    if (subscription && subscription.stripe_subscription_id && subscription.status !== 'active') {
-      console.log('Found subscription but status is not active, updating status...');
-      
-      // Update subscription status to active
-      const { error: updateError } = await supabaseClient
-        .from('subscriptions')
-        .update({ status: 'active' })
-        .eq('id', subscription.id);
-
-      if (updateError) {
-        console.error('Error updating subscription status:', updateError);
-        throw new Error('Error updating subscription status: ' + updateError.message);
-      }
-
-      // Return success with updated subscription status
-      return new Response(
-        JSON.stringify({ 
-          subscribed: true,
-          userId: user.id,
-          subscription: { ...subscription, status: 'active' }
-        }),
-        {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 200,
-        }
-      );
-    }
-
+    // Return subscription status
     return new Response(
       JSON.stringify({ 
-        subscribed: subscription?.status === 'active',
+        subscribed: subscription !== null, // true if there's an active subscription
         userId: user.id,
-        subscription: subscription // Include subscription details for debugging
+        subscription: subscription 
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -105,3 +78,4 @@ serve(async (req) => {
     )
   }
 })
+

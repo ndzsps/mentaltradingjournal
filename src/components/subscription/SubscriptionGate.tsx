@@ -65,22 +65,49 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
   const handleSubscribe = async () => {
     try {
       setLoading(true);
+      
+      // First check if user already has an active subscription
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast({
+          variant: "destructive",
+          title: "Authentication Required",
+          description: "Please sign in to subscribe",
+        });
+        return;
+      }
+
+      const { data: subscriptionData, error: subscriptionError } = await supabase.functions.invoke('check-subscription', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        }
+      });
+
+      if (subscriptionError) {
+        throw subscriptionError;
+      }
+
+      if (subscriptionData.subscribed) {
+        setIsSubscribed(true);
+        toast({
+          title: "Subscription Active",
+          description: "You already have an active subscription. Enjoy the premium features!",
+        });
+        return;
+      }
+
       const { data, error } = await supabase.functions.invoke('create-checkout-session');
       
       if (error) {
-        // Parse the error body which contains the actual error message
-        try {
-          const errorBody = JSON.parse(error.body);
-          if (errorBody.error === "You already have an active subscription") {
-            setIsSubscribed(true);
-            toast({
-              title: "Subscription Active",
-              description: "You already have an active subscription. Enjoy the premium features!",
-            });
-            return;
-          }
-        } catch (parseError) {
-          console.error('Error parsing error body:', parseError);
+        // Check if the error indicates an active subscription
+        if (error.message.includes('already have an active subscription') || 
+            (error.body && error.body.includes('already have an active subscription'))) {
+          setIsSubscribed(true);
+          toast({
+            title: "Subscription Active",
+            description: "You already have an active subscription. Enjoy the premium features!",
+          });
+          return;
         }
         throw error;
       }
@@ -89,12 +116,11 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
         window.location.href = data.url;
       }
     } catch (error: any) {
-      console.error('Error creating checkout session:', error);
-      const errorMessage = "Please try again later";
+      console.error('Error handling subscription:', error);
       toast({
         variant: "destructive",
-        title: "Error creating checkout session",
-        description: errorMessage,
+        title: "Error processing subscription",
+        description: "Please try again later",
       });
     } finally {
       setLoading(false);

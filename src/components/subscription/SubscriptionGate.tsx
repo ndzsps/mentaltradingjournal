@@ -44,14 +44,19 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
       console.log('Subscription check response:', data);
       
       // If user has an active subscription, grant access
-      setIsSubscribed(data.subscribed);
-    } catch (error) {
+      if (data.subscribed) {
+        setIsSubscribed(true);
+      }
+    } catch (error: any) {
       console.error('Error checking subscription:', error);
-      toast({
-        variant: "destructive",
-        title: "Error checking subscription",
-        description: "Please try again later",
-      });
+      // Only show error toast if it's not related to an existing subscription
+      if (!error.message?.includes('already have an active subscription')) {
+        toast({
+          variant: "destructive",
+          title: "Error checking subscription",
+          description: "Please try again later",
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -67,13 +72,22 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
       if (data.url) {
         window.location.href = data.url;
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating checkout session:', error);
-      toast({
-        variant: "destructive",
-        title: "Error creating checkout session",
-        description: "Please try again later",
-      });
+      // If user already has a subscription, update the state and allow access
+      if (error.message?.includes('already have an active subscription')) {
+        setIsSubscribed(true);
+        toast({
+          title: "Subscription Active",
+          description: "You already have an active subscription. Enjoy the premium features!",
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Error creating checkout session",
+          description: "Please try again later",
+        });
+      }
     } finally {
       setLoading(false);
     }

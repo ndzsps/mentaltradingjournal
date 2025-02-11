@@ -29,7 +29,7 @@ export const TradeEntrySection = () => {
           />
         </div>
         <div className="grid w-full items-center gap-1.5">
-          <Label htmlFor="stopLoss">Stop Loss (Pips / Points)</Label>
+          <Label htmlFor="stopLoss">Stop Loss</Label>
           <Input
             type="number"
             id="stopLoss"
@@ -39,7 +39,7 @@ export const TradeEntrySection = () => {
           />
         </div>
         <div className="grid w-full items-center gap-1.5">
-          <Label htmlFor="takeProfit">Take Profit (Pips / Points)</Label>
+          <Label htmlFor="takeProfit">Take Profit</Label>
           <Input
             type="number"
             id="takeProfit"

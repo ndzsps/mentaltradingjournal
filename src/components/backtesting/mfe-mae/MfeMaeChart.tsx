@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -60,24 +59,13 @@ export function MfeMaeChart() {
       const tradesHitSl = processedData.filter(trade => Math.abs(trade.maeRelativeToSl) >= 100).length;
       const tradesHitSlPercentage = (tradesHitSl / totalTrades) * 100;
 
-      // Calculate sum of raw updraw values and divide by total trades
-      const totalUpdraw = entries.reduce((sum, entry) => {
-        const trades = entry.trades as Trade[];
-        if (!trades) return sum;
-        
-        return sum + trades.reduce((tradeSum, t) => {
-          if (!t.direction || !t.entryPrice || !t.highestPrice || !t.lowestPrice) return tradeSum;
-          
-          // Calculate raw updraw value without percentage symbol
-          const updraw = t.direction === 'buy'
-            ? ((Number(t.highestPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100
-            : ((Number(t.entryPrice) - Number(t.lowestPrice)) / Number(t.entryPrice)) * 100;
-          
-          return tradeSum + updraw;
-        }, 0);
+      // Calculate sum of updraw values
+      const sumUpdraw = processedData.reduce((sum, trade) => {
+        return sum + trade.mfeRelativeToTp;
       }, 0);
 
-      const avgUpdraw = totalUpdraw / totalTrades;
+      // Calculate average by dividing sum by total number of trades
+      const avgUpdraw = sumUpdraw / totalTrades;
 
       // Rest of the calculations
       const allTrades = entries.flatMap(entry => entry.trades || []) as Trade[];
@@ -117,7 +105,7 @@ export function MfeMaeChart() {
       setStats({
         tradesHitTp: tradesHitTpPercentage,
         tradesHitSl: tradesHitSlPercentage,
-        avgUpdrawWinner: avgUpdraw, // Now using raw updraw values summed and divided by total trades
+        avgUpdrawWinner: avgUpdraw, // Sum of all updraw values divided by total trades
         avgUpdrawLoser: calculateAverage(losers, getUpdraw),
         avgDrawdownWinner: calculateAverage(winners, getDrawdown),
         avgDrawdownLoser: calculateAverage(losers, getDrawdown),

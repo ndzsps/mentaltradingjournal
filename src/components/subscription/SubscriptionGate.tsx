@@ -68,25 +68,16 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
       const { data, error } = await supabase.functions.invoke('create-checkout-session');
       
       if (error) {
-        // Parse the error message from the body if it exists
-        let errorMessage = error.message;
-        try {
-          const parsedError = JSON.parse(error.message);
-          if (parsedError?.error) {
-            errorMessage = parsedError.error;
-          }
-        } catch (e) {
-          // If parsing fails, use the original error message
-          console.error('Error parsing error message:', e);
-        }
-        
-        // Check if user already has a subscription
-        if (errorMessage?.includes('already have an active subscription')) {
-          // Re-check subscription status with backend
-          await checkSubscription();
+        if (error.message.includes('already have an active subscription')) {
+          setIsSubscribed(true);
+          toast({
+            title: "Subscription Active",
+            description: "You already have an active subscription. Enjoy the premium features!",
+          });
           return;
         }
-        throw new Error(errorMessage);
+
+        throw error;
       }
       
       if (data?.url) {
@@ -94,10 +85,11 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
       }
     } catch (error: any) {
       console.error('Error creating checkout session:', error);
+      const errorMessage = error.message || "Please try again later";
       toast({
         variant: "destructive",
         title: "Error creating checkout session",
-        description: error.message || "Please try again later",
+        description: errorMessage,
       });
     } finally {
       setLoading(false);

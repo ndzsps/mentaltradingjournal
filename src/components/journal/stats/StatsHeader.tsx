@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { generateAnalytics } from "@/utils/analyticsUtils";
@@ -12,12 +11,12 @@ import { useSidebar } from "@/components/ui/sidebar";
 import { Card } from "@/components/ui/card";
 import { DollarSign, Smile, Flame, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { useProgressTracking } from "@/hooks/useProgressTracking";
+import { Trade } from "@/types/trade";
 
 export const StatsHeader = () => {
   const queryClient = useQueryClient();
   const { state, toggleSidebar } = useSidebar();
   
-  // Set up real-time subscription for journal entries
   useEffect(() => {
     const channel = supabase
       .channel('journal_entries_changes')
@@ -78,6 +77,42 @@ export const StatsHeader = () => {
     }
   };
 
+  const getAllTradesFromEntries = (entries: any[] = []): Trade[] => {
+    const interval = getTimeInterval();
+    const allTrades: Trade[] = [];
+
+    entries.forEach(entry => {
+      if (entry.trades && Array.isArray(entry.trades)) {
+        entry.trades.forEach((trade: Trade) => {
+          // Use exitDate if available, otherwise use entry's created_at
+          const exitDate = trade.exitDate ? new Date(trade.exitDate) : new Date(entry.created_at);
+          if (isWithinInterval(exitDate, interval)) {
+            allTrades.push(trade);
+          }
+        });
+      }
+    });
+
+    console.log('All trades for period:', {
+      interval,
+      tradesCount: allTrades.length,
+      trades: allTrades
+    });
+
+    return allTrades;
+  };
+
+  // Get all trades that were closed within the selected time period
+  const allTrades = analytics?.journalEntries ? getAllTradesFromEntries(analytics.journalEntries) : [];
+
+  // Calculate net P&L from all trades within the period
+  const netPnL = allTrades.reduce((total, trade) => {
+    const pnlValue = trade.pnl || 0;
+    const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
+    return total + (isNaN(numericPnL) ? 0 : numericPnL);
+  }, 0);
+
+  // Calculate emotion score
   const filterEntriesByTime = (entries: any[] = []) => {
     const interval = getTimeInterval();
     console.log('Filtering entries with interval:', interval);
@@ -88,35 +123,8 @@ export const StatsHeader = () => {
     });
   };
 
-  const getAllTradesFromEntries = (entries: any[] = []) => {
-    const interval = getTimeInterval();
-    const allTrades: any[] = [];
-
-    entries.forEach(entry => {
-      if (entry.trades && Array.isArray(entry.trades)) {
-        entry.trades.forEach((trade: any) => {
-          const exitDate = trade.exitDate ? new Date(trade.exitDate) : new Date(entry.created_at);
-          if (isWithinInterval(exitDate, interval)) {
-            allTrades.push(trade);
-          }
-        });
-      }
-    });
-
-    return allTrades;
-  };
-
   const filteredEntries = analytics?.journalEntries ? filterEntriesByTime(analytics.journalEntries) : [];
-  const allTrades = analytics?.journalEntries ? getAllTradesFromEntries(analytics.journalEntries) : [];
 
-  // Calculate net P&L from all trades
-  const netPnL = allTrades.reduce((total, trade) => {
-    const pnlValue = trade.pnl || 0;
-    const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
-    return total + (isNaN(numericPnL) ? 0 : numericPnL);
-  }, 0);
-
-  // Calculate emotion score
   const emotionStats = filteredEntries.reduce((acc, entry) => {
     if (entry.emotion?.toLowerCase().includes('positive')) acc.positive++;
     acc.total++;

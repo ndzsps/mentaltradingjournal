@@ -1,6 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { AnalyticsInsight, JournalEntry } from "@/types/analytics";
+import { AnalyticsInsight, JournalEntry, Trade } from "@/types/analytics";
 import { calculateDataRequirements } from "./dataRequirements";
 import { processJournalTrades, calculateAssetPairStats } from "./analytics/tradeProcessing";
 import { calculateEmotionRecovery, calculateEmotionTrend } from "./analytics/emotionAnalysis";
@@ -24,7 +24,6 @@ export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
 
   if (!entries || entries.length === 0) {
     console.log('No journal entries found');
-    // Return default values when no entries are found
     return {
       journalEntries: [],
       performanceByEmotion: { positive: 0, neutral: 0, negative: 0 },
@@ -49,11 +48,14 @@ export const generateAnalytics = async (): Promise<AnalyticsInsight> => {
   // Ensure trades array exists and is properly formatted
   const journalEntries = entries.map(entry => ({
     ...entry,
-    trades: Array.isArray(entry.trades) ? entry.trades.map(trade => ({
-      ...trade,
-      pnl: typeof trade.pnl === 'string' ? parseFloat(trade.pnl) : 
-           typeof trade.pnl === 'number' ? trade.pnl : 0
-    })) : [],
+    trades: Array.isArray(entry.trades) ? entry.trades.map(trade => {
+      const typedTrade = trade as Trade;
+      return {
+        ...typedTrade,
+        pnl: typeof typedTrade.pnl === 'string' ? parseFloat(typedTrade.pnl) : 
+             typeof typedTrade.pnl === 'number' ? typedTrade.pnl : 0
+      };
+    }) : [],
     session_type: ['pre', 'post', 'trade'].includes(entry.session_type) 
       ? entry.session_type as 'pre' | 'post' | 'trade' 
       : 'pre'

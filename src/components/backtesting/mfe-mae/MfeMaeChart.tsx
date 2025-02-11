@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -111,9 +112,9 @@ export function MfeMaeChart() {
       setStats({
         tradesHitTp: tradesHitTpPercentage,
         tradesHitSl: tradesHitSlPercentage,
-        avgUpdrawWinner: calculateAverage(winners, getUpdraw),
+        avgUpdrawWinner: avgCapturedMove, // Updated to use captured move average
         avgUpdrawLoser: calculateAverage(losers, getUpdraw),
-        avgDrawdownWinner: avgCapturedMove, // Updated to use captured move average
+        avgDrawdownWinner: calculateAverage(winners, getDrawdown),
         avgDrawdownLoser: calculateAverage(losers, getDrawdown),
         avgExitWinner: calculateAverage(winners, getExit),
         avgExitLoser: calculateAverage(losers, getExit),

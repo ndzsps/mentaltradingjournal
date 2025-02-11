@@ -16,47 +16,11 @@ interface MfeMaeBarChartProps {
   data: ChartData[];
 }
 
-interface CustomShapeProps {
-  x?: number;
-  y?: number;
-  width?: number;
-  height?: number;
-  value?: number;
-  datum?: ChartData & { tradeNum: string };
-}
-
 export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
   const dataWithNumbers = [...data].reverse().map((item, index) => ({
     ...item,
     tradeNum: (index + 1).toString(),
   }));
-
-  const renderDot = (props: CustomShapeProps) => {
-    const { x, y, height, width, datum } = props;
-    
-    // Return null if we don't have all required properties
-    if (!x || !y || !height || !width || !datum) return null;
-    
-    const capturedMove = datum.capturedMove ?? 0;
-    const mfeValue = datum.mfeRelativeToTp ?? 0;
-    
-    // Only render dot if there's a valid MFE value and captured move
-    if (mfeValue <= 0 || capturedMove === 0) return null;
-    
-    // Calculate position based on captured move percentage relative to MFE
-    const dotPosition = y + (height * (1 - (capturedMove / mfeValue)));
-    
-    return (
-      <circle
-        cx={x + (width / 2)}
-        cy={dotPosition}
-        r={4}
-        fill="white"
-        stroke="#000"
-        strokeWidth={1}
-      />
-    );
-  };
 
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -138,8 +102,17 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           fill="#4ade80" 
           name="Updraw" 
           stackId="stack"
-          shape={renderDot}
-        />
+        >
+          {dataWithNumbers.map((entry, index) => (
+            <circle
+              key={`dot-${index}`}
+              cx={`${index * (100 / (dataWithNumbers.length - 1))}%`}
+              cy={`${50 - (entry.capturedMove || 0) / 2}%`}
+              r={4}
+              fill="white"
+            />
+          ))}
+        </Bar>
         <Bar 
           dataKey="maeRelativeToSl" 
           fill="#f43f5e" 

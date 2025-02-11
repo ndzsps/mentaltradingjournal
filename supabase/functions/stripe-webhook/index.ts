@@ -41,6 +41,7 @@ serve(async (req) => {
         stripeSignature,
         STRIPE_WEBHOOK_SECRET
       )
+      console.log('Webhook event received:', event.type)
     } catch (err) {
       console.error('Error verifying webhook signature:', err)
       return new Response(JSON.stringify({ error: 'Invalid signature' }), {
@@ -60,6 +61,8 @@ serve(async (req) => {
         const session = event.data.object
         const subscription = await stripe.subscriptions.retrieve(session.subscription as string)
         console.log('Processing checkout session:', session.id)
+        console.log('User ID:', session.metadata?.supabase_user_id || session.client_reference_id)
+        console.log('Subscription:', subscription)
 
         // Update or create subscription record
         const { error: upsertError } = await supabaseClient
@@ -83,6 +86,7 @@ serve(async (req) => {
       case 'customer.subscription.deleted': {
         const subscription = event.data.object
         console.log('Processing subscription update:', subscription.id)
+        console.log('New status:', subscription.status)
 
         // Update subscription status
         const { error: updateError } = await supabaseClient

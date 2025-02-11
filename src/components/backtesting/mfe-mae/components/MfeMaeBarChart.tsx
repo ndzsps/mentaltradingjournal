@@ -9,7 +9,6 @@ import {
   Legend,
   ResponsiveContainer,
   ReferenceLine,
-  Scatter,
 } from "recharts";
 import { ChartData } from "../types";
 
@@ -18,11 +17,9 @@ interface MfeMaeBarChartProps {
 }
 
 export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
-  // Reverse the data array and then map the trade numbers
   const dataWithNumbers = [...data].reverse().map((item, index) => ({
     ...item,
     tradeNum: (index + 1).toString(),
-    capturedMove: item.capturedMove
   }));
 
   return (
@@ -105,19 +102,22 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           fill="#4ade80" 
           name="Updraw" 
           stackId="stack"
-        />
+        >
+          {dataWithNumbers.map((entry, index) => (
+            <circle
+              key={`dot-${index}`}
+              cx={`${index * (100 / (dataWithNumbers.length - 1))}%`}
+              cy={`${50 - (entry.capturedMove || 0) / 2}%`}
+              r={4}
+              fill="white"
+            />
+          ))}
+        </Bar>
         <Bar 
           dataKey="maeRelativeToSl" 
           fill="#f43f5e" 
           name="Drawdown" 
           stackId="stack"
-        />
-        <Scatter
-          dataKey="capturedMove"
-          fill="white"
-          name="Captured Move"
-          shape="circle"
-          legendType="circle"
         />
       </BarChart>
     </ResponsiveContainer>

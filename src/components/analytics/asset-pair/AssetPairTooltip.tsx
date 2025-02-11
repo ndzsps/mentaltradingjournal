@@ -1,3 +1,4 @@
+
 interface TooltipProps {
   active?: boolean;
   payload?: any[];
@@ -8,7 +9,7 @@ export const AssetPairTooltip = ({ active, payload, label }: TooltipProps) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-background border border-border rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95">
-        <p className="font-medium text-sm text-foreground mb-2">{label}</p>
+        <p className="text-lg font-bold mb-2">{label}</p>
         {payload.map((entry: any, index: number) => (
           <p
             key={index}

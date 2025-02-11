@@ -42,14 +42,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           strokeDasharray="3 3"
         />
         {/* Zero line */}
-        <CartesianGrid
-          horizontal={true}
-          vertical={false}
-          y={0}
-          stroke="#4ade80"
-          strokeWidth={1}
-          opacity={0.2}
-        />
+        <ReferenceLine y={0} stroke="#FEF7CD" strokeWidth={2} />
         {/* Reference lines for 100 and -100 */}
         <ReferenceLine y={100} stroke="#4ade80" strokeWidth={2} />
         <ReferenceLine y={-100} stroke="#f43f5e" strokeWidth={2} />

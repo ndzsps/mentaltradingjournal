@@ -22,6 +22,27 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
     tradeNum: (index + 1).toString(),
   }));
 
+  const renderDot = (props: any) => {
+    const { x, y, height, datum } = props;
+    const capturedMove = datum.capturedMove || 0;
+    const mfeValue = datum.mfeRelativeToTp || 0;
+    
+    // Only render dot if there's a valid MFE value
+    if (mfeValue <= 0) return null;
+    
+    // Calculate position based on captured move percentage relative to MFE
+    const dotPosition = y + (height * (1 - (capturedMove / mfeValue)));
+    
+    return (
+      <circle
+        cx={x + (props.width / 2)}
+        cy={dotPosition}
+        r={4}
+        fill="white"
+      />
+    );
+  };
+
   return (
     <ResponsiveContainer width="100%" height="100%">
       <BarChart
@@ -102,17 +123,8 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           fill="#4ade80" 
           name="Updraw" 
           stackId="stack"
-        >
-          {dataWithNumbers.map((entry, index) => (
-            <circle
-              key={`dot-${index}`}
-              cx={`${index * (100 / (dataWithNumbers.length - 1))}%`}
-              cy={`${50 - (entry.capturedMove || 0) / 2}%`}
-              r={4}
-              fill="white"
-            />
-          ))}
-        </Bar>
+          shape={renderDot}
+        />
         <Bar 
           dataKey="maeRelativeToSl" 
           fill="#f43f5e" 

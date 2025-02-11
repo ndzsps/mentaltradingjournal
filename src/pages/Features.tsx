@@ -31,14 +31,14 @@ const Features = () => {
       </header>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-24">
+      <div className="container mx-auto px-4 py-16">
         {/* Centered Title */}
-        <h1 className="text-4xl md:text-5xl font-bold text-center mb-20">
+        <h1 className="text-4xl md:text-5xl font-bold text-center mb-16">
           Everything In One Location
         </h1>
 
         {/* Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mt-8">
           {/* Left Column - Text Content */}
           <div className="space-y-8">
             <h2 className="text-3xl md:text-4xl font-semibold">
@@ -61,7 +61,7 @@ const Features = () => {
           </div>
 
           {/* Right Column - Dashboard Image */}
-          <div className="relative rounded-3xl overflow-hidden bg-white shadow-xl">
+          <div className="relative rounded-3xl overflow-hidden bg-white shadow-xl lg:-mt-12">
             <img 
               src="/lovable-uploads/e9c68a6a-c499-475b-9518-7ba15509fc57.png"
               alt="Dashboard Preview"
@@ -82,3 +82,4 @@ const FeatureItem = ({ icon: Icon, text }: { icon: any; text: string }) => (
 );
 
 export default Features;
+

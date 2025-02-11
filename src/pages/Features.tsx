@@ -108,6 +108,105 @@ const Features = () => {
             </Button>
           </div>
         </div>
+
+        {/* Third Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mt-32">
+          {/* Left Column - Text Content */}
+          <div className="space-y-8">
+            <h2 className="text-3xl md:text-4xl font-semibold">
+              Stay organized with comprehensive note-taking
+            </h2>
+            <p className="text-lg text-muted-foreground">
+              Keep track of your trading ideas, strategies, and market observations in one place. Tag and categorize your notes for easy reference
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <FeatureItem icon={NotebookPen} text="Rich text editor" />
+              <FeatureItem icon={BookOpen} text="Custom categories" />
+              <FeatureItem icon={Calendar} text="Date organization" />
+              <FeatureItem icon={LineChart} text="Chart annotations" />
+              <FeatureItem icon={BarChart2} text="Data linking" />
+              <FeatureItem icon={CheckCircle2} text="Task tracking" />
+            </div>
+            <Button size="lg" className="mt-6" asChild>
+              <Link to="/login">Learn More</Link>
+            </Button>
+          </div>
+
+          {/* Right Column - Image */}
+          <div className="relative rounded-3xl overflow-hidden bg-white shadow-xl lg:-mt-12">
+            <img 
+              src="/lovable-uploads/e9c68a6a-c499-475b-9518-7ba15509fc57.png"
+              alt="Notes Preview"
+              className="w-full h-auto"
+            />
+          </div>
+        </div>
+
+        {/* Fourth Section (Flipped) */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mt-32">
+          {/* Left Column - Image */}
+          <div className="relative rounded-3xl overflow-hidden bg-white shadow-xl lg:-mt-12 order-2 lg:order-1">
+            <img 
+              src="/lovable-uploads/e9c68a6a-c499-475b-9518-7ba15509fc57.png"
+              alt="Goals Preview"
+              className="w-full h-auto"
+            />
+          </div>
+
+          {/* Right Column - Text Content */}
+          <div className="space-y-8 order-1 lg:order-2">
+            <h2 className="text-3xl md:text-4xl font-semibold">
+              Set and achieve your trading goals
+            </h2>
+            <p className="text-lg text-muted-foreground">
+              Define clear objectives and track your progress over time. Break down your goals into manageable steps and celebrate your achievements
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <FeatureItem icon={Target} text="Goal setting" />
+              <FeatureItem icon={Medal} text="Achievement system" />
+              <FeatureItem icon={History} text="Progress tracking" />
+              <FeatureItem icon={ChartBar} text="Performance metrics" />
+              <FeatureItem icon={Timer} text="Time management" />
+              <FeatureItem icon={TrendingUp} text="Growth analytics" />
+            </div>
+            <Button size="lg" className="mt-6" asChild>
+              <Link to="/login">Get Started</Link>
+            </Button>
+          </div>
+        </div>
+
+        {/* Fifth Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mt-32">
+          {/* Left Column - Text Content */}
+          <div className="space-y-8">
+            <h2 className="text-3xl md:text-4xl font-semibold">
+              Learn and grow with comprehensive insights
+            </h2>
+            <p className="text-lg text-muted-foreground">
+              Gain valuable insights from your trading history. Identify patterns, learn from mistakes, and continuously improve your trading strategy
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <FeatureItem icon={BookOpen} text="Learning library" />
+              <FeatureItem icon={BarChart2} text="Performance insights" />
+              <FeatureItem icon={LineChart} text="Trend analysis" />
+              <FeatureItem icon={NotebookPen} text="Strategy review" />
+              <FeatureItem icon={CheckCircle2} text="Success patterns" />
+              <FeatureItem icon={Calendar} text="Historical data" />
+            </div>
+            <Button size="lg" className="mt-6" asChild>
+              <Link to="/login">Learn More</Link>
+            </Button>
+          </div>
+
+          {/* Right Column - Image */}
+          <div className="relative rounded-3xl overflow-hidden bg-white shadow-xl lg:-mt-12">
+            <img 
+              src="/lovable-uploads/e9c68a6a-c499-475b-9518-7ba15509fc57.png"
+              alt="Insights Preview"
+              className="w-full h-auto"
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

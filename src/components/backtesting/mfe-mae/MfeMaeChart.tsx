@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -51,6 +50,14 @@ export function MfeMaeChart() {
       setData(processedData);
 
       // Calculate statistics
+      const totalTrades = processedData.length;
+      if (totalTrades === 0) return;
+
+      // Count trades that hit TP (100% updraw)
+      const tradesHitTp = processedData.filter(trade => trade.mfeRelativeToTp >= 100).length;
+      const tradesHitTpPercentage = (tradesHitTp / totalTrades) * 100;
+
+      // Rest of the calculations
       const allTrades = entries.flatMap(entry => entry.trades || []) as Trade[];
       const winners = allTrades.filter(t => {
         if (!t.direction || !t.entryPrice || !t.exitPrice) return false;
@@ -93,7 +100,7 @@ export function MfeMaeChart() {
       };
 
       setStats({
-        tradesHitTp: (winners.length / allTrades.length) * 100,
+        tradesHitTp: tradesHitTpPercentage,
         tradesHitSl: (losers.length / allTrades.length) * 100,
         avgUpdrawWinner: calculateAverage(winners, getUpdraw),
         avgUpdrawLoser: calculateAverage(losers, getUpdraw),

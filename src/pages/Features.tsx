@@ -38,8 +38,8 @@ const Features = () => {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-16">
-        {/* Centered Title */}
-        <h1 className="text-4xl md:text-5xl font-bold text-center mb-16">
+        {/* Centered Title - Added extra top padding */}
+        <h1 className="text-4xl md:text-5xl font-bold text-center mb-16 pt-12">
           Everything In One Location
         </h1>
 

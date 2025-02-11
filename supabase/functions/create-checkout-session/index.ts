@@ -41,6 +41,30 @@ serve(async (req) => {
       apiVersion: '2023-10-16',
     })
 
+    // First check for existing subscriptions
+    const { data: subscriptions, error: subError } = await supabaseClient
+      .from('subscriptions')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('is_active', true)
+      .maybeSingle()
+
+    if (subError) {
+      console.error('Error checking existing subscription:', subError)
+      throw subError
+    }
+
+    if (subscriptions) {
+      return new Response(
+        JSON.stringify({ error: 'You already have an active subscription' }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400,
+        }
+      )
+    }
+
+    // Check Stripe customers
     const customers = await stripe.customers.list({
       email: email,
       limit: 1
@@ -49,15 +73,14 @@ serve(async (req) => {
     let customer_id = undefined
     if (customers.data.length > 0) {
       customer_id = customers.data[0].id
-      // check if already subscribed to this price
-      const subscriptions = await stripe.subscriptions.list({
+      // Check active subscriptions in Stripe
+      const stripeSubscriptions = await stripe.subscriptions.list({
         customer: customers.data[0].id,
         status: 'active',
-        price: 'price_1QiK8SI2A6O6E8LHKlfvakdi',
         limit: 1
       })
 
-      if (subscriptions.data.length > 0) {
+      if (stripeSubscriptions.data.length > 0) {
         return new Response(
           JSON.stringify({ error: 'You already have an active subscription' }),
           { 

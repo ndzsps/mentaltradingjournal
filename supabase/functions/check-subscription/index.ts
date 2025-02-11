@@ -36,12 +36,13 @@ serve(async (req) => {
 
     console.log('Checking subscription for user:', user.id)
 
-    // Check subscription status
-    const { data: subscription, error: subscriptionError } = await supabaseClient
+    // Check subscription status - using maybeSingle() instead of single()
+    const { data: subscriptions, error: subscriptionError } = await supabaseClient
       .from('subscriptions')
       .select('is_active, stripe_subscription_id')
       .eq('user_id', user.id)
-      .single()
+      .eq('is_active', true)
+      .maybeSingle()
 
     if (subscriptionError) {
       console.error('Error checking subscription:', subscriptionError)
@@ -50,16 +51,16 @@ serve(async (req) => {
 
     // Add debug logging
     console.log('Subscription status:', {
-      subscription,
-      isActive: subscription?.is_active,
-      stripeSubId: subscription?.stripe_subscription_id
+      subscriptions,
+      isActive: subscriptions?.is_active,
+      stripeSubId: subscriptions?.stripe_subscription_id
     })
 
     return new Response(
       JSON.stringify({ 
-        subscribed: subscription?.is_active ?? false,
+        subscribed: subscriptions?.is_active ?? false,
         userId: user.id,
-        stripeSubscriptionId: subscription?.stripe_subscription_id
+        stripeSubscriptionId: subscriptions?.stripe_subscription_id
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

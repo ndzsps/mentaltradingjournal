@@ -62,9 +62,22 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
       setLoading(true);
       const { data, error } = await supabase.functions.invoke('create-checkout-session');
       
-      if (error) throw error;
+      if (error) {
+        // Check if the error is due to an existing subscription
+        const errorBody = JSON.parse(error.message);
+        if (errorBody?.message?.includes('already have an active subscription')) {
+          toast({
+            title: "Already Subscribed",
+            description: "You already have an active subscription. Refreshing status...",
+          });
+          // Recheck subscription status
+          await checkSubscription();
+          return;
+        }
+        throw error;
+      }
       
-      if (data.url) {
+      if (data?.url) {
         window.location.href = data.url;
       }
     } catch (error) {

@@ -98,18 +98,19 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
       });
       
       if (error) {
-        // Check if the error is due to existing subscription
-        if (error.message.includes("already have an active subscription")) {
+        console.error('Create checkout session error:', error);
+        
+        // Handle already subscribed case (409 Conflict)
+        if (error.status === 409) {
           toast({
             title: "Already Subscribed",
-            description: "You already have an active subscription. Redirecting to dashboard...",
+            description: "You already have an active subscription.",
           });
-          // Refresh subscription status and redirect
-          await checkSubscription();
-          navigate('/dashboard');
+          await checkSubscription(); // Refresh subscription status
           return;
         }
-        // Check if error is due to invalid session
+        
+        // Handle expired/invalid session
         if (error.message.includes("User from sub claim in JWT does not exist")) {
           toast({
             variant: "destructive",

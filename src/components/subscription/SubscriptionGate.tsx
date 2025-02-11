@@ -1,9 +1,11 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface SubscriptionGateProps {
   children: React.ReactNode;
@@ -14,16 +16,19 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { session } = useAuth();
 
   useEffect(() => {
-    checkSubscription();
-  }, []);
+    if (session?.access_token) {
+      checkSubscription();
+    } else {
+      setLoading(false);
+    }
+  }, [session]);
 
   const checkSubscription = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
+      if (!session?.access_token) {
         setLoading(false);
         return;
       }
@@ -39,6 +44,7 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
         throw error;
       }
       
+      console.log('Subscription check response:', data);
       setIsSubscribed(data.subscribed);
     } catch (error) {
       console.error('Error checking subscription:', error);
@@ -55,7 +61,16 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
   const handleSubscribe = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase.functions.invoke('create-checkout-session');
+      if (!session?.access_token) {
+        navigate('/login');
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke('create-checkout-session', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        }
+      });
       
       if (error) throw error;
       
@@ -80,6 +95,11 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
+  }
+
+  if (!session) {
+    navigate('/login');
+    return null;
   }
 
   if (!isSubscribed) {

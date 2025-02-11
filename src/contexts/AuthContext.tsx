@@ -1,10 +1,12 @@
+
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import type { User, AuthError } from "@supabase/supabase-js";
+import type { User, AuthError, Session } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
 
 interface AuthContextType {
   user: User | null;
+  session: Session | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
@@ -16,12 +18,14 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check active session
+    // Initialize auth state from any existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
     });
@@ -29,37 +33,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
-
-      if (event === 'PASSWORD_RECOVERY') {
-        const newPassword = prompt('What would you like your new password to be?');
-        if (newPassword) {
-          const { error } = await supabase.auth.updateUser({
-            password: newPassword,
-          });
-
-          if (error) {
-            toast({
-              variant: "destructive",
-              title: "Error resetting password",
-              description: error.message,
-            });
-          } else {
-            toast({
-              title: "Password updated successfully",
-              description: "You can now sign in with your new password.",
-            });
-          }
-        }
-      }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [toast]);
+  }, []);
 
   const getErrorMessage = (error: AuthError) => {
     switch (error.message) {
@@ -78,13 +61,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     try {
-      console.log("Attempting to sign in with:", email);
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
       if (error) {
-        console.error("Sign in error:", error);
         toast({
           variant: "destructive",
           title: "Error signing in",
@@ -131,25 +112,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (session) {
-        const { error } = await supabase.auth.signOut();
-        if (error) {
-          toast({
-            variant: "destructive",
-            title: "Error signing out",
-            description: getErrorMessage(error),
-          });
-          throw error;
-        }
-      } else {
-        setUser(null);
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error("Sign out error:", error);
+        toast({
+          variant: "destructive",
+          title: "Error signing out",
+          description: getErrorMessage(error),
+        });
       }
+      // Clear session and user state regardless of error
+      setSession(null);
+      setUser(null);
     } catch (error) {
       console.error("Sign out error:", error);
+      // Clear session and user state on error too
+      setSession(null);
       setUser(null);
-      throw error;
     }
   };
 
@@ -175,6 +154,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const value = {
     user,
+    session,
     loading,
     signIn,
     signUp,

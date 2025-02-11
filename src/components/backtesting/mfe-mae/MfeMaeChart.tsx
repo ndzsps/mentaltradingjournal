@@ -64,8 +64,14 @@ export function MfeMaeChart() {
         return sum + trade.mfeRelativeToTp;
       }, 0);
 
-      // Calculate average by dividing sum by total number of trades
+      // Calculate sum of drawdown values
+      const sumDrawdown = processedData.reduce((sum, trade) => {
+        return sum + Math.abs(trade.maeRelativeToSl);
+      }, 0);
+
+      // Calculate averages by dividing sums by total number of trades
       const avgUpdraw = sumUpdraw / totalTrades;
+      const avgDrawdown = sumDrawdown / totalTrades;
 
       // Rest of the calculations
       const allTrades = entries.flatMap(entry => entry.trades || []) as Trade[];
@@ -107,7 +113,7 @@ export function MfeMaeChart() {
         tradesHitSl: tradesHitSlPercentage,
         avgUpdrawWinner: avgUpdraw, // Sum of all updraw values divided by total trades
         avgUpdrawLoser: calculateAverage(losers, getUpdraw),
-        avgDrawdownWinner: calculateAverage(winners, getDrawdown),
+        avgDrawdownWinner: avgDrawdown, // Sum of all drawdown values divided by total trades
         avgDrawdownLoser: calculateAverage(losers, getDrawdown),
       });
     };

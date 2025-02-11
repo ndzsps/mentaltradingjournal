@@ -31,41 +31,41 @@ const Features = () => {
       </header>
 
       {/* Main Content */}
-      <div className="container mx-auto py-24">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center min-h-[calc(100vh-8rem)]">
+      <div className="container mx-auto px-4 py-24">
+        {/* Centered Title */}
+        <h1 className="text-4xl md:text-5xl font-bold text-center mb-20">
+          Everything In One Location
+        </h1>
+
+        {/* Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           {/* Left Column - Text Content */}
           <div className="space-y-8">
-            <h1 className="text-4xl md:text-5xl font-bold">
-              Everything In One Location
-            </h1>
-            <div className="space-y-6">
-              <h2 className="text-2xl md:text-3xl font-semibold">
-                Focus on what matters through powerful journaling
-              </h2>
-              <p className="text-lg text-muted-foreground">
-                Stay on top of your trading performance with your journal. Store your data, stay on top of goals, track important KPI's, and more
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <FeatureItem icon={BarChart2} text="Analytics dashboard" />
-                <FeatureItem icon={Calendar} text="Calendar view" />
-                <FeatureItem icon={NotebookPen} text="Notes & comments" />
-                <FeatureItem icon={LineChart} text="Profitability charts" />
-                <FeatureItem icon={BookOpen} text="Advanced filtering" />
-                <FeatureItem icon={CheckCircle2} text="Winning percentage" />
-              </div>
-              <Button size="lg" className="mt-6" asChild>
-                <Link to="/login">Learn More</Link>
-              </Button>
+            <h2 className="text-3xl md:text-4xl font-semibold">
+              Focus on what matters through powerful journaling
+            </h2>
+            <p className="text-lg text-muted-foreground">
+              Stay on top of your trading performance with your journal. Store your data, stay on top of goals, track important KPI's, and more
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <FeatureItem icon={BarChart2} text="Analytics dashboard" />
+              <FeatureItem icon={Calendar} text="Calendar view" />
+              <FeatureItem icon={NotebookPen} text="Notes & comments" />
+              <FeatureItem icon={LineChart} text="Profitability charts" />
+              <FeatureItem icon={BookOpen} text="Advanced filtering" />
+              <FeatureItem icon={CheckCircle2} text="Winning percentage" />
             </div>
+            <Button size="lg" className="mt-6" asChild>
+              <Link to="/login">Learn More</Link>
+            </Button>
           </div>
 
           {/* Right Column - Dashboard Image */}
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-3xl -z-10" />
+          <div className="relative rounded-3xl overflow-hidden bg-white shadow-xl">
             <img 
               src="/lovable-uploads/e9c68a6a-c499-475b-9518-7ba15509fc57.png"
               alt="Dashboard Preview"
-              className="rounded-xl shadow-2xl border border-border/50 bg-background"
+              className="w-full h-auto"
             />
           </div>
         </div>

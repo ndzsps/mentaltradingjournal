@@ -1,4 +1,3 @@
-
 import { AnalyticsDashboard } from "@/components/analytics/AnalyticsDashboard";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";

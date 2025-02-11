@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useState } from "react";
 import { TimeFilter } from "@/hooks/useJournalFilters";
-import { startOfMonth, subMonths, startOfQuarter, isWithinInterval, endOfMonth } from "date-fns";
+import { startOfMonth, subMonths, startOfQuarter, isWithinInterval, endOfMonth, isSameDay } from "date-fns";
 
 interface TradeWinPercentageProps {
   timeFilter: TimeFilter;
@@ -45,31 +45,45 @@ export const TradeWinPercentage = ({ timeFilter }: TradeWinPercentageProps) => {
   const calculateWinRate = () => {
     if (!analytics?.journalEntries) return 0;
 
-    let filteredEntries = analytics.journalEntries;
-    
-    // Only consider post-session entries
-    filteredEntries = filteredEntries.filter(entry => entry.session_type === 'post');
+    // Get all pre-session entries with their emotions
+    const preSessionEmotions = analytics.journalEntries
+      .filter(entry => entry.session_type === 'pre')
+      .reduce((acc, entry) => {
+        const date = new Date(entry.created_at).toISOString().split('T')[0];
+        acc[date] = entry.emotion;
+        return acc;
+      }, {} as Record<string, string>);
+
+    // Get all post-session entries with trades
+    let postSessionEntries = analytics.journalEntries.filter(entry => 
+      entry.session_type === 'post' && entry.trades && entry.trades.length > 0
+    );
     
     // Apply time filter
     const interval = getTimeInterval();
     if (interval) {
-      filteredEntries = filteredEntries.filter(entry => {
+      postSessionEntries = postSessionEntries.filter(entry => {
         const entryDate = new Date(entry.created_at);
         return isWithinInterval(entryDate, interval);
       });
     }
 
-    // Apply emotion filter
-    filteredEntries = filteredEntries.filter(entry => {
-      if (emotionFilter === "all") return true;
-      return entry.emotion?.toLowerCase().includes(emotionFilter.toLowerCase());
+    // Filter trades based on pre-session emotion
+    const filteredTrades = postSessionEntries.flatMap(entry => {
+      const date = new Date(entry.created_at).toISOString().split('T')[0];
+      const preSessionEmotion = preSessionEmotions[date];
+      
+      if (emotionFilter === "all" || 
+          (preSessionEmotion && preSessionEmotion.toLowerCase().includes(emotionFilter.toLowerCase()))) {
+        return entry.trades || [];
+      }
+      return [];
     });
 
-    const allTrades = filteredEntries.flatMap(entry => entry.trades || []);
-    const winningTrades = allTrades.filter(trade => Number(trade.pnl) > 0);
+    const winningTrades = filteredTrades.filter(trade => Number(trade.pnl) > 0);
     
-    return allTrades.length > 0 
-      ? (winningTrades.length / allTrades.length) * 100 
+    return filteredTrades.length > 0 
+      ? (winningTrades.length / filteredTrades.length) * 100 
       : 0;
   };
 

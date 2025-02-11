@@ -33,12 +33,14 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
         }}
         stackOffset="sign"
       >
+        {/* Main grid */}
         <CartesianGrid 
           horizontal={true} 
           vertical={false} 
           stroke="rgba(158, 158, 158, 0.1)"
           strokeDasharray="3 3"
         />
+        {/* Zero line */}
         <CartesianGrid
           horizontal={true}
           vertical={false}
@@ -47,21 +49,22 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           strokeWidth={1}
           opacity={0.2}
         />
+        {/* Special lines for 100 and -100 - rendered last to be on top */}
         <CartesianGrid
-          horizontal={true}
+          horizontal={false}
           vertical={false}
           y={100}
           stroke="#4ade80"
           strokeWidth={2}
-          opacity={0.5}
+          opacity={1}
         />
         <CartesianGrid
-          horizontal={true}
+          horizontal={false}
           vertical={false}
           y={-100}
           stroke="#f43f5e"
           strokeWidth={2}
-          opacity={0.5}
+          opacity={1}
         />
         <XAxis 
           dataKey="tradeNum" 

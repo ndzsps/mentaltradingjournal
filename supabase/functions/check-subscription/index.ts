@@ -7,6 +7,15 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+// Valid subscription statuses that should grant access
+const VALID_SUBSCRIPTION_STATUSES = [
+  'active',
+  'trialing',
+  'past_due', // Give users a grace period
+  'incomplete', // Payment being processed
+  'incomplete_expired' // Show them the payment retry UI
+];
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -58,12 +67,12 @@ serve(async (req) => {
       console.log('All subscriptions found:', allSubs);
     }
 
-    // Now check for active subscription - include 'trialing' status as it's also valid
+    // Now check for valid subscription
     const { data: subscription, error: subError } = await supabaseClient
       .from('subscriptions')
-      .select('*, stripe_subscription_id, stripe_customer_id')
+      .select('*, stripe_subscription_id, stripe_customer_id, status')
       .eq('user_id', user.id)
-      .in('status', ['active', 'trialing'])
+      .in('status', VALID_SUBSCRIPTION_STATUSES)
       .maybeSingle();
 
     if (subError) {
@@ -71,7 +80,12 @@ serve(async (req) => {
       throw new Error('Error fetching subscription: ' + subError.message);
     }
 
-    console.log('Active subscription found:', subscription);
+    // Log subscription status for debugging
+    if (subscription) {
+      console.log('Found subscription with status:', subscription.status);
+    } else {
+      console.log('No active subscription found. All subs:', allSubs);
+    }
 
     // Return subscription status with detailed response
     return new Response(
@@ -81,7 +95,8 @@ serve(async (req) => {
         subscription: subscription,
         debug: {
           allSubscriptions: allSubs,
-          userEmail: user.email
+          userEmail: user.email,
+          validStatuses: VALID_SUBSCRIPTION_STATUSES
         }
       }),
       {

@@ -48,7 +48,7 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({ 
-        subscribed: !!subscription, // Will be true only if an active subscription was found
+        subscribed: !!subscription,
         userId: user.id 
       }),
       {

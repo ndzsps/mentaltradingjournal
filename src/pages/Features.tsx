@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { 
@@ -10,7 +9,8 @@ import {
   NotebookPen, 
   TestTube2,
   Check,
-  ArrowRight
+  ArrowRight,
+  Settings
 } from "lucide-react";
 
 const Features = () => {
@@ -25,6 +25,20 @@ const Features = () => {
       "Profitability charts",
       "Notes & comments",
       "Winning percentage"
+    ]
+  };
+
+  const secondFeature = {
+    icon: Settings,
+    title: "Track the metrics that matter",
+    description: "Our advanced trade tracking is built to help you stay on top of the metrics that matter.",
+    capabilities: [
+      "Real-time analysis",
+      "Track entries & exits",
+      "Understand risk management",
+      "Running P/L",
+      "Identify setups and mistakes",
+      "Trade rating and scale"
     ]
   };
 
@@ -122,6 +136,41 @@ const Features = () => {
               alt="Dashboard Preview" 
               className="relative rounded-3xl shadow-xl w-full"
             />
+          </div>
+        </div>
+
+        {/* Second Feature Section - Flipped Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-32">
+          <div className="relative order-2 lg:order-1">
+            <div className="absolute inset-0 bg-gradient-to-br from-accent/20 to-primary/20 rounded-3xl blur-xl" />
+            <img 
+              src="/lovable-uploads/5bbd5d77-4287-40d6-820d-52d61bf7d3bc.png" 
+              alt="Trade Metrics Dashboard" 
+              className="relative rounded-3xl shadow-xl w-full"
+            />
+          </div>
+          <div className="space-y-8 order-1 lg:order-2">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10">
+              <secondFeature.icon className="h-6 w-6 text-primary" />
+            </div>
+            <h2 className="text-4xl font-bold leading-tight">{secondFeature.title}</h2>
+            <p className="text-lg text-muted-foreground">{secondFeature.description}</p>
+            <div className="grid grid-cols-2 gap-4">
+              {secondFeature.capabilities.map((capability, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <div className="flex-shrink-0 rounded-full p-1 bg-primary/10">
+                    <Check className="h-4 w-4 text-primary" />
+                  </div>
+                  <span className="text-sm">{capability}</span>
+                </div>
+              ))}
+            </div>
+            <Button className="group" size="lg" asChild>
+              <Link to="/login">
+                Learn More
+                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </Button>
           </div>
         </div>
 

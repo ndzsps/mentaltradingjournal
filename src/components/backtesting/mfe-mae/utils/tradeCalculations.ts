@@ -22,9 +22,20 @@ export const calculateMfeRelativeToTp = (
   lowestPrice: number,
   isLongForTp: boolean
 ): number => {
-  return isLongForTp 
+  const mfeValue = isLongForTp 
     ? ((highestPrice - entryPrice) / (takeProfit - entryPrice)) * 100
     : ((entryPrice - lowestPrice) / (entryPrice - takeProfit)) * 100;
+
+  console.log('MFE Calculation:', {
+    entryPrice,
+    takeProfit,
+    highestPrice,
+    lowestPrice,
+    isLongForTp,
+    result: mfeValue
+  });
+
+  return mfeValue;
 };
 
 export const calculateRMultiple = (
@@ -53,8 +64,24 @@ export const processTrade = (trade: Trade) => {
   const takeProfit = Number(trade.takeProfit);
   const stopLoss = Number(trade.stopLoss);
   
+  console.log('Processing trade:', {
+    id: trade.id,
+    instrument: trade.instrument,
+    entryPrice,
+    highestPrice,
+    lowestPrice,
+    takeProfit,
+    stopLoss
+  });
+  
   const isLong = stopLoss < entryPrice;
   const isLongForTp = takeProfit > entryPrice;
+
+  console.log('Trade direction:', {
+    isLong,
+    isLongForTp,
+    instrument: trade.instrument
+  });
 
   const maeRelativeToSl = calculateMaeRelativeToSl(
     entryPrice,

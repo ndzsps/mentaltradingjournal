@@ -19,28 +19,26 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
   const { session, signOut } = useAuth();
 
   useEffect(() => {
-    if (session?.access_token) {
-      checkSubscription();
-    } else {
-      setLoading(false);
-      navigate('/login');
-    }
-  }, [session]);
-
-  const checkSubscription = async () => {
-    try {
-      console.log('Checking subscription status...');
-      
-      if (!session?.access_token) {
-        console.log('No session token found, redirecting to login');
+    const checkAuth = async () => {
+      const currentSession = await supabase.auth.getSession();
+      if (!currentSession.data.session) {
         setLoading(false);
         navigate('/login');
         return;
       }
+      checkSubscription(currentSession.data.session.access_token);
+    };
 
+    checkAuth();
+  }, [session]);
+
+  const checkSubscription = async (accessToken: string) => {
+    try {
+      console.log('Checking subscription status...');
+      
       const { data, error } = await supabase.functions.invoke('check-subscription', {
         headers: {
-          Authorization: `Bearer ${session.access_token}`,
+          Authorization: `Bearer ${accessToken}`,
         }
       });
       
@@ -48,7 +46,8 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
         console.error('Subscription check error:', error);
         
         // Handle invalid session
-        if (error.message.includes("User from sub claim in JWT does not exist")) {
+        if (error.message.includes("Auth session missing") || 
+            error.message.includes("User from sub claim in JWT does not exist")) {
           toast({
             variant: "destructive",
             title: "Session expired",
@@ -85,7 +84,8 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
       
       // Handle specific error cases
       if (typeof error === 'object' && error !== null && 'message' in error && 
-          error.message.includes("User from sub claim in JWT does not exist")) {
+          (error.message.includes("Auth session missing") || 
+           error.message.includes("User from sub claim in JWT does not exist"))) {
         toast({
           variant: "destructive",
           title: "Session expired",
@@ -111,7 +111,8 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
       setLoading(true);
       console.log('Creating checkout session...');
       
-      if (!session?.access_token) {
+      const currentSession = await supabase.auth.getSession();
+      if (!currentSession.data.session?.access_token) {
         console.log('No session token found, redirecting to login');
         navigate('/login');
         return;
@@ -119,7 +120,7 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
 
       const { data, error } = await supabase.functions.invoke('create-checkout-session', {
         headers: {
-          Authorization: `Bearer ${session.access_token}`,
+          Authorization: `Bearer ${currentSession.data.session.access_token}`,
         }
       });
 
@@ -144,12 +145,13 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
           if (errorBody?.redirectTo) {
             navigate(errorBody.redirectTo);
           }
-          await checkSubscription();
+          await checkSubscription(currentSession.data.session.access_token);
           return;
         }
         
         // Handle invalid session
-        if (error.message.includes("User from sub claim in JWT does not exist")) {
+        if (error.message.includes("Auth session missing") || 
+            error.message.includes("User from sub claim in JWT does not exist")) {
           toast({
             variant: "destructive",
             title: "Session expired",

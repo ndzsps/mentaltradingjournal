@@ -65,22 +65,23 @@ export function MfeMaeChart() {
         return sum + trade.mfeRelativeToTp;
       }, 0);
 
-      // Calculate sum of drawdown values
-      const sumDrawdown = processedData.reduce((sum, trade) => {
-        return sum + Math.abs(trade.maeRelativeToSl);
-      }, 0);
-
-      // Calculate averages by dividing sums by total number of trades
-      const avgUpdraw = sumUpdraw / totalTrades;
-
       // Calculate MFE for losing trades (trades that hit stop loss)
       const losingTrades = processedData.filter(trade => Math.abs(trade.maeRelativeToSl) >= 100);
       const avgMfeLoser = losingTrades.length > 0
         ? losingTrades.reduce((sum, trade) => sum + trade.mfeRelativeToTp, 0) / losingTrades.length
         : 0;
 
-      // Step 1 & 2: Identify winning trades and extract their drawdown values
-      const winningTrades = processedData.filter(trade => Math.abs(trade.maeRelativeToSl) < 100);
+      // Calculate sum of drawdown values for losing trades
+      const sumDrawdown = processedData.reduce((sum, trade) => {
+        return sum + Math.abs(trade.maeRelativeToSl);
+      }, 0);
+
+      // Step 1 & 2: Identify winning trades based on drawdown and profitability
+      const winningTrades = processedData.filter(trade => {
+        const hasNotHitStopLoss = Math.abs(trade.maeRelativeToSl) < 100;
+        const isProfitable = trade.rMultiple && trade.rMultiple > 0;
+        return hasNotHitStopLoss && isProfitable;
+      });
       
       // Step 3 & 4: Calculate average MAE for winning trades
       const avgMaeWinner = winningTrades.length > 0
@@ -90,9 +91,9 @@ export function MfeMaeChart() {
       setStats({
         tradesHitTp: tradesHitTpPercentage,
         tradesHitSl: tradesHitSlPercentage,
-        avgUpdrawWinner: avgUpdraw,
+        avgUpdrawWinner: sumUpdraw / totalTrades,
         avgUpdrawLoser: avgMfeLoser,
-        avgDrawdownWinner: avgMaeWinner, // Updated with new calculation for winning trades
+        avgDrawdownWinner: avgMaeWinner,
         avgDrawdownLoser: sumDrawdown / totalTrades,
       });
     };

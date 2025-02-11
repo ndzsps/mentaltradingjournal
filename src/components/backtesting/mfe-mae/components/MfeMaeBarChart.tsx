@@ -22,9 +22,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
   const dataWithNumbers = [...data].reverse().map((item, index) => ({
     ...item,
     tradeNum: (index + 1).toString(),
-    // If mfeRelativeToTp is positive, use it as the reference for captured move
-    // If mfeRelativeToTp is negative or zero, use maeRelativeToSl
-    capturedMove: item.mfeRelativeToTp > 0 ? item.mfeRelativeToTp * (item.capturedMove! / 100) : item.maeRelativeToSl * (item.capturedMove! / 100)
+    capturedMove: item.capturedMove
   }));
 
   return (
@@ -87,7 +85,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-white" />
-                    <span>Exit Point: {capturedMove?.toFixed(2)}%</span>
+                    <span>Captured Move: {capturedMove?.toFixed(2)}%</span>
                   </div>
                   <p>R-Multiple: {data.rMultiple?.toFixed(2) || '0'}</p>
                 </div>
@@ -117,7 +115,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
         <Scatter
           dataKey="capturedMove"
           fill="white"
-          name="Exit Point"
+          name="Captured Move"
           shape="circle"
           legendType="circle"
         />
@@ -125,4 +123,3 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
     </ResponsiveContainer>
   );
 }
-

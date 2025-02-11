@@ -1,4 +1,5 @@
-import { Home, BookOpen, BarChart2, Menu, User } from "lucide-react";
+
+import { Home, BookOpen, BarChart2, Menu, User, SlidersHorizontal } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -23,6 +24,7 @@ export function AppHeader() {
   const [isOpen, setIsOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [username, setUsername] = useState("");
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const { user, signOut, updateUsername } = useAuth();
   const { toast } = useToast();
   
@@ -124,6 +126,16 @@ export function AppHeader() {
               </div>
             </PopoverContent>
           </Popover>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            className="transition-all duration-200"
+            onClick={() => setIsCollapsed(!isCollapsed)}
+          >
+            <SlidersHorizontal className="h-4 w-4" />
+            {!isCollapsed && <span className="ml-2">Menu</span>}
+          </Button>
         </nav>
 
         {/* Mobile Navigation */}

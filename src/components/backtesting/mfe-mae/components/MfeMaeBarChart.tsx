@@ -16,29 +16,44 @@ interface MfeMaeBarChartProps {
   data: ChartData[];
 }
 
+interface CustomShapeProps {
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+  value?: number;
+  datum?: ChartData & { tradeNum: string };
+}
+
 export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
   const dataWithNumbers = [...data].reverse().map((item, index) => ({
     ...item,
     tradeNum: (index + 1).toString(),
   }));
 
-  const renderDot = (props: any) => {
-    const { x, y, height, datum } = props;
-    const capturedMove = datum.capturedMove || 0;
-    const mfeValue = datum.mfeRelativeToTp || 0;
+  const renderDot = (props: CustomShapeProps) => {
+    const { x, y, height, width, datum } = props;
     
-    // Only render dot if there's a valid MFE value
-    if (mfeValue <= 0) return null;
+    // Return null if we don't have all required properties
+    if (!x || !y || !height || !width || !datum) return null;
+    
+    const capturedMove = datum.capturedMove ?? 0;
+    const mfeValue = datum.mfeRelativeToTp ?? 0;
+    
+    // Only render dot if there's a valid MFE value and captured move
+    if (mfeValue <= 0 || capturedMove === 0) return null;
     
     // Calculate position based on captured move percentage relative to MFE
     const dotPosition = y + (height * (1 - (capturedMove / mfeValue)));
     
     return (
       <circle
-        cx={x + (props.width / 2)}
+        cx={x + (width / 2)}
         cy={dotPosition}
         r={4}
         fill="white"
+        stroke="#000"
+        strokeWidth={1}
       />
     );
   };

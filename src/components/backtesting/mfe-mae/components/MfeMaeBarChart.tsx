@@ -38,7 +38,6 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           vertical={false} 
           stroke="rgba(158, 158, 158, 0.1)"
           strokeDasharray="3 3"
-          tick={false}
         />
         <CartesianGrid
           horizontal={true}
@@ -46,7 +45,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           y={0}
           stroke="#4ade80"
           strokeWidth={1}
-          opacity={0.3}
+          opacity={0.2}
         />
         <CartesianGrid
           horizontal={true}
@@ -54,7 +53,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           y={100}
           stroke="#4ade80"
           strokeWidth={1}
-          opacity={0.5}
+          opacity={0.3}
         />
         <CartesianGrid
           horizontal={true}
@@ -62,7 +61,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           y={-100}
           stroke="#f43f5e"
           strokeWidth={1}
-          opacity={0.5}
+          opacity={0.3}
         />
         <XAxis 
           dataKey="tradeNum" 

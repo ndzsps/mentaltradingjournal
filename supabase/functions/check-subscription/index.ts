@@ -44,12 +44,12 @@ serve(async (req) => {
 
     console.log('All subscriptions found:', allSubs);
 
-    // Now check for active subscription
+    // Now check for active subscription - include 'trialing' status as it's also valid
     const { data: subscription, error: subError } = await supabaseClient
       .from('subscriptions')
       .select('*, stripe_subscription_id, stripe_customer_id')
       .eq('user_id', user.id)
-      .eq('status', 'active')
+      .in('status', ['active', 'trialing']) // Check for both active and trialing subscriptions
       .maybeSingle();
 
     if (subError) {

@@ -31,9 +31,16 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis 
           dataKey="id" 
-          label={{ value: 'Trade ID', position: 'bottom' }}
+          label={{ value: 'Trade', position: 'bottom' }}
         />
-        <YAxis domain={[-100, 100]} label={{ value: 'Percentage (%)', angle: -90, position: 'insideLeft' }} />
+        <YAxis 
+          domain={[-100, 100]} 
+          label={{ 
+            value: 'Updraw / Drawdown', 
+            angle: -90, 
+            position: 'insideLeft' 
+          }} 
+        />
         <Tooltip 
           formatter={(value: number, name: string, props: { payload: ChartData }) => [
             `${value.toFixed(2)}%`,
@@ -46,12 +53,14 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           fill="#4ade80" 
           name="MFE Relative to TP (%)" 
           stackId="stack"
+          shape="circle"
         />
         <Bar 
           dataKey="maeRelativeToSl" 
           fill="#f43f5e" 
           name="Drawdown (%)" 
           stackId="stack"
+          shape="circle"
         />
       </BarChart>
     </ResponsiveContainer>

@@ -31,10 +31,17 @@ serve(async (req) => {
       throw new Error('No email found')
     }
 
-    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
+    console.log('Creating Stripe instance with secret key...')
+    const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY')
+    if (!stripeSecretKey) {
+      throw new Error('Stripe secret key not found in environment')
+    }
+
+    const stripe = new Stripe(stripeSecretKey, {
       apiVersion: '2023-10-16',
     })
 
+    console.log('Checking for existing customer with email:', email)
     const customers = await stripe.customers.list({
       email: email,
       limit: 1
@@ -43,7 +50,10 @@ serve(async (req) => {
     let customer_id = undefined
     if (customers.data.length > 0) {
       customer_id = customers.data[0].id
+      console.log('Found existing customer:', customer_id)
+      
       // check if already subscribed to this price
+      console.log('Checking for active subscriptions...')
       const subscriptions = await stripe.subscriptions.list({
         customer: customers.data[0].id,
         status: 'active',
@@ -52,6 +62,7 @@ serve(async (req) => {
       })
 
       if (subscriptions.data.length > 0) {
+        console.log('Found active subscription')
         // Return a 409 Conflict status code for existing subscription
         return new Response(
           JSON.stringify({ 
@@ -65,6 +76,8 @@ serve(async (req) => {
           }
         )
       }
+    } else {
+      console.log('No existing customer found')
     }
 
     console.log('Creating subscription checkout session...')
@@ -92,7 +105,15 @@ serve(async (req) => {
       }
     )
   } catch (error) {
-    console.error('Error creating checkout session:', error)
+    console.error('Detailed error creating checkout session:', {
+      name: error.name,
+      message: error.message,
+      stack: error.stack,
+      type: error.type,
+      code: error.code,
+      raw: error
+    })
+    
     return new Response(
       JSON.stringify({ 
         error: error.message,

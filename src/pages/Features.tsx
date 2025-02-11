@@ -7,7 +7,13 @@ import {
   Calendar, 
   LineChart,
   NotebookPen,
-  CheckCircle2
+  CheckCircle2,
+  Target,
+  TrendingUp,
+  Medal,
+  ChartBar,
+  History,
+  Timer
 } from "lucide-react";
 
 const Features = () => {
@@ -37,7 +43,7 @@ const Features = () => {
           Everything In One Location
         </h1>
 
-        {/* Content Grid */}
+        {/* First Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mt-8">
           {/* Left Column - Text Content */}
           <div className="space-y-8">
@@ -67,6 +73,39 @@ const Features = () => {
               alt="Dashboard Preview"
               className="w-full h-auto"
             />
+          </div>
+        </div>
+
+        {/* Second Section (Flipped) */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mt-32">
+          {/* Left Column - Dashboard Image */}
+          <div className="relative rounded-3xl overflow-hidden bg-white shadow-xl lg:-mt-12 order-2 lg:order-1">
+            <img 
+              src="/lovable-uploads/e9c68a6a-c499-475b-9518-7ba15509fc57.png"
+              alt="Analytics Preview"
+              className="w-full h-auto"
+            />
+          </div>
+
+          {/* Right Column - Text Content */}
+          <div className="space-y-8 order-1 lg:order-2">
+            <h2 className="text-3xl md:text-4xl font-semibold">
+              Track your progress with detailed analytics
+            </h2>
+            <p className="text-lg text-muted-foreground">
+              Get insights into your trading performance with comprehensive analytics. Monitor your progress, identify patterns, and improve your strategy
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <FeatureItem icon={Target} text="Performance goals" />
+              <FeatureItem icon={TrendingUp} text="Success metrics" />
+              <FeatureItem icon={Medal} text="Achievement tracking" />
+              <FeatureItem icon={ChartBar} text="Custom reports" />
+              <FeatureItem icon={History} text="Historical data" />
+              <FeatureItem icon={Timer} text="Time analysis" />
+            </div>
+            <Button size="lg" className="mt-6" asChild>
+              <Link to="/login">Get Started</Link>
+            </Button>
           </div>
         </div>
       </div>

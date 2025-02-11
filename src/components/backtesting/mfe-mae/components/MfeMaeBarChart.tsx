@@ -19,7 +19,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
   // Map the data to include a tradeNumber
   const dataWithNumbers = data.map((item, index) => ({
     ...item,
-    tradeNumber: (index + 1).toString()
+    tradeNum: (index + 1).toString()
   }));
 
   return (
@@ -36,7 +36,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
       >
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis 
-          dataKey="tradeNumber" 
+          dataKey="tradeNum" 
           label={{ value: 'Trade', position: 'bottom' }}
         />
         <YAxis 
@@ -48,14 +48,30 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           }} 
         />
         <Tooltip 
-          formatter={(value: number, name: string, props: { payload: ChartData }) => {
-            const label = name === 'mfeRelativeToTp' 
-              ? 'Updraw' 
-              : 'Drawdown';
-            return [
-              `${value.toFixed(2)}%`,
-              `${label} - ${props.payload.instrument || 'Unknown'}\nR-Multiple: ${props.payload.rMultiple?.toFixed(2)}`
-            ];
+          content={({ active, payload }) => {
+            if (!active || !payload || !payload.length) return null;
+
+            const data = payload[0].payload;
+            const updrawValue = payload.find(p => p.dataKey === 'mfeRelativeToTp')?.value;
+            const drawdownValue = payload.find(p => p.dataKey === 'maeRelativeToSl')?.value;
+
+            return (
+              <div className="bg-background border border-border rounded-lg shadow-lg p-3">
+                <div className="space-y-2">
+                  <p className="text-2xl font-bold">{data.tradeNum}</p>
+                  <p className="text-lg">{data.instrument || 'Unknown'}</p>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-[#4ade80]" />
+                    <span>Updraw: {updrawValue?.toFixed(2)}%</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-[#f43f5e]" />
+                    <span>Drawdown: {Math.abs(drawdownValue?.toFixed(2))}%</span>
+                  </div>
+                  <p>R-Multiple: {data.rMultiple?.toFixed(2)}</p>
+                </div>
+              </div>
+            );
           }}
         />
         <Legend 

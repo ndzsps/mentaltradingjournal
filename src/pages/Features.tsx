@@ -27,6 +27,12 @@ const Features = () => {
           </Link>
           <div className="flex items-center gap-4">
             <Button variant="ghost" asChild>
+              <Link to="/features">Features</Link>
+            </Button>
+            <Button variant="ghost" asChild>
+              <Link to="/pricing">Pricing</Link>
+            </Button>
+            <Button variant="ghost" asChild>
               <Link to="/login">Sign In</Link>
             </Button>
             <Button asChild>
@@ -220,4 +226,3 @@ const FeatureItem = ({ icon: Icon, text }: { icon: any; text: string }) => (
 );
 
 export default Features;
-

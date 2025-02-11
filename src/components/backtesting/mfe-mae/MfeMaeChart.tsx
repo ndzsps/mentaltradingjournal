@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -18,8 +17,6 @@ export function MfeMaeChart() {
     avgUpdrawLoser: 0,
     avgDrawdownWinner: 0,
     avgDrawdownLoser: 0,
-    avgExitWinner: 0,
-    avgExitLoser: 0,
   });
   const { user } = useAuth();
 
@@ -102,22 +99,13 @@ export function MfeMaeChart() {
           : ((Number(t.highestPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100;
       };
 
-      const getExit = (t: Trade) => {
-        const isBuy = t.direction === 'buy';
-        return isBuy
-          ? ((Number(t.exitPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100
-          : ((Number(t.entryPrice) - Number(t.exitPrice)) / Number(t.entryPrice)) * 100;
-      };
-
       setStats({
         tradesHitTp: tradesHitTpPercentage,
         tradesHitSl: tradesHitSlPercentage,
-        avgUpdrawWinner: avgCapturedMove, // Updated to use captured move average
+        avgUpdrawWinner: avgCapturedMove,
         avgUpdrawLoser: calculateAverage(losers, getUpdraw),
         avgDrawdownWinner: calculateAverage(winners, getDrawdown),
         avgDrawdownLoser: calculateAverage(losers, getDrawdown),
-        avgExitWinner: calculateAverage(winners, getExit),
-        avgExitLoser: calculateAverage(losers, getExit),
       });
     };
 

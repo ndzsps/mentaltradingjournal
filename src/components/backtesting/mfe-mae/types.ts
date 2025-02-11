@@ -15,6 +15,4 @@ export interface Stats {
   avgUpdrawLoser: number;
   avgDrawdownWinner: number;
   avgDrawdownLoser: number;
-  avgExitWinner: number;
-  avgExitLoser: number;
 }

@@ -9,14 +9,12 @@ interface StatsCardsProps {
     avgUpdrawLoser: number;
     avgDrawdownWinner: number;
     avgDrawdownLoser: number;
-    avgExitWinner: number;
-    avgExitLoser: number;
   };
 }
 
 export function StatsCards({ stats }: StatsCardsProps) {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
       <Card className="p-4">
         <div className="text-sm text-muted-foreground">Trades Hit TP</div>
         <div className="text-2xl font-bold text-green-500">{stats.tradesHitTp.toFixed(2)}%</div>
@@ -40,14 +38,6 @@ export function StatsCards({ stats }: StatsCardsProps) {
       <Card className="p-4">
         <div className="text-sm text-muted-foreground">Avg. MAE Loser</div>
         <div className="text-2xl font-bold text-red-500">{stats.avgDrawdownLoser.toFixed(2)}%</div>
-      </Card>
-      <Card className="p-4">
-        <div className="text-sm text-muted-foreground">Avg. Exit Winner</div>
-        <div className="text-2xl font-bold text-green-500">{stats.avgExitWinner.toFixed(2)}%</div>
-      </Card>
-      <Card className="p-4">
-        <div className="text-sm text-muted-foreground">Avg. Exit Loser</div>
-        <div className="text-2xl font-bold text-red-500">{stats.avgExitLoser.toFixed(2)}%</div>
       </Card>
     </div>
   );

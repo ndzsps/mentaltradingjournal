@@ -70,9 +70,19 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
       const { data, error } = await supabase.functions.invoke('create-checkout-session');
       
       if (error) {
-        const errorMessage = error.message || JSON.parse(error.details)?.error;
+        // Parse the error message from the body if it exists
+        let errorMessage = error.message;
+        try {
+          const parsedError = JSON.parse(error.message);
+          if (parsedError?.error) {
+            errorMessage = parsedError.error;
+          }
+        } catch (e) {
+          // If parsing fails, use the original error message
+          console.error('Error parsing error message:', e);
+        }
         
-        // If user already has a subscription, update state and grant access
+        // Check if user already has a subscription
         if (errorMessage?.includes('already have an active subscription')) {
           setIsSubscribed(true);
           toast({
@@ -81,7 +91,7 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
           });
           return;
         }
-        throw error;
+        throw new Error(errorMessage);
       }
       
       if (data?.url) {

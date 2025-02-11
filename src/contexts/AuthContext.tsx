@@ -22,24 +22,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  // Clear auth state
-  const clearAuthState = () => {
-    setUser(null);
-    setSession(null);
-    // Clear any persisted session
-    supabase.auth.signOut();
-  };
-
+  // Initialize auth state from any existing session
   useEffect(() => {
-    // Initialize auth state from any existing session
     supabase.auth.getSession().then(({ data: { session }, error }) => {
       if (error) {
         console.error("Error getting session:", error);
-        clearAuthState();
-        return;
+        setUser(null);
+        setSession(null);
+      } else {
+        setSession(session);
+        setUser(session?.user ?? null);
       }
-      setSession(session);
-      setUser(session?.user ?? null);
       setLoading(false);
     });
 
@@ -87,9 +80,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           title: "Error signing in",
           description: getErrorMessage(error),
         });
-        if (error.message === "User from sub claim in JWT does not exist") {
-          clearAuthState();
-        }
         throw error;
       }
     } catch (error) {
@@ -131,19 +121,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
+      // First set loading to true to prevent any unwanted state updates
+      setLoading(true);
+      
       const { error } = await supabase.auth.signOut();
+      
       if (error) {
-        console.error("Sign out error:", error);
-        toast({
-          variant: "destructive",
-          title: "Error signing out",
-          description: getErrorMessage(error),
-        });
+        // Only show error toast for non-session related errors
+        if (!error.message.includes("session") && !error.message.includes("Session")) {
+          console.error("Sign out error:", error);
+          toast({
+            variant: "destructive",
+            title: "Error signing out",
+            description: getErrorMessage(error),
+          });
+        }
       }
-      clearAuthState();
+      
+      // Always clear the local state, regardless of error
+      setUser(null);
+      setSession(null);
+      
     } catch (error) {
       console.error("Sign out error:", error);
-      clearAuthState();
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -159,9 +161,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           title: "Error updating username",
           description: getErrorMessage(error),
         });
-        if (error.message === "User from sub claim in JWT does not exist") {
-          clearAuthState();
-        }
         throw error;
       }
     } catch (error) {

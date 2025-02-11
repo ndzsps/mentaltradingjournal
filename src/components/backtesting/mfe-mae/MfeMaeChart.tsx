@@ -61,6 +61,11 @@ export function MfeMaeChart() {
       const tradesHitSl = processedData.filter(trade => Math.abs(trade.maeRelativeToSl) >= 100).length;
       const tradesHitSlPercentage = (tradesHitSl / totalTrades) * 100;
 
+      // Calculate captured move averages
+      const totalCapturedMove = processedData.reduce((sum, trade) => 
+        sum + (trade.capturedMove || 0), 0);
+      const avgCapturedMove = totalCapturedMove / totalTrades;
+
       // Rest of the calculations
       const allTrades = entries.flatMap(entry => entry.trades || []) as Trade[];
       const winners = allTrades.filter(t => {
@@ -108,7 +113,7 @@ export function MfeMaeChart() {
         tradesHitSl: tradesHitSlPercentage,
         avgUpdrawWinner: calculateAverage(winners, getUpdraw),
         avgUpdrawLoser: calculateAverage(losers, getUpdraw),
-        avgDrawdownWinner: calculateAverage(winners, getDrawdown),
+        avgDrawdownWinner: avgCapturedMove, // Updated to use captured move average
         avgDrawdownLoser: calculateAverage(losers, getDrawdown),
         avgExitWinner: calculateAverage(winners, getExit),
         avgExitLoser: calculateAverage(losers, getExit),

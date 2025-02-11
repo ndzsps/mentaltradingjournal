@@ -52,13 +52,11 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
       }
     } catch (error: any) {
       console.error('Error checking subscription:', error);
-      if (!error.message?.includes('already have an active subscription')) {
-        toast({
-          variant: "destructive",
-          title: "Error checking subscription",
-          description: "Please try again later",
-        });
-      }
+      toast({
+        variant: "destructive",
+        title: "Error checking subscription",
+        description: "Please try again later",
+      });
     } finally {
       setLoading(false);
     }
@@ -84,11 +82,8 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
         
         // Check if user already has a subscription
         if (errorMessage?.includes('already have an active subscription')) {
-          setIsSubscribed(true);
-          toast({
-            title: "Subscription Active",
-            description: "You already have an active subscription. Enjoy the premium features!",
-          });
+          // Re-check subscription status with backend
+          await checkSubscription();
           return;
         }
         throw new Error(errorMessage);

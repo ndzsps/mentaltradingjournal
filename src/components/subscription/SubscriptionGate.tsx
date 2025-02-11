@@ -69,7 +69,17 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
       }
       
       console.log('Subscription check response:', data);
-      setIsSubscribed(data.subscribed);
+      
+      // Update subscription status based on response
+      const hasActiveSubscription = data?.subscribed === true;
+      console.log('Setting subscription status to:', hasActiveSubscription);
+      setIsSubscribed(hasActiveSubscription);
+      
+      if (hasActiveSubscription) {
+        console.log('User has active subscription, showing premium features');
+      } else {
+        console.log('User does not have active subscription, showing subscribe prompt');
+      }
     } catch (error) {
       console.error('Error checking subscription:', error);
       

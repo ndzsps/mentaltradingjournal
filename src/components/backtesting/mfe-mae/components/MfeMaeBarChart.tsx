@@ -41,8 +41,8 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           strokeDasharray="3 3"
         />
         <ReferenceLine y={0} stroke="#E5DEFF" strokeWidth={2} />
-        <ReferenceLine y={100} stroke="#9b87f5" strokeWidth={2} />
-        <ReferenceLine y={-100} stroke="#FEC6A1" strokeWidth={2} />
+        <ReferenceLine y={100} stroke="#FEC6A1" strokeWidth={2} />
+        <ReferenceLine y={-100} stroke="#9b87f5" strokeWidth={2} />
         <XAxis 
           dataKey="tradeNum" 
           label={{ value: 'Trade', position: 'bottom' }}
@@ -73,11 +73,11 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
                   <p className="text-lg font-bold">Trade #{data.tradeNum}</p>
                   <p className="text-lg">{data.instrument || 'Unknown'}</p>
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-[#9b87f5]" />
+                    <div className="w-3 h-3 rounded-full bg-[#FEC6A1]" />
                     <span>Updraw: {updrawValue?.toFixed(2)}%</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-[#FEC6A1]" />
+                    <div className="w-3 h-3 rounded-full bg-[#9b87f5]" />
                     <span>Drawdown: {Math.abs(drawdownValue)?.toFixed(2)}%</span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -99,7 +99,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
         />
         <Bar 
           dataKey="mfeRelativeToTp" 
-          fill="#9b87f5" 
+          fill="#FEC6A1" 
           name="Updraw" 
           stackId="stack"
         >
@@ -115,7 +115,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
         </Bar>
         <Bar 
           dataKey="maeRelativeToSl" 
-          fill="#FEC6A1" 
+          fill="#9b87f5" 
           name="Drawdown" 
           stackId="stack"
         />

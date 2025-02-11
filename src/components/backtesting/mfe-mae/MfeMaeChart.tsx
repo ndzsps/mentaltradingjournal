@@ -57,6 +57,10 @@ export function MfeMaeChart() {
       const tradesHitTp = processedData.filter(trade => trade.mfeRelativeToTp >= 100).length;
       const tradesHitTpPercentage = (tradesHitTp / totalTrades) * 100;
 
+      // Count trades that hit SL (100% drawdown)
+      const tradesHitSl = processedData.filter(trade => Math.abs(trade.maeRelativeToSl) >= 100).length;
+      const tradesHitSlPercentage = (tradesHitSl / totalTrades) * 100;
+
       // Rest of the calculations
       const allTrades = entries.flatMap(entry => entry.trades || []) as Trade[];
       const winners = allTrades.filter(t => {
@@ -101,7 +105,7 @@ export function MfeMaeChart() {
 
       setStats({
         tradesHitTp: tradesHitTpPercentage,
-        tradesHitSl: (losers.length / allTrades.length) * 100,
+        tradesHitSl: tradesHitSlPercentage,
         avgUpdrawWinner: calculateAverage(winners, getUpdraw),
         avgUpdrawLoser: calculateAverage(losers, getUpdraw),
         avgDrawdownWinner: calculateAverage(winners, getDrawdown),

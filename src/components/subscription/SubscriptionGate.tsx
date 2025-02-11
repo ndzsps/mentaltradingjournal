@@ -66,7 +66,6 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
     try {
       setLoading(true);
       
-      // First check if user already has an active subscription
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         toast({
@@ -96,12 +95,19 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
         return;
       }
 
-      const { data, error } = await supabase.functions.invoke('create-checkout-session');
+      const { data, error } = await supabase.functions.invoke('create-checkout-session', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        }
+      });
       
       if (error) {
         // Check if the error indicates an active subscription
-        if (error.message.includes('already have an active subscription') || 
-            (error.body && error.body.includes('already have an active subscription'))) {
+        const errorMessage = error.message || '';
+        const errorBody = error.body ? JSON.parse(error.body) : {};
+        
+        if (errorMessage.includes('already have an active subscription') || 
+            (errorBody.error && errorBody.error.includes('already have an active subscription'))) {
           setIsSubscribed(true);
           toast({
             title: "Subscription Active",

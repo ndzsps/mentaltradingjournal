@@ -36,12 +36,12 @@ serve(async (req) => {
 
     console.log('Checking subscription for user:', user.id)
 
-    // Check subscription status using maybeSingle() instead of single()
+    // Check subscription status
     const { data: subscription, error: subscriptionError } = await supabaseClient
       .from('subscriptions')
       .select('is_active, stripe_subscription_id')
       .eq('user_id', user.id)
-      .maybeSingle()
+      .single()
 
     if (subscriptionError) {
       console.error('Error checking subscription:', subscriptionError)
@@ -76,7 +76,7 @@ serve(async (req) => {
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 400, // Changed from 500 to 400 for client errors
+        status: 500,
       }
     )
   }

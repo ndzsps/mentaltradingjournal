@@ -1,10 +1,14 @@
+
 import { AppLayout } from "@/components/layout/AppLayout";
 import { NotebookContent } from "@/components/notebook/NotebookContent";
+import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";
 
 const Notebook = () => {
   return (
     <AppLayout>
-      <NotebookContent />
+      <SubscriptionGate>
+        <NotebookContent />
+      </SubscriptionGate>
     </AppLayout>
   );
 };

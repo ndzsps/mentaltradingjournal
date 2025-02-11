@@ -1,7 +1,8 @@
+
 import { AppLayout } from "@/components/layout/AppLayout";
 import { EmotionLogger } from "@/components/journal/EmotionLogger";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";
 
 const AddJournalEntry = () => {
   const location = useLocation();
@@ -10,14 +11,16 @@ const AddJournalEntry = () => {
 
   return (
     <AppLayout>
-      <div className="max-w-7xl mx-auto px-4">
-        <EmotionLogger 
-          initialSessionType={sessionType}
-          onSubmitSuccess={() => {
-            navigate("/dashboard");
-          }}
-        />
-      </div>
+      <SubscriptionGate>
+        <div className="max-w-7xl mx-auto px-4">
+          <EmotionLogger 
+            initialSessionType={sessionType}
+            onSubmitSuccess={() => {
+              navigate("/dashboard");
+            }}
+          />
+        </div>
+      </SubscriptionGate>
     </AppLayout>
   );
 };

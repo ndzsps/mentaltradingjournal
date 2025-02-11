@@ -34,21 +34,32 @@ serve(async (req) => {
       throw new Error('Error getting user: ' + userError?.message)
     }
 
+    console.log('Checking subscription for user:', user.id)
+
     // Check subscription status
     const { data: subscription, error: subscriptionError } = await supabaseClient
       .from('subscriptions')
-      .select('is_active')
+      .select('is_active, stripe_subscription_id')
       .eq('user_id', user.id)
       .single()
 
     if (subscriptionError) {
       console.error('Error checking subscription:', subscriptionError)
+      throw new Error('Error checking subscription: ' + subscriptionError.message)
     }
+
+    // Add debug logging
+    console.log('Subscription status:', {
+      subscription,
+      isActive: subscription?.is_active,
+      stripeSubId: subscription?.stripe_subscription_id
+    })
 
     return new Response(
       JSON.stringify({ 
         subscribed: subscription?.is_active ?? false,
-        userId: user.id 
+        userId: user.id,
+        stripeSubscriptionId: subscription?.stripe_subscription_id
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

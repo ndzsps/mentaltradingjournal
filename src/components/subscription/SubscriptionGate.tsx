@@ -40,7 +40,10 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
         console.error('Subscription check error:', error);
         throw error;
       }
+
+      console.log('Subscription check response:', data);
       
+      // If user has an active subscription, grant access
       setIsSubscribed(data.subscribed);
     } catch (error) {
       console.error('Error checking subscription:', error);

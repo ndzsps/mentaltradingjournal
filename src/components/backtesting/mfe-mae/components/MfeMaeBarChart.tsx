@@ -47,22 +47,24 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
             `${name} - ${props.payload.instrument || 'Unknown'}`
           ]}
         />
-        <Legend />
+        <Legend 
+          verticalAlign="top" 
+          align="right"
+        />
         <Bar 
           dataKey="mfeRelativeToTp" 
           fill="#4ade80" 
           name="MFE Relative to TP (%)" 
           stackId="stack"
-          shape="circle"
         />
         <Bar 
           dataKey="maeRelativeToSl" 
           fill="#f43f5e" 
           name="Drawdown (%)" 
           stackId="stack"
-          shape="circle"
         />
       </BarChart>
     </ResponsiveContainer>
   );
 }
+

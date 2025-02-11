@@ -79,16 +79,44 @@ export const WeeklyReviewDialog = ({
     try {
       setLoading(true);
       const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
+      const weekStartDate = weekStart.toISOString().split('T')[0];
 
-      const { error } = await supabase
+      // First try to get an existing review
+      const { data: existingReview, error: fetchError } = await supabase
         .from('weekly_reviews')
-        .upsert({
-          user_id: user.id,
-          week_start_date: weekStart.toISOString().split('T')[0],
-          strength,
-          weakness,
-          improvement,
-        });
+        .select('id')
+        .eq('week_start_date', weekStartDate)
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (fetchError) throw fetchError;
+
+      let error;
+
+      if (existingReview) {
+        // Update existing review
+        const { error: updateError } = await supabase
+          .from('weekly_reviews')
+          .update({
+            strength,
+            weakness,
+            improvement,
+          })
+          .eq('id', existingReview.id);
+        error = updateError;
+      } else {
+        // Insert new review
+        const { error: insertError } = await supabase
+          .from('weekly_reviews')
+          .insert({
+            user_id: user.id,
+            week_start_date: weekStartDate,
+            strength,
+            weakness,
+            improvement,
+          });
+        error = insertError;
+      }
 
       if (error) throw error;
 

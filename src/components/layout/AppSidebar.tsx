@@ -41,7 +41,7 @@ export function AppSidebar() {
   return (
     <>
       <Sidebar className={cn(
-        "relative transition-all duration-300 ease-in-out",
+        "transition-all duration-300 ease-in-out h-screen sticky top-0",
         isCollapsed ? "w-[60px]" : "w-[240px]"
       )}>
         <div className="absolute right-0 top-6 translate-x-1/2 z-20">

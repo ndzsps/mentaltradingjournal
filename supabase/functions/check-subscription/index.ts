@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.1'
 
@@ -22,7 +23,7 @@ serve(async (req) => {
     // Initialize Supabase client
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     )
 
     // Get user from token
@@ -33,10 +34,21 @@ serve(async (req) => {
       throw new Error('Error getting user: ' + userError?.message)
     }
 
-    // For now, return true as subscription check is not implemented yet
+    // Check if user has an active subscription
+    const { data: subscription, error: subError } = await supabaseClient
+      .from('subscriptions')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('status', 'active')
+      .single();
+
+    if (subError) {
+      console.error('Error fetching subscription:', subError);
+    }
+
     return new Response(
       JSON.stringify({ 
-        subscribed: true,
+        subscribed: !!subscription, // Will be true only if an active subscription was found
         userId: user.id 
       }),
       {

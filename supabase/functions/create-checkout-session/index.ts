@@ -46,7 +46,7 @@ serve(async (req) => {
       .from('subscriptions')
       .select('is_active')
       .eq('user_id', user.id)
-      .single()
+      .maybeSingle()
 
     if (existingSubscription?.is_active) {
       return new Response(

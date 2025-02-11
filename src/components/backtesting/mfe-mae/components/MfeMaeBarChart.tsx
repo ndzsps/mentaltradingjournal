@@ -55,7 +55,9 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           label={{ 
             value: 'Updraw / Drawdown', 
             angle: -90, 
-            position: 'insideLeft' 
+            position: 'insideLeft',
+            offset: 0,
+            dy: 60  // Add vertical offset to center the label
           }} 
         />
         <Tooltip 

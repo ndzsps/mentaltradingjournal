@@ -17,7 +17,8 @@ interface MfeMaeBarChartProps {
 }
 
 export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
-  const dataWithNumbers = data.map((item, index) => ({
+  // Reverse the data array and then map the trade numbers
+  const dataWithNumbers = [...data].reverse().map((item, index) => ({
     ...item,
     tradeNum: (index + 1).toString()
   }));
@@ -34,16 +35,13 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
         }}
         stackOffset="sign"
       >
-        {/* Background grid */}
         <CartesianGrid 
           horizontal={true} 
           vertical={false} 
           stroke="rgba(158, 158, 158, 0.1)"
           strokeDasharray="3 3"
         />
-        {/* Zero line */}
         <ReferenceLine y={0} stroke="#FEF7CD" strokeWidth={2} />
-        {/* Reference lines for 100 and -100 */}
         <ReferenceLine y={100} stroke="#4ade80" strokeWidth={2} />
         <ReferenceLine y={-100} stroke="#f43f5e" strokeWidth={2} />
         <XAxis 
@@ -111,3 +109,4 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
     </ResponsiveContainer>
   );
 }
+

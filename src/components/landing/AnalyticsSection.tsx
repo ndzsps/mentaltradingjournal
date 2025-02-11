@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 export const AnalyticsSection = () => {
   const navigate = useNavigate();
-
+  
   const analyticsTools = [
     {
       title: "Emotional Mastery",
@@ -57,16 +57,18 @@ export const AnalyticsSection = () => {
 
   return (
     <section className="relative py-32">
-      {/* Matching background effects from the upper section */}
       <div className="absolute inset-0">
+        {/* Base dark background layer */}
         <div className="absolute inset-0 bg-[#1A1F2C]" />
+        
+        {/* Gradient overlays for seamless blending */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10 opacity-40" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent opacity-30" />
         
         {/* Animated glow effects */}
         <div className="absolute inset-0">
-          <div className="absolute top-0 -left-40 w-80 h-80 bg-primary/30 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" />
-          <div className="absolute top-0 -right-40 w-80 h-80 bg-accent/30 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-1000" />
+          <div className="absolute top-0 -left-40 w-80 h-80 bg-primary/30 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" />
+          <div className="absolute top-0 -right-40 w-80 h-80 bg-accent/30 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse delay-1000" />
         </div>
         
         {/* Noise texture overlay */}
@@ -75,15 +77,20 @@ export const AnalyticsSection = () => {
         {/* Glass effect base */}
         <div className="absolute inset-0 backdrop-blur-[100px]" />
       </div>
+      
       <div className="relative container mx-auto px-4">
         <div className="text-center mb-20 space-y-6">
-          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#9b87f5] via-[#D6BCFA] to-[#7E69AB] bg-clip-text text-transparent pb-4 leading-relaxed">
-            Trading Psychology Analytics
-          </h2>
+          <div className="relative py-4">
+            <div className="absolute -inset-2 bg-gradient-to-r from-primary/20 via-[#9b87f5]/10 to-[#7E69AB]/20 rounded-lg blur-3xl opacity-50" />
+            <h2 className="relative text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#9b87f5] via-[#D6BCFA] to-[#7E69AB] bg-clip-text text-transparent pb-4 leading-relaxed">
+              Trading Psychology Analytics
+            </h2>
+          </div>
           <p className="text-xl text-gray-300/90 max-w-3xl mx-auto">
             Evolve your trading mindset with our suite of psychological analysis tools
           </p>
         </div>
+
         <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-6">
           {analyticsTools.map((tool, index) => (
             <Card 
@@ -119,6 +126,7 @@ export const AnalyticsSection = () => {
             </Card>
           ))}
         </div>
+
         <div className="mt-16 text-center">
           <div className="relative inline-block group">
             <div className="absolute -inset-1 bg-gradient-to-r from-[#9b87f5]/30 via-[#7E69AB]/20 to-[#9b87f5]/30 rounded-lg blur-xl opacity-75 group-hover:opacity-100 transition-all duration-300 group-hover:scale-105" />
@@ -136,3 +144,4 @@ export const AnalyticsSection = () => {
     </section>
   );
 };
+

@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -79,6 +80,11 @@ export function MfeMaeChart() {
         ? losingTrades.reduce((sum, trade) => sum + trade.mfeRelativeToTp, 0) / losingTrades.length
         : 0;
 
+      // Calculate MAE for losing trades (trades that hit stop loss)
+      const avgMaeLoser = losingTrades.length > 0
+        ? losingTrades.reduce((sum, trade) => sum + Math.abs(trade.maeRelativeToSl), 0) / losingTrades.length
+        : 0;
+
       // Rest of the calculations
       const allTrades = entries.flatMap(entry => entry.trades || []) as Trade[];
       const winners = allTrades.filter(t => {
@@ -120,7 +126,7 @@ export function MfeMaeChart() {
         avgUpdrawWinner: avgUpdraw, // Sum of all updraw values divided by total trades
         avgUpdrawLoser: avgMfeLoser, // Average MFE for losing trades only
         avgDrawdownWinner: avgDrawdown, // Sum of all drawdown values divided by total trades
-        avgDrawdownLoser: calculateAverage(losers, getDrawdown),
+        avgDrawdownLoser: avgMaeLoser, // Average MAE for losing trades only
       });
     };
 

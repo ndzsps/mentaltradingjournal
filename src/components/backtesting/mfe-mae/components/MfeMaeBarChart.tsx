@@ -26,6 +26,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           left: 20,
           bottom: 5,
         }}
+        stackOffset="sign"
       >
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis 
@@ -44,11 +45,13 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           dataKey="mfeRelativeToTp" 
           fill="#4ade80" 
           name="MFE Relative to TP (%)" 
+          stackId="stack"
         />
         <Bar 
           dataKey="maeRelativeToSl" 
           fill="#f43f5e" 
           name="Drawdown (%)" 
+          stackId="stack"
         />
       </BarChart>
     </ResponsiveContainer>

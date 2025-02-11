@@ -33,7 +33,6 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
         }}
         stackOffset="sign"
       >
-        <CartesianGrid strokeDasharray="3 3" />
         <XAxis 
           dataKey="tradeNum" 
           label={{ value: 'Trade', position: 'bottom' }}
@@ -47,6 +46,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           }} 
         />
         <Tooltip 
+          cursor={false}
           content={({ active, payload }) => {
             if (!active || !payload || !payload.length) return null;
 
@@ -76,6 +76,9 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
         <Legend 
           verticalAlign="top" 
           align="right"
+          wrapperStyle={{ 
+            paddingBottom: "20px" 
+          }}
         />
         <Bar 
           dataKey="mfeRelativeToTp" 

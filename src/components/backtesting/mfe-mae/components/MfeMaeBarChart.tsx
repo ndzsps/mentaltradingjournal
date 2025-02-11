@@ -16,7 +16,6 @@ interface MfeMaeBarChartProps {
 }
 
 export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
-  // Map the data to include a tradeNumber
   const dataWithNumbers = data.map((item, index) => ({
     ...item,
     tradeNum: (index + 1).toString()
@@ -58,17 +57,17 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
             return (
               <div className="bg-background border border-border rounded-lg shadow-lg p-3">
                 <div className="space-y-2">
-                  <p className="text-2xl font-bold">{data.tradeNum}</p>
+                  <p className="text-2xl font-bold">Trade #{data.tradeNum}</p>
                   <p className="text-lg">{data.instrument || 'Unknown'}</p>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-[#4ade80]" />
-                    <span>Updraw: {updrawValue?.toFixed(2)}%</span>
+                    <span>Updraw: {typeof updrawValue === 'number' ? updrawValue.toFixed(2) : '0'}%</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-[#f43f5e]" />
-                    <span>Drawdown: {Math.abs(drawdownValue?.toFixed(2))}%</span>
+                    <span>Drawdown: {typeof drawdownValue === 'number' ? Math.abs(drawdownValue).toFixed(2) : '0'}%</span>
                   </div>
-                  <p>R-Multiple: {data.rMultiple?.toFixed(2)}</p>
+                  <p>R-Multiple: {data.rMultiple?.toFixed(2) || '0'}</p>
                 </div>
               </div>
             );

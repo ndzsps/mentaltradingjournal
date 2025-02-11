@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -89,7 +90,7 @@ const Landing = () => {
                 {" "}like this before
               </h1>
               <p className="text-xl md:text-2xl text-gray-300 max-w-2xl leading-relaxed">
-                Elevate your trading performance with data-driven insights and emotional intelligence tools designed for success.
+                Find your breakthrough with a data-driven journal that utilizes both technicals AND psychology
               </p>
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
                 <Button
@@ -179,10 +180,10 @@ const Landing = () => {
                 </h2>
                 <div className="space-y-6">
                   <p className="text-lg md:text-xl text-gray-300 leading-relaxed">
-                    Are you aware of how your emotions are affecting your trading? Or are you still thinking that a good strategy is all you need to become profitable?
+                    Technicals alone is not enough to create breakthroughs, you must understand how your emotional states directly impact how you interpret market movement.
                   </p>
                   <p className="text-lg md:text-xl text-gray-300 leading-relaxed">
-                    Our journal shows you exactly how your emotions can either make or break your trading performance, in a way no other journal has ever done before.
+                    Our journal shows you exactly how your emotions can make or break your trading performance in a way no other trading journal has ever done.
                   </p>
                 </div>
                 <Button

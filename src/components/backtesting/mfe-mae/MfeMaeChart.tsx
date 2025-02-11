@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -59,7 +60,7 @@ export function MfeMaeChart() {
       const tradesHitSl = processedData.filter(trade => Math.abs(trade.maeRelativeToSl) >= 100).length;
       const tradesHitSlPercentage = (tradesHitSl / totalTrades) * 100;
 
-      // Calculate average updraw across all trades
+      // Calculate sum of raw updraw values and divide by total trades
       const totalUpdraw = entries.reduce((sum, entry) => {
         const trades = entry.trades as Trade[];
         if (!trades) return sum;
@@ -67,6 +68,7 @@ export function MfeMaeChart() {
         return sum + trades.reduce((tradeSum, t) => {
           if (!t.direction || !t.entryPrice || !t.highestPrice || !t.lowestPrice) return tradeSum;
           
+          // Calculate raw updraw value without percentage symbol
           const updraw = t.direction === 'buy'
             ? ((Number(t.highestPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100
             : ((Number(t.entryPrice) - Number(t.lowestPrice)) / Number(t.entryPrice)) * 100;
@@ -115,7 +117,7 @@ export function MfeMaeChart() {
       setStats({
         tradesHitTp: tradesHitTpPercentage,
         tradesHitSl: tradesHitSlPercentage,
-        avgUpdrawWinner: avgUpdraw, // Now using the average updraw across all trades
+        avgUpdrawWinner: avgUpdraw, // Now using raw updraw values summed and divided by total trades
         avgUpdrawLoser: calculateAverage(losers, getUpdraw),
         avgDrawdownWinner: calculateAverage(winners, getDrawdown),
         avgDrawdownLoser: calculateAverage(losers, getDrawdown),

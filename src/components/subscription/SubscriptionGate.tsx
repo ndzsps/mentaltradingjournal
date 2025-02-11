@@ -29,7 +29,10 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
 
   const checkSubscription = async () => {
     try {
+      console.log('Checking subscription status...');
+      
       if (!session?.access_token) {
+        console.log('No session token found, redirecting to login');
         setLoading(false);
         navigate('/login');
         return;
@@ -42,7 +45,9 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
       });
       
       if (error) {
-        // Check if error is due to invalid session
+        console.error('Subscription check error:', error);
+        
+        // Handle invalid session
         if (error.message.includes("User from sub claim in JWT does not exist")) {
           toast({
             variant: "destructive",
@@ -53,7 +58,13 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
           navigate('/login');
           return;
         }
-        console.error('Subscription check error:', error);
+
+        // Handle other errors
+        toast({
+          variant: "destructive",
+          title: "Error checking subscription",
+          description: "Please try again later",
+        });
         throw error;
       }
       
@@ -61,6 +72,7 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
       setIsSubscribed(data.subscribed);
     } catch (error) {
       console.error('Error checking subscription:', error);
+      
       // Handle specific error cases
       if (typeof error === 'object' && error !== null && 'message' in error && 
           error.message.includes("User from sub claim in JWT does not exist")) {
@@ -73,6 +85,7 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
         navigate('/login');
         return;
       }
+      
       toast({
         variant: "destructive",
         title: "Error checking subscription",
@@ -86,7 +99,10 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
   const handleSubscribe = async () => {
     try {
       setLoading(true);
+      console.log('Creating checkout session...');
+      
       if (!session?.access_token) {
+        console.log('No session token found, redirecting to login');
         navigate('/login');
         return;
       }
@@ -110,7 +126,7 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
           return;
         }
         
-        // Handle expired/invalid session
+        // Handle invalid session
         if (error.message.includes("User from sub claim in JWT does not exist")) {
           toast({
             variant: "destructive",
@@ -121,6 +137,7 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
           navigate('/login');
           return;
         }
+        
         throw error;
       }
       

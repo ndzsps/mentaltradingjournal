@@ -33,7 +33,11 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
         }}
         stackOffset="sign"
       >
-        <CartesianGrid horizontal={true} vertical={false} />
+        <CartesianGrid 
+          horizontal={true} 
+          vertical={false} 
+          stroke="rgba(158, 158, 158, 0.1)" 
+        />
         <XAxis 
           dataKey="tradeNum" 
           label={{ value: 'Trade', position: 'bottom' }}

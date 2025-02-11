@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 export const AnalyticsSection = () => {
   const navigate = useNavigate();
-  
+
   const analyticsTools = [
     {
       title: "Emotional Mastery",
@@ -56,17 +56,7 @@ export const AnalyticsSection = () => {
 
   return (
     <section className="relative py-32">
-      <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-[#1A1F2C]" />
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10 opacity-40" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent opacity-30" />
-        <div className="absolute inset-0">
-          <div className="absolute top-0 -left-40 w-80 h-80 bg-primary/30 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" />
-          <div className="absolute top-0 -right-40 w-80 h-80 bg-accent/30 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse delay-1000" />
-        </div>
-        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.02]" />
-        <div className="absolute inset-0 backdrop-blur-[100px]" />
-      </div>
+      <div className="absolute inset-0 bg-[#0F1117]" />
       <div className="relative container mx-auto px-4">
         <div className="text-center mb-20 space-y-6">
           <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#9b87f5] via-[#D6BCFA] to-[#7E69AB] bg-clip-text text-transparent pb-4 leading-relaxed">
@@ -80,13 +70,13 @@ export const AnalyticsSection = () => {
           {analyticsTools.map((tool, index) => (
             <Card 
               key={index} 
-              className={`group relative overflow-hidden transition-all duration-500 hover:shadow-lg hover:shadow-primary/5 border-none bg-[#1A1F2C]/40 backdrop-blur-xl animate-fade-in`}
+              className={`group relative overflow-hidden transition-all duration-500 hover:shadow-lg hover:shadow-primary/5 border-none bg-[#0F1117]/40 backdrop-blur-xl animate-fade-in`}
               style={{ animationDelay: `${index * 150}ms` }}
             >
               <div className="absolute inset-0 bg-gradient-to-br from-[#7E69AB]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <CardHeader className="relative space-y-4">
                 <div className="flex items-center space-x-4">
-                  <div className="p-2.5 rounded-xl bg-[#1A1F2C]/60 backdrop-blur-sm border border-white/5 group-hover:border-primary/20 transition-colors duration-300">
+                  <div className="p-2.5 rounded-xl bg-[#0F1117]/60 backdrop-blur-sm border border-white/5 group-hover:border-primary/20 transition-colors duration-300">
                     <tool.icon className="h-6 w-6 text-[#9b87f5] group-hover:text-primary-light transition-colors duration-300" />
                   </div>
                   <CardTitle className="text-xl font-semibold text-gray-200">{tool.title}</CardTitle>
@@ -117,7 +107,7 @@ export const AnalyticsSection = () => {
             <Button 
               onClick={() => navigate("/login")} 
               size="lg"
-              className="relative bg-[#1A1F2C] hover:bg-[#1A1F2C]/80 text-gray-200 px-8 py-6 text-lg border border-white/10 hover:border-primary/20 shadow-lg shadow-primary/10 hover:shadow-xl hover:shadow-primary/20 transition-all duration-300"
+              className="relative bg-[#0F1117] hover:bg-[#0F1117]/80 text-gray-200 px-8 py-6 text-lg border border-white/10 hover:border-primary/20 shadow-lg shadow-primary/10 hover:shadow-xl hover:shadow-primary/20 transition-all duration-300"
             >
               Start Going Mental
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />

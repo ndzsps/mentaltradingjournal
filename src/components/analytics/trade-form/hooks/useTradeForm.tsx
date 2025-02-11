@@ -77,7 +77,8 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
 
         if (updateError) throw updateError;
       } else {
-        // Create a new trade entry
+        // Create a new trade entry using the exit date as created_at
+        const exitDate = new Date(tradeData.exitDate);
         const tradeObject = {
           id: crypto.randomUUID(),
           ...tradeData
@@ -91,7 +92,8 @@ export const useTradeForm = ({ editTrade, onSubmit, onOpenChange }: UseTradeForm
             trades: [tradeObject],
             session_type: 'trade',
             emotion: 'neutral',    
-            emotion_detail: 'neutral'
+            emotion_detail: 'neutral',
+            created_at: exitDate.toISOString() // Set created_at to the trade's exit date
           });
 
         if (tradeError) throw tradeError;

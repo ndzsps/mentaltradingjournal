@@ -98,9 +98,12 @@ export function MfeMaeChart() {
             console.log('Determined direction based on SL:', isLong ? 'long' : 'short');
 
             // Step 2: Calculate MAE relative to SL based on trade direction
-            const maeRelativeToSl = isLong 
+            let maeRelativeToSl = isLong 
               ? ((lowestPrice - entryPrice) / (stopLoss - entryPrice)) * 100
               : ((highestPrice - entryPrice) / (stopLoss - entryPrice)) * 100;
+
+            // Make MAE always negative
+            maeRelativeToSl = -Math.abs(maeRelativeToSl);
 
             // Calculate MFE relative to TP (keeping existing logic)
             const isBuyForTp = takeProfit > entryPrice;
@@ -214,7 +217,7 @@ export function MfeMaeChart() {
                 dataKey="id" 
                 label={{ value: 'Trade ID', position: 'bottom' }}
               />
-              <YAxis domain={[0, 100]} label={{ value: 'Percentage (%)', angle: -90, position: 'insideLeft' }} />
+              <YAxis domain={[-100, 100]} label={{ value: 'Percentage (%)', angle: -90, position: 'insideLeft' }} />
               <Tooltip 
                 formatter={(value: number, name: string, props: { payload: ChartData }) => [
                   `${value.toFixed(2)}%`,
@@ -230,7 +233,7 @@ export function MfeMaeChart() {
               <Bar 
                 dataKey="maeRelativeToSl" 
                 fill="#f43f5e" 
-                name="MAE Relative to SL (%)" 
+                name="Drawdown (%)" 
               />
             </BarChart>
           </ResponsiveContainer>

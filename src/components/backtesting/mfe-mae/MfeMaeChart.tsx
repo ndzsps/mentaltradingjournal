@@ -126,7 +126,7 @@ export function MfeMaeChart() {
         avgUpdrawWinner: avgUpdraw, // Sum of all updraw values divided by total trades
         avgUpdrawLoser: avgMfeLoser, // Average MFE for losing trades only
         avgDrawdownWinner: avgDrawdown, // Sum of all drawdown values divided by total trades
-        avgDrawdownLoser: avgMaeLoser, // Average MAE for losing trades only
+        avgDrawdownLoser: sumDrawdown / totalTrades, // Sum of all drawdown values divided by total trades
       });
     };
 

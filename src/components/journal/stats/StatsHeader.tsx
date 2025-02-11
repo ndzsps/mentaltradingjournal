@@ -30,7 +30,6 @@ export const StatsHeader = () => {
         },
         (payload) => {
           console.log('Real-time update received:', payload);
-          // Invalidate and refetch analytics when journal entries change
           queryClient.invalidateQueries({ queryKey: ['analytics'] });
         }
       )
@@ -46,7 +45,6 @@ export const StatsHeader = () => {
     queryFn: generateAnalytics,
   });
 
-  // Log analytics data for debugging
   useEffect(() => {
     console.log('Analytics data:', analytics);
   }, [analytics]);
@@ -84,42 +82,38 @@ export const StatsHeader = () => {
     const interval = getTimeInterval();
     console.log('Filtering entries with interval:', interval);
 
-    const filteredEntries = entries.filter(entry => {
+    return entries.filter(entry => {
       const entryDate = new Date(entry.created_at);
-      
-      // Check if the entry has trades
-      if (entry.trades && entry.trades.length > 0) {
-        // For entries with trades, check if any trade's exit date falls within the interval
-        return entry.trades.some((trade: any) => {
-          const exitDate = trade.exitDate ? new Date(trade.exitDate) : new Date(entry.created_at);
-          return isWithinInterval(exitDate, interval);
-        });
-      }
-      
-      // For entries without trades, use the created_at date
       return isWithinInterval(entryDate, interval);
     });
+  };
 
-    console.log('Filtered entries:', {
-      beforeFilter: entries.length,
-      afterFilter: filteredEntries.length,
-      entries: filteredEntries
+  const getAllTradesFromEntries = (entries: any[] = []) => {
+    const interval = getTimeInterval();
+    const allTrades: any[] = [];
+
+    entries.forEach(entry => {
+      if (entry.trades && Array.isArray(entry.trades)) {
+        entry.trades.forEach((trade: any) => {
+          const exitDate = trade.exitDate ? new Date(trade.exitDate) : new Date(entry.created_at);
+          if (isWithinInterval(exitDate, interval)) {
+            allTrades.push(trade);
+          }
+        });
+      }
     });
 
-    return filteredEntries;
+    return allTrades;
   };
 
   const filteredEntries = analytics?.journalEntries ? filterEntriesByTime(analytics.journalEntries) : [];
+  const allTrades = analytics?.journalEntries ? getAllTradesFromEntries(analytics.journalEntries) : [];
 
-  // Calculate net P&L from filtered trades with proper numeric conversion
-  const netPnL = filteredEntries.reduce((total, entry) => {
-    if (!entry.trades) return total;
-    
-    return entry.trades.reduce((sum: number, trade: any) => {
-      const pnlValue = trade.pnl || 0;
-      const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
-      return sum + (isNaN(numericPnL) ? 0 : numericPnL);
-    }, total);
+  // Calculate net P&L from all trades
+  const netPnL = allTrades.reduce((total, trade) => {
+    const pnlValue = trade.pnl || 0;
+    const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
+    return total + (isNaN(numericPnL) ? 0 : numericPnL);
   }, 0);
 
   // Calculate emotion score

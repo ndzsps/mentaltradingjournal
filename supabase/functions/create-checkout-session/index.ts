@@ -31,6 +31,7 @@ serve(async (req) => {
     }
     
     const token = authHeader.replace('Bearer ', '')
+    console.log('Authenticating user...');
     const { data: { user }, error: userError } = await supabaseClient.auth.getUser(token)
     
     if (userError) {

@@ -36,12 +36,20 @@ serve(async (req) => {
 
     console.log('Checking subscription for user:', user.id, 'email:', user.email);
 
-    // Check if user has an active subscription
+    // First, let's get ALL subscriptions for this user to debug
+    const { data: allSubs, error: allSubsError } = await supabaseClient
+      .from('subscriptions')
+      .select('*')
+      .eq('user_id', user.id);
+
+    console.log('All subscriptions found:', allSubs);
+
+    // Now check for active subscription
     const { data: subscription, error: subError } = await supabaseClient
       .from('subscriptions')
       .select('*, stripe_subscription_id, stripe_customer_id')
       .eq('user_id', user.id)
-      .eq('status', 'active')  // Only get active subscriptions
+      .eq('status', 'active')
       .maybeSingle();
 
     if (subError) {
@@ -49,14 +57,18 @@ serve(async (req) => {
       throw new Error('Error fetching subscription: ' + subError.message);
     }
 
-    console.log('Found subscription:', subscription);
+    console.log('Active subscription found:', subscription);
 
     // Return subscription status
     return new Response(
       JSON.stringify({ 
-        subscribed: subscription !== null, // true if there's an active subscription
+        subscribed: subscription !== null,  // true if there's an active subscription
         userId: user.id,
-        subscription: subscription 
+        subscription: subscription,
+        debug: {
+          allSubscriptions: allSubs,
+          userEmail: user.email
+        }
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -78,4 +90,3 @@ serve(async (req) => {
     )
   }
 })
-

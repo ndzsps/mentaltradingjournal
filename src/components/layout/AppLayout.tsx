@@ -31,10 +31,19 @@ export const AppLayout = ({ children }: { children: React.ReactNode }) => {
         <AppSidebar />
         <div className={cn(
           "flex-1 flex flex-col transition-all duration-300",
-          isCollapsed ? "ml-[60px]" : "ml-[240px]"
+          isCollapsed 
+            ? "ml-[60px] max-w-[calc(100%-60px)]" 
+            : "ml-[240px] max-w-[calc(100%-240px)]"
         )}>
           <AppHeader />
-          <main className="flex-1 p-6 animate-fade-in">{children}</main>
+          <main className={cn(
+            "flex-1 animate-fade-in transition-all duration-300",
+            isCollapsed 
+              ? "px-8 lg:px-12 py-6 mx-auto w-full max-w-[1400px]" 
+              : "p-6"
+          )}>
+            {children}
+          </main>
         </div>
       </div>
     </SidebarProvider>

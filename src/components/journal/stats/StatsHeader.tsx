@@ -48,12 +48,7 @@ export const StatsHeader = () => {
 
   // Log analytics data for debugging
   useEffect(() => {
-    if (analytics) {
-      console.log('Fetched analytics data:', {
-        entriesCount: analytics.journalEntries?.length,
-        entries: analytics.journalEntries
-      });
-    }
+    console.log('Analytics data:', analytics);
   }, [analytics]);
 
   const { stats } = useProgressTracking();
@@ -64,28 +59,29 @@ export const StatsHeader = () => {
     switch (timeFilter) {
       case "this-month":
         return {
-          start: startOfDay(subMonths(now, 1)),
+          start: startOfDay(startOfMonth(now)),
           end: endOfDay(now)
         };
       case "last-month":
         return {
-          start: startOfDay(subMonths(now, 3)),
-          end: endOfDay(now)
+          start: startOfDay(startOfMonth(subMonths(now, 1))),
+          end: endOfDay(endOfMonth(subMonths(now, 1)))
         };
       case "last-three-months":
         return {
-          start: startOfDay(subMonths(now, 12)),
+          start: startOfDay(startOfMonth(subMonths(now, 3))),
           end: endOfDay(now)
         };
       default:
-        return null;
+        return {
+          start: startOfDay(startOfMonth(now)),
+          end: endOfDay(now)
+        };
     }
   };
 
-  const filterEntriesByTime = (entries: any[]) => {
+  const filterEntriesByTime = (entries: any[] = []) => {
     const interval = getTimeInterval();
-    if (!interval) return entries;
-
     console.log('Filtering entries with interval:', interval);
 
     const filteredEntries = entries.filter(entry => {
@@ -113,22 +109,17 @@ export const StatsHeader = () => {
     return filteredEntries;
   };
 
-  const filteredEntries = analytics ? filterEntriesByTime(analytics.journalEntries) : [];
+  const filteredEntries = analytics?.journalEntries ? filterEntriesByTime(analytics.journalEntries) : [];
 
-  // Calculate net P&L from filtered trades with proper numeric conversion and unique trade tracking
-  const processedTradeIds = new Set<string>();
+  // Calculate net P&L from filtered trades with proper numeric conversion
   const netPnL = filteredEntries.reduce((total, entry) => {
     if (!entry.trades) return total;
     
-    return total + entry.trades.reduce((sum: number, trade: any) => {
-      if (trade?.id && !processedTradeIds.has(trade.id)) {
-        processedTradeIds.add(trade.id);
-        const pnlValue = trade.pnl || 0;
-        const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
-        return sum + (isNaN(numericPnL) ? 0 : numericPnL);
-      }
-      return sum;
-    }, 0);
+    return entry.trades.reduce((sum: number, trade: any) => {
+      const pnlValue = trade.pnl || 0;
+      const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
+      return sum + (isNaN(numericPnL) ? 0 : numericPnL);
+    }, total);
   }, 0);
 
   // Calculate emotion score
@@ -180,19 +171,19 @@ export const StatsHeader = () => {
           variant={timeFilter === "this-month" ? "default" : "outline"}
           onClick={() => setTimeFilter("this-month")}
         >
-          Last 30 Days
+          This Month
         </Button>
         <Button 
           variant={timeFilter === "last-month" ? "default" : "outline"}
           onClick={() => setTimeFilter("last-month")}
         >
-          Last Quarter
+          Last Month
         </Button>
         <Button 
           variant={timeFilter === "last-three-months" ? "default" : "outline"}
           onClick={() => setTimeFilter("last-three-months")}
         >
-          Last Year
+          Last 3 Months
         </Button>
       </div>
 

@@ -48,10 +48,15 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           }} 
         />
         <Tooltip 
-          formatter={(value: number, name: string, props: { payload: ChartData }) => [
-            `${value.toFixed(2)}%`,
-            `${name} - ${props.payload.instrument || 'Unknown'}`
-          ]}
+          formatter={(value: number, name: string, props: { payload: ChartData }) => {
+            const label = name === 'mfeRelativeToTp' 
+              ? 'Updraw' 
+              : 'Drawdown';
+            return [
+              `${value.toFixed(2)}%`,
+              `${label} - ${props.payload.instrument || 'Unknown'}\nR-Multiple: ${props.payload.rMultiple?.toFixed(2)}`
+            ];
+          }}
         />
         <Legend 
           verticalAlign="top" 

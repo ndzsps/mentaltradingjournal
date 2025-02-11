@@ -27,6 +27,14 @@ export const calculateMfeRelativeToTp = (
     : ((entryPrice - lowestPrice) / (entryPrice - takeProfit)) * 100;
 };
 
+export const calculateRMultiple = (
+  entryPrice: number,
+  takeProfit: number,
+  stopLoss: number
+): number => {
+  return Math.abs(entryPrice - takeProfit) / Math.abs(entryPrice - stopLoss);
+};
+
 export const processTrade = (trade: Trade) => {
   if (
     !trade.highestPrice ||
@@ -64,10 +72,13 @@ export const processTrade = (trade: Trade) => {
     isLongForTp
   );
 
+  const rMultiple = calculateRMultiple(entryPrice, takeProfit, stopLoss);
+
   return {
     id: trade.id,
     mfeRelativeToTp,
     maeRelativeToSl,
-    instrument: trade.instrument
+    instrument: trade.instrument,
+    rMultiple
   };
 };

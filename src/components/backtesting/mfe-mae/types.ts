@@ -4,6 +4,7 @@ export interface ChartData {
   mfeRelativeToTp: number;
   maeRelativeToSl: number;
   instrument?: string;
+  rMultiple?: number;
 }
 
 export interface Stats {

@@ -73,6 +73,12 @@ export function MfeMaeChart() {
       const avgUpdraw = sumUpdraw / totalTrades;
       const avgDrawdown = sumDrawdown / totalTrades;
 
+      // Calculate MFE for losing trades (trades that hit stop loss)
+      const losingTrades = processedData.filter(trade => Math.abs(trade.maeRelativeToSl) >= 100);
+      const avgMfeLoser = losingTrades.length > 0
+        ? losingTrades.reduce((sum, trade) => sum + trade.mfeRelativeToTp, 0) / losingTrades.length
+        : 0;
+
       // Rest of the calculations
       const allTrades = entries.flatMap(entry => entry.trades || []) as Trade[];
       const winners = allTrades.filter(t => {
@@ -112,7 +118,7 @@ export function MfeMaeChart() {
         tradesHitTp: tradesHitTpPercentage,
         tradesHitSl: tradesHitSlPercentage,
         avgUpdrawWinner: avgUpdraw, // Sum of all updraw values divided by total trades
-        avgUpdrawLoser: calculateAverage(losers, getUpdraw),
+        avgUpdrawLoser: avgMfeLoser, // Average MFE for losing trades only
         avgDrawdownWinner: avgDrawdown, // Sum of all drawdown values divided by total trades
         avgDrawdownLoser: calculateAverage(losers, getDrawdown),
       });

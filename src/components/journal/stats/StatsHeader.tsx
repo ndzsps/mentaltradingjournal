@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { generateAnalytics } from "@/utils/analyticsUtils";
@@ -51,6 +52,39 @@ export const StatsHeader = () => {
   const { stats } = useProgressTracking();
   const { timeFilter, setTimeFilter } = useTimeFilter();
 
+  // Simplified getAllTrades function - just get all trades without filtering
+  const getAllTrades = (entries: any[] = []): Trade[] => {
+    const allTrades: Trade[] = [];
+    entries.forEach(entry => {
+      if (entry.trades && Array.isArray(entry.trades)) {
+        allTrades.push(...entry.trades);
+      }
+    });
+    console.log('All trades:', allTrades);
+    return allTrades;
+  };
+
+  // Get all trades without any filtering
+  const allTrades = analytics?.journalEntries ? getAllTrades(analytics.journalEntries) : [];
+
+  // Calculate total P&L from all trades
+  const netPnL = allTrades.reduce((total, trade) => {
+    const pnlValue = trade.pnl || 0;
+    const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
+    return total + (isNaN(numericPnL) ? 0 : numericPnL);
+  }, 0);
+
+  // Calculate emotion score
+  const filterEntriesByTime = (entries: any[] = []) => {
+    const interval = getTimeInterval();
+    console.log('Filtering entries with interval:', interval);
+
+    return entries.filter(entry => {
+      const entryDate = new Date(entry.created_at);
+      return isWithinInterval(entryDate, interval);
+    });
+  };
+
   const getTimeInterval = () => {
     const now = new Date();
     switch (timeFilter) {
@@ -75,52 +109,6 @@ export const StatsHeader = () => {
           end: endOfDay(now)
         };
     }
-  };
-
-  const getAllTradesFromEntries = (entries: any[] = []): Trade[] => {
-    const interval = getTimeInterval();
-    const allTrades: Trade[] = [];
-
-    entries.forEach(entry => {
-      if (entry.trades && Array.isArray(entry.trades)) {
-        entry.trades.forEach((trade: Trade) => {
-          // Use exitDate if available, otherwise use entry's created_at
-          const exitDate = trade.exitDate ? new Date(trade.exitDate) : new Date(entry.created_at);
-          if (isWithinInterval(exitDate, interval)) {
-            allTrades.push(trade);
-          }
-        });
-      }
-    });
-
-    console.log('All trades for period:', {
-      interval,
-      tradesCount: allTrades.length,
-      trades: allTrades
-    });
-
-    return allTrades;
-  };
-
-  // Get all trades that were closed within the selected time period
-  const allTrades = analytics?.journalEntries ? getAllTradesFromEntries(analytics.journalEntries) : [];
-
-  // Calculate net P&L from all trades within the period
-  const netPnL = allTrades.reduce((total, trade) => {
-    const pnlValue = trade.pnl || 0;
-    const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
-    return total + (isNaN(numericPnL) ? 0 : numericPnL);
-  }, 0);
-
-  // Calculate emotion score
-  const filterEntriesByTime = (entries: any[] = []) => {
-    const interval = getTimeInterval();
-    console.log('Filtering entries with interval:', interval);
-
-    return entries.filter(entry => {
-      const entryDate = new Date(entry.created_at);
-      return isWithinInterval(entryDate, interval);
-    });
   };
 
   const filteredEntries = analytics?.journalEntries ? filterEntriesByTime(analytics.journalEntries) : [];

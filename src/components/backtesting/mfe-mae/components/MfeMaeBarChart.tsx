@@ -22,14 +22,6 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
     tradeNum: (index + 1).toString()
   }));
 
-  // Find actual max and min values for proper domain scaling
-  const maxMfe = Math.max(...data.map(d => d.mfeRelativeToTp));
-  const minMae = Math.min(...data.map(d => d.maeRelativeToSl));
-
-  // Scale domain to next hundred to ensure proper visualization
-  const maxDomain = Math.ceil(maxMfe / 100) * 100;
-  const minDomain = Math.floor(minMae / 100) * 100;
-
   return (
     <ResponsiveContainer width="100%" height="100%">
       <BarChart
@@ -59,15 +51,14 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           label={{ value: 'Trade', position: 'bottom' }}
         />
         <YAxis 
-          domain={[minDomain, maxDomain]}
+          domain={[-100, 100]} 
           label={{ 
             value: 'Updraw / Drawdown', 
             angle: -90, 
             position: 'insideLeft',
             offset: 0,
-            dy: 60
+            dy: 60  // Add vertical offset to center the label
           }} 
-          ticks={[-100, -75, -50, -25, 0, 25, 50, 75, 100]}
         />
         <Tooltip 
           cursor={false}

@@ -21,13 +21,13 @@ export const AnalyticsSection = () => {
       gradient: "from-primary/10 via-primary/5 to-transparent"
     },
     {
-      title: "Mental Balance Metrics",
-      description: "Maintain psychological equilibrium during market volatility",
+      title: "Flow State Tracker",
+      description: "Achieve the peak performance state proven in science",
       icon: Scale,
       features: [
-        "Stress level monitoring",
-        "Recovery time analysis",
-        "Mindset optimization"
+        "Monitor stress levels at any given time",
+        "Develop a recovery process during drawdown",
+        "Set daily rituals that ensure the Flow State"
       ],
       gradient: "from-accent/10 via-accent/5 to-transparent"
     },
@@ -43,13 +43,13 @@ export const AnalyticsSection = () => {
       gradient: "from-primary/10 via-primary/5 to-transparent"
     },
     {
-      title: "Behavioral Pattern Analysis",
-      description: "Identify and optimize your trading behavior patterns",
+      title: "Behavioral Patterns",
+      description: "Just as the market has patterns, so do you.",
       icon: Activity,
       features: [
-        "Trading habit analysis",
-        "Psychological biases detection",
-        "Behavior optimization tips"
+        "Gain clarity on your specific trading habits",
+        "Detect psychological bias before you trade",
+        "Optimize your self alongside your strategy"
       ],
       gradient: "from-accent/10 via-accent/5 to-transparent"
     }

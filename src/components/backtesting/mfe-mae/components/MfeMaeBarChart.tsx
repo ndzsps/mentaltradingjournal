@@ -33,6 +33,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
         }}
         stackOffset="sign"
       >
+        <CartesianGrid horizontal={true} vertical={false} />
         <XAxis 
           dataKey="tradeNum" 
           label={{ value: 'Trade', position: 'bottom' }}
@@ -83,13 +84,13 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
         <Bar 
           dataKey="mfeRelativeToTp" 
           fill="#4ade80" 
-          name="MFE Relative to TP (%)" 
+          name="Updraw" 
           stackId="stack"
         />
         <Bar 
           dataKey="maeRelativeToSl" 
           fill="#f43f5e" 
-          name="Drawdown (%)" 
+          name="Drawdown" 
           stackId="stack"
         />
       </BarChart>

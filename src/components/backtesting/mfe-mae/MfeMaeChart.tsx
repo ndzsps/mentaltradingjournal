@@ -59,10 +59,23 @@ export function MfeMaeChart() {
       const tradesHitSl = processedData.filter(trade => Math.abs(trade.maeRelativeToSl) >= 100).length;
       const tradesHitSlPercentage = (tradesHitSl / totalTrades) * 100;
 
-      // Calculate captured move averages
-      const totalCapturedMove = processedData.reduce((sum, trade) => 
-        sum + (trade.capturedMove || 0), 0);
-      const avgCapturedMove = totalCapturedMove / totalTrades;
+      // Calculate average updraw across all trades
+      const totalUpdraw = entries.reduce((sum, entry) => {
+        const trades = entry.trades as Trade[];
+        if (!trades) return sum;
+        
+        return sum + trades.reduce((tradeSum, t) => {
+          if (!t.direction || !t.entryPrice || !t.highestPrice || !t.lowestPrice) return tradeSum;
+          
+          const updraw = t.direction === 'buy'
+            ? ((Number(t.highestPrice) - Number(t.entryPrice)) / Number(t.entryPrice)) * 100
+            : ((Number(t.entryPrice) - Number(t.lowestPrice)) / Number(t.entryPrice)) * 100;
+          
+          return tradeSum + updraw;
+        }, 0);
+      }, 0);
+
+      const avgUpdraw = totalUpdraw / totalTrades;
 
       // Rest of the calculations
       const allTrades = entries.flatMap(entry => entry.trades || []) as Trade[];
@@ -102,7 +115,7 @@ export function MfeMaeChart() {
       setStats({
         tradesHitTp: tradesHitTpPercentage,
         tradesHitSl: tradesHitSlPercentage,
-        avgUpdrawWinner: avgCapturedMove,
+        avgUpdrawWinner: avgUpdraw, // Now using the average updraw across all trades
         avgUpdrawLoser: calculateAverage(losers, getUpdraw),
         avgDrawdownWinner: calculateAverage(winners, getDrawdown),
         avgDrawdownLoser: calculateAverage(losers, getDrawdown),

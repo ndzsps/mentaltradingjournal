@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowUpDown } from "lucide-react";
@@ -45,6 +46,9 @@ export const TradeWinPercentage = ({ timeFilter }: TradeWinPercentageProps) => {
     if (!analytics?.journalEntries) return 0;
 
     let filteredEntries = analytics.journalEntries;
+    
+    // Only consider post-session entries
+    filteredEntries = filteredEntries.filter(entry => entry.session_type === 'post');
     
     // Apply time filter
     const interval = getTimeInterval();

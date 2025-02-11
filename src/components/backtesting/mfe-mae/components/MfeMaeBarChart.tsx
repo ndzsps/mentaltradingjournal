@@ -16,10 +16,16 @@ interface MfeMaeBarChartProps {
 }
 
 export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
+  // Map the data to include a tradeNumber
+  const dataWithNumbers = data.map((item, index) => ({
+    ...item,
+    tradeNumber: (index + 1).toString()
+  }));
+
   return (
     <ResponsiveContainer width="100%" height="100%">
       <BarChart
-        data={data}
+        data={dataWithNumbers}
         margin={{
           top: 20,
           right: 30,
@@ -30,7 +36,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
       >
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis 
-          dataKey="id" 
+          dataKey="tradeNumber" 
           label={{ value: 'Trade', position: 'bottom' }}
         />
         <YAxis 
@@ -67,4 +73,3 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
     </ResponsiveContainer>
   );
 }
-

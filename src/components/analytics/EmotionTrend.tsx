@@ -30,12 +30,10 @@ const getEmotionColor = (emotion: string): string => {
   }
 };
 
-// Calculate correlation coefficient (R)
 const calculateCorrelation = (data: any[]) => {
   const n = data.length;
   if (n === 0) return 0;
 
-  // Convert emotions to numeric values
   const emotionToNumber = (emotion: string) => {
     switch (emotion.toLowerCase()) {
       case 'positive': return 1;
@@ -44,14 +42,12 @@ const calculateCorrelation = (data: any[]) => {
     }
   };
 
-  // Calculate means
   const emotionValues = data.map(d => emotionToNumber(d.emotion));
   const pnlValues = data.map(d => d.pnl);
   
   const meanEmotion = emotionValues.reduce((a, b) => a + b, 0) / n;
   const meanPnL = pnlValues.reduce((a, b) => a + b, 0) / n;
 
-  // Calculate correlation coefficient
   let numerator = 0;
   let denomEmotionSquared = 0;
   let denomPnLSquared = 0;
@@ -122,16 +118,32 @@ export const EmotionTrend = () => {
     );
   }
 
-  const scatterData = analytics.journalEntries
+  const preSessionEmotions = analytics.journalEntries
+    .filter(entry => entry.session_type === 'pre')
+    .reduce((acc, entry) => {
+      const date = new Date(entry.created_at).toISOString().split('T')[0];
+      acc[date] = entry.emotion;
+      return acc;
+    }, {} as Record<string, string>);
+
+  const tradesByDate = analytics.journalEntries
     .flatMap(entry => 
       entry.trades?.map(trade => ({
-        date: new Date(entry.created_at).getTime(),
+        date: new Date(trade.entryDate || entry.created_at).toISOString().split('T')[0],
         pnl: Number(trade.pnl) || 0,
-        emotion: entry.emotion,
       })) || []
     )
-    .filter(item => !isNaN(item.pnl))
-    .reverse();
+    .reduce((acc, { date, pnl }) => {
+      if (!acc[date]) acc[date] = [];
+      acc[date].push(pnl);
+      return acc;
+    }, {} as Record<string, number[]>);
+
+  const scatterData = Object.entries(tradesByDate).map(([date, pnls]) => ({
+    date: new Date(date).getTime(),
+    pnl: pnls.reduce((sum, pnl) => sum + pnl, 0),
+    emotion: preSessionEmotions[date] || 'neutral'
+  })).sort((a, b) => a.date - b.date);
 
   const positiveData = scatterData.filter(d => d.emotion === 'positive');
   const neutralData = scatterData.filter(d => d.emotion === 'neutral');
@@ -141,7 +153,6 @@ export const EmotionTrend = () => {
   const bestPerformance = Math.max(...allPnls);
   const worstPerformance = Math.min(...allPnls);
 
-  // Calculate correlation coefficient
   const correlationCoefficient = calculateCorrelation(scatterData);
   const correlationStrength = Math.abs(correlationCoefficient);
   const correlationDescription = correlationStrength >= 0.7 ? 'strong' :

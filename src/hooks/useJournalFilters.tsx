@@ -1,9 +1,9 @@
 
 import { useState } from "react";
-import { isWithinInterval, startOfMonth, endOfMonth, subMonths, isSameDay } from "date-fns";
+import { isWithinInterval, startOfMonth, endOfMonth, subMonths, isSameDay, startOfYear, endOfYear, subYears } from "date-fns";
 import { JournalEntryType } from "@/types/journal";
 
-export type TimeFilter = "this-month" | "last-month" | "last-three-months" | "eternal" | null;
+export type TimeFilter = "this-month" | "last-month" | "last-three-months" | "last-year" | "eternal" | null;
 
 export const useJournalFilters = (entries: JournalEntryType[]) => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
@@ -34,6 +34,10 @@ export const useJournalFilters = (entries: JournalEntryType[]) => {
         "last-three-months": {
           start: startOfMonth(subMonths(now, 3)),
           end: endOfMonth(now)
+        },
+        "last-year": {
+          start: startOfYear(subYears(now, 1)),
+          end: endOfYear(subYears(now, 1))
         }
       };
 

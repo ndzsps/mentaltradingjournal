@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { TradeWinPercentage } from "./TradeWinPercentage";
 import { useTimeFilter } from "@/contexts/TimeFilterContext";
-import { startOfMonth, subMonths, isWithinInterval, endOfMonth, startOfDay, endOfDay } from "date-fns";
+import { startOfMonth, subMonths, isWithinInterval, endOfMonth, startOfDay, endOfDay, startOfYear, endOfYear, subYears } from "date-fns";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -54,7 +54,6 @@ export const StatsHeader = () => {
 
   const getTimeInterval = () => {
     const now = new Date();
-    // If no timeFilter is selected, return null to indicate we want all trades
     if (!timeFilter) {
       return null;
     }
@@ -74,6 +73,11 @@ export const StatsHeader = () => {
         return {
           start: startOfDay(startOfMonth(subMonths(now, 3))),
           end: endOfDay(now)
+        };
+      case "last-year":
+        return {
+          start: startOfDay(startOfYear(subYears(now, 1))),
+          end: endOfDay(endOfYear(subYears(now, 1)))
         };
       default:
         return null;
@@ -137,6 +141,7 @@ export const StatsHeader = () => {
           <div className="h-10 w-32 bg-muted animate-pulse rounded-md" />
           <div className="h-10 w-32 bg-muted animate-pulse rounded-md" />
           <div className="h-10 w-32 bg-muted animate-pulse rounded-md" />
+          <div className="h-10 w-32 bg-muted animate-pulse rounded-md" />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {[...Array(4)].map((_, i) => (
@@ -182,6 +187,12 @@ export const StatsHeader = () => {
           onClick={() => setTimeFilter("last-three-months")}
         >
           Last 90 Days
+        </Button>
+        <Button 
+          variant={timeFilter === "last-year" ? "default" : "outline"}
+          onClick={() => setTimeFilter("last-year")}
+        >
+          Last Year
         </Button>
         <Button 
           variant={timeFilter === "eternal" ? "default" : "outline"}

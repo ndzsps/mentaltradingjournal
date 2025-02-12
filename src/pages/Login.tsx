@@ -12,6 +12,7 @@ const Login = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [isResetPassword, setIsResetPassword] = useState(false);
@@ -19,28 +20,23 @@ const Login = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Only redirect if user is logged in and NOT in reset password mode
   useEffect(() => {
-    if (user) {
+    if (user && !isResetPassword) {
       navigate("/dashboard");
     }
-  }, [user, navigate]);
+  }, [user, navigate, isResetPassword]);
 
   // Check for recovery token in URL
   useEffect(() => {
-    // Function to check if URL contains a recovery token
     const checkForRecoveryToken = async () => {
       try {
         const fragments = new URLSearchParams(window.location.hash.substring(1));
         const accessToken = fragments.get('access_token');
         const type = fragments.get('type');
         
-        // If we have an access token and it's a recovery flow
         if (accessToken && type === 'recovery') {
           setIsResetPassword(true);
-          // Set the session using the access token
-          const { error } = await supabase.auth.getSession();
-          if (error) throw error;
-          
           toast({
             title: "Reset Password",
             description: "Please enter your new password below.",
@@ -64,6 +60,14 @@ const Login = () => {
     setLoading(true);
 
     try {
+      if (password !== confirmPassword) {
+        throw new Error("Passwords do not match");
+      }
+
+      if (password.length < 6) {
+        throw new Error("Password must be at least 6 characters long");
+      }
+
       const { error } = await supabase.auth.updateUser({
         password: password
       });
@@ -72,12 +76,20 @@ const Login = () => {
 
       toast({
         title: "Password updated successfully",
-        description: "You can now sign in with your new password.",
+        description: "Please sign in with your new password.",
       });
       
+      // Clear passwords
+      setPassword("");
+      setConfirmPassword("");
       setIsResetPassword(false);
+      
       // Clear the URL
       window.history.replaceState({}, document.title, window.location.pathname);
+      
+      // Force logout to ensure security
+      await supabase.auth.signOut();
+      
     } catch (error) {
       console.error('Reset password error:', error);
       toast({
@@ -138,7 +150,7 @@ const Login = () => {
           <h1 className="text-3xl font-bold">Welcome to Mental</h1>
           <p className="text-muted-foreground">
             {isResetPassword
-              ? "Reset your password"
+              ? "Create a new password"
               : isForgotPassword
               ? "Reset your password"
               : isSignUp
@@ -167,14 +179,25 @@ const Login = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                minLength={6}
               />
+              {isResetPassword && (
+                <Input
+                  type="password"
+                  placeholder="Confirm New Password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  minLength={6}
+                />
+              )}
             </div>
           )}
           <Button className="w-full" type="submit" disabled={loading}>
             {loading ? (
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
             ) : isResetPassword ? (
-              "Reset Password"
+              "Set New Password"
             ) : isForgotPassword ? (
               "Send Reset Link"
             ) : isSignUp ? (

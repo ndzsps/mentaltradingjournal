@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { generateAnalytics } from "@/utils/analyticsUtils";
@@ -54,6 +53,11 @@ export const StatsHeader = () => {
 
   const getTimeInterval = () => {
     const now = new Date();
+    // If no timeFilter is selected, return null to indicate we want all trades
+    if (!timeFilter) {
+      return null;
+    }
+    
     switch (timeFilter) {
       case "this-month":
         return {
@@ -71,10 +75,7 @@ export const StatsHeader = () => {
           end: endOfDay(now)
         };
       default:
-        return {
-          start: startOfDay(startOfMonth(now)),
-          end: endOfDay(now)
-        };
+        return null;
     }
   };
 
@@ -83,10 +84,13 @@ export const StatsHeader = () => {
     if (!analytics?.journalEntries) return 0;
 
     const interval = getTimeInterval();
-    const filteredEntries = analytics.journalEntries.filter(entry => {
-      const entryDate = new Date(entry.created_at);
-      return isWithinInterval(entryDate, interval);
-    });
+    // If no interval is set, include all entries
+    const filteredEntries = interval ? 
+      analytics.journalEntries.filter(entry => {
+        const entryDate = new Date(entry.created_at);
+        return isWithinInterval(entryDate, interval);
+      }) :
+      analytics.journalEntries; // Use all entries when no time filter is selected
 
     return filteredEntries.reduce((total, entry) => {
       if (!entry.trades) return total;
@@ -102,10 +106,14 @@ export const StatsHeader = () => {
   const netPnL = calculateNetPnL();
 
   // Filter entries by time (for other components that need filtered data)
-  const filteredEntries = analytics?.journalEntries ? analytics.journalEntries.filter(entry => {
-    const entryDate = new Date(entry.created_at);
-    return isWithinInterval(entryDate, getTimeInterval());
-  }) : [];
+  const filteredEntries = analytics?.journalEntries ? 
+    (getTimeInterval() ? 
+      analytics.journalEntries.filter(entry => {
+        const entryDate = new Date(entry.created_at);
+        return isWithinInterval(entryDate, getTimeInterval()!);
+      }) : 
+      analytics.journalEntries) : 
+    [];
 
   const emotionStats = filteredEntries.reduce((acc, entry) => {
     // Only count pre and post session entries for emotion stats

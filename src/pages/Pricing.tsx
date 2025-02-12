@@ -2,55 +2,10 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Check, DollarSign } from "lucide-react";
+import { Check } from "lucide-react";
 
 const Pricing = () => {
   const navigate = useNavigate();
-
-  const features = [
-    {
-      name: "Accounts",
-      description: "Manage multiple trading accounts in one place",
-      monthly: "1",
-      yearly: "Unlimited",
-    },
-    {
-      name: "Data Storage",
-      description: "Store your trading data securely",
-      monthly: "1GB",
-      yearly: "Unlimited",
-    },
-    {
-      name: "Trade Imports",
-      description: "Import your trading history from various brokers using auto-sync, file upload or manual input",
-      monthly: "Limited",
-      yearly: "Unlimited",
-    },
-    {
-      name: "Trade Sharing",
-      description: "Share trades or analysis with other traders",
-      monthly: true,
-      yearly: true,
-    },
-    {
-      name: "Commissions & Fees",
-      description: "Factor in and analyze commissions and fees paid",
-      monthly: true,
-      yearly: true,
-    },
-    {
-      name: "Multiple Currency Support",
-      description: "Select from various currencies to track your performance",
-      monthly: true,
-      yearly: true,
-    },
-    {
-      name: "Breakeven Settings",
-      description: "Define your breakeven range for a precise analysis",
-      monthly: true,
-      yearly: true,
-    },
-  ];
 
   return (
     <div className="min-h-screen relative bg-[#1A1F2C] overflow-hidden">
@@ -119,7 +74,7 @@ const Pricing = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-20">
+          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
             {/* Monthly Plan */}
             <div className="relative p-8 rounded-xl backdrop-blur-sm bg-white/5 border border-white/10">
               <div className="flex items-center justify-between mb-6">
@@ -193,60 +148,6 @@ const Pricing = () => {
               </Button>
             </div>
           </div>
-
-          {/* Features Comparison Table */}
-          <div className="max-w-5xl mx-auto mt-20">
-            <h2 className="text-3xl font-bold text-white mb-12 text-center">
-              Compare Features
-            </h2>
-            <div className="space-y-8">
-              {features.map((feature) => (
-                <div
-                  key={feature.name}
-                  className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center py-6 border-b border-white/10"
-                >
-                  <div className="md:col-span-6">
-                    <h3 className="text-lg font-semibold text-white mb-2">
-                      {feature.name}
-                    </h3>
-                    <p className="text-gray-400 text-sm">
-                      {feature.description}
-                    </p>
-                  </div>
-                  <div className="md:col-span-3 text-center">
-                    <div className="text-gray-300">
-                      {typeof feature.monthly === "boolean" ? (
-                        feature.monthly ? (
-                          <Check className="h-6 w-6 mx-auto text-primary" />
-                        ) : (
-                          "—"
-                        )
-                      ) : (
-                        <span className="text-primary font-medium">
-                          {feature.monthly}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="md:col-span-3 text-center">
-                    <div className="text-gray-300">
-                      {typeof feature.yearly === "boolean" ? (
-                        feature.yearly ? (
-                          <Check className="h-6 w-6 mx-auto text-primary" />
-                        ) : (
-                          "—"
-                        )
-                      ) : (
-                        <span className="text-primary-light font-medium">
-                          {feature.yearly}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -254,4 +155,3 @@ const Pricing = () => {
 };
 
 export default Pricing;
-

@@ -61,7 +61,6 @@ const Features = () => {
             <div className="grid grid-cols-1 gap-4">
               <FeatureItem icon={BarChart2} text="Write down how you feel at this moment, what's going on in your life, and what you want to achieve today." />
               <FeatureItem icon={NotebookPen} text="Detailed notes & comments for trade analysis" />
-              <FeatureItem icon={LineChart} text="In-depth profitability tracking and charts" />
             </div>
             <Button size="lg" className="mt-6" asChild>
               <Link to="/login">Learn More</Link>
@@ -100,7 +99,6 @@ const Features = () => {
             <div className="grid grid-cols-1 gap-4">
               <FeatureItem icon={Target} text="Which trading rules did you follow? Which did you break?" />
               <FeatureItem icon={TrendingUp} text="Compile observations of the market through screenshots, analyze how these will help your next trading day" />
-              <FeatureItem icon={ChartBar} text="Generate customized performance reports" />
             </div>
             <Button size="lg" className="mt-6" asChild>
               <Link to="/login">Get Started</Link>
@@ -121,7 +119,6 @@ const Features = () => {
             <div className="grid grid-cols-1 gap-4">
               <FeatureItem icon={NotebookPen} text="Identify exactly how you are holding yourself back in extreme detail through our Behavioral Slippage tool" />
               <FeatureItem icon={BookOpen} text="Discover your personalized route to breaking out of old habit patterns through our Emotional Recovery Time tool" />
-              <FeatureItem icon={LineChart} text="Add chart annotations and technical analysis" />
             </div>
             <Button size="lg" className="mt-6" asChild>
               <Link to="/login">Learn More</Link>
@@ -160,7 +157,6 @@ const Features = () => {
             <div className="grid grid-cols-1 gap-4">
               <FeatureItem icon={Target} text="Utilize state of the art metrics like Maximum Adverse Excursion to level up your strategy" />
               <FeatureItem icon={Medal} text="Find out if the trades you're taking are even worth it through our P&L Distribution tool" />
-              <FeatureItem icon={TrendingUp} text="Monitor long-term growth and progress" />
             </div>
             <Button size="lg" className="mt-6" asChild>
               <Link to="/login">Get Started</Link>
@@ -181,7 +177,6 @@ const Features = () => {
             <div className="grid grid-cols-1 gap-4">
               <FeatureItem icon={BookOpen} text="Test out new strategies with simple but effective tools" />
               <FeatureItem icon={LineChart} text="Refine existing strategies with unlimited trade entries" />
-              <FeatureItem icon={NotebookPen} text="Write down all the notes you need without fear of writing too much, it's all for you!" />
             </div>
             <Button size="lg" className="mt-6" asChild>
               <Link to="/login">Learn More</Link>

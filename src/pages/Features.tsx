@@ -53,13 +53,13 @@ const Features = () => {
           {/* Left Column - Text Content */}
           <div className="space-y-8">
             <h2 className="text-3xl md:text-4xl font-semibold">
-              Focus on what matters through powerful journaling
+              Pre-Session Check In
             </h2>
             <p className="text-lg text-muted-foreground">
-              Stay on top of your trading performance with your journal. Store your data, stay on top of goals, track important KPI's, and more
+              Start your trading day on the right foot by checking off pre-trading activities that promote focus
             </p>
             <div className="grid grid-cols-1 gap-4">
-              <FeatureItem icon={BarChart2} text="Advanced analytics dashboard with comprehensive metrics" />
+              <FeatureItem icon={BarChart2} text="Write down how you feel at this moment, what's going on in your life, and what you want to achieve today." />
               <FeatureItem icon={NotebookPen} text="Detailed notes & comments for trade analysis" />
               <FeatureItem icon={LineChart} text="In-depth profitability tracking and charts" />
             </div>
@@ -92,14 +92,14 @@ const Features = () => {
           {/* Right Column - Text Content */}
           <div className="space-y-8 order-1 lg:order-2">
             <h2 className="text-3xl md:text-4xl font-semibold">
-              Track your progress with detailed analytics
+              Post-Session Review
             </h2>
             <p className="text-lg text-muted-foreground">
-              Get insights into your trading performance with comprehensive analytics. Monitor your progress, identify patterns, and improve your strategy
+              Look back on your trading day and reflect on how it went
             </p>
             <div className="grid grid-cols-1 gap-4">
-              <FeatureItem icon={Target} text="Set and track personalized performance goals" />
-              <FeatureItem icon={TrendingUp} text="Monitor key success metrics and trends" />
+              <FeatureItem icon={Target} text="Which trading rules did you follow? Which did you break?" />
+              <FeatureItem icon={TrendingUp} text="Compile observations of the market through screenshots, analyze how these will help your next trading day" />
               <FeatureItem icon={ChartBar} text="Generate customized performance reports" />
             </div>
             <Button size="lg" className="mt-6" asChild>
@@ -113,14 +113,14 @@ const Features = () => {
           {/* Left Column - Text Content */}
           <div className="space-y-8">
             <h2 className="text-3xl md:text-4xl font-semibold">
-              Stay organized with comprehensive note-taking
+              Psychology Metrics
             </h2>
             <p className="text-lg text-muted-foreground">
-              Keep track of your trading ideas, strategies, and market observations in one place. Tag and categorize your notes for easy reference
+              Gain insight into your hidden behavioral patterns like never before, powered by AI
             </p>
             <div className="grid grid-cols-1 gap-4">
-              <FeatureItem icon={NotebookPen} text="Full-featured rich text editor for detailed notes" />
-              <FeatureItem icon={BookOpen} text="Organize entries with custom categories" />
+              <FeatureItem icon={NotebookPen} text="Identify exactly how you are holding yourself back in extreme detail through our Behavioral Slippage tool" />
+              <FeatureItem icon={BookOpen} text="Discover your personalized route to breaking out of old habit patterns through our Emotional Recovery Time tool" />
               <FeatureItem icon={LineChart} text="Add chart annotations and technical analysis" />
             </div>
             <Button size="lg" className="mt-6" asChild>
@@ -152,14 +152,14 @@ const Features = () => {
           {/* Right Column - Text Content */}
           <div className="space-y-8 order-1 lg:order-2">
             <h2 className="text-3xl md:text-4xl font-semibold">
-              Set and achieve your trading goals
+              Cutting Edge Trading Analytics
             </h2>
             <p className="text-lg text-muted-foreground">
-              Define clear objectives and track your progress over time. Break down your goals into manageable steps and celebrate your achievements
+              Visualize all your trading data in beautiful charts
             </p>
             <div className="grid grid-cols-1 gap-4">
-              <FeatureItem icon={Target} text="Set clear, measurable trading objectives" />
-              <FeatureItem icon={Medal} text="Track achievements and milestones" />
+              <FeatureItem icon={Target} text="Utilize state of the art metrics like Maximum Adverse Excursion to level up your strategy" />
+              <FeatureItem icon={Medal} text="Find out if the trades you're taking are even worth it through our P&L Distribution tool" />
               <FeatureItem icon={TrendingUp} text="Monitor long-term growth and progress" />
             </div>
             <Button size="lg" className="mt-6" asChild>
@@ -173,15 +173,15 @@ const Features = () => {
           {/* Left Column - Text Content */}
           <div className="space-y-8">
             <h2 className="text-3xl md:text-4xl font-semibold">
-              Learn and grow with comprehensive insights
+              Backtesting Journal
             </h2>
             <p className="text-lg text-muted-foreground">
               Gain valuable insights from your trading history. Identify patterns, learn from mistakes, and continuously improve your trading strategy
             </p>
             <div className="grid grid-cols-1 gap-4">
-              <FeatureItem icon={BookOpen} text="Access comprehensive learning resources" />
-              <FeatureItem icon={LineChart} text="Analyze detailed performance trends" />
-              <FeatureItem icon={NotebookPen} text="Review and optimize trading strategies" />
+              <FeatureItem icon={BookOpen} text="Test out new strategies with simple but effective tools" />
+              <FeatureItem icon={LineChart} text="Refine existing strategies with unlimited trade entries" />
+              <FeatureItem icon={NotebookPen} text="Write down all the notes you need without fear of writing too much, it's all for you!" />
             </div>
             <Button size="lg" className="mt-6" asChild>
               <Link to="/login">Learn More</Link>

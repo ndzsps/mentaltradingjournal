@@ -119,8 +119,11 @@ export const StatsHeader = () => {
   const filteredEntries = analytics?.journalEntries ? filterEntriesByTime(analytics.journalEntries) : [];
 
   const emotionStats = filteredEntries.reduce((acc, entry) => {
-    if (entry.emotion?.toLowerCase().includes('positive')) acc.positive++;
-    acc.total++;
+    // Only count pre and post session entries for emotion stats
+    if (entry.session_type === 'pre' || entry.session_type === 'post') {
+      if (entry.emotion?.toLowerCase().includes('positive')) acc.positive++;
+      acc.total++;
+    }
     return acc;
   }, { positive: 0, total: 0 });
 

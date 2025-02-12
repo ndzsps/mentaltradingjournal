@@ -25,18 +25,38 @@ const Login = () => {
     }
   }, [user, navigate]);
 
-  // Check if we're in a password reset flow
+  // Check for recovery token in URL
   useEffect(() => {
-    const hash = window.location.hash;
-    const query = new URLSearchParams(window.location.search);
-    
-    if (hash && hash.includes('type=recovery') || query.get('type') === 'recovery') {
-      setIsResetPassword(true);
-      toast({
-        title: "Reset Password",
-        description: "Please enter your new password below.",
-      });
-    }
+    // Function to check if URL contains a recovery token
+    const checkForRecoveryToken = async () => {
+      try {
+        const fragments = new URLSearchParams(window.location.hash.substring(1));
+        const accessToken = fragments.get('access_token');
+        const type = fragments.get('type');
+        
+        // If we have an access token and it's a recovery flow
+        if (accessToken && type === 'recovery') {
+          setIsResetPassword(true);
+          // Set the session using the access token
+          const { error } = await supabase.auth.getSession();
+          if (error) throw error;
+          
+          toast({
+            title: "Reset Password",
+            description: "Please enter your new password below.",
+          });
+        }
+      } catch (error) {
+        console.error('Error checking recovery token:', error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Unable to process password reset. Please try again.",
+        });
+      }
+    };
+
+    checkForRecoveryToken();
   }, [toast]);
 
   const handleResetPassword = async (e: React.FormEvent) => {
@@ -56,7 +76,7 @@ const Login = () => {
       });
       
       setIsResetPassword(false);
-      // Clear the recovery token from the URL
+      // Clear the URL
       window.history.replaceState({}, document.title, window.location.pathname);
     } catch (error) {
       console.error('Reset password error:', error);
@@ -81,7 +101,7 @@ const Login = () => {
 
       if (isForgotPassword) {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/login?type=recovery`,
+          redirectTo: `${window.location.origin}/login`,
         });
         if (error) throw error;
         toast({

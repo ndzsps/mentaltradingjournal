@@ -52,44 +52,6 @@ export const StatsHeader = () => {
   const { stats } = useProgressTracking();
   const { timeFilter, setTimeFilter } = useTimeFilter();
 
-  // Get all trades and group them by month
-  const getAllTradesWithMonthlyTotals = (entries: any[] = []) => {
-    const tradesByMonth: { [key: string]: number } = {};
-    
-    entries.forEach(entry => {
-      if (entry.trades && Array.isArray(entry.trades)) {
-        entry.trades.forEach((trade: Trade) => {
-          // Get the month from either exitDate or entry's created_at
-          const tradeDate = trade.exitDate ? new Date(trade.exitDate) : new Date(entry.created_at);
-          const monthKey = `${tradeDate.getFullYear()}-${String(tradeDate.getMonth() + 1).padStart(2, '0')}`;
-          
-          const pnlValue = trade.pnl || 0;
-          const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
-          
-          tradesByMonth[monthKey] = (tradesByMonth[monthKey] || 0) + (isNaN(numericPnL) ? 0 : numericPnL);
-        });
-      }
-    });
-
-    console.log('Trades by month:', tradesByMonth);
-    return tradesByMonth;
-  };
-
-  // Calculate total P&L across all months
-  const monthlyTotals = analytics?.journalEntries ? getAllTradesWithMonthlyTotals(analytics.journalEntries) : {};
-  const netPnL = Object.values(monthlyTotals).reduce((total, monthlyPnL) => total + monthlyPnL, 0);
-
-  // Filter entries by time (for other components that need filtered data)
-  const filterEntriesByTime = (entries: any[] = []) => {
-    const interval = getTimeInterval();
-    console.log('Filtering entries with interval:', interval);
-
-    return entries.filter(entry => {
-      const entryDate = new Date(entry.created_at);
-      return isWithinInterval(entryDate, interval);
-    });
-  };
-
   const getTimeInterval = () => {
     const now = new Date();
     switch (timeFilter) {
@@ -116,7 +78,34 @@ export const StatsHeader = () => {
     }
   };
 
-  const filteredEntries = analytics?.journalEntries ? filterEntriesByTime(analytics.journalEntries) : [];
+  // Calculate Net P&L for the selected time period
+  const calculateNetPnL = () => {
+    if (!analytics?.journalEntries) return 0;
+
+    const interval = getTimeInterval();
+    const filteredEntries = analytics.journalEntries.filter(entry => {
+      const entryDate = new Date(entry.created_at);
+      return isWithinInterval(entryDate, interval);
+    });
+
+    return filteredEntries.reduce((total, entry) => {
+      if (!entry.trades) return total;
+      
+      return total + entry.trades.reduce((tradePnL, trade) => {
+        const pnlValue = trade.pnl || 0;
+        const numericPnL = typeof pnlValue === 'string' ? parseFloat(pnlValue) : pnlValue;
+        return tradePnL + (isNaN(numericPnL) ? 0 : numericPnL);
+      }, 0);
+    }, 0);
+  };
+
+  const netPnL = calculateNetPnL();
+
+  // Filter entries by time (for other components that need filtered data)
+  const filteredEntries = analytics?.journalEntries ? analytics.journalEntries.filter(entry => {
+    const entryDate = new Date(entry.created_at);
+    return isWithinInterval(entryDate, getTimeInterval());
+  }) : [];
 
   const emotionStats = filteredEntries.reduce((acc, entry) => {
     // Only count pre and post session entries for emotion stats

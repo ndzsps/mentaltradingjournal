@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -13,6 +14,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [isResetPassword, setIsResetPassword] = useState(false);
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -23,11 +25,60 @@ const Login = () => {
     }
   }, [user, navigate]);
 
+  // Check if we're in a password reset flow
+  useEffect(() => {
+    const hash = window.location.hash;
+    const query = new URLSearchParams(window.location.search);
+    
+    if (hash && hash.includes('type=recovery') || query.get('type') === 'recovery') {
+      setIsResetPassword(true);
+      toast({
+        title: "Reset Password",
+        description: "Please enter your new password below.",
+      });
+    }
+  }, [toast]);
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: password
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Password updated successfully",
+        description: "You can now sign in with your new password.",
+      });
+      
+      setIsResetPassword(false);
+      // Clear the recovery token from the URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } catch (error) {
+      console.error('Reset password error:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error instanceof Error ? error.message : "An error occurred while resetting your password",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      if (isResetPassword) {
+        return handleResetPassword(e);
+      }
+
       if (isForgotPassword) {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: `${window.location.origin}/login?type=recovery`,
@@ -60,27 +111,15 @@ const Login = () => {
     }
   };
 
-  // Check if we're in a password reset flow
-  useEffect(() => {
-    const hash = window.location.hash;
-    const query = new URLSearchParams(window.location.search);
-    
-    if (hash && hash.includes('type=recovery') || query.get('type') === 'recovery') {
-      // Handle password reset flow
-      toast({
-        title: "Reset Password",
-        description: "Please enter your new password below.",
-      });
-    }
-  }, [toast]);
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md p-6 space-y-6">
         <div className="space-y-2 text-center">
           <h1 className="text-3xl font-bold">Welcome to Mental</h1>
           <p className="text-muted-foreground">
-            {isForgotPassword
+            {isResetPassword
+              ? "Reset your password"
+              : isForgotPassword
               ? "Reset your password"
               : isSignUp
               ? "Create an account"
@@ -89,20 +128,22 @@ const Login = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
+          {!isResetPassword && (
+            <div className="space-y-2">
+              <Input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+          )}
           {!isForgotPassword && (
             <div className="space-y-2">
               <Input
                 type="password"
-                placeholder="Password"
+                placeholder={isResetPassword ? "New Password" : "Password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -112,6 +153,8 @@ const Login = () => {
           <Button className="w-full" type="submit" disabled={loading}>
             {loading ? (
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+            ) : isResetPassword ? (
+              "Reset Password"
             ) : isForgotPassword ? (
               "Send Reset Link"
             ) : isSignUp ? (
@@ -123,7 +166,7 @@ const Login = () => {
         </form>
 
         <div className="space-y-2 text-center">
-          {!isForgotPassword && (
+          {!isResetPassword && !isForgotPassword && (
             <Button
               variant="link"
               onClick={() => setIsSignUp(!isSignUp)}
@@ -134,7 +177,7 @@ const Login = () => {
                 : "Don't have an account? Sign Up"}
             </Button>
           )}
-          {!isSignUp && !isForgotPassword && (
+          {!isSignUp && !isForgotPassword && !isResetPassword && (
             <Button
               variant="link"
               onClick={() => setIsForgotPassword(true)}
@@ -143,10 +186,14 @@ const Login = () => {
               Forgot your password?
             </Button>
           )}
-          {isForgotPassword && (
+          {(isForgotPassword || isResetPassword) && (
             <Button
               variant="link"
-              onClick={() => setIsForgotPassword(false)}
+              onClick={() => {
+                setIsForgotPassword(false);
+                setIsResetPassword(false);
+                window.history.replaceState({}, document.title, window.location.pathname);
+              }}
               className="text-sm"
             >
               Back to Sign In

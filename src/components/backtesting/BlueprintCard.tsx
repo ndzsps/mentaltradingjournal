@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
@@ -34,11 +33,11 @@ interface BlueprintCardProps {
 }
 
 const emojis = [
-  { icon: Smile, label: "Smile", color: "#8B5CF6" },    // Vivid Purple
-  { icon: ThumbsUp, label: "Thumbs Up", color: "#0EA5E9" },  // Ocean Blue
-  { icon: Heart, label: "Heart", color: "#D946EF" },    // Magenta Pink
-  { icon: Star, label: "Star", color: "#F97316" },      // Bright Orange
-  { icon: Trophy, label: "Trophy", color: "#F97316" },  // Bright Orange
+  { icon: Smile, label: "Smile", color: "#F2FCE2" },
+  { icon: ThumbsUp, label: "Thumbs Up", color: "#D3E4FD" },
+  { icon: Heart, label: "Heart", color: "#FFDEE2" },
+  { icon: Star, label: "Star", color: "#FEF7CD" },
+  { icon: Trophy, label: "Trophy", color: "#FEC6A1" },
 ];
 
 export function BlueprintCard({ name, instrument, winRate = 0, id, emoji: initialEmoji, onDelete }: BlueprintCardProps) {
@@ -123,7 +122,7 @@ export function BlueprintCard({ name, instrument, winRate = 0, id, emoji: initia
                 >
                   <EmojiIcon 
                     className="h-5 w-5" 
-                    style={{ color: "#FFFFFF" }}
+                    style={{ color: "#1A1F2C" }}
                   />
                 </Button>
               </DropdownMenuTrigger>
@@ -134,7 +133,7 @@ export function BlueprintCard({ name, instrument, winRate = 0, id, emoji: initia
                     onClick={(e) => handleEmojiSelect(label, e)}
                     className="cursor-pointer hover:bg-accent/10"
                   >
-                    <Icon className="mr-2 h-4 w-4" style={{ color }} />
+                    <Icon className="mr-2 h-4 w-4" style={{ color: "#1A1F2C" }} />
                     <span>{label}</span>
                   </DropdownMenuItem>
                 ))}

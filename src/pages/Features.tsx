@@ -60,6 +60,9 @@ const Features = () => {
               <p className="text-lg text-muted-foreground">
                 Start your trading day on the right foot by checking off pre-trading activities that promote focus
               </p>
+              <p className="text-lg text-muted-foreground mt-4">
+                Write down how you feel at this moment, what's going on in your life, and what you want to achieve today.
+              </p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <FeatureItem icon={BarChart2} text="Analytics dashboard" />

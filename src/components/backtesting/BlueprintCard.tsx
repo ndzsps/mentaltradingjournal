@@ -104,7 +104,7 @@ export function BlueprintCard({ name, instrument, winRate = 0, id, emoji: initia
             <Button
               variant="destructive"
               size="icon"
-              className="h-8 w-8 bg-destructive hover:bg-destructive/90"
+              className="h-8 w-8 bg-red-400/80 hover:bg-red-400/90"
               onClick={handleDelete}
             >
               <Trash2 className="h-4 w-4" />

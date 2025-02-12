@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -90,7 +91,7 @@ export function PlaybookSection({ onBlueprintAdded }: PlaybookSectionProps) {
               className="flex items-center gap-2"
             >
               <Plus className="h-4 w-4" />
-              Add Blueprint
+              Add Playbook
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[500px]">

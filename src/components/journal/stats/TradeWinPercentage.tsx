@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useState } from "react";
 import { TimeFilter } from "@/hooks/useJournalFilters";
-import { startOfMonth, subMonths, startOfQuarter, isWithinInterval, endOfMonth, isSameDay } from "date-fns";
+import { startOfMonth, subMonths, isWithinInterval, endOfMonth, startOfYear, endOfYear, subYears } from "date-fns";
 
 interface TradeWinPercentageProps {
   timeFilter: TimeFilter;
@@ -37,6 +37,11 @@ export const TradeWinPercentage = ({ timeFilter }: TradeWinPercentageProps) => {
           start: startOfMonth(subMonths(now, 3)),
           end: now
         };
+      case "last-year":
+        return {
+          start: startOfYear(subYears(now, 1)),
+          end: endOfYear(subYears(now, 1))
+        };
       default:
         return null;
     }
@@ -64,11 +69,11 @@ export const TradeWinPercentage = ({ timeFilter }: TradeWinPercentageProps) => {
       return !isNaN(pnl);
     });
 
+    // If there are no valid trades, return 0
+    if (validTrades.length === 0) return 0;
+
     const winningTrades = validTrades.filter(trade => Number(trade.pnl) > 0);
-    
-    return validTrades.length > 0 
-      ? (winningTrades.length / validTrades.length) * 100 
-      : 0;
+    return (winningTrades.length / validTrades.length) * 100;
   };
 
   const winRate = calculateWinRate();

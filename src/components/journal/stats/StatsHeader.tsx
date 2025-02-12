@@ -186,7 +186,7 @@ export const StatsHeader = () => {
           variant={timeFilter === "last-three-months" ? "default" : "outline"}
           onClick={() => setTimeFilter("last-three-months")}
         >
-          Last 90 Days
+          Last Quarter
         </Button>
         <Button 
           variant={timeFilter === "last-year" ? "default" : "outline"}

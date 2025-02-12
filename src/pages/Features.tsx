@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { 
@@ -59,13 +58,10 @@ const Features = () => {
             <p className="text-lg text-muted-foreground">
               Stay on top of your trading performance with your journal. Store your data, stay on top of goals, track important KPI's, and more
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <FeatureItem icon={BarChart2} text="Analytics dashboard" />
-              <FeatureItem icon={Calendar} text="Calendar view" />
-              <FeatureItem icon={NotebookPen} text="Notes & comments" />
-              <FeatureItem icon={LineChart} text="Profitability charts" />
-              <FeatureItem icon={BookOpen} text="Advanced filtering" />
-              <FeatureItem icon={CheckCircle2} text="Winning percentage" />
+            <div className="grid grid-cols-1 gap-4">
+              <FeatureItem icon={BarChart2} text="Advanced analytics dashboard with comprehensive metrics" />
+              <FeatureItem icon={NotebookPen} text="Detailed notes & comments for trade analysis" />
+              <FeatureItem icon={LineChart} text="In-depth profitability tracking and charts" />
             </div>
             <Button size="lg" className="mt-6" asChild>
               <Link to="/login">Learn More</Link>
@@ -101,13 +97,10 @@ const Features = () => {
             <p className="text-lg text-muted-foreground">
               Get insights into your trading performance with comprehensive analytics. Monitor your progress, identify patterns, and improve your strategy
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <FeatureItem icon={Target} text="Performance goals" />
-              <FeatureItem icon={TrendingUp} text="Success metrics" />
-              <FeatureItem icon={Medal} text="Achievement tracking" />
-              <FeatureItem icon={ChartBar} text="Custom reports" />
-              <FeatureItem icon={History} text="Historical data" />
-              <FeatureItem icon={Timer} text="Time analysis" />
+            <div className="grid grid-cols-1 gap-4">
+              <FeatureItem icon={Target} text="Set and track personalized performance goals" />
+              <FeatureItem icon={TrendingUp} text="Monitor key success metrics and trends" />
+              <FeatureItem icon={ChartBar} text="Generate customized performance reports" />
             </div>
             <Button size="lg" className="mt-6" asChild>
               <Link to="/login">Get Started</Link>
@@ -125,13 +118,10 @@ const Features = () => {
             <p className="text-lg text-muted-foreground">
               Keep track of your trading ideas, strategies, and market observations in one place. Tag and categorize your notes for easy reference
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <FeatureItem icon={NotebookPen} text="Rich text editor" />
-              <FeatureItem icon={BookOpen} text="Custom categories" />
-              <FeatureItem icon={Calendar} text="Date organization" />
-              <FeatureItem icon={LineChart} text="Chart annotations" />
-              <FeatureItem icon={BarChart2} text="Data linking" />
-              <FeatureItem icon={CheckCircle2} text="Task tracking" />
+            <div className="grid grid-cols-1 gap-4">
+              <FeatureItem icon={NotebookPen} text="Full-featured rich text editor for detailed notes" />
+              <FeatureItem icon={BookOpen} text="Organize entries with custom categories" />
+              <FeatureItem icon={LineChart} text="Add chart annotations and technical analysis" />
             </div>
             <Button size="lg" className="mt-6" asChild>
               <Link to="/login">Learn More</Link>
@@ -167,13 +157,10 @@ const Features = () => {
             <p className="text-lg text-muted-foreground">
               Define clear objectives and track your progress over time. Break down your goals into manageable steps and celebrate your achievements
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <FeatureItem icon={Target} text="Goal setting" />
-              <FeatureItem icon={Medal} text="Achievement system" />
-              <FeatureItem icon={History} text="Progress tracking" />
-              <FeatureItem icon={ChartBar} text="Performance metrics" />
-              <FeatureItem icon={Timer} text="Time management" />
-              <FeatureItem icon={TrendingUp} text="Growth analytics" />
+            <div className="grid grid-cols-1 gap-4">
+              <FeatureItem icon={Target} text="Set clear, measurable trading objectives" />
+              <FeatureItem icon={Medal} text="Track achievements and milestones" />
+              <FeatureItem icon={TrendingUp} text="Monitor long-term growth and progress" />
             </div>
             <Button size="lg" className="mt-6" asChild>
               <Link to="/login">Get Started</Link>
@@ -191,13 +178,10 @@ const Features = () => {
             <p className="text-lg text-muted-foreground">
               Gain valuable insights from your trading history. Identify patterns, learn from mistakes, and continuously improve your trading strategy
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <FeatureItem icon={BookOpen} text="Learning library" />
-              <FeatureItem icon={BarChart2} text="Performance insights" />
-              <FeatureItem icon={LineChart} text="Trend analysis" />
-              <FeatureItem icon={NotebookPen} text="Strategy review" />
-              <FeatureItem icon={CheckCircle2} text="Success patterns" />
-              <FeatureItem icon={Calendar} text="Historical data" />
+            <div className="grid grid-cols-1 gap-4">
+              <FeatureItem icon={BookOpen} text="Access comprehensive learning resources" />
+              <FeatureItem icon={LineChart} text="Analyze detailed performance trends" />
+              <FeatureItem icon={NotebookPen} text="Review and optimize trading strategies" />
             </div>
             <Button size="lg" className="mt-6" asChild>
               <Link to="/login">Learn More</Link>
@@ -219,9 +203,9 @@ const Features = () => {
 };
 
 const FeatureItem = ({ icon: Icon, text }: { icon: any; text: string }) => (
-  <div className="flex items-center gap-2 bg-accent/10 rounded-lg p-3 hover:bg-accent/20 transition-colors">
-    <Icon className="h-5 w-5 text-primary" />
-    <span className="text-sm font-medium">{text}</span>
+  <div className="flex items-center gap-3 bg-accent/10 rounded-lg p-4 hover:bg-accent/20 transition-colors">
+    <Icon className="h-6 w-6 text-primary flex-shrink-0" />
+    <span className="text-base font-medium">{text}</span>
   </div>
 );
 

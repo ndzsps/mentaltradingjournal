@@ -136,6 +136,7 @@ export const StatsHeader = () => {
           <div className="h-10 w-32 bg-muted animate-pulse rounded-md" />
           <div className="h-10 w-32 bg-muted animate-pulse rounded-md" />
           <div className="h-10 w-32 bg-muted animate-pulse rounded-md" />
+          <div className="h-10 w-32 bg-muted animate-pulse rounded-md" />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {[...Array(4)].map((_, i) => (
@@ -165,16 +166,10 @@ export const StatsHeader = () => {
           )}
         </Button>
         <Button 
-          variant={timeFilter === "eternal" ? "default" : "outline"}
-          onClick={() => setTimeFilter("eternal")}
-        >
-          Eternal
-        </Button>
-        <Button 
           variant={timeFilter === "this-month" ? "default" : "outline"}
           onClick={() => setTimeFilter("this-month")}
         >
-          This Month
+          Last 30 Days
         </Button>
         <Button 
           variant={timeFilter === "last-month" ? "default" : "outline"}
@@ -186,7 +181,13 @@ export const StatsHeader = () => {
           variant={timeFilter === "last-three-months" ? "default" : "outline"}
           onClick={() => setTimeFilter("last-three-months")}
         >
-          Last 3 Months
+          Last 90 Days
+        </Button>
+        <Button 
+          variant={timeFilter === "eternal" ? "default" : "outline"}
+          onClick={() => setTimeFilter("eternal")}
+        >
+          Eternal
         </Button>
       </div>
 

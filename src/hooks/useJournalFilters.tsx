@@ -1,8 +1,9 @@
+
 import { useState } from "react";
 import { isWithinInterval, startOfMonth, endOfMonth, subMonths, isSameDay } from "date-fns";
 import { JournalEntryType } from "@/types/journal";
 
-export type TimeFilter = "this-month" | "last-month" | "last-three-months" | null;
+export type TimeFilter = "this-month" | "last-month" | "last-three-months" | "eternal" | null;
 
 export const useJournalFilters = (entries: JournalEntryType[]) => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
@@ -19,9 +20,9 @@ export const useJournalFilters = (entries: JournalEntryType[]) => {
     const matchesOutcome = !outcomeFilter || (entry.outcome === outcomeFilter && entry.session_type === 'post');
     
     let matchesTimeFilter = true;
-    if (timeFilter) {
+    if (timeFilter && timeFilter !== 'eternal') {
       const now = new Date();
-      const intervals: Record<Exclude<TimeFilter, null>, { start: Date; end: Date }> = {
+      const intervals: Record<Exclude<TimeFilter, "eternal" | null>, { start: Date; end: Date }> = {
         "this-month": {
           start: startOfMonth(now),
           end: endOfMonth(now)
@@ -36,10 +37,8 @@ export const useJournalFilters = (entries: JournalEntryType[]) => {
         }
       };
 
-      if (timeFilter) {
-        const interval = intervals[timeFilter];
-        matchesTimeFilter = isWithinInterval(entryDate, interval);
-      }
+      const interval = intervals[timeFilter as Exclude<TimeFilter, "eternal" | null>];
+      matchesTimeFilter = isWithinInterval(entryDate, interval);
     }
 
     return matchesDate && matchesEmotion && matchesDetail && matchesTimeFilter && matchesOutcome;

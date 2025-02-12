@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
 import {
@@ -29,8 +30,8 @@ export const TimeFilterDropdown = ({
       <DropdownMenuContent>
         <DropdownMenuLabel>Filter by Time</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => setTimeFilter(null)}>
-          All Time
+        <DropdownMenuItem onClick={() => setTimeFilter("eternal")}>
+          Eternal (All-Time)
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTimeFilter("this-month")}>
           This Month

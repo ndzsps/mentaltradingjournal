@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useState } from "react";
 import { TimeFilter } from "@/hooks/useJournalFilters";
-import { startOfMonth, subMonths, startOfQuarter, isWithinInterval, endOfMonth, isSameDay } from "date-fns";
+import { startOfMonth, subMonths, isWithinInterval, endOfMonth } from "date-fns";
 
 interface TradeWinPercentageProps {
   timeFilter: TimeFilter;
@@ -38,7 +38,11 @@ export const TradeWinPercentage = ({ timeFilter }: TradeWinPercentageProps) => {
           end: now
         };
       default:
-        return null;
+        // Default to this month if no filter is selected
+        return {
+          start: startOfMonth(now),
+          end: now
+        };
     }
   };
 
@@ -46,16 +50,13 @@ export const TradeWinPercentage = ({ timeFilter }: TradeWinPercentageProps) => {
     if (!analytics?.journalEntries) return 0;
 
     // Get entries within the time filter
-    let timeFilteredEntries = analytics.journalEntries;
     const interval = getTimeInterval();
-    if (interval) {
-      timeFilteredEntries = timeFilteredEntries.filter(entry => {
-        const entryDate = new Date(entry.created_at);
-        return isWithinInterval(entryDate, interval);
-      });
-    }
+    const timeFilteredEntries = analytics.journalEntries.filter(entry => {
+      const entryDate = new Date(entry.created_at);
+      return isWithinInterval(entryDate, interval);
+    });
 
-    // Get all trades from all entries
+    // Get all trades from filtered entries
     const allTrades = timeFilteredEntries.flatMap(entry => entry.trades || []);
     
     // Filter out trades with undefined or NaN PnL

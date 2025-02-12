@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { 
@@ -70,8 +71,8 @@ const Features = () => {
           {/* Right Column - Dashboard Image */}
           <div className="relative rounded-3xl overflow-hidden bg-white shadow-xl lg:-mt-12">
             <img 
-              src="/lovable-uploads/e9c68a6a-c499-475b-9518-7ba15509fc57.png"
-              alt="Dashboard Preview"
+              src="/lovable-uploads/b70a5c45-5d2d-4a9c-a885-3841b19ed6c2.png"
+              alt="Pre-Session Check In Interface"
               className="w-full h-auto"
             />
           </div>

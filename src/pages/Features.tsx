@@ -54,11 +54,13 @@ const Features = () => {
           {/* Left Column - Text Content */}
           <div className="space-y-8">
             <h2 className="text-3xl md:text-4xl font-semibold">
-              Focus on what matters through powerful journaling
+              Pre-Session Check In
             </h2>
-            <p className="text-lg text-muted-foreground">
-              Stay on top of your trading performance with your journal. Store your data, stay on top of goals, track important KPI's, and more
-            </p>
+            <div className="border border-border rounded-lg p-4 bg-background/50">
+              <p className="text-lg text-muted-foreground">
+                Start your trading day on the right foot by checking off pre-trading activities that promote focus
+              </p>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <FeatureItem icon={BarChart2} text="Analytics dashboard" />
               <FeatureItem icon={Calendar} text="Calendar view" />

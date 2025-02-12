@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { generateAnalytics } from "@/utils/analyticsUtils";
@@ -134,6 +135,7 @@ export const StatsHeader = () => {
           <div className="h-10 w-32 bg-muted animate-pulse rounded-md" />
           <div className="h-10 w-32 bg-muted animate-pulse rounded-md" />
           <div className="h-10 w-32 bg-muted animate-pulse rounded-md" />
+          <div className="h-10 w-32 bg-muted animate-pulse rounded-md" />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {[...Array(4)].map((_, i) => (
@@ -161,6 +163,12 @@ export const StatsHeader = () => {
           ) : (
             <PanelLeftOpen className="h-4 w-4" />
           )}
+        </Button>
+        <Button 
+          variant={timeFilter === "eternal" ? "default" : "outline"}
+          onClick={() => setTimeFilter("eternal")}
+        >
+          Eternal
         </Button>
         <Button 
           variant={timeFilter === "this-month" ? "default" : "outline"}

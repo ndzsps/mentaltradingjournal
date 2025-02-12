@@ -45,45 +45,29 @@ export const TradeWinPercentage = ({ timeFilter }: TradeWinPercentageProps) => {
   const calculateWinRate = () => {
     if (!analytics?.journalEntries) return 0;
 
-    // Get all pre-session entries with their emotions
-    const preSessionEmotions = analytics.journalEntries
-      .filter(entry => entry.session_type === 'pre')
-      .reduce((acc, entry) => {
-        const date = new Date(entry.created_at).toISOString().split('T')[0];
-        acc[date] = entry.emotion;
-        return acc;
-      }, {} as Record<string, string>);
-
-    // Get all post-session entries with trades
-    let postSessionEntries = analytics.journalEntries.filter(entry => 
-      entry.session_type === 'post' && entry.trades && entry.trades.length > 0
-    );
-    
-    // Apply time filter
+    // Get entries within the time filter
+    let timeFilteredEntries = analytics.journalEntries;
     const interval = getTimeInterval();
     if (interval) {
-      postSessionEntries = postSessionEntries.filter(entry => {
+      timeFilteredEntries = timeFilteredEntries.filter(entry => {
         const entryDate = new Date(entry.created_at);
         return isWithinInterval(entryDate, interval);
       });
     }
 
-    // Filter trades based on pre-session emotion
-    const filteredTrades = postSessionEntries.flatMap(entry => {
-      const date = new Date(entry.created_at).toISOString().split('T')[0];
-      const preSessionEmotion = preSessionEmotions[date];
-      
-      if (emotionFilter === "all" || 
-          (preSessionEmotion && preSessionEmotion.toLowerCase().includes(emotionFilter.toLowerCase()))) {
-        return entry.trades || [];
-      }
-      return [];
+    // Get all trades from all entries
+    const allTrades = timeFilteredEntries.flatMap(entry => entry.trades || []);
+    
+    // Filter out trades with undefined or NaN PnL
+    const validTrades = allTrades.filter(trade => {
+      const pnl = Number(trade.pnl);
+      return !isNaN(pnl);
     });
 
-    const winningTrades = filteredTrades.filter(trade => Number(trade.pnl) > 0);
+    const winningTrades = validTrades.filter(trade => Number(trade.pnl) > 0);
     
-    return filteredTrades.length > 0 
-      ? (winningTrades.length / filteredTrades.length) * 100 
+    return validTrades.length > 0 
+      ? (winningTrades.length / validTrades.length) * 100 
       : 0;
   };
 

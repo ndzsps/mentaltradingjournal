@@ -48,7 +48,7 @@ export const TradeWinPercentage = ({ timeFilter }: TradeWinPercentageProps) => {
   };
 
   const calculateWinRate = () => {
-    if (!analytics?.journalEntries) return 0;
+    if (!analytics?.journalEntries || analytics.journalEntries.length === 0) return 0;
 
     // Get entries within the time filter
     let timeFilteredEntries = analytics.journalEntries;
@@ -59,6 +59,8 @@ export const TradeWinPercentage = ({ timeFilter }: TradeWinPercentageProps) => {
         return isWithinInterval(entryDate, interval);
       });
     }
+
+    if (timeFilteredEntries.length === 0) return 0;
 
     // Get all trades from all entries
     const allTrades = timeFilteredEntries.flatMap(entry => entry.trades || []);

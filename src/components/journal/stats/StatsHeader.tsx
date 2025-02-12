@@ -86,7 +86,7 @@ export const StatsHeader = () => {
 
   // Calculate Net P&L for the selected time period
   const calculateNetPnL = () => {
-    if (!analytics?.journalEntries) return 0;
+    if (!analytics?.journalEntries || analytics.journalEntries.length === 0) return 0;
 
     const interval = getTimeInterval();
     // If no interval is set, include all entries
@@ -95,10 +95,12 @@ export const StatsHeader = () => {
         const entryDate = new Date(entry.created_at);
         return isWithinInterval(entryDate, interval);
       }) :
-      analytics.journalEntries; // Use all entries when no time filter is selected
+      analytics.journalEntries;
+
+    if (filteredEntries.length === 0) return 0;
 
     return filteredEntries.reduce((total, entry) => {
-      if (!entry.trades) return total;
+      if (!entry.trades || entry.trades.length === 0) return total;
       
       return total + entry.trades.reduce((tradePnL, trade) => {
         const pnlValue = trade.pnl || 0;

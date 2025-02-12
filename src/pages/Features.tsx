@@ -56,11 +56,13 @@ const Features = () => {
             <h2 className="text-3xl md:text-4xl font-semibold">
               Pre-Session Check In
             </h2>
-            <div className="border border-border rounded-lg p-4 bg-background/50">
+            <div className="border border-border rounded-lg p-4 bg-background/50 backdrop-blur-sm">
               <p className="text-lg text-muted-foreground">
                 Start your trading day on the right foot by checking off pre-trading activities that promote focus
               </p>
-              <p className="text-lg text-muted-foreground mt-4">
+            </div>
+            <div className="border border-border rounded-lg p-4 bg-background/50 backdrop-blur-sm">
+              <p className="text-lg text-muted-foreground">
                 Write down how you feel at this moment, what's going on in your life, and what you want to achieve today.
               </p>
             </div>

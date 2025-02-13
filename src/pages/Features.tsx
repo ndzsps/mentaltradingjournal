@@ -141,8 +141,8 @@ const Features = () => {
           {/* Left Column - Image */}
           <div className="relative rounded-3xl overflow-hidden bg-white shadow-xl lg:-mt-12 order-2 lg:order-1">
             <img 
-              src="/lovable-uploads/e9c68a6a-c499-475b-9518-7ba15509fc57.png"
-              alt="Goals Preview"
+              src="/lovable-uploads/1a442a11-7b9d-4bda-9d76-926ef1becdc7.png"
+              alt="Analytics Charts"
               className="w-full h-auto"
             />
           </div>

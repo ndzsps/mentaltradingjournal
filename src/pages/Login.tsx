@@ -1,12 +1,12 @@
+
 import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useSubscription } from "@/hooks/useSubscription";
 
 const Login = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -19,19 +19,13 @@ const Login = () => {
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const location = useLocation();
-  const { data: hasActiveSubscription } = useSubscription();
 
-  // Only redirect if user is logged in, NOT in reset password mode, and has an active subscription
+  // Only redirect if user is logged in and NOT in reset password mode
   useEffect(() => {
     if (user && !isResetPassword) {
-      if (hasActiveSubscription) {
-        navigate("/dashboard");
-      } else if (location.pathname !== "/pricing") {
-        navigate("/pricing");
-      }
+      navigate("/dashboard");
     }
-  }, [user, navigate, isResetPassword, hasActiveSubscription, location]);
+  }, [user, navigate, isResetPassword]);
 
   // Check for recovery token in URL
   useEffect(() => {
@@ -135,7 +129,7 @@ const Login = () => {
         });
       } else {
         await signIn(email, password);
-        // Let the useEffect handle navigation based on subscription status
+        navigate("/dashboard");
       }
     } catch (error) {
       console.error('Auth error:', error);

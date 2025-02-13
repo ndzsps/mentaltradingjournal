@@ -24,19 +24,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Initialize auth state from any existing session
   useEffect(() => {
-    // Clear any existing sessions on mount
-    supabase.auth.signOut().then(() => {
-      supabase.auth.getSession().then(({ data: { session }, error }) => {
-        if (error) {
-          console.error("Error getting session:", error);
-          setUser(null);
-          setSession(null);
-        } else {
-          setSession(session);
-          setUser(session?.user ?? null);
-        }
-        setLoading(false);
-      });
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (error) {
+        console.error("Error getting session:", error);
+        setUser(null);
+        setSession(null);
+      } else {
+        setSession(session);
+        setUser(session?.user ?? null);
+      }
+      setLoading(false);
     });
 
     // Listen for auth changes
@@ -73,8 +70,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     try {
-      // Clear any existing sessions before attempting to sign in
-      await supabase.auth.signOut();
+      // Only try to sign out if we have an active session
+      if (session) {
+        await supabase.auth.signOut();
+      }
       
       const { error } = await supabase.auth.signInWithPassword({
         email,
@@ -130,21 +129,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // First set loading to true to prevent any unwanted state updates
       setLoading(true);
       
-      const { error } = await supabase.auth.signOut();
-      
-      if (error) {
-        // Only show error toast for non-session related errors
-        if (!error.message.includes("session") && !error.message.includes("Session")) {
-          console.error("Sign out error:", error);
-          toast({
-            variant: "destructive",
-            title: "Error signing out",
-            description: getErrorMessage(error),
-          });
+      // Only attempt to sign out if we have an active session
+      if (session) {
+        const { error } = await supabase.auth.signOut();
+        if (error) {
+          // Only show error toast for non-session related errors
+          if (!error.message.includes("session") && !error.message.includes("Session")) {
+            console.error("Sign out error:", error);
+            toast({
+              variant: "destructive",
+              title: "Error signing out",
+              description: getErrorMessage(error),
+            });
+          }
         }
       }
       
-      // Always clear the local state, regardless of error
+      // Always clear the local state
       setUser(null);
       setSession(null);
       

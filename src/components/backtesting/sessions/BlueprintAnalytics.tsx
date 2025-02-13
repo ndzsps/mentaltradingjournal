@@ -97,6 +97,15 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
     return Math.max(maxDD, drawdown);
   }, 0);
 
+  // Convert sessions to trade format for duration analysis
+  const tradeDurationData = sessions.map(session => ({
+    id: session.id,
+    entryDate: session.entryDate,
+    exitDate: session.exitDate,
+    pnl: session.pnl,
+    duration: session.duration
+  }));
+
   return (
     <div className="space-y-8 mt-8">
       <div>
@@ -135,7 +144,7 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
           </div>
         </Card>
 
-        <TradeDuration />
+        <TradeDuration trades={tradeDurationData} />
       </div>
 
       <Card className="p-6">

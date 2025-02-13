@@ -92,7 +92,9 @@ const handler = async (req: Request): Promise<Response> => {
           console.log("Retrieved subscription details:", {
             id: subscription.id,
             status: subscription.status,
-            userId: subscription.metadata.user_id
+            userId: subscription.metadata.user_id,
+            customerId: subscription.customer,
+            priceId: subscription.items.data[0].price.id
           });
           
           const { error } = await supabase.from("subscriptions").upsert({
@@ -109,12 +111,12 @@ const handler = async (req: Request): Promise<Response> => {
 
           if (error) {
             console.error("Error upserting subscription:", error);
-            return new Response(JSON.stringify({ error: "Error upserting subscription" }), { 
+            return new Response(JSON.stringify({ error: "Error upserting subscription", details: error }), { 
               status: 500,
               headers: { ...corsHeaders, 'Content-Type': 'application/json' }
             });
           }
-          console.log("Successfully updated subscription in database");
+          console.log("Successfully updated subscription in database for session:", session.id);
         }
         break;
       }
@@ -126,7 +128,9 @@ const handler = async (req: Request): Promise<Response> => {
           type: event.type,
           id: subscription.id,
           status: subscription.status,
-          userId: subscription.metadata.user_id
+          userId: subscription.metadata.user_id,
+          customerId: subscription.customer,
+          priceId: subscription.items.data[0].price.id
         });
         
         const { error } = await supabase.from("subscriptions").upsert({
@@ -143,12 +147,12 @@ const handler = async (req: Request): Promise<Response> => {
 
         if (error) {
           console.error("Error upserting subscription:", error);
-          return new Response(JSON.stringify({ error: "Error upserting subscription" }), { 
+          return new Response(JSON.stringify({ error: "Error upserting subscription", details: error }), { 
             status: 500,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' }
           });
         }
-        console.log("Successfully updated subscription in database");
+        console.log("Successfully updated subscription in database for subscription:", subscription.id);
         break;
       }
 
@@ -163,12 +167,12 @@ const handler = async (req: Request): Promise<Response> => {
 
         if (error) {
           console.error("Error updating subscription:", error);
-          return new Response(JSON.stringify({ error: "Error updating subscription" }), { 
+          return new Response(JSON.stringify({ error: "Error updating subscription", details: error }), { 
             status: 500,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' }
           });
         }
-        console.log("Successfully marked subscription as canceled in database");
+        console.log("Successfully marked subscription as canceled in database:", subscription.id);
         break;
       }
     }
@@ -192,3 +196,4 @@ const handler = async (req: Request): Promise<Response> => {
 };
 
 Deno.serve(handler);
+

@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import {
   BarChart,
@@ -172,12 +171,63 @@ export const ProfitLossDistribution = () => {
             <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
             <XAxis 
               dataKey="range" 
-              tick={{ fontSize: 12 }}
+              tick={{ fontSize: 11 }}
               stroke="currentColor"
               tickLine={{ stroke: 'currentColor' }}
-              angle={-15}
-              textAnchor="end"
-              height={60}
+              height={70}
+              interval={0}
+              tickFormatter={(value) => {
+                // Split the range into two lines for better readability
+                const parts = value.split(' to ');
+                if (parts.length === 2) {
+                  return [parts[0], parts[1]];
+                }
+                return value;
+              }}
+              tick={({ x, y, payload }) => {
+                const value = payload.value;
+                const parts = value.split(' to ');
+                
+                return (
+                  <g transform={`translate(${x},${y})`}>
+                    {parts.length === 2 ? (
+                      <>
+                        <text
+                          x={0}
+                          y={0}
+                          dy={10}
+                          textAnchor="middle"
+                          fill="currentColor"
+                          fontSize={11}
+                        >
+                          {parts[0]}
+                        </text>
+                        <text
+                          x={0}
+                          y={0}
+                          dy={25}
+                          textAnchor="middle"
+                          fill="currentColor"
+                          fontSize={11}
+                        >
+                          {parts[1]}
+                        </text>
+                      </>
+                    ) : (
+                      <text
+                        x={0}
+                        y={0}
+                        dy={10}
+                        textAnchor="middle"
+                        fill="currentColor"
+                        fontSize={11}
+                      >
+                        {value}
+                      </text>
+                    )}
+                  </g>
+                );
+              }}
             />
             <YAxis 
               tick={{ fontSize: 12 }}

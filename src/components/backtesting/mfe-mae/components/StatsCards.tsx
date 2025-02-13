@@ -17,29 +17,28 @@ export function StatsCards({ stats }: StatsCardsProps) {
     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
       <Card className="p-4">
         <div className="text-sm text-muted-foreground">Trades Hit TP</div>
-        <div className="text-2xl font-bold text-white">{stats.tradesHitTp.toFixed(2)}%</div>
+        <div className="text-2xl font-bold text-black">{stats.tradesHitTp.toFixed(2)}%</div>
       </Card>
       <Card className="p-4">
         <div className="text-sm text-muted-foreground">Trades Hit SL</div>
-        <div className="text-2xl font-bold text-white">{stats.tradesHitSl.toFixed(2)}%</div>
+        <div className="text-2xl font-bold text-black">{stats.tradesHitSl.toFixed(2)}%</div>
       </Card>
       <Card className="p-4">
         <div className="text-sm text-muted-foreground">Avg. MFE Winner</div>
-        <div className="text-2xl font-bold text-white">{stats.avgUpdrawWinner.toFixed(2)}%</div>
+        <div className="text-2xl font-bold text-black">{stats.avgUpdrawWinner.toFixed(2)}%</div>
       </Card>
       <Card className="p-4">
         <div className="text-sm text-muted-foreground">Avg. MFE Loser</div>
-        <div className="text-2xl font-bold">{stats.avgUpdrawLoser.toFixed(2)}%</div>
+        <div className="text-2xl font-bold text-black">{stats.avgUpdrawLoser.toFixed(2)}%</div>
       </Card>
       <Card className="p-4">
         <div className="text-sm text-muted-foreground">Avg. MAE Winner</div>
-        <div className="text-2xl font-bold">{stats.avgDrawdownWinner.toFixed(2)}%</div>
+        <div className="text-2xl font-bold text-black">{stats.avgDrawdownWinner.toFixed(2)}%</div>
       </Card>
       <Card className="p-4">
         <div className="text-sm text-muted-foreground">Avg. MAE Loser</div>
-        <div className="text-2xl font-bold text-white">{stats.avgDrawdownLoser.toFixed(2)}%</div>
+        <div className="text-2xl font-bold text-black">{stats.avgDrawdownLoser.toFixed(2)}%</div>
       </Card>
     </div>
   );
 }
-

@@ -8,6 +8,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Session } from "./types";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,6 +33,7 @@ interface EditSessionDialogProps {
 export const EditSessionDialog = ({ session, open, onOpenChange }: EditSessionDialogProps) => {
   const [formData, setFormData] = useState<Partial<Session>>(session || {});
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,11 +59,33 @@ export const EditSessionDialog = ({ session, open, onOpenChange }: EditSessionDi
 
       toast.success("Trade updated successfully");
       onOpenChange(false);
-      window.location.reload(); // Refresh to show updated data
+      window.location.reload();
     } catch (error) {
       toast.error("Failed to update trade");
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!session?.id) return;
+
+    setIsDeleting(true);
+    try {
+      const { error } = await supabase
+        .from("backtesting_sessions")
+        .delete()
+        .eq("id", session.id);
+
+      if (error) throw error;
+
+      toast.success("Trade deleted successfully");
+      onOpenChange(false);
+      window.location.reload();
+    } catch (error) {
+      toast.error("Failed to delete trade");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -144,17 +178,38 @@ export const EditSessionDialog = ({ session, open, onOpenChange }: EditSessionDi
               />
             </div>
           </div>
-          <div className="flex justify-end gap-3 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isSaving}>
-              {isSaving ? "Saving..." : "Save Changes"}
-            </Button>
+          <div className="flex justify-between pt-4">
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button type="button" variant="destructive" disabled={isDeleting}>
+                  {isDeleting ? "Deleting..." : "Delete Trade"}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete this trade and remove it from your statistics.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isSaving}>
+                {isSaving ? "Saving..." : "Save Changes"}
+              </Button>
+            </div>
           </div>
         </form>
       </DialogContent>

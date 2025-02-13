@@ -2,14 +2,24 @@
 import Stripe from "https://esm.sh/stripe@14.21.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature',
+};
+
 const handler = async (req: Request): Promise<Response> => {
-  if (req.method !== "POST") {
-    return new Response("Method not allowed", { status: 405 });
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
   }
 
   const stripeSignature = req.headers.get("stripe-signature");
   if (!stripeSignature) {
-    return new Response("No signature", { status: 400 });
+    console.error("No stripe signature in webhook request");
+    return new Response("No stripe signature", { 
+      status: 400,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
   }
 
   const STRIPE_SECRET_KEY = Deno.env.get("STRIPE_SECRET_KEY");
@@ -18,13 +28,11 @@ const handler = async (req: Request): Promise<Response> => {
   const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
   if (!STRIPE_SECRET_KEY || !STRIPE_WEBHOOK_SECRET || !SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
-    console.error("Missing environment variables:", {
-      hasStripeKey: !!STRIPE_SECRET_KEY,
-      hasWebhookSecret: !!STRIPE_WEBHOOK_SECRET,
-      hasSupabaseUrl: !!SUPABASE_URL,
-      hasServiceRoleKey: !!SUPABASE_SERVICE_ROLE_KEY
+    console.error("Missing environment variables");
+    return new Response("Missing environment variables", { 
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
-    return new Response("Missing environment variables", { status: 500 });
   }
 
   const stripe = new Stripe(STRIPE_SECRET_KEY, {
@@ -36,15 +44,27 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const body = await req.text();
-    console.log("Received webhook event");
+    console.log("Received webhook event with signature:", stripeSignature);
     
-    const event = stripe.webhooks.constructEvent(
-      body,
-      stripeSignature,
-      STRIPE_WEBHOOK_SECRET
-    );
+    let event: Stripe.Event;
+    try {
+      event = stripe.webhooks.constructEvent(
+        body,
+        stripeSignature,
+        STRIPE_WEBHOOK_SECRET
+      );
+    } catch (err) {
+      console.error("Error verifying webhook signature:", err);
+      return new Response(
+        `Webhook signature verification failed: ${err instanceof Error ? err.message : "Unknown Error"}`,
+        { 
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
 
-    console.log("Webhook event type:", event.type);
+    console.log("Successfully verified webhook signature. Event type:", event.type);
 
     switch (event.type) {
       case "checkout.session.completed": {
@@ -53,7 +73,11 @@ const handler = async (req: Request): Promise<Response> => {
         
         if (session.subscription) {
           const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
-          console.log("Retrieved subscription:", subscription.id);
+          console.log("Retrieved subscription details:", {
+            id: subscription.id,
+            status: subscription.status,
+            userId: subscription.metadata.user_id
+          });
           
           const { error } = await supabase.from("subscriptions").upsert({
             stripe_subscription_id: subscription.id,
@@ -69,8 +93,12 @@ const handler = async (req: Request): Promise<Response> => {
 
           if (error) {
             console.error("Error upserting subscription:", error);
-            return new Response("Error upserting subscription", { status: 500 });
+            return new Response(JSON.stringify({ error: "Error upserting subscription" }), { 
+              status: 500,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            });
           }
+          console.log("Successfully updated subscription in database");
         }
         break;
       }
@@ -78,7 +106,12 @@ const handler = async (req: Request): Promise<Response> => {
       case "customer.subscription.created":
       case "customer.subscription.updated": {
         const subscription = event.data.object as Stripe.Subscription;
-        console.log("Processing subscription event:", subscription.id);
+        console.log("Processing subscription event:", {
+          type: event.type,
+          id: subscription.id,
+          status: subscription.status,
+          userId: subscription.metadata.user_id
+        });
         
         const { error } = await supabase.from("subscriptions").upsert({
           stripe_subscription_id: subscription.id,
@@ -94,8 +127,12 @@ const handler = async (req: Request): Promise<Response> => {
 
         if (error) {
           console.error("Error upserting subscription:", error);
-          return new Response("Error upserting subscription", { status: 500 });
+          return new Response(JSON.stringify({ error: "Error upserting subscription" }), { 
+            status: 500,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
         }
+        console.log("Successfully updated subscription in database");
         break;
       }
 
@@ -110,21 +147,28 @@ const handler = async (req: Request): Promise<Response> => {
 
         if (error) {
           console.error("Error updating subscription:", error);
-          return new Response("Error updating subscription", { status: 500 });
+          return new Response(JSON.stringify({ error: "Error updating subscription" }), { 
+            status: 500,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
         }
+        console.log("Successfully marked subscription as canceled in database");
         break;
       }
     }
 
-    console.log("Successfully processed webhook event:", event.type);
+    console.log("Successfully processed webhook event");
     return new Response(JSON.stringify({ received: true }), {
-      headers: { "Content-Type": "application/json" },
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (err) {
     console.error("Error processing webhook:", err);
     return new Response(
-      `Webhook Error: ${err instanceof Error ? err.message : "Unknown Error"}`,
-      { status: 400 }
+      JSON.stringify({ error: `Webhook Error: ${err instanceof Error ? err.message : "Unknown Error"}` }),
+      { 
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
     );
   }
 };

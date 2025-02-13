@@ -1,6 +1,6 @@
 
 import { Home, BookOpen, BarChart2, Menu, User } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -21,6 +21,7 @@ import { useToast } from "@/hooks/use-toast";
 
 export function AppHeader() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [username, setUsername] = useState("");
@@ -133,13 +134,13 @@ export function AppHeader() {
               <Button
                 variant="ghost"
                 className="text-white/70 hover:text-white hover:bg-white/5"
-                onClick={() => location.pathname !== "/login" && navigate("/login")}
+                onClick={() => navigate("/login")}
               >
                 Sign In
               </Button>
               <Button
                 className="bg-primary/20 hover:bg-primary/30 text-primary-light border border-primary/20 backdrop-blur-sm"
-                onClick={() => location.pathname !== "/login" && navigate("/login")}
+                onClick={() => navigate("/login")}
               >
                 Get Started
               </Button>

@@ -6,6 +6,7 @@ import { Check } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { createCheckoutSession } from "@/lib/stripe";
 import { toast } from "sonner";
+import { AppHeader } from "@/components/layout/AppHeader";
 
 const Pricing = () => {
   const navigate = useNavigate();
@@ -40,45 +41,8 @@ const Pricing = () => {
         <div className="absolute inset-0 backdrop-blur-[100px]" />
       </div>
 
-      {/* Header - matching Landing page style */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background/5 backdrop-blur-md border-b border-white/5">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center">
-            <span className="text-xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
-              Mental
-            </span>
-          </div>
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              className="text-white/70 hover:text-white hover:bg-white/5"
-              onClick={() => navigate("/features")}
-            >
-              Features
-            </Button>
-            <Button
-              variant="ghost"
-              className="text-white/70 hover:text-white hover:bg-white/5"
-              onClick={() => navigate("/pricing")}
-            >
-              Pricing
-            </Button>
-            <Button
-              variant="ghost"
-              className="text-white/70 hover:text-white hover:bg-white/5"
-              onClick={() => navigate("/login")}
-            >
-              Sign In
-            </Button>
-            <Button
-              className="bg-primary/20 hover:bg-primary/30 text-primary-light border border-primary/20 backdrop-blur-sm"
-              onClick={() => navigate("/login")}
-            >
-              Get Started
-            </Button>
-          </div>
-        </div>
-      </header>
+      {/* Use AppHeader instead of custom header */}
+      <AppHeader />
 
       {/* Pricing Content */}
       <div className="relative z-10 pt-32 pb-20">

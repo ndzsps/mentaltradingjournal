@@ -17,9 +17,9 @@ import {
 
 const Features = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#1A1F2C]">
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-b">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-[#1A1F2C]/80 backdrop-blur-sm border-b border-white/10">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link to="/" className="text-xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
             Mental
@@ -43,14 +43,11 @@ const Features = () => {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-16">
-        {/* Centered Title - Added extra top padding */}
         <h1 className="text-4xl md:text-5xl font-bold text-center mb-16 pt-12">
           Everything In One Location
         </h1>
 
-        {/* First Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mt-8">
-          {/* Left Column - Text Content */}
           <div className="space-y-8">
             <h2 className="text-3xl md:text-4xl font-semibold">
               Pre-Session Check In
@@ -67,7 +64,6 @@ const Features = () => {
             </Button>
           </div>
 
-          {/* Right Column - Dashboard Image */}
           <div className="relative rounded-3xl overflow-hidden bg-white shadow-xl lg:-mt-12">
             <img 
               src="/lovable-uploads/b70a5c45-5d2d-4a9c-a885-3841b19ed6c2.png"
@@ -77,9 +73,7 @@ const Features = () => {
           </div>
         </div>
 
-        {/* Second Section (Flipped) */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mt-32">
-          {/* Left Column - Dashboard Image */}
           <div className="relative rounded-3xl overflow-hidden bg-white shadow-xl lg:-mt-12 order-2 lg:order-1">
             <img 
               src="/lovable-uploads/e9c68a6a-c499-475b-9518-7ba15509fc57.png"
@@ -88,7 +82,6 @@ const Features = () => {
             />
           </div>
 
-          {/* Right Column - Text Content */}
           <div className="space-y-8 order-1 lg:order-2">
             <h2 className="text-3xl md:text-4xl font-semibold">
               Post-Session Review
@@ -106,9 +99,7 @@ const Features = () => {
           </div>
         </div>
 
-        {/* Third Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mt-32">
-          {/* Left Column - Text Content */}
           <div className="space-y-8">
             <h2 className="text-3xl md:text-4xl font-semibold">
               Psychology Metrics
@@ -125,7 +116,6 @@ const Features = () => {
             </Button>
           </div>
 
-          {/* Right Column - Image */}
           <div className="relative rounded-3xl overflow-hidden bg-white shadow-xl lg:-mt-12">
             <img 
               src="/lovable-uploads/e9c68a6a-c499-475b-9518-7ba15509fc57.png"
@@ -135,9 +125,7 @@ const Features = () => {
           </div>
         </div>
 
-        {/* Fourth Section (Flipped) */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mt-32">
-          {/* Right Column - Text Content */}
           <div className="space-y-8 order-1 lg:order-2">
             <h2 className="text-3xl md:text-4xl font-semibold">
               Cutting Edge Trading Analytics
@@ -154,7 +142,6 @@ const Features = () => {
             </Button>
           </div>
 
-          {/* Left Column - Image */}
           <div className="relative rounded-3xl overflow-hidden bg-white shadow-xl lg:-mt-12 order-2 lg:order-1">
             <img 
               src="/lovable-uploads/871474ba-41ef-4e5d-ad53-f98502fd473b.png"
@@ -164,9 +151,7 @@ const Features = () => {
           </div>
         </div>
 
-        {/* Fifth Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mt-32">
-          {/* Left Column - Text Content */}
           <div className="space-y-8">
             <h2 className="text-3xl md:text-4xl font-semibold">
               Backtesting Journal
@@ -183,7 +168,6 @@ const Features = () => {
             </Button>
           </div>
 
-          {/* Right Column - Image */}
           <div className="relative rounded-3xl overflow-hidden bg-white shadow-xl lg:-mt-12">
             <img 
               src="/lovable-uploads/e9c68a6a-c499-475b-9518-7ba15509fc57.png"

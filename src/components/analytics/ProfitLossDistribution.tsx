@@ -54,11 +54,12 @@ const generateDynamicRanges = (trades: any[]) => {
   const spread = max - min;
   const targetBinCount = spread > 10000 ? 6 : spread > 5000 ? 5 : 4;
 
-  const binSize = spread / targetBinCount;
+  const binSize = Math.ceil(spread / targetBinCount);
   const ranges = [];
 
   // Create bins with round numbers
   const roundToPrettyNumber = (num: number) => {
+    if (num === 0) return 0;
     const magnitude = Math.pow(10, Math.floor(Math.log10(Math.abs(num))));
     return Math.round(num / magnitude) * magnitude;
   };

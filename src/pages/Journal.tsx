@@ -1,4 +1,3 @@
-
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { useEffect, useState } from "react";
@@ -14,6 +13,7 @@ import { StatsHeader } from "@/components/journal/stats/StatsHeader";
 import { TimeFilterProvider } from "@/contexts/TimeFilterContext";
 import { startOfDay, endOfDay } from "date-fns";
 import { useLocation } from "react-router-dom";
+import { SubscriptionGuard } from "@/components/subscription/SubscriptionGuard";
 
 const Journal = () => {
   const [entries, setEntries] = useState<JournalEntryType[]>([]);
@@ -114,53 +114,55 @@ const Journal = () => {
 
   return (
     <AppLayout>
-      <TimeFilterProvider>
-        <div className="max-w-7xl mx-auto space-y-8 px-4">
-          <StatsHeader />
+      <SubscriptionGuard>
+        <TimeFilterProvider>
+          <div className="max-w-7xl mx-auto space-y-8 px-4">
+            <StatsHeader />
 
-          <div>
-            <JournalCalendar 
-              date={selectedDate}
-              onDateSelect={setSelectedDate}
-              entries={calendarEntries}
-            />
-          </div>
-
-          <Card id="journal-entries" className="p-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
-                {selectedDate 
-                  ? `Journal Entries for ${selectedDate.toLocaleDateString('en-US', { 
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}`
-                  : 'Journal Entries'
-                }
-              </h2>
-              <JournalFilters />
+            <div>
+              <JournalCalendar 
+                date={selectedDate}
+                onDateSelect={setSelectedDate}
+                entries={calendarEntries}
+              />
             </div>
-            
-            <ScrollArea className="h-[600px] pr-4">
-              {displayedEntries.length > 0 ? (
-                <div className="space-y-4">
-                  {displayedEntries.map((entry) => (
-                    <JournalEntry key={entry.id} entry={entry} />
-                  ))}
-                </div>
-              ) : (
-                <p className="text-muted-foreground text-center py-8">
+
+            <Card id="journal-entries" className="p-8 bg-card/30 backdrop-blur-xl border-primary/10 shadow-2xl">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
                   {selectedDate 
-                    ? `No entries found for ${selectedDate.toLocaleDateString()}`
-                    : 'No entries found for the selected filters'
+                    ? `Journal Entries for ${selectedDate.toLocaleDateString('en-US', { 
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}`
+                    : 'Journal Entries'
                   }
-                </p>
-              )}
-            </ScrollArea>
-          </Card>
-        </div>
-      </TimeFilterProvider>
+                </h2>
+                <JournalFilters />
+              </div>
+              
+              <ScrollArea className="h-[600px] pr-4">
+                {displayedEntries.length > 0 ? (
+                  <div className="space-y-4">
+                    {displayedEntries.map((entry) => (
+                      <JournalEntry key={entry.id} entry={entry} />
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground text-center py-8">
+                    {selectedDate 
+                      ? `No entries found for ${selectedDate.toLocaleDateString()}`
+                      : 'No entries found for the selected filters'
+                    }
+                  </p>
+                )}
+              </ScrollArea>
+            </Card>
+          </div>
+        </TimeFilterProvider>
+      </SubscriptionGuard>
     </AppLayout>
   );
 };

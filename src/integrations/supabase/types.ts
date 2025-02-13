@@ -608,6 +608,10 @@ export type Database = {
         }
         Returns: number
       }
+      check_subscription: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       get_trade_duration: {
         Args: {
           entry_date: string

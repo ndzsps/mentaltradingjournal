@@ -7,12 +7,14 @@ const corsHeaders = {
 };
 
 const handler = async (req: Request): Promise<Response> => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   const authHeader = req.headers.get('Authorization');
   if (!authHeader) {
+    console.error('No authorization header provided');
     return new Response(JSON.stringify({ error: 'No authorization header' }), {
       status: 401,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -31,12 +33,14 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    // Create Supabase client
+    // Create Supabase client with service role key
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // Get user ID from token
-    const { data: { user }, error: userError } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''));
-    
+    // Get user ID from the JWT token
+    const { data: { user }, error: userError } = await supabase.auth.getUser(
+      authHeader.replace('Bearer ', '')
+    );
+
     if (userError || !user) {
       console.error('Error getting user:', userError);
       return new Response(JSON.stringify({ error: 'Invalid token' }), {
@@ -50,7 +54,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Query subscriptions table
     const { data: subscription, error: subscriptionError } = await supabase
       .from('subscriptions')
-      .select('*')
+      .select()
       .eq('user_id', user.id)
       .eq('status', 'active')
       .maybeSingle();
@@ -63,7 +67,7 @@ const handler = async (req: Request): Promise<Response> => {
       });
     }
 
-    console.log('Subscription data:', subscription);
+    console.log('Found subscription:', subscription);
 
     // Check if subscription is active and not expired
     const hasActiveSubscription = subscription && 
@@ -72,7 +76,6 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log('Has active subscription:', hasActiveSubscription);
 
-    // Return whether user has an active subscription
     return new Response(JSON.stringify(hasActiveSubscription), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });

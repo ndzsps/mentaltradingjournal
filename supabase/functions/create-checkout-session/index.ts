@@ -1,6 +1,6 @@
 
-import Stripe from "stripe";
-import { createClient } from "@supabase/supabase-js";
+import Stripe from "https://esm.sh/stripe@14.21.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 
 const handler = async (req: Request): Promise<Response> => {
   if (req.method !== "POST") {

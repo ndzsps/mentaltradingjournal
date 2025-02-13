@@ -10,6 +10,10 @@ import { analyzeTradeDurations } from "@/utils/analytics/tradeDurationAnalysis";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { PerformanceInsight } from "@/components/analytics/performance/PerformanceInsight";
 import { WinLossRatioBP } from "@/components/analytics/WinLossRatioBP";
+import { MfeMaeBarChart } from "@/components/backtesting/mfe-mae/components/MfeMaeBarChart";
+import { StatsCards } from "@/components/backtesting/mfe-mae/components/StatsCards";
+import { processTrade } from "@/components/backtesting/mfe-mae/utils/tradeCalculations";
+import { ChartData } from "@/components/backtesting/mfe-mae/types";
 
 interface BlueprintAnalyticsProps {
   sessions: Session[];
@@ -156,6 +160,45 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
 
   const durationInsight = getTradeDurationInsight();
 
+  // Process sessions for MFE & MAE analysis
+  const processedMfeMaeData = sessions
+    .map(session => ({
+      id: session.id,
+      entryPrice: session.entryPrice,
+      exitPrice: session.exitPrice,
+      highestPrice: session.highestPrice,
+      lowestPrice: session.lowestPrice,
+      takeProfit: session.takeProfit,
+      stopLoss: session.stopLoss,
+      instrument: session.instrument,
+    }))
+    .map(processTrade)
+    .filter((trade): trade is ChartData => trade !== null);
+
+  // Calculate MFE & MAE statistics
+  const calculateStats = () => {
+    const trades = processedMfeMaeData;
+    const totalTrades = trades.length;
+    if (totalTrades === 0) return null;
+
+    const tradesHitTp = (trades.filter(trade => trade.mfeRelativeToTp >= 100).length / totalTrades) * 100;
+    const tradesHitSl = (trades.filter(trade => Math.abs(trade.maeRelativeToSl) >= 100).length / totalTrades) * 100;
+
+    const winningTrades = trades.filter(trade => trade.mfeRelativeToTp >= trade.maeRelativeToSl);
+    const losingTrades = trades.filter(trade => trade.mfeRelativeToTp < trade.maeRelativeToSl);
+
+    return {
+      tradesHitTp,
+      tradesHitSl,
+      avgUpdrawWinner: winningTrades.reduce((sum, trade) => sum + trade.mfeRelativeToTp, 0) / (winningTrades.length || 1),
+      avgUpdrawLoser: losingTrades.reduce((sum, trade) => sum + trade.mfeRelativeToTp, 0) / (losingTrades.length || 1),
+      avgDrawdownWinner: winningTrades.reduce((sum, trade) => sum + Math.abs(trade.maeRelativeToSl), 0) / (winningTrades.length || 1),
+      avgDrawdownLoser: losingTrades.reduce((sum, trade) => sum + Math.abs(trade.maeRelativeToSl), 0) / (losingTrades.length || 1),
+    };
+  };
+
+  const mfeMaeStats = calculateStats();
+
   return (
     <div className="space-y-8 mt-8">
       <div>
@@ -273,6 +316,19 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
         <h3 className="text-xl font-bold mb-4">Risk/Reward Analysis</h3>
         <RiskRewardChart data={riskRewardData} />
       </Card>
+
+      <div className="space-y-6">
+        <Card className="p-6">
+          <h3 className="text-xl font-bold mb-6">MFE & MAE Analysis</h3>
+          <div className="h-[600px] w-full">
+            <MfeMaeBarChart data={processedMfeMaeData} />
+          </div>
+        </Card>
+        
+        {mfeMaeStats && (
+          <StatsCards stats={mfeMaeStats} />
+        )}
+      </div>
     </div>
   );
 };

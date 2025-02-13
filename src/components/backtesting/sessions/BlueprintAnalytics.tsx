@@ -192,7 +192,7 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart 
                 data={durationChartData}
-                margin={{ top: 20, right: 45, left: 45, bottom: 20 }}
+                margin={{ top: 20, right: 20, left: 20, bottom: 20 }}
               >
                 <XAxis 
                   dataKey="category" 
@@ -200,7 +200,6 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
                   stroke="hsl(var(--foreground))"
                 />
                 <YAxis
-                  yAxisId="left"
                   tick={{ fontSize: 12 }}
                   tickFormatter={(value) => `${value.toFixed(0)}%`}
                   domain={[0, 100]}
@@ -213,24 +212,7 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
                       textAnchor: 'middle',
                       fill: 'hsl(var(--foreground))'
                     },
-                    dx: -30
-                  }}
-                  stroke="hsl(var(--foreground))"
-                />
-                <YAxis
-                  yAxisId="right"
-                  orientation="right"
-                  tick={{ fontSize: 12 }}
-                  label={{
-                    value: 'Trade Count',
-                    angle: 90,
-                    position: 'insideRight',
-                    style: { 
-                      fontSize: '12px', 
-                      textAnchor: 'middle',
-                      fill: 'hsl(var(--foreground))'
-                    },
-                    dx: 30
+                    dx: -20
                   }}
                   stroke="hsl(var(--foreground))"
                 />
@@ -248,16 +230,18 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
                   itemStyle={{
                     color: 'hsl(var(--foreground))'
                   }}
+                  formatter={(value: number, name: string) => {
+                    if (name === 'winRate') return [`${value.toFixed(1)}%`, 'Win Rate'];
+                    return [`${value}`, 'Trade Count'];
+                  }}
                 />
                 <Bar
-                  yAxisId="left"
                   dataKey="winRate"
                   fill="hsl(var(--primary))"
                   name="Win Rate"
                   radius={[4, 4, 0, 0]}
                 />
                 <Bar
-                  yAxisId="right"
                   dataKey="count"
                   fill="hsl(var(--secondary))"
                   name="Trade Count"

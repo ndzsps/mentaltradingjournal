@@ -26,8 +26,7 @@ const Pricing = () => {
       }
       await createCheckoutSession(priceId);
     } catch (error) {
-      console.error("Error creating checkout session:", error);
-      toast.error("Failed to start checkout process. Please try again.");
+      toast("Failed to start checkout process. Please try again.");
     }
   };
 
@@ -35,16 +34,9 @@ const Pricing = () => {
     try {
       await updateUsername(username);
       setIsEditing(false);
-      toast({
-        title: "Username updated",
-        description: "Your username has been updated successfully.",
-      });
+      toast("Username updated successfully");
     } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to update username",
-      });
+      toast(error instanceof Error ? error.message : "Failed to update username");
     }
   };
 

@@ -15,41 +15,19 @@ interface GeneralSectionProps {
 }
 
 export function GeneralSection({ formData, direction, onInputChange, onDirectionSelect }: GeneralSectionProps) {
-  const setTodayDateTime = () => {
-    const now = new Date();
-    const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
-      .toISOString()
-      .slice(0, 16);
-    const input = document.getElementById('entryDate') as HTMLInputElement;
-    if (input) {
-      input.value = localDateTime;
-      const event = new Event('change', { bubbles: true });
-      input.dispatchEvent(event);
-    }
-  };
-
   return (
     <div className="space-y-4 p-6 bg-background/50 border rounded-lg">
       <h3 className="text-lg font-semibold">General</h3>
       
       <div className="space-y-2">
         <Label htmlFor="entryDate">Entry Date & Time *</Label>
-        <div className="flex gap-2">
-          <Input
-            type="datetime-local"
-            id="entryDate"
-            value={formData.entryDate}
-            onChange={onInputChange}
-            className="flex-1"
-          />
-          <Button 
-            type="button" 
-            variant="outline" 
-            onClick={setTodayDateTime}
-          >
-            Now
-          </Button>
-        </div>
+        <Input
+          type="datetime-local"
+          id="entryDate"
+          value={formData.entryDate}
+          onChange={onInputChange}
+          className="flex-1"
+        />
       </div>
 
       <div className="space-y-2">

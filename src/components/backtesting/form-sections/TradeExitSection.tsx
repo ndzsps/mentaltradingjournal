@@ -1,6 +1,14 @@
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 
 interface TradeExitSectionProps {
   formData: {
@@ -14,19 +22,50 @@ interface TradeExitSectionProps {
 }
 
 export function TradeExitSection({ formData, onInputChange }: TradeExitSectionProps) {
+  const handleDateSelect = (date: Date | undefined) => {
+    if (!date) return;
+    
+    // Create a synthetic event to match the expected type
+    const syntheticEvent = {
+      target: {
+        id: 'exitDate',
+        value: date.toISOString().slice(0, 16) // Format as yyyy-MM-ddThh:mm
+      }
+    } as React.ChangeEvent<HTMLInputElement>;
+    
+    onInputChange(syntheticEvent);
+  };
+
   return (
     <div className="space-y-4 p-6 bg-background/50 border rounded-lg">
       <h3 className="text-lg font-semibold">Trade Exit</h3>
       
       <div className="space-y-2">
         <Label htmlFor="exitDate">Exit Date & Time</Label>
-        <Input
-          type="datetime-local"
-          id="exitDate"
-          value={formData.exitDate}
-          onChange={onInputChange}
-          className="flex-1"
-        />
+        <div className="flex gap-2">
+          <Input
+            type="datetime-local"
+            id="exitDate"
+            value={formData.exitDate}
+            onChange={onInputChange}
+            className="flex-1"
+          />
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="icon">
+                <Calendar className="h-4 w-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="end">
+              <CalendarComponent
+                mode="single"
+                selected={formData.exitDate ? new Date(formData.exitDate) : undefined}
+                onSelect={handleDateSelect}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
       </div>
 
       <div className="space-y-2">

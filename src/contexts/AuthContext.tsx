@@ -24,16 +24,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Initialize auth state from any existing session
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session }, error }) => {
-      if (error) {
-        console.error("Error getting session:", error);
-        setUser(null);
-        setSession(null);
-      } else {
-        setSession(session);
-        setUser(session?.user ?? null);
-      }
-      setLoading(false);
+    // Clear any existing sessions on mount
+    supabase.auth.signOut().then(() => {
+      supabase.auth.getSession().then(({ data: { session }, error }) => {
+        if (error) {
+          console.error("Error getting session:", error);
+          setUser(null);
+          setSession(null);
+        } else {
+          setSession(session);
+          setUser(session?.user ?? null);
+        }
+        setLoading(false);
+      });
     });
 
     // Listen for auth changes
@@ -70,6 +73,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     try {
+      // Clear any existing sessions before attempting to sign in
+      await supabase.auth.signOut();
+      
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,

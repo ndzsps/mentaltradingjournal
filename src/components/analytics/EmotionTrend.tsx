@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import {
   ScatterChart,
@@ -11,6 +12,7 @@ import {
 } from "recharts";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 
 const formatValue = (value: number): string => {
   if (Math.abs(value) >= 1000) {
@@ -95,6 +97,9 @@ const CustomTooltip = ({ active, payload }: any) => {
             </span>
           </div>
         </div>
+        <div className="mt-2 text-xs text-muted-foreground">
+          Click to view journal entries
+        </div>
       </div>
     );
   }
@@ -102,6 +107,7 @@ const CustomTooltip = ({ active, payload }: any) => {
 };
 
 export const EmotionTrend = () => {
+  const navigate = useNavigate();
   const { data: analytics, isLoading } = useQuery({
     queryKey: ['analytics'],
     queryFn: generateAnalytics,
@@ -159,6 +165,15 @@ export const EmotionTrend = () => {
     correlationStrength >= 0.5 ? 'moderate' :
     correlationStrength >= 0.3 ? 'weak' : 'very weak';
 
+  const handleDataPointClick = (data: any) => {
+    const date = new Date(data.date);
+    navigate('/dashboard', { 
+      state: { 
+        selectedDate: date
+      }
+    });
+  };
+
   return (
     <Card className="p-4 md:p-6 space-y-4 col-span-2">
       <div className="space-y-2">
@@ -215,16 +230,22 @@ export const EmotionTrend = () => {
               name="Positive"
               data={positiveData}
               fill={getEmotionColor('positive')}
+              onClick={handleDataPointClick}
+              cursor="pointer"
             />
             <Scatter
               name="Neutral"
               data={neutralData}
               fill={getEmotionColor('neutral')}
+              onClick={handleDataPointClick}
+              cursor="pointer"
             />
             <Scatter
               name="Negative"
               data={negativeData}
               fill={getEmotionColor('negative')}
+              onClick={handleDataPointClick}
+              cursor="pointer"
             />
           </ScatterChart>
         </ResponsiveContainer>

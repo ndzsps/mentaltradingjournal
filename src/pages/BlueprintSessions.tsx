@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SessionsTable } from "@/components/backtesting/sessions/SessionsTable";
 import { SessionHeader } from "@/components/backtesting/sessions/SessionHeader";
 import { Session } from "@/components/backtesting/sessions/types";
+import { BlueprintAnalytics } from "@/components/backtesting/sessions/BlueprintAnalytics";
 
 export default function BlueprintSessions() {
   const { blueprintId } = useParams();
@@ -86,7 +87,10 @@ export default function BlueprintSessions() {
           blueprintId={blueprint?.id}
         />
         {sessions.length > 0 ? (
-          <SessionsTable sessions={sessions} />
+          <>
+            <SessionsTable sessions={sessions} />
+            <BlueprintAnalytics sessions={sessions} />
+          </>
         ) : (
           <p className="text-center text-muted-foreground">
             No sessions found for this blueprint

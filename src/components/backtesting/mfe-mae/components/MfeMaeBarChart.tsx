@@ -48,9 +48,9 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           label={{ 
             value: 'Trade', 
             position: 'bottom',
-            style: { fill: 'hsl(var(--foreground))' }
+            style: { fill: 'hsl(var(--card-foreground))' }
           }}
-          tick={{ fill: 'hsl(var(--foreground))' }}
+          tick={{ fill: 'hsl(var(--card-foreground))' }}
         />
         <YAxis 
           domain={[-100, 100]} 
@@ -60,9 +60,9 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
             position: 'insideLeft',
             offset: 0,
             dy: 60,
-            style: { fill: 'hsl(var(--foreground))' }
+            style: { fill: 'hsl(var(--card-foreground))' }
           }}
-          tick={{ fill: 'hsl(var(--foreground))' }}
+          tick={{ fill: 'hsl(var(--card-foreground))' }}
         />
         <Tooltip 
           cursor={false}
@@ -77,21 +77,21 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
             return (
               <div className="bg-card border border-border rounded-lg shadow-lg p-3">
                 <div className="space-y-2">
-                  <p className="text-lg font-bold text-foreground">Trade #{data.tradeNum}</p>
-                  <p className="text-lg text-foreground">{data.instrument || 'Unknown'}</p>
+                  <p className="text-lg font-bold text-card-foreground">Trade #{data.tradeNum}</p>
+                  <p className="text-lg text-card-foreground">{data.instrument || 'Unknown'}</p>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-[#FEC6A1]" />
-                    <span className="text-foreground">Updraw: {updrawValue?.toFixed(2)}%</span>
+                    <span className="text-card-foreground">Updraw: {updrawValue?.toFixed(2)}%</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-[#9b87f5]" />
-                    <span className="text-foreground">Drawdown: {Math.abs(drawdownValue)?.toFixed(2)}%</span>
+                    <span className="text-card-foreground">Drawdown: {Math.abs(drawdownValue)?.toFixed(2)}%</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-[#0EA5E9]" />
-                    <span className="text-foreground">Captured Move: {capturedMove?.toFixed(2)}%</span>
+                    <span className="text-card-foreground">Captured Move: {capturedMove?.toFixed(2)}%</span>
                   </div>
-                  <p className="text-foreground">R-Multiple: {data.rMultiple?.toFixed(2) || '0'}</p>
+                  <p className="text-card-foreground">R-Multiple: {data.rMultiple?.toFixed(2) || '0'}</p>
                 </div>
               </div>
             );
@@ -102,7 +102,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           align="right"
           wrapperStyle={{ 
             paddingBottom: "20px",
-            color: 'hsl(var(--foreground))'
+            color: 'hsl(var(--card-foreground))'
           }}
         />
         <Bar 

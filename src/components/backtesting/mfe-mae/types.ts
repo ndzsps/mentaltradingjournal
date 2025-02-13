@@ -5,7 +5,7 @@ export interface ChartData {
   maeRelativeToSl: number;
   instrument?: string;
   rMultiple?: number;
-  capturedMove?: number;
+  capturedMove: number;
 }
 
 export interface Stats {

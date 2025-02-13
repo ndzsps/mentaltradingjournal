@@ -112,12 +112,13 @@ export const ProfitLossDistribution = () => {
     }).length,
   }));
 
-  // Calculate statistics for AI insight
+  // Calculate statistics for AI insight with initial value for reduce
   const totalTrades = allTrades.length;
   const mostFrequentBin = data.reduce((prev, current) => 
-    (current.count > prev.count) ? current : prev
+    (current.count > prev.count) ? current : prev, 
+    { range: '', count: 0 } // Add initial value here
   );
-  const mostFrequentPercentage = (mostFrequentBin.count / totalTrades) * 100;
+  const mostFrequentPercentage = totalTrades > 0 ? (mostFrequentBin.count / totalTrades) * 100 : 0;
 
   return (
     <Card className="p-4 md:p-6 space-y-4">

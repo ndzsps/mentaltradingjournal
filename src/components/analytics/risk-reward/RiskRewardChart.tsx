@@ -10,7 +10,7 @@ import {
   ReferenceLine,
   Scatter,
 } from "recharts";
-import { format, isValid } from "date-fns";
+import { format } from "date-fns";
 
 interface RiskRewardData {
   date: Date;
@@ -34,7 +34,7 @@ const CustomTooltip = ({ active, payload }: any) => {
             <div className="w-2 h-2 rounded-full bg-primary" />
             <span className="text-muted-foreground">Date:</span>
             <span className="font-medium text-foreground">
-              {isValid(data.date) ? format(data.date, 'MMM d, yyyy') : 'Invalid Date'}
+              {format(data.date, 'MMM d, yyyy')}
             </span>
           </div>
           <div className="flex items-center gap-2 text-sm">
@@ -59,11 +59,6 @@ const CustomTooltip = ({ active, payload }: any) => {
 };
 
 export const RiskRewardChart = ({ data }: RiskRewardChartProps) => {
-  const formatDate = (date: Date) => {
-    if (!isValid(date)) return '';
-    return format(date, 'MMM d');
-  };
-
   return (
     <div className="h-[250px] md:h-[300px] w-full">
       <ResponsiveContainer width="100%" height="100%">
@@ -71,7 +66,7 @@ export const RiskRewardChart = ({ data }: RiskRewardChartProps) => {
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
             dataKey="date"
-            tickFormatter={formatDate}
+            tickFormatter={(date) => format(date, 'MMM d')}
             tick={{ fontSize: 12 }}
             label={{
               value: 'Trading Days',

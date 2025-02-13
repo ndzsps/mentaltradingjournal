@@ -7,10 +7,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Pencil } from "lucide-react";
 import { Session } from "./types";
 import { BacktestingStats } from "./BacktestingStats";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { EditSessionDialog } from "./EditSessionDialog";
 
 interface SessionsTableProps {
   sessions: Session[];
@@ -57,6 +59,9 @@ const renderUrlLink = (url: string | null, label: string) => {
 };
 
 export const SessionsTable = ({ sessions }: SessionsTableProps) => {
+  const [selectedSession, setSelectedSession] = useState<Session | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
   return (
     <div className="space-y-6">
       <BacktestingStats sessions={sessions} />
@@ -64,6 +69,7 @@ export const SessionsTable = ({ sessions }: SessionsTableProps) => {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>Actions</TableHead>
               <TableHead>Entry Date</TableHead>
               <TableHead>Instrument</TableHead>
               <TableHead>Direction</TableHead>
@@ -85,6 +91,20 @@ export const SessionsTable = ({ sessions }: SessionsTableProps) => {
           <TableBody>
             {sessions.map((session) => (
               <TableRow key={session.id}>
+                <TableCell>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0"
+                    onClick={() => {
+                      setSelectedSession(session);
+                      setIsEditDialogOpen(true);
+                    }}
+                  >
+                    <Pencil className="h-4 w-4" />
+                    <span className="sr-only">Edit trade</span>
+                  </Button>
+                </TableCell>
                 <TableCell>{formatDate(session.entryDate)}</TableCell>
                 <TableCell>{session.instrument || '-'}</TableCell>
                 <TableCell>
@@ -120,6 +140,11 @@ export const SessionsTable = ({ sessions }: SessionsTableProps) => {
           </TableBody>
         </Table>
       </div>
+      <EditSessionDialog
+        session={selectedSession}
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+      />
     </div>
   );
 };

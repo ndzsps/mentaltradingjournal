@@ -69,6 +69,7 @@ export default function BlueprintSessions() {
         <SessionHeader 
           blueprintName={blueprint?.name || ""} 
           description={blueprint?.description || ""}
+          blueprintId={blueprint?.id}
         />
         {sessions.length > 0 ? (
           <SessionsTable sessions={sessions} />

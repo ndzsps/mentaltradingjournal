@@ -23,6 +23,7 @@ const handler = async (req: Request): Promise<Response> => {
   const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
   if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+    console.error('Missing environment variables');
     return new Response(JSON.stringify({ error: 'Missing environment variables' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -44,6 +45,8 @@ const handler = async (req: Request): Promise<Response> => {
       });
     }
 
+    console.log('Checking subscription for user:', user.id);
+
     // Query subscriptions table
     const { data: subscription, error: subscriptionError } = await supabase
       .from('subscriptions')
@@ -60,8 +63,17 @@ const handler = async (req: Request): Promise<Response> => {
       });
     }
 
+    console.log('Subscription data:', subscription);
+
+    // Check if subscription is active and not expired
+    const hasActiveSubscription = subscription && 
+                                subscription.status === 'active' && 
+                                new Date(subscription.current_period_end) > new Date();
+
+    console.log('Has active subscription:', hasActiveSubscription);
+
     // Return whether user has an active subscription
-    return new Response(JSON.stringify(!!subscription), {
+    return new Response(JSON.stringify(hasActiveSubscription), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
 

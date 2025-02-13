@@ -14,23 +14,34 @@ export const useSubscription = () => {
         return false;
       }
 
-      console.log('Checking subscription status with token...');
-      const { data, error } = await supabase.functions.invoke(
-        'check-subscription',
-        {
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
+      try {
+        console.log('Checking subscription status with token...');
+        const { data, error } = await supabase.functions.invoke(
+          'check-subscription',
+          {
+            headers: {
+              Authorization: `Bearer ${session.access_token}`,
+            }
           }
+        );
+        
+        if (error) {
+          // If we get an authentication error, return false instead of throwing
+          if (error.status === 401) {
+            console.log('Subscription check failed due to auth error, returning false');
+            return false;
+          }
+          console.error('Error checking subscription:', error);
+          throw error;
         }
-      );
-      
-      if (error) {
-        console.error('Error checking subscription:', error);
-        throw error;
+        
+        console.log('Subscription check result:', data);
+        return data;
+      } catch (error) {
+        // If there's a network error or other issue, log it and return false
+        console.error('Subscription check failed:', error);
+        return false;
       }
-      
-      console.log('Subscription check result:', data);
-      return data;
     },
     enabled: !!session?.access_token,
     retry: false,

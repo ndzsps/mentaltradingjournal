@@ -1,9 +1,8 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { EmotionalTendencies } from "./EmotionalTendencies";
-import { PerformanceBreakdown } from "./PerformanceBreakdown";
 import { EmotionTrend } from "./EmotionTrend";
+import { PerformanceBreakdown } from "./PerformanceBreakdown";
 import { RuleAdherence } from "./RuleAdherence";
 import { EmotionRecovery } from "./EmotionRecovery";
 import { PreTradingEvents } from "./PreTradingEvents";
@@ -25,9 +24,8 @@ export const AnalyticsDashboard = () => {
   const [activeView, setActiveView] = useState<'all' | 'psychological' | 'trading'>('all');
 
   const psychologicalComponents = [
-    EmotionTrend, // Moved EmotionTrend to the beginning of psychological components
+    EmotionTrend,
     MistakeAnalysis,
-    EmotionalTendencies,
     EmotionRecovery,
     PreTradingEvents,
     PersonalityPatterns,
@@ -53,7 +51,7 @@ export const AnalyticsDashboard = () => {
       case 'trading':
         return tradingComponents;
       default:
-        return [EmotionTrend, ...psychologicalComponents.slice(1), ...tradingComponents]; // Always show EmotionTrend first in 'all' view
+        return [EmotionTrend, ...psychologicalComponents.slice(1), ...tradingComponents];
     }
   };
 

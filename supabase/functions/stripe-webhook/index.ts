@@ -59,7 +59,6 @@ const handler = async (req: Request): Promise<Response> => {
     
     let event: Stripe.Event;
     try {
-      // Changed from constructEvent to constructEventAsync
       event = await stripe.webhooks.constructEventAsync(
         body,
         stripeSignature,
@@ -97,8 +96,22 @@ const handler = async (req: Request): Promise<Response> => {
             customerId: subscription.customer,
             priceId: subscription.items.data[0].price.id
           });
+
+          // Check if subscription already exists
+          const { data: existingSubscription } = await supabase
+            .from("subscriptions")
+            .select()
+            .eq("stripe_subscription_id", subscription.id)
+            .maybeSingle();
+
+          if (existingSubscription) {
+            console.log("Subscription already exists, skipping creation:", subscription.id);
+            return new Response(JSON.stringify({ received: true }), {
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            });
+          }
           
-          const { error } = await supabase.from("subscriptions").upsert({
+          const { error } = await supabase.from("subscriptions").insert({
             stripe_subscription_id: subscription.id,
             user_id: subscription.metadata.user_id,
             status: subscription.status,
@@ -111,13 +124,13 @@ const handler = async (req: Request): Promise<Response> => {
           });
 
           if (error) {
-            console.error("Error upserting subscription:", error);
-            return new Response(JSON.stringify({ error: "Error upserting subscription", details: error }), { 
+            console.error("Error inserting subscription:", error);
+            return new Response(JSON.stringify({ error: "Error inserting subscription", details: error }), { 
               status: 500,
               headers: { ...corsHeaders, 'Content-Type': 'application/json' }
             });
           }
-          console.log("Successfully updated subscription in database for session:", session.id);
+          console.log("Successfully created subscription in database for session:", session.id);
         }
         break;
       }

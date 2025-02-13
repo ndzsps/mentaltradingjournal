@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import {
   BarChart,
@@ -29,6 +30,46 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   );
 };
 
+const generateDynamicRanges = (trades: any[]) => {
+  const pnlValues = trades.map(trade => Number(trade.pnl));
+  const min = Math.min(...pnlValues);
+  const max = Math.max(...pnlValues);
+
+  // Determine the optimal number of bins based on data spread
+  const spread = max - min;
+  const targetBinCount = spread > 10000 ? 6 : spread > 5000 ? 5 : 4;
+
+  const binSize = spread / targetBinCount;
+  const ranges = [];
+
+  // Create bins with round numbers
+  const roundToPrettyNumber = (num: number) => {
+    const magnitude = Math.pow(10, Math.floor(Math.log10(Math.abs(num))));
+    return Math.round(num / magnitude) * magnitude;
+  };
+
+  let currentMin = roundToPrettyNumber(min);
+  const roundedMax = roundToPrettyNumber(max + binSize);
+
+  while (currentMin < roundedMax) {
+    const currentMax = Math.min(roundToPrettyNumber(currentMin + binSize), roundedMax);
+    ranges.push({
+      min: currentMin,
+      max: currentMax,
+      label: `$${currentMin.toLocaleString()} to $${currentMax.toLocaleString()}`
+    });
+    currentMin = currentMax;
+  }
+
+  return ranges;
+};
+
+const formatRangeLabel = (range: { min: number; max: number; label: string }) => {
+  if (range.min === -Infinity) return `< $${range.max.toLocaleString()}`;
+  if (range.max === Infinity) return `> $${range.min.toLocaleString()}`;
+  return range.label;
+};
+
 export const ProfitLossDistribution = () => {
   const { data: analytics, isLoading } = useQuery({
     queryKey: ['analytics'],
@@ -46,32 +87,44 @@ export const ProfitLossDistribution = () => {
     );
   }
 
-  // Process trades from journal entries to create P/L distribution
-  const allTrades = analytics.journalEntries.flatMap(entry => entry.trades || []);
-  const ranges = [
-    { min: -Infinity, max: -1000, label: "-$1000+" },
-    { min: -1000, max: -500, label: "-$500 to -$1000" },
-    { min: -500, max: -100, label: "-$100 to -$500" },
-    { min: -100, max: 100, label: "-$100 to $100" },
-    { min: 100, max: 500, label: "$100 to $500" },
-    { min: 500, max: 1000, label: "$500 to $1000" },
-    { min: 1000, max: Infinity, label: "$1000+" },
-  ];
+  // Process trades from journal entries
+  const allTrades = analytics.journalEntries.flatMap(entry => entry.trades || [])
+    .filter(trade => trade && trade.pnl !== undefined && trade.pnl !== null);
+
+  if (allTrades.length === 0) {
+    return (
+      <Card className="p-4 md:p-6 space-y-4">
+        <div className="space-y-2">
+          <h3 className="text-xl md:text-2xl font-bold">Profit/Loss Distribution</h3>
+          <p className="text-sm text-muted-foreground">No trade data available yet</p>
+        </div>
+      </Card>
+    );
+  }
+
+  const ranges = generateDynamicRanges(allTrades);
 
   const data = ranges.map(range => ({
-    range: range.label,
+    range: formatRangeLabel(range),
     count: allTrades.filter(trade => {
       const pnl = Number(trade.pnl);
-      return pnl > range.min && pnl <= range.max;
+      return pnl >= range.min && pnl < range.max;
     }).length,
   }));
+
+  // Calculate statistics for AI insight
+  const totalTrades = allTrades.length;
+  const mostFrequentBin = data.reduce((prev, current) => 
+    (current.count > prev.count) ? current : prev
+  );
+  const mostFrequentPercentage = (mostFrequentBin.count / totalTrades) * 100;
 
   return (
     <Card className="p-4 md:p-6 space-y-4">
       <div className="space-y-2">
         <h3 className="text-xl md:text-2xl font-bold">Profit/Loss Distribution</h3>
         <p className="text-sm text-muted-foreground">
-          Distribution of trade outcomes across different P/L ranges
+          Distribution of trade outcomes across P&L ranges
         </p>
       </div>
 
@@ -84,6 +137,9 @@ export const ProfitLossDistribution = () => {
               tick={{ fontSize: 12 }}
               stroke="currentColor"
               tickLine={{ stroke: 'currentColor' }}
+              angle={-15}
+              textAnchor="end"
+              height={60}
             />
             <YAxis 
               tick={{ fontSize: 12 }}
@@ -106,10 +162,9 @@ export const ProfitLossDistribution = () => {
       <div className="space-y-2 bg-accent/10 p-3 md:p-4 rounded-lg">
         <h4 className="font-semibold text-sm md:text-base">AI Insight</h4>
         <p className="text-xs md:text-sm text-muted-foreground">
-          {data.find(d => d.range === "-$100 to $100")?.count > 
-           Math.max(...data.map(d => d.count)) / 2
-            ? "Most of your trades fall within the -$100 to $100 range, suggesting consistent but conservative position sizing."
-            : "Your trade outcomes show varied distribution. Consider reviewing position sizing strategy for more consistent results."}
+          {mostFrequentPercentage > 40
+            ? `${mostFrequentPercentage.toFixed(1)}% of your trades fall within the ${mostFrequentBin.range} range, indicating a consistent pattern in your trade outcomes.`
+            : "Your trade outcomes show a diverse distribution across different P&L ranges, suggesting varied market conditions or strategy adaptations."}
         </p>
       </div>
     </Card>

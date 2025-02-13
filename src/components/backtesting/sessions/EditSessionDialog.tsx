@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -38,9 +37,12 @@ export const EditSessionDialog = ({ session, open, onOpenChange }: EditSessionDi
 
   useEffect(() => {
     if (session) {
+      const entryDate = session.entryDate ? new Date(session.entryDate).toISOString().slice(0, 16) : '';
+      const exitDate = session.exitDate ? new Date(session.exitDate).toISOString().slice(0, 16) : '';
+
       setFormData({
-        entryDate: session.entryDate,
-        exitDate: session.exitDate,
+        entryDate,
+        exitDate,
         entryPrice: session.entryPrice,
         exitPrice: session.exitPrice,
         quantity: session.quantity,
@@ -59,11 +61,14 @@ export const EditSessionDialog = ({ session, open, onOpenChange }: EditSessionDi
 
     setIsSaving(true);
     try {
+      const entry_date = formData.entryDate ? new Date(formData.entryDate).toISOString() : null;
+      const exit_date = formData.exitDate ? new Date(formData.exitDate).toISOString() : null;
+
       const { error } = await supabase
         .from("backtesting_sessions")
         .update({
-          entry_date: formData.entryDate,
-          exit_date: formData.exitDate,
+          entry_date,
+          exit_date,
           entry_price: formData.entryPrice,
           exit_price: formData.exitPrice,
           quantity: formData.quantity,
@@ -80,11 +85,11 @@ export const EditSessionDialog = ({ session, open, onOpenChange }: EditSessionDi
       toast.success("Trade updated successfully");
       onOpenChange(false);
       
-      // Store success message in sessionStorage before refresh
       sessionStorage.setItem('tradeEditSuccess', 'true');
       window.location.reload();
     } catch (error) {
       toast.error("Failed to update trade");
+      console.error("Error updating trade:", error);
     } finally {
       setIsSaving(false);
     }
@@ -126,7 +131,7 @@ export const EditSessionDialog = ({ session, open, onOpenChange }: EditSessionDi
                 <Input
                   id="entryDate"
                   type="datetime-local"
-                  value={formData.entryDate?.slice(0, 16) || ""}
+                  value={formData.entryDate || ""}
                   onChange={(e) => setFormData(prev => ({ ...prev, entryDate: e.target.value }))}
                 />
               </div>
@@ -135,7 +140,7 @@ export const EditSessionDialog = ({ session, open, onOpenChange }: EditSessionDi
                 <Input
                   id="exitDate"
                   type="datetime-local"
-                  value={formData.exitDate?.slice(0, 16) || ""}
+                  value={formData.exitDate || ""}
                   onChange={(e) => setFormData(prev => ({ ...prev, exitDate: e.target.value }))}
                 />
               </div>

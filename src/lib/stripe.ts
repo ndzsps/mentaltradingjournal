@@ -9,20 +9,17 @@ export async function createCheckoutSession(priceId: string) {
       throw new Error('User must be logged in');
     }
 
-    const response = await fetch('/api/create-checkout-session', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${session.access_token}`,
-      },
-      body: JSON.stringify({
+    const { data, error } = await supabase.functions.invoke('create-checkout-session', {
+      body: {
         priceId,
         userId: session.user.id,
-      }),
+      },
     });
 
-    const { url } = await response.json();
-    window.location.href = url;
+    if (error) throw error;
+    if (!data?.url) throw new Error('No checkout URL returned');
+
+    window.location.href = data.url;
   } catch (error) {
     console.error('Error creating checkout session:', error);
     throw error;
@@ -37,16 +34,14 @@ export async function createPortalSession() {
       throw new Error('User must be logged in');
     }
 
-    const response = await fetch('/api/create-portal-session', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${session.access_token}`,
-      },
+    const { data, error } = await supabase.functions.invoke('create-portal-session', {
+      body: {},
     });
 
-    const { url } = await response.json();
-    window.location.href = url;
+    if (error) throw error;
+    if (!data?.url) throw new Error('No portal URL returned');
+
+    window.location.href = data.url;
   } catch (error) {
     console.error('Error creating portal session:', error);
     throw error;

@@ -59,7 +59,8 @@ const handler = async (req: Request): Promise<Response> => {
     
     let event: Stripe.Event;
     try {
-      event = stripe.webhooks.constructEvent(
+      // Changed from constructEvent to constructEventAsync
+      event = await stripe.webhooks.constructEventAsync(
         body,
         stripeSignature,
         STRIPE_WEBHOOK_SECRET

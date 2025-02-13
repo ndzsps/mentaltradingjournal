@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { Info } from "lucide-react";
 import {
@@ -34,6 +35,31 @@ export const BacktestingStats = ({ sessions }: BacktestingStatsProps) => {
   const profitFactorValue = profitFactor.losses === 0 
     ? profitFactor.profits > 0 ? "∞" : "0" 
     : (profitFactor.profits / profitFactor.losses).toFixed(2);
+
+  // Calculate max drawdown (consecutive losses)
+  const calculateMaxDrawdown = () => {
+    let maxDrawdown = 0;
+    let currentDrawdown = 0;
+
+    // Sort sessions by exitDate
+    const sortedSessions = [...sessions].sort((a, b) => 
+      new Date(a.exitDate).getTime() - new Date(b.exitDate).getTime()
+    );
+
+    sortedSessions.forEach(session => {
+      const pnl = session.pnl || 0;
+      if (pnl < 0) {
+        currentDrawdown += Math.abs(pnl);
+        maxDrawdown = Math.max(maxDrawdown, currentDrawdown);
+      } else {
+        currentDrawdown = 0;
+      }
+    });
+
+    return maxDrawdown;
+  };
+
+  const maxDrawdown = calculateMaxDrawdown();
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -106,9 +132,9 @@ export const BacktestingStats = ({ sessions }: BacktestingStatsProps) => {
       <Card className="p-4 relative">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm text-muted-foreground">Daily Win %</p>
-            <p className="text-2xl font-bold">
-              {winRate.toFixed(2)}%
+            <p className="text-sm text-muted-foreground">Max Drawdown</p>
+            <p className="text-2xl font-bold text-red-500">
+              -${maxDrawdown.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
           </div>
           <TooltipProvider>
@@ -117,7 +143,7 @@ export const BacktestingStats = ({ sessions }: BacktestingStatsProps) => {
                 <Info className="h-4 w-4 text-muted-foreground" />
               </TooltipTrigger>
               <TooltipContent>
-                <p>Percentage of profitable days</p>
+                <p>Maximum consecutive loss amount</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>

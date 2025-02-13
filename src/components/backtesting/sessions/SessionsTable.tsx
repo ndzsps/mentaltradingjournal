@@ -69,7 +69,7 @@ export const SessionsTable = ({ sessions }: SessionsTableProps) => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Actions</TableHead>
+              <TableHead className="w-[40px]"></TableHead>
               <TableHead>Entry Date</TableHead>
               <TableHead>Instrument</TableHead>
               <TableHead>Direction</TableHead>
@@ -91,7 +91,7 @@ export const SessionsTable = ({ sessions }: SessionsTableProps) => {
           <TableBody>
             {sessions.map((session) => (
               <TableRow key={session.id}>
-                <TableCell>
+                <TableCell className="w-[40px] px-2">
                   <Button
                     variant="ghost"
                     size="sm"

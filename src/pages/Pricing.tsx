@@ -14,7 +14,8 @@ const Pricing = () => {
   const handleSubscribe = async (priceId: string) => {
     try {
       if (!user) {
-        navigate("/login");
+        // Include the current path as the return URL
+        navigate(`/login?returnTo=${encodeURIComponent('/pricing')}`);
         return;
       }
       await createCheckoutSession(priceId);

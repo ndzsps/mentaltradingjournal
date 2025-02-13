@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,14 +18,20 @@ const Login = () => {
   const [isResetPassword, setIsResetPassword] = useState(false);
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
+
+  // Get the return URL from the query parameters
+  const searchParams = new URLSearchParams(location.search);
+  const returnTo = searchParams.get('returnTo') || '/dashboard';
 
   // Only redirect if user is logged in and NOT in reset password mode
   useEffect(() => {
     if (user && !isResetPassword) {
-      navigate("/dashboard");
+      // Redirect to the return URL if authenticated
+      navigate(returnTo);
     }
-  }, [user, navigate, isResetPassword]);
+  }, [user, navigate, isResetPassword, returnTo]);
 
   // Check for recovery token in URL
   useEffect(() => {
@@ -129,7 +135,7 @@ const Login = () => {
         });
       } else {
         await signIn(email, password);
-        navigate("/dashboard");
+        navigate(returnTo);
       }
     } catch (error) {
       console.error('Auth error:', error);

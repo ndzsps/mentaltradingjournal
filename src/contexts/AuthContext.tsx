@@ -91,11 +91,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUp = async (email: string, password: string) => {
     try {
+      // Get the current URL to preserve the return path
+      const currentUrl = new URL(window.location.href);
+      const returnTo = currentUrl.searchParams.get('returnTo') || '/dashboard';
+      
       const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/login`,
+          emailRedirectTo: `${window.location.origin}/login?returnTo=${encodeURIComponent(returnTo)}`,
           data: {
             username: email.split("@")[0],
           },

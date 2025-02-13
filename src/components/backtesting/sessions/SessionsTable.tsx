@@ -1,4 +1,3 @@
-
 import {
   Table,
   TableBody,
@@ -58,14 +57,17 @@ export const SessionsTable = ({ sessions }: SessionsTableProps) => {
               <TableHead>Instrument</TableHead>
               <TableHead>Setup</TableHead>
               <TableHead>Direction</TableHead>
-              <TableHead className="text-right">Entry</TableHead>
-              <TableHead className="text-right">Exit</TableHead>
-              <TableHead className="text-right">High</TableHead>
-              <TableHead className="text-right">Low</TableHead>
+              <TableHead className="text-right">Entry Price</TableHead>
+              <TableHead className="text-right">Exit Price</TableHead>
+              <TableHead className="text-right">Quantity</TableHead>
               <TableHead className="text-right">Stop Loss</TableHead>
               <TableHead className="text-right">Take Profit</TableHead>
               <TableHead className="text-right">P&L</TableHead>
-              <TableHead className="text-center">Charts</TableHead>
+              <TableHead className="text-center">Weekly</TableHead>
+              <TableHead className="text-center">Daily</TableHead>
+              <TableHead className="text-center">4H</TableHead>
+              <TableHead className="text-center">1H</TableHead>
+              <TableHead className="text-center">Entry</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -87,8 +89,7 @@ export const SessionsTable = ({ sessions }: SessionsTableProps) => {
                 </TableCell>
                 <TableCell className="text-right">{formatNumber(session.entryPrice)}</TableCell>
                 <TableCell className="text-right">{formatNumber(session.exitPrice)}</TableCell>
-                <TableCell className="text-right font-medium text-green-600">{formatNumber(session.highestPrice)}</TableCell>
-                <TableCell className="text-right font-medium text-red-600">{formatNumber(session.lowestPrice)}</TableCell>
+                <TableCell className="text-right">{session.quantity}</TableCell>
                 <TableCell className="text-right">{formatNumber(session.stopLoss)}</TableCell>
                 <TableCell className="text-right">{formatNumber(session.takeProfit)}</TableCell>
                 <TableCell className={`text-right font-medium ${
@@ -96,13 +97,11 @@ export const SessionsTable = ({ sessions }: SessionsTableProps) => {
                 }`}>
                   {formatCurrency(session.pnl)}
                 </TableCell>
-                <TableCell className="text-center">
-                  {renderUrlLink(session.weeklyUrl, 'Weekly')}
-                  {renderUrlLink(session.dailyUrl, 'Daily')}
-                  {renderUrlLink(session.fourHourUrl, '4H')}
-                  {renderUrlLink(session.oneHourUrl, '1H')}
-                  {renderUrlLink(session.refinedEntryUrl, 'Entry')}
-                </TableCell>
+                <TableCell className="text-center">{renderUrlLink(session.weeklyUrl, 'Weekly')}</TableCell>
+                <TableCell className="text-center">{renderUrlLink(session.dailyUrl, 'Daily')}</TableCell>
+                <TableCell className="text-center">{renderUrlLink(session.fourHourUrl, '4H')}</TableCell>
+                <TableCell className="text-center">{renderUrlLink(session.oneHourUrl, '1H')}</TableCell>
+                <TableCell className="text-center">{renderUrlLink(session.refinedEntryUrl, 'Entry')}</TableCell>
               </TableRow>
             ))}
           </TableBody>

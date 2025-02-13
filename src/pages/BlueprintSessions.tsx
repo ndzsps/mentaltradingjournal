@@ -10,7 +10,7 @@ import { Session } from "@/components/backtesting/sessions/types";
 export default function BlueprintSessions() {
   const { blueprintId } = useParams();
   const [sessions, setSessions] = useState<Session[]>([]);
-  const [blueprint, setBlueprint] = useState<{ id: string; name: string; description: string | null; } | null>(null);
+  const [blueprint, setBlueprint] = useState<{ id: string; name: string; } | null>(null);
 
   useEffect(() => {
     if (blueprintId) {
@@ -22,7 +22,7 @@ export default function BlueprintSessions() {
   const fetchBlueprint = async () => {
     const { data, error } = await supabase
       .from("trading_blueprints")
-      .select("id, name, description")
+      .select("id, name")
       .eq("id", blueprintId)
       .single();
 
@@ -66,10 +66,7 @@ export default function BlueprintSessions() {
   return (
     <AppLayout>
       <div className="container mx-auto px-4 py-8">
-        <SessionHeader 
-          blueprintName={blueprint?.name || ""} 
-          description={blueprint?.description || ""}
-        />
+        <SessionHeader blueprintName={blueprint?.name || ""} />
         {sessions.length > 0 ? (
           <SessionsTable sessions={sessions} />
         ) : (

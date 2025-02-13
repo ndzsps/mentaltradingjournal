@@ -37,15 +37,20 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
         <CartesianGrid 
           horizontal={true} 
           vertical={false} 
-          stroke="rgba(158, 158, 158, 0.1)"
+          stroke="hsl(var(--border))"
           strokeDasharray="3 3"
         />
-        <ReferenceLine y={0} stroke="#E5DEFF" strokeWidth={2} />
+        <ReferenceLine y={0} stroke="hsl(var(--border))" strokeWidth={2} />
         <ReferenceLine y={100} stroke="#FEC6A1" strokeWidth={2} />
         <ReferenceLine y={-100} stroke="#9b87f5" strokeWidth={2} />
         <XAxis 
           dataKey="tradeNum" 
-          label={{ value: 'Trade', position: 'bottom' }}
+          label={{ 
+            value: 'Trade', 
+            position: 'bottom',
+            style: { fill: 'hsl(var(--foreground))' }
+          }}
+          tick={{ fill: 'hsl(var(--foreground))' }}
         />
         <YAxis 
           domain={[-100, 100]} 
@@ -54,8 +59,10 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
             angle: -90, 
             position: 'insideLeft',
             offset: 0,
-            dy: 60
-          }} 
+            dy: 60,
+            style: { fill: 'hsl(var(--foreground))' }
+          }}
+          tick={{ fill: 'hsl(var(--foreground))' }}
         />
         <Tooltip 
           cursor={false}
@@ -68,23 +75,23 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
             const capturedMove = data.capturedMove;
 
             return (
-              <div className="bg-background border border-border rounded-lg shadow-lg p-3">
+              <div className="bg-card border border-border rounded-lg shadow-lg p-3">
                 <div className="space-y-2">
-                  <p className="text-lg font-bold">Trade #{data.tradeNum}</p>
-                  <p className="text-lg">{data.instrument || 'Unknown'}</p>
+                  <p className="text-lg font-bold text-foreground">Trade #{data.tradeNum}</p>
+                  <p className="text-lg text-foreground">{data.instrument || 'Unknown'}</p>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-[#FEC6A1]" />
-                    <span>Updraw: {updrawValue?.toFixed(2)}%</span>
+                    <span className="text-foreground">Updraw: {updrawValue?.toFixed(2)}%</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-[#9b87f5]" />
-                    <span>Drawdown: {Math.abs(drawdownValue)?.toFixed(2)}%</span>
+                    <span className="text-foreground">Drawdown: {Math.abs(drawdownValue)?.toFixed(2)}%</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-[#0EA5E9]" />
-                    <span>Captured Move: {capturedMove?.toFixed(2)}%</span>
+                    <span className="text-foreground">Captured Move: {capturedMove?.toFixed(2)}%</span>
                   </div>
-                  <p>R-Multiple: {data.rMultiple?.toFixed(2) || '0'}</p>
+                  <p className="text-foreground">R-Multiple: {data.rMultiple?.toFixed(2) || '0'}</p>
                 </div>
               </div>
             );
@@ -94,7 +101,8 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
           verticalAlign="top" 
           align="right"
           wrapperStyle={{ 
-            paddingBottom: "20px" 
+            paddingBottom: "20px",
+            color: 'hsl(var(--foreground))'
           }}
         />
         <Bar 

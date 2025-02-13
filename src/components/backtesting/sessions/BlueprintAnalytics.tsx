@@ -157,7 +157,7 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <Card className="p-6">
           <h3 className="text-xl font-bold mb-4">Asset Pair Performance</h3>
-          <div className="h-[300px]">
+          <div className="h-[300px] pr-4">
             <AssetPairChart data={chartData} />
           </div>
         </Card>
@@ -166,10 +166,14 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
           <h3 className="text-xl font-bold mb-4">Trade Duration Analysis</h3>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={durationChartData}>
+              <BarChart 
+                data={durationChartData}
+                margin={{ top: 20, right: 45, left: 45, bottom: 20 }}
+              >
                 <XAxis 
                   dataKey="category" 
                   tick={{ fontSize: 12 }}
+                  stroke="hsl(var(--foreground))"
                 />
                 <YAxis
                   yAxisId="left"
@@ -180,9 +184,14 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
                     value: 'Win Rate',
                     angle: -90,
                     position: 'insideLeft',
-                    style: { fontSize: '12px', textAnchor: 'middle' },
-                    dx: -10
+                    style: { 
+                      fontSize: '12px', 
+                      textAnchor: 'middle',
+                      fill: 'hsl(var(--foreground))'
+                    },
+                    dx: -30
                   }}
+                  stroke="hsl(var(--foreground))"
                 />
                 <YAxis
                   yAxisId="right"
@@ -192,22 +201,61 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
                     value: 'Trade Count',
                     angle: 90,
                     position: 'insideRight',
-                    style: { fontSize: '12px', textAnchor: 'middle' },
-                    dx: 10
+                    style: { 
+                      fontSize: '12px', 
+                      textAnchor: 'middle',
+                      fill: 'hsl(var(--foreground))'
+                    },
+                    dx: 30
+                  }}
+                  stroke="hsl(var(--foreground))"
+                />
+                <Tooltip 
+                  cursor={{ 
+                    fill: 'hsl(var(--muted))',
+                    opacity: 0.1 
+                  }}
+                  contentStyle={{
+                    backgroundColor: 'hsl(var(--card))',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '8px',
+                    padding: '8px 12px'
+                  }}
+                  itemStyle={{
+                    color: 'hsl(var(--foreground))'
                   }}
                 />
-                <Tooltip />
                 <Bar
                   yAxisId="left"
                   dataKey="winRate"
                   fill="hsl(var(--primary))"
                   name="Win Rate"
+                  radius={[4, 4, 0, 0]}
+                  style={{
+                    transition: 'fill 0.2s ease-in-out'
+                  }}
+                  onMouseOver={(data, index) => {
+                    document.querySelectorAll(`[name="Win Rate"]`)[index].style.fill = 'hsl(var(--primary-foreground))';
+                  }}
+                  onMouseOut={(data, index) => {
+                    document.querySelectorAll(`[name="Win Rate"]`)[index].style.fill = 'hsl(var(--primary))';
+                  }}
                 />
                 <Bar
                   yAxisId="right"
                   dataKey="count"
                   fill="hsl(var(--secondary))"
                   name="Trade Count"
+                  radius={[4, 4, 0, 0]}
+                  style={{
+                    transition: 'fill 0.2s ease-in-out'
+                  }}
+                  onMouseOver={(data, index) => {
+                    document.querySelectorAll(`[name="Trade Count"]`)[index].style.fill = 'hsl(var(--secondary-foreground))';
+                  }}
+                  onMouseOut={(data, index) => {
+                    document.querySelectorAll(`[name="Trade Count"]`)[index].style.fill = 'hsl(var(--secondary))';
+                  }}
                 />
               </BarChart>
             </ResponsiveContainer>

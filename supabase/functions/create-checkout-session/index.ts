@@ -86,6 +86,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     console.log("Using customer ID:", customerId);
+    console.log("Creating checkout session with price ID:", priceId);
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,

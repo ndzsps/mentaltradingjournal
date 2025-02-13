@@ -4,7 +4,6 @@ import {
   Line,
   XAxis,
   YAxis,
-  CartesianGrid,
   Tooltip,
   ResponsiveContainer,
   ReferenceLine,
@@ -33,7 +32,6 @@ export const EquityCurveChart = ({ data, initialBalance }: EquityCurveChartProps
             bottom: 5
           }}
         >
-          <CartesianGrid strokeDasharray="3 3" />
           <XAxis
             dataKey="date"
             tick={{ fontSize: 12 }}

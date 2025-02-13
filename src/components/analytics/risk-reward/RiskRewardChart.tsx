@@ -10,7 +10,7 @@ import {
   ReferenceLine,
   Scatter,
 } from "recharts";
-import { format } from "date-fns";
+import { format, isValid } from "date-fns";
 
 interface RiskRewardData {
   date: Date;
@@ -26,6 +26,7 @@ interface RiskRewardChartProps {
 const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
+    const date = new Date(data.date);
     return (
       <div className="bg-background border border-border rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95">
         <p className="font-medium text-sm text-foreground mb-2">Trade Details</p>
@@ -34,7 +35,7 @@ const CustomTooltip = ({ active, payload }: any) => {
             <div className="w-2 h-2 rounded-full bg-primary" />
             <span className="text-muted-foreground">Date:</span>
             <span className="font-medium text-foreground">
-              {format(data.date, 'MMM d, yyyy')}
+              {isValid(date) ? format(date, 'MMM d, yyyy') : 'Invalid Date'}
             </span>
           </div>
           <div className="flex items-center gap-2 text-sm">
@@ -59,14 +60,25 @@ const CustomTooltip = ({ active, payload }: any) => {
 };
 
 export const RiskRewardChart = ({ data }: RiskRewardChartProps) => {
+  const formatDateTick = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return isValid(date) ? format(date, 'MMM d') : '';
+  };
+
+  // Ensure all dates are valid Date objects
+  const validData = data.map(item => ({
+    ...item,
+    date: item.date instanceof Date ? item.date : new Date(item.date),
+  })).filter(item => isValid(item.date));
+
   return (
     <div className="h-[250px] md:h-[300px] w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data} margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
+        <LineChart data={validData} margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
             dataKey="date"
-            tickFormatter={(date) => format(date, 'MMM d')}
+            tickFormatter={formatDateTick}
             tick={{ fontSize: 12 }}
             label={{
               value: 'Trading Days',
@@ -93,7 +105,7 @@ export const RiskRewardChart = ({ data }: RiskRewardChartProps) => {
             dot={false}
           />
           <Scatter
-            data={data.filter(d => d.isSignificant)}
+            data={validData.filter(d => d.isSignificant)}
             dataKey="riskRewardRatio"
             fill="#FF6B6B"
             shape="star"

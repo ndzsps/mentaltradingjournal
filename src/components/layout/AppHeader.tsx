@@ -1,3 +1,4 @@
+
 import { Home, BookOpen, BarChart2, Menu, User } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -51,6 +52,7 @@ export function AppHeader() {
   };
 
   const displayName = user?.user_metadata?.username || user?.email?.split('@')[0] || 'User';
+  const userEmail = user?.email;
 
   return (
     <header className="border-b border-border/40 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -82,48 +84,67 @@ export function AppHeader() {
 
           <ThemeToggle />
 
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="ghost" className="gap-2">
-                <User className="h-4 w-4" />
-                <span>{displayName}</span>
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-80">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  {isEditing ? (
-                    <div className="flex gap-2">
-                      <Input
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        placeholder="Enter new username"
-                      />
-                      <Button onClick={handleUpdateUsername}>Save</Button>
-                    </div>
-                  ) : (
-                    <Button
-                      variant="outline"
-                      className="w-full"
-                      onClick={() => {
-                        setUsername(displayName);
-                        setIsEditing(true);
-                      }}
-                    >
-                      Edit Username
-                    </Button>
-                  )}
-                </div>
-                <Button
-                  variant="destructive"
-                  className="w-full"
-                  onClick={() => signOut()}
-                >
-                  Sign Out
+          {user ? (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" className="gap-2">
+                  <User className="h-4 w-4" />
+                  <span className="hidden sm:inline-block">{userEmail}</span>
+                  <span className="inline-block sm:hidden">{displayName}</span>
                 </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
+              </PopoverTrigger>
+              <PopoverContent className="w-80">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    {isEditing ? (
+                      <div className="flex gap-2">
+                        <Input
+                          value={username}
+                          onChange={(e) => setUsername(e.target.value)}
+                          placeholder="Enter new username"
+                        />
+                        <Button onClick={handleUpdateUsername}>Save</Button>
+                      </div>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        className="w-full"
+                        onClick={() => {
+                          setUsername(displayName);
+                          setIsEditing(true);
+                        }}
+                      >
+                        Edit Username
+                      </Button>
+                    )}
+                  </div>
+                  <Button
+                    variant="destructive"
+                    className="w-full"
+                    onClick={() => signOut()}
+                  >
+                    Sign Out
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
+          ) : (
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                className="text-white/70 hover:text-white hover:bg-white/5"
+                onClick={() => location.pathname !== "/login" && navigate("/login")}
+              >
+                Sign In
+              </Button>
+              <Button
+                className="bg-primary/20 hover:bg-primary/30 text-primary-light border border-primary/20 backdrop-blur-sm"
+                onClick={() => location.pathname !== "/login" && navigate("/login")}
+              >
+                Get Started
+              </Button>
+            </div>
+          )}
         </nav>
 
         {/* Mobile Navigation */}
@@ -155,38 +176,40 @@ export function AppHeader() {
                 </Button>
               ))}
               <ThemeToggle />
-              <div className="space-y-2">
-                {isEditing ? (
-                  <div className="space-y-2">
-                    <Input
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      placeholder="Enter new username"
-                    />
-                    <Button onClick={handleUpdateUsername} className="w-full">
-                      Save
+              {user && (
+                <div className="space-y-2">
+                  {isEditing ? (
+                    <div className="space-y-2">
+                      <Input
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        placeholder="Enter new username"
+                      />
+                      <Button onClick={handleUpdateUsername} className="w-full">
+                        Save
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => {
+                        setUsername(displayName);
+                        setIsEditing(true);
+                      }}
+                    >
+                      Edit Username
                     </Button>
-                  </div>
-                ) : (
+                  )}
                   <Button
-                    variant="outline"
+                    variant="destructive"
                     className="w-full"
-                    onClick={() => {
-                      setUsername(displayName);
-                      setIsEditing(true);
-                    }}
+                    onClick={() => signOut()}
                   >
-                    Edit Username
+                    Sign Out
                   </Button>
-                )}
-                <Button
-                  variant="destructive"
-                  className="w-full"
-                  onClick={() => signOut()}
-                >
-                  Sign Out
-                </Button>
-              </div>
+                </div>
+              )}
             </nav>
           </SheetContent>
         </Sheet>

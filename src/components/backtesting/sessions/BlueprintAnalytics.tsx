@@ -184,8 +184,8 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
     const tradesHitTp = (trades.filter(trade => trade.mfeRelativeToTp >= 100).length / totalTrades) * 100;
     const tradesHitSl = (trades.filter(trade => Math.abs(trade.maeRelativeToSl) >= 100).length / totalTrades) * 100;
 
-    const winningTrades = trades.filter(trade => trade.mfeRelativeToTp >= trade.maeRelativeToSl);
-    const losingTrades = trades.filter(trade => trade.mfeRelativeToTp < trade.maeRelativeToSl);
+    const winningTrades = trades.filter(trade => trade.mfeRelativeToTp >= 100);
+    const losingTrades = trades.filter(trade => Math.abs(trade.maeRelativeToSl) >= 100);
 
     return {
       tradesHitTp,

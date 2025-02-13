@@ -25,8 +25,9 @@ export const AnalyticsDashboard = () => {
   const [activeView, setActiveView] = useState<'all' | 'psychological' | 'trading'>('all');
 
   const psychologicalComponents = [
-    MistakeAnalysis,  // Moved MistakeAnalysis to the beginning
-    EmotionalTendencies, // Moved EmotionalTendencies after MistakeAnalysis
+    EmotionTrend, // Moved EmotionTrend to the beginning of psychological components
+    MistakeAnalysis,
+    EmotionalTendencies,
     EmotionRecovery,
     PreTradingEvents,
     PersonalityPatterns,
@@ -39,7 +40,6 @@ export const AnalyticsDashboard = () => {
     PerformanceBreakdown,
     RuleAdherence,
     TradeDuration,
-    EmotionTrend,
     ProfitLossDistribution,
     TradeFrequency,
     RiskRewardAnalysis,
@@ -53,7 +53,7 @@ export const AnalyticsDashboard = () => {
       case 'trading':
         return tradingComponents;
       default:
-        return [...psychologicalComponents, ...tradingComponents];
+        return [EmotionTrend, ...psychologicalComponents.slice(1), ...tradingComponents]; // Always show EmotionTrend first in 'all' view
     }
   };
 

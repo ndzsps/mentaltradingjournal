@@ -17,7 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 export function AppHeader() {
   const location = useLocation();
@@ -26,7 +26,6 @@ export function AppHeader() {
   const [isEditing, setIsEditing] = useState(false);
   const [username, setUsername] = useState("");
   const { user, signOut, updateUsername } = useAuth();
-  const { toast } = useToast();
   
   const navigationItems = [
     { icon: Home, label: "Home", path: "/" },
@@ -39,16 +38,9 @@ export function AppHeader() {
     try {
       await updateUsername(username);
       setIsEditing(false);
-      toast({
-        title: "Username updated",
-        description: "Your username has been updated successfully.",
-      });
+      toast("Username updated successfully");
     } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to update username",
-      });
+      toast(error instanceof Error ? error.message : "Failed to update username");
     }
   };
 
@@ -131,18 +123,11 @@ export function AppHeader() {
             </Popover>
           ) : (
             <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                className="text-white/70 hover:text-white hover:bg-white/5"
-                onClick={() => navigate("/login")}
-              >
-                Sign In
+              <Button variant="ghost" asChild>
+                <Link to="/login">Sign In</Link>
               </Button>
-              <Button
-                className="bg-primary/20 hover:bg-primary/30 text-primary-light border border-primary/20 backdrop-blur-sm"
-                onClick={() => navigate("/login")}
-              >
-                Get Started
+              <Button asChild>
+                <Link to="/pricing">Get Started</Link>
               </Button>
             </div>
           )}
@@ -177,7 +162,7 @@ export function AppHeader() {
                 </Button>
               ))}
               <ThemeToggle />
-              {user && (
+              {user ? (
                 <div className="space-y-2">
                   {isEditing ? (
                     <div className="space-y-2">
@@ -208,6 +193,15 @@ export function AppHeader() {
                     onClick={() => signOut()}
                   >
                     Sign Out
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Button variant="outline" className="w-full" asChild>
+                    <Link to="/login">Sign In</Link>
+                  </Button>
+                  <Button className="w-full" asChild>
+                    <Link to="/pricing">Get Started</Link>
                   </Button>
                 </div>
               )}

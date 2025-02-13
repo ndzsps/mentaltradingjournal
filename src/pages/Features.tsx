@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { 
@@ -12,10 +13,37 @@ import {
   Medal,
   ChartBar,
   History,
-  Timer
+  Timer,
+  User
 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useState } from "react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 
 const Features = () => {
+  const { user, signOut, updateUsername } = useAuth();
+  const [isEditing, setIsEditing] = useState(false);
+  const [username, setUsername] = useState("");
+
+  const handleUpdateUsername = async () => {
+    try {
+      await updateUsername(username);
+      setIsEditing(false);
+      toast("Username updated successfully");
+    } catch (error) {
+      toast(error instanceof Error ? error.message : "Failed to update username");
+    }
+  };
+
+  const displayName = user?.user_metadata?.username || user?.email?.split('@')[0] || 'User';
+  const userEmail = user?.email;
+
   return (
     <div className="min-h-screen bg-[#1A1F2C]">
       {/* Header */}
@@ -31,12 +59,60 @@ const Features = () => {
             <Button variant="ghost" asChild>
               <Link to="/pricing">Pricing</Link>
             </Button>
-            <Button variant="ghost" asChild>
-              <Link to="/login">Sign In</Link>
-            </Button>
-            <Button asChild>
-              <Link to="/login">Get Started</Link>
-            </Button>
+            {user ? (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" className="gap-2">
+                    <User className="h-4 w-4" />
+                    <span className="hidden sm:inline-block">{userEmail}</span>
+                    <span className="inline-block sm:hidden">{displayName}</span>
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      {isEditing ? (
+                        <div className="flex gap-2">
+                          <Input
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            placeholder="Enter new username"
+                          />
+                          <Button onClick={handleUpdateUsername}>Save</Button>
+                        </div>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          className="w-full"
+                          onClick={() => {
+                            setUsername(displayName);
+                            setIsEditing(true);
+                          }}
+                        >
+                          Edit Username
+                        </Button>
+                      )}
+                    </div>
+                    <Button
+                      variant="destructive"
+                      className="w-full"
+                      onClick={() => signOut()}
+                    >
+                      Sign Out
+                    </Button>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            ) : (
+              <>
+                <Button variant="ghost" asChild>
+                  <Link to="/login">Sign In</Link>
+                </Button>
+                <Button asChild>
+                  <Link to="/pricing">Get Started</Link>
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </header>

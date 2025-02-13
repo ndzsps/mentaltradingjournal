@@ -17,28 +17,29 @@ export const SubscriptionGuard = ({ children }: { children: React.ReactNode }) =
   const isPublicRoute = PUBLIC_ROUTES.includes(location.pathname);
 
   useEffect(() => {
-    // Always allow access to public routes regardless of subscription status
+    // Always allow access to public routes
     if (isPublicRoute) {
       return;
     }
 
+    // Skip subscription check if user is not authenticated
+    if (!user || !session) {
+      return;
+    }
+
     // Only show error if we have a session and there's a subscription check error
-    if (error && session) {
+    if (error) {
       console.error("Subscription check error:", error);
-      toast.error(
-        "Error checking subscription",
-        {
-          description: "Please try again or contact support if the issue persists."
-        }
-      );
+      // Don't show error toast for subscription check failures
+      return;
     }
 
     // Only redirect if:
-    // 1. We're not loading
+    // 1. Not on a public route
     // 2. User is authenticated
-    // 3. No subscription is found
-    // 4. Not on a public route
-    if (!isLoading && !hasActiveSubscription && user && session && !isPublicRoute) {
+    // 3. Not loading
+    // 4. No subscription found
+    if (!isPublicRoute && user && !isLoading && hasActiveSubscription === false) {
       toast.error(
         "Active subscription required",
         {
@@ -49,18 +50,24 @@ export const SubscriptionGuard = ({ children }: { children: React.ReactNode }) =
     }
   }, [hasActiveSubscription, isLoading, navigate, user, session, error, isPublicRoute]);
 
-  // For public routes, always render content regardless of auth state
+  // Always render content for public routes
   if (isPublicRoute) {
     return <>{children}</>;
   }
 
-  // For protected routes, show nothing while loading
-  if (isLoading) {
+  // Show nothing while loading or if not authenticated
+  if (isLoading || !user || !session) {
     return null;
   }
 
-  // For protected routes, require both authentication and subscription
-  if (!hasActiveSubscription && !isPublicRoute) {
+  // Allow access if subscription check failed (to prevent blocking legitimate users)
+  if (error) {
+    console.warn("Subscription check failed, allowing access:", error);
+    return <>{children}</>;
+  }
+
+  // For protected routes, require subscription
+  if (!hasActiveSubscription) {
     return null;
   }
 

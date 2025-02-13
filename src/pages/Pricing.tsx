@@ -1,21 +1,26 @@
-
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
-import { Check } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
+import { Check, User } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { createCheckoutSession } from "@/lib/stripe";
 import { toast } from "sonner";
-import { AppHeader } from "@/components/layout/AppHeader";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Input } from "@/components/ui/input";
 
 const Pricing = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, signOut, updateUsername } = useAuth();
+  const [isEditing, setIsEditing] = useState(false);
+  const [username, setUsername] = useState("");
 
   const handleSubscribe = async (priceId: string) => {
     try {
       if (!user) {
-        // Include the current path as the return URL
         navigate(`/login?returnTo=${encodeURIComponent('/pricing')}`);
         return;
       }
@@ -26,9 +31,29 @@ const Pricing = () => {
     }
   };
 
+  const handleUpdateUsername = async () => {
+    try {
+      await updateUsername(username);
+      setIsEditing(false);
+      toast({
+        title: "Username updated",
+        description: "Your username has been updated successfully.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to update username",
+      });
+    }
+  };
+
+  const displayName = user?.user_metadata?.username || user?.email?.split('@')[0] || 'User';
+  const userEmail = user?.email;
+
   return (
     <div className="min-h-screen relative bg-[#1A1F2C] overflow-hidden">
-      {/* Background effects - matching Landing page style */}
+      {/* Background effects */}
       <div className="fixed inset-0">
         <div className="absolute inset-0 bg-[#1A1F2C]" />
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10 opacity-40" />
@@ -41,8 +66,76 @@ const Pricing = () => {
         <div className="absolute inset-0 backdrop-blur-[100px]" />
       </div>
 
-      {/* Use AppHeader instead of custom header */}
-      <AppHeader />
+      {/* Header matching Features page */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-[#1A1F2C]/80 backdrop-blur-sm border-b border-white/10">
+        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+          <Link to="/" className="text-xl font-bold bg-gradient-to-r from-primary-light to-accent bg-clip-text text-transparent">
+            Mental
+          </Link>
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" asChild>
+              <Link to="/features">Features</Link>
+            </Button>
+            <Button variant="ghost" asChild>
+              <Link to="/pricing">Pricing</Link>
+            </Button>
+            {user ? (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" className="gap-2">
+                    <User className="h-4 w-4" />
+                    <span className="hidden sm:inline-block">{userEmail}</span>
+                    <span className="inline-block sm:hidden">{displayName}</span>
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      {isEditing ? (
+                        <div className="flex gap-2">
+                          <Input
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            placeholder="Enter new username"
+                          />
+                          <Button onClick={handleUpdateUsername}>Save</Button>
+                        </div>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          className="w-full"
+                          onClick={() => {
+                            setUsername(displayName);
+                            setIsEditing(true);
+                          }}
+                        >
+                          Edit Username
+                        </Button>
+                      )}
+                    </div>
+                    <Button
+                      variant="destructive"
+                      className="w-full"
+                      onClick={() => signOut()}
+                    >
+                      Sign Out
+                    </Button>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            ) : (
+              <>
+                <Button variant="ghost" asChild>
+                  <Link to="/login">Sign In</Link>
+                </Button>
+                <Button asChild>
+                  <Link to="/login">Get Started</Link>
+                </Button>
+              </>
+            )}
+          </div>
+        </div>
+      </header>
 
       {/* Pricing Content */}
       <div className="relative z-10 pt-32 pb-20">

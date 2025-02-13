@@ -45,7 +45,7 @@ export default function BlueprintSessions() {
         .from("backtesting_sessions")
         .select("*")
         .eq("playbook_id", blueprintId)
-        .order("created_at", { ascending: false });
+        .order("entry_date", { ascending: false }); // Changed to order by entry_date
 
       if (error) throw error;
 

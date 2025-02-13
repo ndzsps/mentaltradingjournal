@@ -5,12 +5,16 @@ import { AssetPairChart } from "@/components/analytics/asset-pair/AssetPairChart
 import { RiskRewardChart } from "@/components/analytics/risk-reward/RiskRewardChart";
 import { EquityCurveChart } from "@/components/analytics/equity-curve/EquityCurveChart";
 import { EquityMetrics } from "@/components/analytics/equity-curve/EquityMetrics";
+import { BalanceSelector } from "@/components/analytics/equity-curve/BalanceSelector";
+import { useState } from "react";
 
 interface BlueprintAnalyticsProps {
   sessions: Session[];
 }
 
 export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
+  const [selectedBalance, setSelectedBalance] = useState(10000);
+
   // Process sessions for asset pair performance
   const assetPairData = sessions.reduce((acc, session) => {
     const instrument = session.instrument || 'Unknown';
@@ -68,7 +72,7 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
     .sort((a, b) => new Date(a.exitDate).getTime() - new Date(b.exitDate).getTime())
     .reduce((acc, session, index) => {
       const date = new Date(session.exitDate).toLocaleDateString();
-      const previousBalance = index > 0 ? acc[index - 1].balance : 0;
+      const previousBalance = index > 0 ? acc[index - 1].balance : selectedBalance;
       const dailyPnL = session.pnl || 0;
       
       acc.push({
@@ -80,13 +84,10 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
       return acc;
     }, [] as Array<{ date: string; balance: number; dailyPnL: number; }>);
 
-  const initialBalance = 0;
   const currentBalance = equityCurveData.length > 0 
     ? equityCurveData[equityCurveData.length - 1].balance 
-    : 0;
-  const totalReturn = initialBalance !== 0 
-    ? ((currentBalance - initialBalance) / initialBalance) * 100 
-    : 0;
+    : selectedBalance;
+  const totalReturn = ((currentBalance - selectedBalance) / selectedBalance) * 100;
 
   // Calculate max drawdown percentage
   const maxDrawdownPercentage = equityCurveData.reduce((maxDD, point, index) => {
@@ -100,7 +101,7 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
       <div>
         <h2 className="text-2xl font-bold mb-4">Blueprint Analytics</h2>
         <EquityMetrics
-          initialBalance={initialBalance}
+          initialBalance={selectedBalance}
           currentBalance={currentBalance}
           totalReturn={totalReturn}
           maxDrawdown={maxDrawdownPercentage}
@@ -108,11 +109,19 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
       </div>
 
       <Card className="p-6">
-        <h3 className="text-xl font-bold mb-4">Equity Curve</h3>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-bold">Equity Curve</h3>
+            <BalanceSelector
+              selectedBalance={selectedBalance}
+              onBalanceChange={setSelectedBalance}
+            />
+          </div>
+        </div>
         <div className="h-[400px]">
           <EquityCurveChart
             data={equityCurveData}
-            initialBalance={initialBalance}
+            initialBalance={selectedBalance}
           />
         </div>
       </Card>

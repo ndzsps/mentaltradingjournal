@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { TradeWinPercentage } from "./TradeWinPercentage";
 import { useTimeFilter } from "@/contexts/TimeFilterContext";
-import { startOfMonth, subMonths, isWithinInterval, endOfMonth, startOfDay, endOfDay, startOfYear, endOfYear, subYears } from "date-fns";
+import { startOfMonth, subMonths, isWithinInterval, endOfMonth, startOfYear, endOfYear, subYears } from "date-fns";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -12,7 +12,6 @@ import { useSidebar } from "@/components/ui/sidebar";
 import { Card } from "@/components/ui/card";
 import { DollarSign, Smile, Flame, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { useProgressTracking } from "@/hooks/useProgressTracking";
-import { Trade } from "@/types/trade";
 
 export const StatsHeader = () => {
   const queryClient = useQueryClient();
@@ -45,10 +44,6 @@ export const StatsHeader = () => {
     queryFn: generateAnalytics,
   });
 
-  useEffect(() => {
-    console.log('Analytics data:', analytics);
-  }, [analytics]);
-
   const { stats } = useProgressTracking();
   const { timeFilter, setTimeFilter } = useTimeFilter();
 
@@ -61,23 +56,23 @@ export const StatsHeader = () => {
     switch (timeFilter) {
       case "this-month":
         return {
-          start: startOfDay(startOfMonth(now)),
-          end: endOfDay(now)
+          start: startOfMonth(now),
+          end: now
         };
       case "last-month":
         return {
-          start: startOfDay(startOfMonth(subMonths(now, 1))),
-          end: endOfDay(endOfMonth(subMonths(now, 1)))
+          start: startOfMonth(subMonths(now, 1)),
+          end: endOfMonth(subMonths(now, 1))
         };
       case "last-three-months":
         return {
-          start: startOfDay(startOfMonth(subMonths(now, 3))),
-          end: endOfDay(now)
+          start: startOfMonth(subMonths(now, 3)),
+          end: now
         };
       case "last-year":
         return {
-          start: startOfDay(startOfYear(subYears(now, 1))),
-          end: endOfDay(endOfYear(subYears(now, 1)))
+          start: startOfYear(subYears(now, 1)),
+          end: endOfYear(subYears(now, 1))
         };
       default:
         return null;
@@ -89,7 +84,6 @@ export const StatsHeader = () => {
     if (!analytics?.journalEntries || analytics.journalEntries.length === 0) return 0;
 
     const interval = getTimeInterval();
-    // If no interval is set, include all entries
     const filteredEntries = interval ? 
       analytics.journalEntries.filter(entry => {
         const entryDate = new Date(entry.created_at);
@@ -156,6 +150,8 @@ export const StatsHeader = () => {
     );
   }
 
+  const hasEntries = analytics?.journalEntries && analytics.journalEntries.length > 0;
+
   return (
     <div className="space-y-4">
       <div className="flex justify-start gap-2 items-center">
@@ -175,30 +171,35 @@ export const StatsHeader = () => {
         <Button 
           variant={timeFilter === "this-month" ? "default" : "outline"}
           onClick={() => setTimeFilter("this-month")}
+          disabled={!hasEntries}
         >
           Last 30 Days
         </Button>
         <Button 
           variant={timeFilter === "last-month" ? "default" : "outline"}
           onClick={() => setTimeFilter("last-month")}
+          disabled={!hasEntries}
         >
           Last Month
         </Button>
         <Button 
           variant={timeFilter === "last-three-months" ? "default" : "outline"}
           onClick={() => setTimeFilter("last-three-months")}
+          disabled={!hasEntries}
         >
           Last Quarter
         </Button>
         <Button 
           variant={timeFilter === "last-year" ? "default" : "outline"}
           onClick={() => setTimeFilter("last-year")}
+          disabled={!hasEntries}
         >
           Last Year
         </Button>
         <Button 
           variant={timeFilter === "eternal" ? "default" : "outline"}
           onClick={() => setTimeFilter("eternal")}
+          disabled={!hasEntries}
         >
           Eternal
         </Button>
@@ -211,10 +212,10 @@ export const StatsHeader = () => {
             <DollarSign className="h-4 w-4 text-primary" />
           </div>
           <div className="text-2xl font-bold text-foreground">
-            ${Math.abs(netPnL).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            ${hasEntries ? Math.abs(netPnL).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'}
           </div>
           <div className={`text-sm ${netPnL >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-            {netPnL >= 0 ? '▲' : '▼'} {netPnL >= 0 ? 'Profit' : 'Loss'}
+            {hasEntries ? (netPnL >= 0 ? '▲ Profit' : '▼ Loss') : '-'}
           </div>
         </Card>
 
@@ -224,14 +225,14 @@ export const StatsHeader = () => {
             <Smile className="h-4 w-4 text-accent-dark" />
           </div>
           <div className="text-2xl font-bold text-foreground">
-            {emotionScore.toFixed(0)}%
+            {hasEntries ? emotionScore.toFixed(0) : '0'}%
           </div>
           <div className="text-sm text-muted-foreground">
             Positive Emotions
           </div>
         </Card>
 
-        <TradeWinPercentage timeFilter={timeFilter} />
+        <TradeWinPercentage timeFilter={timeFilter} hasEntries={hasEntries} />
 
         <Card className="p-4 hover:shadow-lg transition-shadow">
           <div className="flex items-center justify-between mb-2">

@@ -10,9 +10,10 @@ import { startOfMonth, subMonths, isWithinInterval, endOfMonth, startOfYear, end
 
 interface TradeWinPercentageProps {
   timeFilter: TimeFilter;
+  hasEntries: boolean;
 }
 
-export const TradeWinPercentage = ({ timeFilter }: TradeWinPercentageProps) => {
+export const TradeWinPercentage = ({ timeFilter, hasEntries }: TradeWinPercentageProps) => {
   const [emotionFilter, setEmotionFilter] = useState<string>("all");
   const { data: analytics, isLoading } = useQuery({
     queryKey: ['analytics'],
@@ -95,12 +96,13 @@ export const TradeWinPercentage = ({ timeFilter }: TradeWinPercentageProps) => {
         <ArrowUpDown className="h-4 w-4 text-primary" />
       </div>
       <div className="text-2xl font-bold text-foreground">
-        {winRate.toFixed(1)}%
+        {hasEntries ? winRate.toFixed(1) : '0.0'}%
       </div>
       <div className="mt-2">
         <Select
           value={emotionFilter}
           onValueChange={setEmotionFilter}
+          disabled={!hasEntries}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Filter by emotion" />

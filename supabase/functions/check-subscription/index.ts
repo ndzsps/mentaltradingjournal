@@ -13,7 +13,6 @@ const handler = async (req: Request): Promise<Response> => {
 
   const authHeader = req.headers.get('Authorization');
   if (!authHeader) {
-    console.error('No authorization header provided');
     return new Response(JSON.stringify({ error: 'No authorization header' }), {
       status: 401,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }

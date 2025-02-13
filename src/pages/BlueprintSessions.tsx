@@ -30,7 +30,7 @@ export default function BlueprintSessions() {
       if (error) throw error;
       
       if (data) {
-        console.log("Fetched blueprint:", data); // Debug log
+        console.log("Fetched blueprint:", data);
         setBlueprint(data);
       }
     } catch (error) {
@@ -52,6 +52,7 @@ export default function BlueprintSessions() {
         const mappedSessions = data.map(session => ({
           id: session.id,
           entryDate: session.entry_date || '',
+          exitDate: session.exit_date || '',
           instrument: session.instrument || '',
           setup: session.setup || '',
           direction: session.direction as 'buy' | 'sell' | null,

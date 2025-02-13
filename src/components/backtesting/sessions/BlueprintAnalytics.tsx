@@ -227,7 +227,7 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
   return (
     <div className="space-y-8 mt-8">
       <div>
-        <h2 className="text-2xl font-bold mb-4">Blueprint Analytics</h2>
+        <h2 className="text-2xl font-bold mb-4">Analytics</h2>
         <EquityMetrics
           initialBalance={selectedBalance}
           currentBalance={currentBalance}

@@ -19,7 +19,6 @@ export function AddBlueprintForm({ onSuccess }: AddBlueprintFormProps) {
   const [formData, setFormData] = useState({
     strategy: "",
     description: "",
-    instrument: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -34,7 +33,6 @@ export function AddBlueprintForm({ onSuccess }: AddBlueprintFormProps) {
           user_id: user.id,
           name: formData.strategy,
           description: formData.description,
-          rules: [`Instrument: ${formData.instrument}`],
         });
 
       if (error) throw error;
@@ -76,17 +74,6 @@ export function AddBlueprintForm({ onSuccess }: AddBlueprintFormProps) {
           onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
           placeholder="Describe your strategy, including rules, exit management, etc."
           className="min-h-[150px]"
-          required
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="instrument">Instrument*</Label>
-        <Input
-          id="instrument"
-          value={formData.instrument}
-          onChange={(e) => setFormData(prev => ({ ...prev, instrument: e.target.value }))}
-          placeholder="Enter trading instrument"
           required
         />
       </div>

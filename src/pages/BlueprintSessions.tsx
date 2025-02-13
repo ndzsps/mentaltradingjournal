@@ -20,46 +20,59 @@ export default function BlueprintSessions() {
   }, [blueprintId]);
 
   const fetchBlueprint = async () => {
-    const { data, error } = await supabase
-      .from("trading_blueprints")
-      .select("id, name, description")
-      .eq("id", blueprintId)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from("trading_blueprints")
+        .select("id, name, description")
+        .eq("id", blueprintId)
+        .single();
 
-    if (!error && data) {
-      setBlueprint(data);
+      if (error) throw error;
+      
+      if (data) {
+        console.log("Fetched blueprint:", data); // Debug log
+        setBlueprint(data);
+      }
+    } catch (error) {
+      console.error("Error fetching blueprint:", error);
     }
   };
 
   const fetchSessions = async () => {
-    const { data, error } = await supabase
-      .from("backtesting_sessions")
-      .select("*")
-      .eq("playbook_id", blueprintId)
-      .order("created_at", { ascending: false });
+    try {
+      const { data, error } = await supabase
+        .from("backtesting_sessions")
+        .select("*")
+        .eq("playbook_id", blueprintId)
+        .order("created_at", { ascending: false });
 
-    if (!error && data) {
-      const mappedSessions = data.map(session => ({
-        id: session.id,
-        entryDate: session.entry_date || '',
-        instrument: session.instrument || '',
-        setup: session.setup || '',
-        direction: session.direction as 'buy' | 'sell' | null,
-        entryPrice: session.entry_price ?? 0,
-        exitPrice: session.exit_price ?? 0,
-        quantity: session.quantity ?? 0,
-        stopLoss: session.stop_loss ?? 0,
-        takeProfit: session.take_profit ?? 0,
-        pnl: session.pnl ?? 0,
-        highestPrice: session.highest_price ?? 0,
-        lowestPrice: session.lowest_price ?? 0,
-        weeklyUrl: session.weekly_url,
-        dailyUrl: session.daily_url,
-        fourHourUrl: session.four_hour_url,
-        oneHourUrl: session.one_hour_url,
-        refinedEntryUrl: session.refined_entry_url,
-      }));
-      setSessions(mappedSessions);
+      if (error) throw error;
+
+      if (data) {
+        const mappedSessions = data.map(session => ({
+          id: session.id,
+          entryDate: session.entry_date || '',
+          instrument: session.instrument || '',
+          setup: session.setup || '',
+          direction: session.direction as 'buy' | 'sell' | null,
+          entryPrice: session.entry_price ?? 0,
+          exitPrice: session.exit_price ?? 0,
+          quantity: session.quantity ?? 0,
+          stopLoss: session.stop_loss ?? 0,
+          takeProfit: session.take_profit ?? 0,
+          pnl: session.pnl ?? 0,
+          highestPrice: session.highest_price ?? 0,
+          lowestPrice: session.lowest_price ?? 0,
+          weeklyUrl: session.weekly_url,
+          dailyUrl: session.daily_url,
+          fourHourUrl: session.four_hour_url,
+          oneHourUrl: session.one_hour_url,
+          refinedEntryUrl: session.refined_entry_url,
+        }));
+        setSessions(mappedSessions);
+      }
+    } catch (error) {
+      console.error("Error fetching sessions:", error);
     }
   };
 

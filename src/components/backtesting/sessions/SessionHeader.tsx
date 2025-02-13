@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Save } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
@@ -26,6 +26,11 @@ export const SessionHeader = ({ blueprintName, description, blueprintId }: Sessi
   const [isOpen, setIsOpen] = useState(false);
   const [editedDescription, setEditedDescription] = useState(description || "");
   const [isSaving, setIsSaving] = useState(false);
+
+  // Update editedDescription when description prop changes
+  useEffect(() => {
+    setEditedDescription(description || "");
+  }, [description]);
 
   const handleSave = async () => {
     if (!blueprintId) return;

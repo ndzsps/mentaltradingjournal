@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,7 +19,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Session } from "./types";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -31,9 +30,24 @@ interface EditSessionDialogProps {
 }
 
 export const EditSessionDialog = ({ session, open, onOpenChange }: EditSessionDialogProps) => {
-  const [formData, setFormData] = useState<Partial<Session>>(session || {});
+  const [formData, setFormData] = useState<Partial<Session>>({});
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    if (session) {
+      setFormData({
+        entryPrice: session.entryPrice,
+        exitPrice: session.exitPrice,
+        quantity: session.quantity,
+        stopLoss: session.stopLoss,
+        takeProfit: session.takeProfit,
+        pnl: session.pnl,
+        highestPrice: session.highestPrice,
+        lowestPrice: session.lowestPrice,
+      });
+    }
+  }, [session]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

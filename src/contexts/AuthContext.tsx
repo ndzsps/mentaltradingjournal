@@ -70,11 +70,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     try {
-      // Only try to sign out if we have an active session
-      if (session) {
-        await supabase.auth.signOut();
-      }
-      
+      // Instead of signing out first, just proceed with sign in
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -126,29 +122,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
-      // First set loading to true to prevent any unwanted state updates
-      setLoading(true);
-      
-      // Only attempt to sign out if we have an active session
-      if (session) {
-        const { error } = await supabase.auth.signOut();
-        if (error) {
-          // Only show error toast for non-session related errors
-          if (!error.message.includes("session") && !error.message.includes("Session")) {
-            console.error("Sign out error:", error);
-            toast({
-              variant: "destructive",
-              title: "Error signing out",
-              description: getErrorMessage(error),
-            });
-          }
-        }
-      }
-      
-      // Always clear the local state
+      // First clear the local state
       setUser(null);
       setSession(null);
       
+      // Then attempt to sign out from Supabase
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        // Only log non-session related errors
+        if (!error.message.includes("session") && !error.message.includes("Session")) {
+          console.error("Sign out error:", error);
+        }
+      }
     } catch (error) {
       console.error("Sign out error:", error);
     } finally {

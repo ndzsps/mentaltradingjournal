@@ -122,20 +122,20 @@ export const EditSessionDialog = ({ session, open, onOpenChange }: EditSessionDi
           <form onSubmit={handleSubmit} className="space-y-4 py-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="entryDate">Entry Date</Label>
+                <Label htmlFor="entryDate">Entry Date & Time</Label>
                 <Input
                   id="entryDate"
-                  type="date"
-                  value={formData.entryDate?.split('T')[0] || ""}
+                  type="datetime-local"
+                  value={formData.entryDate?.slice(0, 16) || ""}
                   onChange={(e) => setFormData(prev => ({ ...prev, entryDate: e.target.value }))}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="exitDate">Exit Date</Label>
+                <Label htmlFor="exitDate">Exit Date & Time</Label>
                 <Input
                   id="exitDate"
-                  type="date"
-                  value={formData.exitDate?.split('T')[0] || ""}
+                  type="datetime-local"
+                  value={formData.exitDate?.slice(0, 16) || ""}
                   onChange={(e) => setFormData(prev => ({ ...prev, exitDate: e.target.value }))}
                 />
               </div>

@@ -1,6 +1,6 @@
 
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -8,10 +8,12 @@ import { toast } from "sonner";
 export const SubscriptionGuard = ({ children }: { children: React.ReactNode }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const { data: hasActiveSubscription, isLoading } = useSubscription();
 
   useEffect(() => {
-    if (!isLoading && !hasActiveSubscription && user) {
+    // Don't redirect if on pricing page or not logged in
+    if (!isLoading && !hasActiveSubscription && user && location.pathname !== "/pricing") {
       toast.error(
         "Active subscription required",
         {
@@ -20,13 +22,14 @@ export const SubscriptionGuard = ({ children }: { children: React.ReactNode }) =
       );
       navigate("/pricing");
     }
-  }, [hasActiveSubscription, isLoading, navigate, user]);
+  }, [hasActiveSubscription, isLoading, navigate, user, location]);
 
   if (isLoading || !user) {
     return null;
   }
 
-  if (!hasActiveSubscription) {
+  // Allow rendering children if user has subscription or is on pricing page
+  if (!hasActiveSubscription && location.pathname !== "/pricing") {
     return null;
   }
 

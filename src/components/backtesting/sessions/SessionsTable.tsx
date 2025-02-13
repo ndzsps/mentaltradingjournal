@@ -13,6 +13,7 @@ import { BacktestingStats } from "./BacktestingStats";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { EditSessionDialog } from "./EditSessionDialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface SessionsTableProps {
   sessions: Session[];
@@ -90,58 +91,60 @@ export const SessionsTable = ({ sessions }: SessionsTableProps) => {
               <TableHead className="text-center">Entry</TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody>
-            {sessions.map((session) => (
-              <TableRow key={session.id}>
-                <TableCell className="w-[40px] px-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 w-8 p-0"
-                    onClick={() => {
-                      setSelectedSession(session);
-                      setIsEditDialogOpen(true);
-                    }}
-                  >
-                    <Pencil className="h-4 w-4" />
-                    <span className="sr-only">Edit trade</span>
-                  </Button>
-                </TableCell>
-                <TableCell>{formatDate(session.entryDate)}</TableCell>
-                <TableCell>{formatDate(session.exitDate)}</TableCell>
-                <TableCell>{session.duration || '-'}</TableCell>
-                <TableCell>{session.instrument || '-'}</TableCell>
-                <TableCell>
-                  <span className={`font-medium ${
-                    session.direction === 'buy' 
-                      ? 'text-green-600' 
-                      : session.direction === 'sell'
-                        ? 'text-red-600'
-                        : ''
+          <ScrollArea className="h-[500px]">
+            <TableBody>
+              {sessions.map((session) => (
+                <TableRow key={session.id}>
+                  <TableCell className="w-[40px] px-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0"
+                      onClick={() => {
+                        setSelectedSession(session);
+                        setIsEditDialogOpen(true);
+                      }}
+                    >
+                      <Pencil className="h-4 w-4" />
+                      <span className="sr-only">Edit trade</span>
+                    </Button>
+                  </TableCell>
+                  <TableCell>{formatDate(session.entryDate)}</TableCell>
+                  <TableCell>{formatDate(session.exitDate)}</TableCell>
+                  <TableCell>{session.duration || '-'}</TableCell>
+                  <TableCell>{session.instrument || '-'}</TableCell>
+                  <TableCell>
+                    <span className={`font-medium ${
+                      session.direction === 'buy' 
+                        ? 'text-green-600' 
+                        : session.direction === 'sell'
+                          ? 'text-red-600'
+                          : ''
+                    }`}>
+                      {session.direction ? session.direction.toUpperCase() : '-'}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-right">{formatNumber(session.entryPrice)}</TableCell>
+                  <TableCell className="text-right">{formatNumber(session.exitPrice)}</TableCell>
+                  <TableCell className="text-right">{session.quantity}</TableCell>
+                  <TableCell className="text-right">{formatNumber(session.stopLoss)}</TableCell>
+                  <TableCell className="text-right">{formatNumber(session.takeProfit)}</TableCell>
+                  <TableCell className="text-right font-medium text-green-600">{formatNumber(session.highestPrice)}</TableCell>
+                  <TableCell className="text-right font-medium text-red-600">{formatNumber(session.lowestPrice)}</TableCell>
+                  <TableCell className={`text-right font-medium ${
+                    session.pnl >= 0 ? 'text-green-600' : 'text-red-600'
                   }`}>
-                    {session.direction ? session.direction.toUpperCase() : '-'}
-                  </span>
-                </TableCell>
-                <TableCell className="text-right">{formatNumber(session.entryPrice)}</TableCell>
-                <TableCell className="text-right">{formatNumber(session.exitPrice)}</TableCell>
-                <TableCell className="text-right">{session.quantity}</TableCell>
-                <TableCell className="text-right">{formatNumber(session.stopLoss)}</TableCell>
-                <TableCell className="text-right">{formatNumber(session.takeProfit)}</TableCell>
-                <TableCell className="text-right font-medium text-green-600">{formatNumber(session.highestPrice)}</TableCell>
-                <TableCell className="text-right font-medium text-red-600">{formatNumber(session.lowestPrice)}</TableCell>
-                <TableCell className={`text-right font-medium ${
-                  session.pnl >= 0 ? 'text-green-600' : 'text-red-600'
-                }`}>
-                  {formatCurrency(session.pnl)}
-                </TableCell>
-                <TableCell className="text-center">{renderUrlLink(session.weeklyUrl, 'Weekly')}</TableCell>
-                <TableCell className="text-center">{renderUrlLink(session.dailyUrl, 'Daily')}</TableCell>
-                <TableCell className="text-center">{renderUrlLink(session.fourHourUrl, '4H')}</TableCell>
-                <TableCell className="text-center">{renderUrlLink(session.oneHourUrl, '1H')}</TableCell>
-                <TableCell className="text-center">{renderUrlLink(session.refinedEntryUrl, 'Entry')}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
+                    {formatCurrency(session.pnl)}
+                  </TableCell>
+                  <TableCell className="text-center">{renderUrlLink(session.weeklyUrl, 'Weekly')}</TableCell>
+                  <TableCell className="text-center">{renderUrlLink(session.dailyUrl, 'Daily')}</TableCell>
+                  <TableCell className="text-center">{renderUrlLink(session.fourHourUrl, '4H')}</TableCell>
+                  <TableCell className="text-center">{renderUrlLink(session.oneHourUrl, '1H')}</TableCell>
+                  <TableCell className="text-center">{renderUrlLink(session.refinedEntryUrl, 'Entry')}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </ScrollArea>
         </Table>
       </div>
       <EditSessionDialog

@@ -1,3 +1,4 @@
+
 import {
   Table,
   TableBody,
@@ -55,13 +56,14 @@ export const SessionsTable = ({ sessions }: SessionsTableProps) => {
             <TableRow>
               <TableHead>Entry Date</TableHead>
               <TableHead>Instrument</TableHead>
-              <TableHead>Setup</TableHead>
               <TableHead>Direction</TableHead>
               <TableHead className="text-right">Entry Price</TableHead>
               <TableHead className="text-right">Exit Price</TableHead>
               <TableHead className="text-right">Quantity</TableHead>
               <TableHead className="text-right">Stop Loss</TableHead>
               <TableHead className="text-right">Take Profit</TableHead>
+              <TableHead className="text-right">Highest Price</TableHead>
+              <TableHead className="text-right">Lowest Price</TableHead>
               <TableHead className="text-right">P&L</TableHead>
               <TableHead className="text-center">Weekly</TableHead>
               <TableHead className="text-center">Daily</TableHead>
@@ -75,7 +77,6 @@ export const SessionsTable = ({ sessions }: SessionsTableProps) => {
               <TableRow key={session.id}>
                 <TableCell>{session.entryDate ? new Date(session.entryDate).toLocaleDateString() : '-'}</TableCell>
                 <TableCell>{session.instrument || '-'}</TableCell>
-                <TableCell>{session.setup || '-'}</TableCell>
                 <TableCell>
                   <span className={`font-medium ${
                     session.direction === 'buy' 
@@ -92,6 +93,8 @@ export const SessionsTable = ({ sessions }: SessionsTableProps) => {
                 <TableCell className="text-right">{session.quantity}</TableCell>
                 <TableCell className="text-right">{formatNumber(session.stopLoss)}</TableCell>
                 <TableCell className="text-right">{formatNumber(session.takeProfit)}</TableCell>
+                <TableCell className="text-right font-medium text-green-600">{formatNumber(session.highestPrice)}</TableCell>
+                <TableCell className="text-right font-medium text-red-600">{formatNumber(session.lowestPrice)}</TableCell>
                 <TableCell className={`text-right font-medium ${
                   session.pnl >= 0 ? 'text-green-600' : 'text-red-600'
                 }`}>

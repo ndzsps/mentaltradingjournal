@@ -30,6 +30,16 @@ const formatNumber = (value: number) => {
   }).format(value);
 };
 
+const formatDate = (dateString: string) => {
+  if (!dateString) return '-';
+  const date = new Date(dateString);
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'numeric',
+    day: 'numeric',
+    year: '2-digit'
+  }).format(date);
+};
+
 const renderUrlLink = (url: string | null, label: string) => {
   if (!url) return '-';
   
@@ -75,7 +85,7 @@ export const SessionsTable = ({ sessions }: SessionsTableProps) => {
           <TableBody>
             {sessions.map((session) => (
               <TableRow key={session.id}>
-                <TableCell>{session.entryDate ? new Date(session.entryDate).toLocaleDateString() : '-'}</TableCell>
+                <TableCell>{formatDate(session.entryDate)}</TableCell>
                 <TableCell>{session.instrument || '-'}</TableCell>
                 <TableCell>
                   <span className={`font-medium ${

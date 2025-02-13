@@ -1,3 +1,10 @@
 
+# Project ID is at the top
+project_id = "lywdivwtwjmwiwpjzbuj"
+
 [functions.check-subscription]
 verify_jwt = true
+
+[functions.stripe-webhook]
+verify_jwt = false
+

@@ -190,10 +190,18 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
     return {
       tradesHitTp,
       tradesHitSl,
-      avgUpdrawWinner: winningTrades.reduce((sum, trade) => sum + trade.mfeRelativeToTp, 0) / (winningTrades.length || 1),
-      avgUpdrawLoser: losingTrades.reduce((sum, trade) => sum + trade.mfeRelativeToTp, 0) / (losingTrades.length || 1),
-      avgDrawdownWinner: winningTrades.reduce((sum, trade) => sum + Math.abs(trade.maeRelativeToSl), 0) / (winningTrades.length || 1),
-      avgDrawdownLoser: losingTrades.reduce((sum, trade) => sum + Math.abs(trade.maeRelativeToSl), 0) / (losingTrades.length || 1),
+      avgUpdrawWinner: winningTrades.length > 0
+        ? winningTrades.reduce((sum, trade) => sum + trade.mfeRelativeToTp, 0) / winningTrades.length
+        : 0,
+      avgUpdrawLoser: losingTrades.length > 0
+        ? losingTrades.reduce((sum, trade) => sum + trade.mfeRelativeToTp, 0) / losingTrades.length
+        : 0,
+      avgDrawdownWinner: winningTrades.length > 0
+        ? winningTrades.reduce((sum, trade) => sum + Math.abs(trade.maeRelativeToSl), 0) / winningTrades.length
+        : 0,
+      avgDrawdownLoser: losingTrades.length > 0
+        ? losingTrades.reduce((sum, trade) => sum + Math.abs(trade.maeRelativeToSl), 0) / losingTrades.length
+        : 0,
     };
   };
 

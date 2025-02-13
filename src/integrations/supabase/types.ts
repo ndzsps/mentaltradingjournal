@@ -17,6 +17,7 @@ export type Database = {
           daily_url: string | null
           description: string | null
           direction: string | null
+          duration: string | null
           end_date: string
           entry_date: string | null
           entry_price: number | null
@@ -52,6 +53,7 @@ export type Database = {
           daily_url?: string | null
           description?: string | null
           direction?: string | null
+          duration?: string | null
           end_date: string
           entry_date?: string | null
           entry_price?: number | null
@@ -87,6 +89,7 @@ export type Database = {
           daily_url?: string | null
           description?: string | null
           direction?: string | null
+          duration?: string | null
           end_date?: string
           entry_date?: string | null
           entry_price?: number | null
@@ -547,6 +550,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_duration: {
+        Args: {
+          entry_time: string
+          exit_time: string
+        }
+        Returns: string
+      }
       calculate_level_from_streak: {
         Args: {
           daily_streak: number

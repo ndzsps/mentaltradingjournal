@@ -19,4 +19,5 @@ export interface Session {
   fourHourUrl: string | null;
   oneHourUrl: string | null;
   refinedEntryUrl: string | null;
+  duration: string | null;
 }

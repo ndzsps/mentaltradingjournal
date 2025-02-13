@@ -97,6 +97,7 @@ const handler = async (req: Request): Promise<Response> => {
         },
       ],
       mode: "subscription",
+      allow_promotion_codes: true, // Enable promotion code field
       success_url: `${req.headers.get("origin")}/dashboard?success=true`,
       cancel_url: `${req.headers.get("origin")}/pricing?canceled=true`,
       subscription_data: {

@@ -6,10 +6,8 @@ import { RiskRewardChart } from "@/components/analytics/risk-reward/RiskRewardCh
 import { EquityCurveChart } from "@/components/analytics/equity-curve/EquityCurveChart";
 import { EquityMetrics } from "@/components/analytics/equity-curve/EquityMetrics";
 import { BalanceSelector } from "@/components/analytics/equity-curve/BalanceSelector";
+import { TradeDuration } from "@/components/analytics/TradeDuration";
 import { useState } from "react";
-import { analyzeTradeDurations } from "@/utils/analytics/tradeDurationAnalysis";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-import { CustomTooltip } from "@/components/analytics/shared/CustomTooltip";
 
 interface BlueprintAnalyticsProps {
   sessions: Session[];
@@ -99,34 +97,6 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
     return Math.max(maxDD, drawdown);
   }, 0);
 
-  // Process trade duration data
-  const trades = sessions.map(session => ({
-    entryDate: session.entryDate,
-    exitDate: session.exitDate,
-    pnl: session.pnl
-  }));
-
-  const durationData = analyzeTradeDurations(trades);
-
-  // Calculate win rates for each category
-  const winRatesByCategory = durationData.reduce((acc, trade) => {
-    const category = trade.category;
-    if (!acc[category]) {
-      acc[category] = { wins: 0, total: 0 };
-    }
-    acc[category].total += 1;
-    if (trade.pnl > 0) {
-      acc[category].wins += 1;
-    }
-    return acc;
-  }, {} as Record<string, { wins: number; total: number; }>);
-
-  const durationChartData = Object.entries(winRatesByCategory).map(([category, stats]) => ({
-    category,
-    winRate: (stats.wins / stats.total) * 100,
-    tradeCount: stats.total
-  }));
-
   return (
     <div className="space-y-8 mt-8">
       <div>
@@ -165,60 +135,7 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
           </div>
         </Card>
 
-        <Card className="p-6">
-          <h3 className="text-xl font-bold mb-4">Trade Duration Analysis</h3>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={durationChartData}>
-                <XAxis 
-                  dataKey="category" 
-                  tick={{ fontSize: 12 }}
-                />
-                <YAxis
-                  yAxisId="left"
-                  tick={{ fontSize: 12 }}
-                  tickFormatter={(value) => `${value.toFixed(0)}%`}
-                  domain={[0, 100]}
-                  label={{
-                    value: 'Win Rate',
-                    angle: -90,
-                    position: 'insideLeft',
-                    style: { fontSize: '12px', textAnchor: 'middle' },
-                    dx: -10
-                  }}
-                />
-                <YAxis
-                  yAxisId="right"
-                  orientation="right"
-                  tick={{ fontSize: 12 }}
-                  tickFormatter={(value) => `${value}`}
-                  label={{
-                    value: '# of Trades',
-                    angle: 90,
-                    position: 'insideRight',
-                    style: { fontSize: '12px', textAnchor: 'middle' },
-                    dx: 10
-                  }}
-                />
-                <Tooltip
-                  content={<CustomTooltip />}
-                />
-                <Bar
-                  yAxisId="left"
-                  dataKey="winRate"
-                  fill="hsl(var(--primary))"
-                  name="Win Rate"
-                />
-                <Bar
-                  yAxisId="right"
-                  dataKey="tradeCount"
-                  fill="hsl(var(--secondary))"
-                  name="Number of Trades"
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </Card>
+        <TradeDuration />
       </div>
 
       <Card className="p-6">

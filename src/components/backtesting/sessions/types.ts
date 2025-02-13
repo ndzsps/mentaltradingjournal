@@ -2,6 +2,7 @@
 export interface Session {
   id: string;
   entryDate: string;
+  exitDate: string;
   instrument: string;
   setup: string;
   direction: 'buy' | 'sell' | null;

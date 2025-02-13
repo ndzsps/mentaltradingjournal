@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -38,6 +39,8 @@ export const EditSessionDialog = ({ session, open, onOpenChange }: EditSessionDi
   useEffect(() => {
     if (session) {
       setFormData({
+        entryDate: session.entryDate,
+        exitDate: session.exitDate,
         entryPrice: session.entryPrice,
         exitPrice: session.exitPrice,
         quantity: session.quantity,
@@ -59,6 +62,8 @@ export const EditSessionDialog = ({ session, open, onOpenChange }: EditSessionDi
       const { error } = await supabase
         .from("backtesting_sessions")
         .update({
+          entry_date: formData.entryDate,
+          exit_date: formData.exitDate,
           entry_price: formData.entryPrice,
           exit_price: formData.exitPrice,
           quantity: formData.quantity,
@@ -116,6 +121,24 @@ export const EditSessionDialog = ({ session, open, onOpenChange }: EditSessionDi
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4 py-4">
             <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="entryDate">Entry Date</Label>
+                <Input
+                  id="entryDate"
+                  type="date"
+                  value={formData.entryDate?.split('T')[0] || ""}
+                  onChange={(e) => setFormData(prev => ({ ...prev, entryDate: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="exitDate">Exit Date</Label>
+                <Input
+                  id="exitDate"
+                  type="date"
+                  value={formData.exitDate?.split('T')[0] || ""}
+                  onChange={(e) => setFormData(prev => ({ ...prev, exitDate: e.target.value }))}
+                />
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="entryPrice">Entry Price</Label>
                 <Input

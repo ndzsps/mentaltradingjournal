@@ -71,6 +71,7 @@ export const SessionsTable = ({ sessions }: SessionsTableProps) => {
             <TableRow>
               <TableHead className="w-[40px]"></TableHead>
               <TableHead>Entry Date</TableHead>
+              <TableHead>Exit Date</TableHead>
               <TableHead>Instrument</TableHead>
               <TableHead>Direction</TableHead>
               <TableHead className="text-right">Entry Price</TableHead>
@@ -106,6 +107,7 @@ export const SessionsTable = ({ sessions }: SessionsTableProps) => {
                   </Button>
                 </TableCell>
                 <TableCell>{formatDate(session.entryDate)}</TableCell>
+                <TableCell>{formatDate(session.exitDate)}</TableCell>
                 <TableCell>{session.instrument || '-'}</TableCell>
                 <TableCell>
                   <span className={`font-medium ${

@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Session } from "./types";
 import { AssetPairChart } from "@/components/analytics/asset-pair/AssetPairChart";
@@ -10,6 +9,7 @@ import { useState } from "react";
 import { analyzeTradeDurations } from "@/utils/analytics/tradeDurationAnalysis";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { PerformanceInsight } from "@/components/analytics/performance/PerformanceInsight";
+import { WinLossRatioBP } from "@/components/analytics/WinLossRatioBP";
 
 interface BlueprintAnalyticsProps {
   sessions: Session[];
@@ -178,7 +178,7 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
         </div>
       </Card>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <Card className="p-6">
           <h3 className="text-xl font-bold mb-4">Asset Pair Performance</h3>
           <div className="h-[300px] pr-4">
@@ -273,6 +273,8 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
             />
           </div>
         </Card>
+
+        <WinLossRatioBP sessions={sessions} />
       </div>
 
       <Card className="p-6">

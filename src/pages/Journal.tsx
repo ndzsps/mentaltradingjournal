@@ -1,3 +1,4 @@
+
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card } from "@/components/ui/card";
 import { useEffect, useState } from "react";
@@ -12,15 +13,33 @@ import { JournalEntryType } from "@/types/journal";
 import { StatsHeader } from "@/components/journal/stats/StatsHeader";
 import { TimeFilterProvider } from "@/contexts/TimeFilterContext";
 import { startOfDay, endOfDay } from "date-fns";
+import { useLocation } from "react-router-dom";
 
 const Journal = () => {
   const [entries, setEntries] = useState<JournalEntryType[]>([]);
   const { user } = useAuth();
+  const location = useLocation();
+  const locationState = location.state as { selectedDate?: Date } | undefined;
+  
   const {
     selectedDate,
     setSelectedDate,
     filteredEntries
   } = useJournalFilters(entries);
+
+  useEffect(() => {
+    if (locationState?.selectedDate) {
+      setSelectedDate(new Date(locationState.selectedDate));
+      
+      // Scroll to journal entries section after a short delay to ensure the DOM is ready
+      setTimeout(() => {
+        const journalEntriesSection = document.querySelector('#journal-entries');
+        if (journalEntriesSection) {
+          journalEntriesSection.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    }
+  }, [locationState?.selectedDate, setSelectedDate]);
 
   const fetchEntries = async () => {
     if (!user) return;

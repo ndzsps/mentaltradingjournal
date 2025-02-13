@@ -135,11 +135,15 @@ const handler = async (req: Request): Promise<Response> => {
         break;
       }
       
-      case "customer.subscription.created":
+      case "customer.subscription.created": {
+        // Skip processing this event as we handle subscription creation in checkout.session.completed
+        console.log("Skipping customer.subscription.created as it's handled by checkout.session.completed");
+        break;
+      }
+
       case "customer.subscription.updated": {
         const subscription = event.data.object as Stripe.Subscription;
-        console.log("Processing subscription event:", {
-          type: event.type,
+        console.log("Processing subscription update:", {
           id: subscription.id,
           status: subscription.status,
           userId: subscription.metadata.user_id,
@@ -147,26 +151,23 @@ const handler = async (req: Request): Promise<Response> => {
           priceId: subscription.items.data[0].price.id
         });
         
-        const { error } = await supabase.from("subscriptions").upsert({
-          stripe_subscription_id: subscription.id,
-          user_id: subscription.metadata.user_id,
+        const { error } = await supabase.from("subscriptions").update({
           status: subscription.status,
-          stripe_customer_id: subscription.customer as string,
           stripe_price_id: subscription.items.data[0].price.id,
           current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
           current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
           cancel_at: subscription.cancel_at ? new Date(subscription.cancel_at * 1000).toISOString() : null,
           canceled_at: subscription.canceled_at ? new Date(subscription.canceled_at * 1000).toISOString() : null,
-        });
+        }).eq("stripe_subscription_id", subscription.id);
 
         if (error) {
-          console.error("Error upserting subscription:", error);
-          return new Response(JSON.stringify({ error: "Error upserting subscription", details: error }), { 
+          console.error("Error updating subscription:", error);
+          return new Response(JSON.stringify({ error: "Error updating subscription", details: error }), { 
             status: 500,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' }
           });
         }
-        console.log("Successfully updated subscription in database for subscription:", subscription.id);
+        console.log("Successfully updated subscription in database:", subscription.id);
         break;
       }
 

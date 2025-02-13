@@ -70,6 +70,7 @@ export default function BlueprintSessions() {
           fourHourUrl: session.four_hour_url,
           oneHourUrl: session.one_hour_url,
           refinedEntryUrl: session.refined_entry_url,
+          duration: session.duration,
         }));
         setSessions(mappedSessions);
       }

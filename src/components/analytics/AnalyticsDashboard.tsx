@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { EmotionalTendencies } from "./EmotionalTendencies";
@@ -24,8 +25,8 @@ export const AnalyticsDashboard = () => {
   const [activeView, setActiveView] = useState<'all' | 'psychological' | 'trading'>('all');
 
   const psychologicalComponents = [
-    EmotionTrend,
-    EmotionalTendencies,
+    MistakeAnalysis,  // Moved MistakeAnalysis to the beginning
+    EmotionalTendencies, // Moved EmotionalTendencies after MistakeAnalysis
     EmotionRecovery,
     PreTradingEvents,
     PersonalityPatterns,
@@ -38,7 +39,7 @@ export const AnalyticsDashboard = () => {
     PerformanceBreakdown,
     RuleAdherence,
     TradeDuration,
-    MistakeAnalysis,
+    EmotionTrend,
     ProfitLossDistribution,
     TradeFrequency,
     RiskRewardAnalysis,

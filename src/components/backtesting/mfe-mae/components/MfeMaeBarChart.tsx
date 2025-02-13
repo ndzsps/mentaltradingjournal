@@ -81,7 +81,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
                     <span>Drawdown: {Math.abs(drawdownValue)?.toFixed(2)}%</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-white" />
+                    <div className="w-3 h-3 rounded-full bg-[#0EA5E9]" />
                     <span>Captured Move: {capturedMove?.toFixed(2)}%</span>
                   </div>
                   <p>R-Multiple: {data.rMultiple?.toFixed(2) || '0'}</p>
@@ -109,7 +109,7 @@ export function MfeMaeBarChart({ data }: MfeMaeBarChartProps) {
               cx={`${index * (100 / (dataWithNumbers.length - 1))}%`}
               cy={`${50 - (entry.capturedMove || 0) / 2}%`}
               r={4}
-              fill="white"
+              fill="#0EA5E9"
             />
           ))}
         </Bar>

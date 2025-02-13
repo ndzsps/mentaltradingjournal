@@ -121,7 +121,7 @@ const Pricing = () => {
               </ul>
               <Button
                 className="w-full bg-white/10 hover:bg-white/20 text-white"
-                onClick={() => handleSubscribe("price_1Qs2QGI2A6O6E8LHv6mgd8nT")}
+                onClick={() => handleSubscribe("price_1Qw9XyI2A6O6E8LHKh7LW2Zn")}
               >
                 Get Started
               </Button>
@@ -159,7 +159,7 @@ const Pricing = () => {
               </ul>
               <Button
                 className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-                onClick={() => handleSubscribe("price_1Qs2QaI2A6O6E8LH8YdwlxiE")}
+                onClick={() => handleSubscribe("price_1Qw9XyI2A6O6E8LHvqhwXmK9")}
               >
                 Get Yearly Plan
               </Button>

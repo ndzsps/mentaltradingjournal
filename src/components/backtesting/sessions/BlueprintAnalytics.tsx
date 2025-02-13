@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Session } from "./types";
 import { AssetPairChart } from "@/components/analytics/asset-pair/AssetPairChart";
@@ -6,8 +5,9 @@ import { RiskRewardChart } from "@/components/analytics/risk-reward/RiskRewardCh
 import { EquityCurveChart } from "@/components/analytics/equity-curve/EquityCurveChart";
 import { EquityMetrics } from "@/components/analytics/equity-curve/EquityMetrics";
 import { BalanceSelector } from "@/components/analytics/equity-curve/BalanceSelector";
-import { TradeDuration } from "@/components/analytics/TradeDuration";
 import { useState } from "react";
+import { analyzeTradeDurations } from "@/utils/analytics/tradeDurationAnalysis";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
 interface BlueprintAnalyticsProps {
   sessions: Session[];
@@ -97,13 +97,31 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
     return Math.max(maxDD, drawdown);
   }, 0);
 
-  // Convert sessions to trade format for duration analysis
+  // Process sessions for trade duration analysis
   const tradeDurationData = sessions.map(session => ({
-    id: session.id,
     entryDate: session.entryDate,
     exitDate: session.exitDate,
-    pnl: session.pnl,
-    duration: session.duration
+    pnl: session.pnl
+  }));
+
+  const durationData = analyzeTradeDurations(tradeDurationData);
+
+  // Group trades by duration category and calculate stats
+  const durationStats = durationData.reduce((acc, trade) => {
+    if (!acc[trade.category]) {
+      acc[trade.category] = { count: 0, wins: 0, totalPnL: 0 };
+    }
+    acc[trade.category].count += 1;
+    if (trade.pnl > 0) acc[trade.category].wins += 1;
+    acc[trade.category].totalPnL += trade.pnl;
+    return acc;
+  }, {} as Record<string, { count: number; wins: number; totalPnL: number; }>);
+
+  const durationChartData = Object.entries(durationStats).map(([category, stats]) => ({
+    category,
+    count: stats.count,
+    winRate: (stats.wins / stats.count) * 100,
+    avgPnL: stats.totalPnL / stats.count
   }));
 
   return (
@@ -144,7 +162,57 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
           </div>
         </Card>
 
-        <TradeDuration trades={tradeDurationData} />
+        <Card className="p-6">
+          <h3 className="text-xl font-bold mb-4">Trade Duration Analysis</h3>
+          <div className="h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={durationChartData}>
+                <XAxis 
+                  dataKey="category" 
+                  tick={{ fontSize: 12 }}
+                />
+                <YAxis
+                  yAxisId="left"
+                  tick={{ fontSize: 12 }}
+                  tickFormatter={(value) => `${value.toFixed(0)}%`}
+                  domain={[0, 100]}
+                  label={{
+                    value: 'Win Rate',
+                    angle: -90,
+                    position: 'insideLeft',
+                    style: { fontSize: '12px', textAnchor: 'middle' },
+                    dx: -10
+                  }}
+                />
+                <YAxis
+                  yAxisId="right"
+                  orientation="right"
+                  tick={{ fontSize: 12 }}
+                  label={{
+                    value: 'Trade Count',
+                    angle: 90,
+                    position: 'insideRight',
+                    style: { fontSize: '12px', textAnchor: 'middle' },
+                    dx: 10
+                  }}
+                />
+                <Tooltip />
+                <Bar
+                  yAxisId="left"
+                  dataKey="winRate"
+                  fill="hsl(var(--primary))"
+                  name="Win Rate"
+                />
+                <Bar
+                  yAxisId="right"
+                  dataKey="count"
+                  fill="hsl(var(--secondary))"
+                  name="Trade Count"
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </Card>
       </div>
 
       <Card className="p-6">

@@ -32,8 +32,23 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 const generateDynamicRanges = (trades: any[]) => {
   const pnlValues = trades.map(trade => Number(trade.pnl));
-  const min = Math.min(...pnlValues);
-  const max = Math.max(...pnlValues);
+  const validPnlValues = pnlValues.filter(pnl => !isNaN(pnl) && isFinite(pnl));
+  
+  if (validPnlValues.length === 0) {
+    return [];
+  }
+
+  const min = Math.min(...validPnlValues);
+  const max = Math.max(...validPnlValues);
+
+  // Handle case where all values are the same
+  if (min === max) {
+    return [{
+      min: min - 1,
+      max: max + 1,
+      label: `$${min.toLocaleString()}`
+    }];
+  }
 
   // Determine the optimal number of bins based on data spread
   const spread = max - min;
@@ -103,6 +118,17 @@ export const ProfitLossDistribution = () => {
   }
 
   const ranges = generateDynamicRanges(allTrades);
+
+  if (ranges.length === 0) {
+    return (
+      <Card className="p-4 md:p-6 space-y-4">
+        <div className="space-y-2">
+          <h3 className="text-xl md:text-2xl font-bold">Profit/Loss Distribution</h3>
+          <p className="text-sm text-muted-foreground">Unable to generate valid P&L ranges from the available data</p>
+        </div>
+      </Card>
+    );
+  }
 
   const data = ranges.map(range => ({
     range: formatRangeLabel(range),

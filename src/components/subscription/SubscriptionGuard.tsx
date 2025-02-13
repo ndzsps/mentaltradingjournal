@@ -17,7 +17,7 @@ export const SubscriptionGuard = ({ children }: { children: React.ReactNode }) =
   const isPublicRoute = PUBLIC_ROUTES.includes(location.pathname);
 
   useEffect(() => {
-    // Skip subscription check for public routes
+    // Always allow access to public routes regardless of subscription status
     if (isPublicRoute) {
       return;
     }
@@ -49,18 +49,18 @@ export const SubscriptionGuard = ({ children }: { children: React.ReactNode }) =
     }
   }, [hasActiveSubscription, isLoading, navigate, user, session, error, isPublicRoute]);
 
-  // Show nothing while loading or if not authenticated
-  if (isLoading || !user || !session) {
-    return null;
-  }
-
-  // Always render content for public routes
+  // For public routes, always render content regardless of auth state
   if (isPublicRoute) {
     return <>{children}</>;
   }
 
-  // No subscription, don't render protected content
-  if (!hasActiveSubscription) {
+  // For protected routes, show nothing while loading
+  if (isLoading) {
+    return null;
+  }
+
+  // For protected routes, require both authentication and subscription
+  if (!hasActiveSubscription && !isPublicRoute) {
     return null;
   }
 

@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { Session } from "./types";
 import { AssetPairChart } from "@/components/analytics/asset-pair/AssetPairChart";
@@ -173,7 +174,12 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
       instrument: session.instrument,
     }))
     .map(processTrade)
-    .filter((trade): trade is ChartData => trade !== null);
+    .filter((trade): trade is ChartData => 
+      trade !== null && 
+      typeof trade.mfeRelativeToTp === 'number' && 
+      typeof trade.maeRelativeToSl === 'number' && 
+      typeof trade.id === 'string'
+    );
 
   // Calculate MFE & MAE statistics
   const calculateStats = () => {

@@ -113,28 +113,45 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
   const durationData = analyzeTradeDurations(tradeDurationData);
 
   // Group trades by duration category and calculate stats
+  const durationRanges = [
+    { min: 0, max: 30, label: "< 30 min" },
+    { min: 30, max: 60, label: "30-60 min" },
+    { min: 60, max: 180, label: "1-3 hrs" },
+    { min: 180, max: 360, label: "3-6 hrs" },
+    { min: 360, max: 540, label: "6-9 hrs" },
+    { min: 540, max: 720, label: "9-12 hrs" },
+    { min: 720, max: 1440, label: "12-24 hrs" },
+    { min: 1440, max: Infinity, label: "> 24 hrs" },
+  ];
+
   const durationStats = durationData.reduce((acc, trade) => {
-    if (!acc[trade.category]) {
-      acc[trade.category] = { count: 0, wins: 0, totalPnL: 0 };
+    const duration = trade.duration;
+    const range = durationRanges.find(r => 
+      duration > r.min && duration <= r.max
+    );
+    
+    if (range) {
+      if (!acc[range.label]) {
+        acc[range.label] = { count: 0, wins: 0, totalPnL: 0 };
+      }
+      acc[range.label].count += 1;
+      if (trade.pnl > 0) acc[range.label].wins += 1;
+      acc[range.label].totalPnL += trade.pnl;
     }
-    acc[trade.category].count += 1;
-    if (trade.pnl > 0) acc[trade.category].wins += 1;
-    acc[trade.category].totalPnL += trade.pnl;
     return acc;
   }, {} as Record<string, { count: number; wins: number; totalPnL: number; }>);
 
-  const durationOrder = ['0-1h', '1-4h', '4-24h', '24h+'];
-  
   const durationChartData = Object.entries(durationStats)
     .map(([category, stats]) => ({
       category,
-      count: stats.count,
       winRate: (stats.wins / stats.count) * 100,
+      count: stats.count,
       avgPnL: stats.totalPnL / stats.count
     }))
+    .filter(item => item.count > 0)
     .sort((a, b) => {
-      const indexA = durationOrder.indexOf(a.category);
-      const indexB = durationOrder.indexOf(b.category);
+      const indexA = durationRanges.findIndex(r => r.label === a.category);
+      const indexB = durationRanges.findIndex(r => r.label === b.category);
       return indexA - indexB;
     });
 
@@ -280,30 +297,30 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
                     fill: 'hsl(var(--muted))',
                     opacity: 0.1 
                   }}
-                  contentStyle={{
-                    backgroundColor: 'hsl(var(--card))',
-                    border: '1px solid hsl(var(--border))',
-                    borderRadius: '8px',
-                    padding: '8px 12px'
-                  }}
-                  itemStyle={{
-                    color: 'hsl(var(--foreground))'
-                  }}
-                  formatter={(value: number, name: string) => {
-                    if (name === 'Win Rate') return [`${value.toFixed(1)}%`, 'Win Rate'];
-                    return [`${value}`, 'Trade Count'];
+                  content={({ active, payload, label }) => {
+                    if (!active || !payload || !payload.length) return null;
+                    return (
+                      <div className="bg-background border border-border rounded-lg p-3">
+                        <p className="font-medium text-sm mb-2">{label}</p>
+                        <div className="text-sm space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-muted-foreground">Win Rate:</span>
+                            <span className="font-medium">
+                              {payload[0].value.toFixed(1)}%
+                            </span>
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            ({payload[0].payload.count} trades)
+                          </div>
+                        </div>
+                      </div>
+                    );
                   }}
                 />
                 <Bar
                   dataKey="winRate"
                   fill="hsl(var(--primary))"
                   name="Win Rate"
-                  radius={[4, 4, 0, 0]}
-                />
-                <Bar
-                  dataKey="count"
-                  fill="hsl(var(--secondary))"
-                  name="Trade Count"
                   radius={[4, 4, 0, 0]}
                 />
               </BarChart>

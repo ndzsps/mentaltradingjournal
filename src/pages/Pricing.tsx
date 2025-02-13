@@ -3,9 +3,26 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Check } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { createCheckoutSession } from "@/lib/stripe";
+import { toast } from "sonner";
 
 const Pricing = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const handleSubscribe = async (priceId: string) => {
+    try {
+      if (!user) {
+        navigate("/login");
+        return;
+      }
+      await createCheckoutSession(priceId);
+    } catch (error) {
+      console.error("Error creating checkout session:", error);
+      toast.error("Failed to start checkout process. Please try again.");
+    }
+  };
 
   return (
     <div className="min-h-screen relative bg-[#1A1F2C] overflow-hidden">
@@ -104,7 +121,7 @@ const Pricing = () => {
               </ul>
               <Button
                 className="w-full bg-white/10 hover:bg-white/20 text-white"
-                onClick={() => navigate("/login")}
+                onClick={() => handleSubscribe("price_1Qs2QGI2A6O6E8LHv6mgd8nT")}
               >
                 Get Started
               </Button>
@@ -142,7 +159,7 @@ const Pricing = () => {
               </ul>
               <Button
                 className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-                onClick={() => navigate("/login")}
+                onClick={() => handleSubscribe("price_1Qs2QaI2A6O6E8LH8YdwlxiE")}
               >
                 Get Yearly Plan
               </Button>

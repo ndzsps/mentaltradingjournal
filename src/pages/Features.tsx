@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { 
@@ -138,15 +137,6 @@ const Features = () => {
 
         {/* Fourth Section (Flipped) */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mt-32">
-          {/* Left Column - Image */}
-          <div className="relative rounded-3xl overflow-hidden bg-white shadow-xl lg:-mt-12 order-2 lg:order-1">
-            <img 
-              src="/lovable-uploads/1a442a11-7b9d-4bda-9d76-926ef1becdc7.png"
-              alt="Analytics Charts"
-              className="w-full h-auto"
-            />
-          </div>
-
           {/* Right Column - Text Content */}
           <div className="space-y-8 order-1 lg:order-2">
             <h2 className="text-3xl md:text-4xl font-semibold">
@@ -162,6 +152,15 @@ const Features = () => {
             <Button size="lg" className="mt-6" asChild>
               <Link to="/login">Get Started</Link>
             </Button>
+          </div>
+
+          {/* Left Column - Image */}
+          <div className="relative rounded-3xl overflow-hidden bg-white shadow-xl lg:-mt-12 order-2 lg:order-1">
+            <img 
+              src="/lovable-uploads/871474ba-41ef-4e5d-ad53-f98502fd473b.png"
+              alt="Analytics Charts"
+              className="w-full h-auto"
+            />
           </div>
         </div>
 

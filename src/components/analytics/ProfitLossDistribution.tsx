@@ -8,6 +8,7 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  Cell,
 } from "recharts";
 import { generateAnalytics } from "@/utils/analyticsUtils";
 import { useQuery } from "@tanstack/react-query";
@@ -30,6 +31,14 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   );
 };
 
+const formatToK = (value: number): string => {
+  const absValue = Math.abs(value);
+  if (absValue >= 1000) {
+    return `${value < 0 ? '-' : ''}$${(absValue / 1000).toFixed(0)}K`;
+  }
+  return `${value < 0 ? '-' : ''}$${absValue}`;
+};
+
 const generateDynamicRanges = (trades: any[]) => {
   const pnlValues = trades.map(trade => Number(trade.pnl));
   const validPnlValues = pnlValues.filter(pnl => !isNaN(pnl) && isFinite(pnl));
@@ -46,7 +55,7 @@ const generateDynamicRanges = (trades: any[]) => {
     return [{
       min: min - 1,
       max: max + 1,
-      label: `$${min.toLocaleString()}`
+      label: formatToK(min)
     }];
   }
 
@@ -72,7 +81,7 @@ const generateDynamicRanges = (trades: any[]) => {
     ranges.push({
       min: currentMin,
       max: currentMax,
-      label: `$${currentMin.toLocaleString()} to $${currentMax.toLocaleString()}`
+      label: `${formatToK(currentMin)} to ${formatToK(currentMax)}`
     });
     currentMin = currentMax;
   }
@@ -81,8 +90,8 @@ const generateDynamicRanges = (trades: any[]) => {
 };
 
 const formatRangeLabel = (range: { min: number; max: number; label: string }) => {
-  if (range.min === -Infinity) return `< $${range.max.toLocaleString()}`;
-  if (range.max === Infinity) return `> $${range.min.toLocaleString()}`;
+  if (range.min === -Infinity) return `< ${formatToK(range.max)}`;
+  if (range.max === Infinity) return `> ${formatToK(range.min)}`;
   return range.label;
 };
 
@@ -137,13 +146,14 @@ export const ProfitLossDistribution = () => {
       const pnl = Number(trade.pnl);
       return pnl >= range.min && pnl < range.max;
     }).length,
+    min: range.min // Add min value to determine color
   }));
 
   // Calculate statistics for AI insight with initial value for reduce
   const totalTrades = allTrades.length;
   const mostFrequentBin = data.reduce((prev, current) => 
     (current.count > prev.count) ? current : prev, 
-    { range: '', count: 0 } // Add initial value here
+    { range: '', count: 0 }
   );
   const mostFrequentPercentage = totalTrades > 0 ? (mostFrequentBin.count / totalTrades) * 100 : 0;
 
@@ -178,11 +188,14 @@ export const ProfitLossDistribution = () => {
               content={<CustomTooltip />}
               cursor={{ fill: 'currentColor', opacity: 0.1 }}
             />
-            <Bar 
-              dataKey="count" 
-              fill="#6E59A5"
-              radius={[4, 4, 0, 0]}
-            />
+            <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+              {data.map((entry, index) => (
+                <Cell 
+                  key={`cell-${index}`} 
+                  fill={entry.min < 0 ? '#FEC6A1' : '#6E59A5'}
+                />
+              ))}
+            </Bar>
           </BarChart>
         </ResponsiveContainer>
       </div>

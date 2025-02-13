@@ -119,12 +119,20 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
     return acc;
   }, {} as Record<string, { count: number; wins: number; totalPnL: number; }>);
 
-  const durationChartData = Object.entries(durationStats).map(([category, stats]) => ({
-    category,
-    count: stats.count,
-    winRate: (stats.wins / stats.count) * 100,
-    avgPnL: stats.totalPnL / stats.count
-  }));
+  const durationOrder = ['0-1h', '1-4h', '4-24h', '24h+'];
+  
+  const durationChartData = Object.entries(durationStats)
+    .map(([category, stats]) => ({
+      category,
+      count: stats.count,
+      winRate: (stats.wins / stats.count) * 100,
+      avgPnL: stats.totalPnL / stats.count
+    }))
+    .sort((a, b) => {
+      const indexA = durationOrder.indexOf(a.category);
+      const indexB = durationOrder.indexOf(b.category);
+      return indexA - indexB;
+    });
 
   // Find the best performing duration category
   const bestDuration = durationChartData.reduce((prev, current) => 
@@ -231,7 +239,7 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
                     color: 'hsl(var(--foreground))'
                   }}
                   formatter={(value: number, name: string) => {
-                    if (name === 'winRate') return [`${value.toFixed(1)}%`, 'Win Rate'];
+                    if (name === 'Win Rate') return [`${value.toFixed(1)}%`, 'Win Rate'];
                     return [`${value}`, 'Trade Count'];
                   }}
                 />

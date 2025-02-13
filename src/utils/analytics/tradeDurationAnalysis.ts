@@ -1,3 +1,4 @@
+
 import { Trade } from "@/types/analytics";
 
 export const analyzeTradeDurations = (trades: Trade[]) => {

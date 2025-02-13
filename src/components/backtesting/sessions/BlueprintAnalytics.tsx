@@ -6,6 +6,7 @@ import { RiskRewardChart } from "@/components/analytics/risk-reward/RiskRewardCh
 import { EquityCurveChart } from "@/components/analytics/equity-curve/EquityCurveChart";
 import { EquityMetrics } from "@/components/analytics/equity-curve/EquityMetrics";
 import { BalanceSelector } from "@/components/analytics/equity-curve/BalanceSelector";
+import { TradeDuration } from "@/components/analytics/TradeDuration";
 import { useState } from "react";
 
 interface BlueprintAnalyticsProps {
@@ -126,10 +127,16 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
         </div>
       </Card>
 
-      <Card className="p-6">
-        <h3 className="text-xl font-bold mb-4">Asset Pair Performance</h3>
-        <AssetPairChart data={chartData} />
-      </Card>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <Card className="p-6">
+          <h3 className="text-xl font-bold mb-4">Asset Pair Performance</h3>
+          <div className="h-[300px]">
+            <AssetPairChart data={chartData} />
+          </div>
+        </Card>
+
+        <TradeDuration />
+      </div>
 
       <Card className="p-6">
         <h3 className="text-xl font-bold mb-4">Risk/Reward Analysis</h3>

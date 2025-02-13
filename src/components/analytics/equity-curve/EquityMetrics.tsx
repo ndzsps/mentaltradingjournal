@@ -1,3 +1,4 @@
+
 interface EquityMetricsProps {
   initialBalance: number;
   currentBalance: number;

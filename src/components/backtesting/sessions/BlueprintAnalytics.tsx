@@ -114,18 +114,18 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
 
   // Group trades by duration category and calculate stats
   const durationRanges = [
-    { min: 0, max: 30, label: "< 30 min" },
-    { min: 30, max: 60, label: "30-60 min" },
-    { min: 60, max: 180, label: "1-3 hrs" },
-    { min: 180, max: 360, label: "3-6 hrs" },
-    { min: 360, max: 540, label: "6-9 hrs" },
-    { min: 540, max: 720, label: "9-12 hrs" },
-    { min: 720, max: 1440, label: "12-24 hrs" },
-    { min: 1440, max: Infinity, label: "> 24 hrs" },
+    { min: 0, max: 0.5, label: "< 30 min" },
+    { min: 0.5, max: 1, label: "30-60 min" },
+    { min: 1, max: 3, label: "1-3 hrs" },
+    { min: 3, max: 6, label: "3-6 hrs" },
+    { min: 6, max: 9, label: "6-9 hrs" },
+    { min: 9, max: 12, label: "9-12 hrs" },
+    { min: 12, max: 24, label: "12-24 hrs" },
+    { min: 24, max: Infinity, label: "> 24 hrs" },
   ];
 
   const durationStats = durationData.reduce((acc, trade) => {
-    const duration = trade.duration;
+    const duration = trade.duration; // Now in hours
     const range = durationRanges.find(r => 
       duration > r.min && duration <= r.max
     );
@@ -299,6 +299,7 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
                   }}
                   content={({ active, payload, label }) => {
                     if (!active || !payload || !payload.length) return null;
+                    const value = payload[0].value as number;
                     return (
                       <div className="bg-background border border-border rounded-lg p-3">
                         <p className="font-medium text-sm mb-2">{label}</p>
@@ -306,7 +307,7 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
                           <div className="flex items-center gap-2">
                             <span className="text-muted-foreground">Win Rate:</span>
                             <span className="font-medium">
-                              {payload[0].value.toFixed(1)}%
+                              {value.toFixed(1)}%
                             </span>
                           </div>
                           <div className="text-xs text-muted-foreground">

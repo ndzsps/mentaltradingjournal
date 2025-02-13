@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { Session } from "./types";
 import { AssetPairChart } from "@/components/analytics/asset-pair/AssetPairChart";
@@ -8,6 +9,7 @@ import { BalanceSelector } from "@/components/analytics/equity-curve/BalanceSele
 import { useState } from "react";
 import { analyzeTradeDurations } from "@/utils/analytics/tradeDurationAnalysis";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { PerformanceInsight } from "@/components/analytics/performance/PerformanceInsight";
 
 interface BlueprintAnalyticsProps {
   sessions: Session[];
@@ -124,6 +126,28 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
     avgPnL: stats.totalPnL / stats.count
   }));
 
+  // Find the best performing duration category
+  const bestDuration = durationChartData.reduce((prev, current) => 
+    current.winRate > prev.winRate && current.count >= 5 ? current : prev, 
+    durationChartData[0]
+  );
+
+  const getTradeDurationInsight = () => {
+    if (!bestDuration) {
+      return {
+        mainInsight: "Not enough trade duration data available.",
+        recommendedAction: "Add more trades to see duration-based insights."
+      };
+    }
+
+    return {
+      mainInsight: `Your ${bestDuration.category} trades have a ${bestDuration.winRate.toFixed(1)}% win rate.`,
+      recommendedAction: "Consider focusing more on trades within this duration range for optimal results."
+    };
+  };
+
+  const durationInsight = getTradeDurationInsight();
+
   return (
     <div className="space-y-8 mt-8">
       <div>
@@ -231,15 +255,6 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
                   fill="hsl(var(--primary))"
                   name="Win Rate"
                   radius={[4, 4, 0, 0]}
-                  style={{
-                    transition: 'fill 0.2s ease-in-out'
-                  }}
-                  onMouseOver={(data, index) => {
-                    document.querySelectorAll(`[name="Win Rate"]`)[index].style.fill = 'hsl(var(--primary-foreground))';
-                  }}
-                  onMouseOut={(data, index) => {
-                    document.querySelectorAll(`[name="Win Rate"]`)[index].style.fill = 'hsl(var(--primary))';
-                  }}
                 />
                 <Bar
                   yAxisId="right"
@@ -247,18 +262,15 @@ export const BlueprintAnalytics = ({ sessions }: BlueprintAnalyticsProps) => {
                   fill="hsl(var(--secondary))"
                   name="Trade Count"
                   radius={[4, 4, 0, 0]}
-                  style={{
-                    transition: 'fill 0.2s ease-in-out'
-                  }}
-                  onMouseOver={(data, index) => {
-                    document.querySelectorAll(`[name="Trade Count"]`)[index].style.fill = 'hsl(var(--secondary-foreground))';
-                  }}
-                  onMouseOut={(data, index) => {
-                    document.querySelectorAll(`[name="Trade Count"]`)[index].style.fill = 'hsl(var(--secondary))';
-                  }}
                 />
               </BarChart>
             </ResponsiveContainer>
+          </div>
+          <div className="mt-4">
+            <PerformanceInsight 
+              mainInsight={durationInsight.mainInsight}
+              recommendedAction={durationInsight.recommendedAction}
+            />
           </div>
         </Card>
       </div>

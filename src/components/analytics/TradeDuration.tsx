@@ -19,22 +19,19 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return (
     <div className="bg-background border border-border rounded-lg shadow-lg p-3 animate-in fade-in-0 zoom-in-95">
       <p className="font-medium text-sm text-foreground mb-2">{label}</p>
-      {payload.map((item: any, index: number) => (
-        <div key={index} className="flex items-center gap-2 text-sm">
-          <div
-            className="w-2 h-2 rounded-full"
-            style={{ backgroundColor: item.fill }}
-          />
-          <span className="text-muted-foreground">
-            {item.dataKey === 'tradeCount' ? '# of Trades:' : 'Win Rate:'}
-          </span>
-          <span className="font-medium text-foreground">
-            {item.dataKey === 'tradeCount' ? 
-              `${item.value} trades` : 
-              `${item.value.toFixed(1)}%`}
-          </span>
-        </div>
-      ))}
+      <div className="flex items-center gap-2 text-sm">
+        <div
+          className="w-2 h-2 rounded-full"
+          style={{ backgroundColor: payload[0].fill }}
+        />
+        <span className="text-muted-foreground">Win Rate:</span>
+        <span className="font-medium text-foreground">
+          {payload[0].value.toFixed(1)}%
+        </span>
+      </div>
+      <div className="text-xs text-muted-foreground mt-1">
+        ({payload[0].payload.tradeCount} trades)
+      </div>
     </div>
   );
 };
@@ -67,10 +64,14 @@ export const TradeDuration = () => {
   };
 
   const durationRanges = [
-    { min: 0, max: 10, label: "< 10 min" },
-    { min: 10, max: 30, label: "10-30 min" },
+    { min: 0, max: 30, label: "< 30 min" },
     { min: 30, max: 60, label: "30-60 min" },
-    { min: 60, max: Infinity, label: "> 1 hour" },
+    { min: 60, max: 180, label: "1-3 hrs" },
+    { min: 180, max: 360, label: "3-6 hrs" },
+    { min: 360, max: 540, label: "6-9 hrs" },
+    { min: 540, max: 720, label: "9-12 hrs" },
+    { min: 720, max: 1440, label: "12-24 hrs" },
+    { min: 1440, max: Infinity, label: "> 24 hrs" },
   ];
 
   const data = durationRanges.map(range => {
@@ -90,7 +91,7 @@ export const TradeDuration = () => {
       winRate: totalTrades > 0 ? (winningTrades / totalTrades) * 100 : 0,
       tradeCount: totalTrades,
     };
-  });
+  }).filter(item => item.tradeCount > 0); // Only show ranges with trades
 
   const bestDuration = data.reduce((prev, current) => 
     current.winRate > prev.winRate && current.tradeCount > 0 ? current : prev
@@ -110,16 +111,19 @@ export const TradeDuration = () => {
           <BarChart data={data} margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="duration" tick={{ fontSize: 12 }} />
-            <YAxis tick={{ fontSize: 12 }} />
+            <YAxis 
+              tick={{ fontSize: 12 }} 
+              domain={[0, 100]}
+              label={{ 
+                value: 'Win Rate (%)', 
+                angle: -90, 
+                position: 'insideLeft',
+                style: { fontSize: '12px' }
+              }}
+            />
             <Tooltip 
               content={<CustomTooltip />}
               cursor={{ fill: 'transparent' }}
-            />
-            <Bar 
-              dataKey="tradeCount" 
-              fill="#0EA5E9" 
-              name="# of Trades" 
-              radius={[4, 4, 0, 0]}
             />
             <Bar 
               dataKey="winRate" 
@@ -141,4 +145,3 @@ export const TradeDuration = () => {
     </Card>
   );
 };
-

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -6,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useSubscription } from "@/hooks/useSubscription";
 
 const Login = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -17,7 +17,6 @@ const Login = () => {
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [isResetPassword, setIsResetPassword] = useState(false);
   const { signIn, signUp, user } = useAuth();
-  const { data: hasActiveSubscription, isLoading: isSubscriptionLoading } = useSubscription();
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
@@ -26,19 +25,13 @@ const Login = () => {
   const searchParams = new URLSearchParams(location.search);
   const returnTo = searchParams.get('returnTo') || '/dashboard';
 
-  // Only redirect if user is logged in, NOT in reset password mode, and subscription check is complete
+  // Only redirect if user is logged in and NOT in reset password mode
   useEffect(() => {
-    if (user && !isResetPassword && !isSubscriptionLoading) {
-      console.log('Login redirect - User:', !!user, 'Subscription:', hasActiveSubscription);
-      // If user has no subscription, redirect to pricing
-      if (hasActiveSubscription === false) {
-        navigate('/pricing', { replace: true });
-      } else if (hasActiveSubscription === true) {
-        // Only redirect to returnTo if user has an active subscription
-        navigate(returnTo, { replace: true });
-      }
+    if (user && !isResetPassword) {
+      // Redirect to the return URL if authenticated
+      navigate(returnTo);
     }
-  }, [user, navigate, isResetPassword, returnTo, hasActiveSubscription, isSubscriptionLoading]);
+  }, [user, navigate, isResetPassword, returnTo]);
 
   // Check for recovery token in URL
   useEffect(() => {
@@ -142,6 +135,7 @@ const Login = () => {
         });
       } else {
         await signIn(email, password);
+        navigate(returnTo);
       }
     } catch (error) {
       console.error('Auth error:', error);

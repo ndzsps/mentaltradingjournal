@@ -18,6 +18,7 @@ import Notebook from "./pages/Notebook";
 import Login from "./pages/Login";
 import MfeMae from "./pages/MfeMae";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { SubscriptionGuard } from "@/components/subscription/SubscriptionGuard";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -43,7 +44,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <Navigate to="/login" replace />;
   }
 
-  return <>{children}</>;
+  return <SubscriptionGuard>{children}</SubscriptionGuard>;
 };
 
 const App = () => {

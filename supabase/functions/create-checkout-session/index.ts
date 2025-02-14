@@ -44,6 +44,41 @@ const handler = async (req: Request): Promise<Response> => {
     const { priceId, userId } = await req.json();
     console.log("Received request for price:", priceId, "user:", userId);
 
+    // First, ensure we have a profile for this user
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", userId)
+      .single();
+
+    if (profileError) {
+      console.error("Error fetching profile:", profileError);
+      // If profile doesn't exist, try to create it
+      if (profileError.message.includes("no rows")) {
+        const { data: userData, error: userError } = await supabase.auth.admin.getUserById(userId);
+        
+        if (userError) {
+          console.error("Error fetching user:", userError);
+          throw new Error("Error fetching user data");
+        }
+
+        const { error: insertError } = await supabase
+          .from("profiles")
+          .insert({
+            id: userId,
+            email: userData.user.email,
+            username: userData.user.email?.split("@")[0],
+          });
+
+        if (insertError) {
+          console.error("Error creating profile:", insertError);
+          throw new Error("Error creating user profile");
+        }
+      } else {
+        throw new Error("Error fetching user profile");
+      }
+    }
+
     // Create or retrieve customer
     let { data: subscriptions, error: subscriptionError } = await supabase
       .from("subscriptions")
@@ -97,7 +132,7 @@ const handler = async (req: Request): Promise<Response> => {
         },
       ],
       mode: "subscription",
-      allow_promotion_codes: true, // Enable promotion code field
+      allow_promotion_codes: true,
       success_url: `${req.headers.get("origin")}/dashboard?success=true`,
       cancel_url: `${req.headers.get("origin")}/pricing?canceled=true`,
       subscription_data: {

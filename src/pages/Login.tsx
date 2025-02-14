@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -31,6 +32,47 @@ const Login = () => {
       }
     }
   }, [user, hasSubscription, isSubscriptionLoading, isResetPassword, navigate]);
+
+  // Check for verification tokens or recovery tokens in URL
+  useEffect(() => {
+    const checkForTokens = async () => {
+      try {
+        // Check hash fragment first (for password recovery)
+        const fragments = new URLSearchParams(window.location.hash.substring(1));
+        const accessToken = fragments.get('access_token');
+        const type = fragments.get('type');
+        
+        if (accessToken && type === 'recovery') {
+          setIsResetPassword(true);
+          toast({
+            title: "Reset Password",
+            description: "Please enter your new password below.",
+          });
+          return;
+        }
+
+        // Check query parameters for email verification
+        const searchParams = new URLSearchParams(window.location.search);
+        if (searchParams.has('access_token')) {
+          toast({
+            title: "Email verified",
+            description: "Your email has been verified. You can now sign in.",
+          });
+          // Clean up the URL
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+      } catch (error) {
+        console.error('Error checking tokens:', error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Unable to process verification. Please try again.",
+        });
+      }
+    };
+
+    checkForTokens();
+  }, [toast]);
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();

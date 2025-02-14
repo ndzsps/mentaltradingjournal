@@ -41,14 +41,30 @@ const handler = async (req: Request): Promise<Response> => {
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
   try {
-    const { priceId, userId } = await req.json();
-    console.log("Received request for price:", priceId, "user:", userId);
+    // Get the Authorization header
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      throw new Error('No authorization header');
+    }
+
+    // Get the JWT token
+    const token = authHeader.replace('Bearer ', '');
+    
+    // Verify the JWT and get the user
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      throw new Error('Invalid token');
+    }
+
+    const { priceId } = await req.json();
+    console.log("Received request for price:", priceId, "user:", user.id);
 
     // Create or retrieve customer
     let { data: subscriptions, error: subscriptionError } = await supabase
       .from("subscriptions")
       .select("stripe_customer_id")
-      .eq("user_id", userId)
+      .eq("user_id", user.id)
       .maybeSingle();
 
     if (subscriptionError) {
@@ -59,26 +75,22 @@ const handler = async (req: Request): Promise<Response> => {
     let customerId = subscriptions?.stripe_customer_id;
 
     if (!customerId) {
-      const { data: userProfile, error: profileError } = await supabase
+      // Get user profile data
+      const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("email")
-        .eq("id", userId)
+        .eq("id", user.id)
         .single();
 
-      if (profileError) {
-        console.error("Error fetching user profile:", profileError);
+      if (profileError || !profile) {
+        console.error("Error fetching profile:", profileError);
         throw new Error("Error fetching user profile");
       }
 
-      if (!userProfile?.email) {
-        console.error("No email found for user:", userId);
-        throw new Error("User email not found");
-      }
-
       const customer = await stripe.customers.create({
-        email: userProfile.email,
+        email: profile.email,
         metadata: {
-          user_id: userId,
+          user_id: user.id,
         },
       });
       customerId = customer.id;
@@ -97,12 +109,12 @@ const handler = async (req: Request): Promise<Response> => {
         },
       ],
       mode: "subscription",
-      allow_promotion_codes: true, // Enable promotion code field
+      allow_promotion_codes: true,
       success_url: `${req.headers.get("origin")}/dashboard?success=true`,
       cancel_url: `${req.headers.get("origin")}/pricing?canceled=true`,
       subscription_data: {
         metadata: {
-          user_id: userId,
+          user_id: user.id,
         },
       },
     });
@@ -121,7 +133,7 @@ const handler = async (req: Request): Promise<Response> => {
         details: err instanceof Error ? err.stack : undefined
       }),
       { 
-        status: 500, 
+        status: err instanceof Error && err.message === 'Invalid token' ? 401 : 500, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       }
     );

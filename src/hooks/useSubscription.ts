@@ -26,19 +26,21 @@ export const useSubscription = () => {
         );
         
         if (error) {
+          // Log the full error for debugging
+          console.error('Subscription check error:', JSON.stringify(error, null, 2));
+          
           // If we get an authentication error, return false instead of throwing
           if (error.status === 401) {
             console.log('Subscription check failed due to auth error, returning false');
             return false;
           }
-          console.error('Error checking subscription:', error);
           throw error;
         }
         
         console.log('Subscription check result:', data);
         return data;
       } catch (error) {
-        // If there's a network error or other issue, log it and return false
+        // Log the full error for debugging
         console.error('Subscription check failed:', error);
         return false;
       }

@@ -46,17 +46,27 @@ export const SubscriptionGuard = ({ children }: { children: React.ReactNode }) =
           description: "Please subscribe to access this feature."
         }
       );
-      navigate("/pricing");
+      navigate("/pricing", { replace: true }); // Added replace: true to prevent back navigation
+      return;
     }
-  }, [hasActiveSubscription, isLoading, navigate, user, session, error, isPublicRoute]);
+  }, [hasActiveSubscription, isLoading, navigate, user, session, error, isPublicRoute, location.pathname]);
 
   // Always render content for public routes
   if (isPublicRoute) {
     return <>{children}</>;
   }
 
-  // Show nothing while loading or if not authenticated
-  if (isLoading || !user || !session) {
+  // Show loading state while checking subscription
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  // Show nothing if not authenticated
+  if (!user || !session) {
     return null;
   }
 

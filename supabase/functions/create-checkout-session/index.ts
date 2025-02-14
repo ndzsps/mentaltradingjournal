@@ -42,41 +42,36 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const { priceId, userId } = await req.json();
-    console.log("Received request for price:", priceId, "user:", userId);
+    console.log("Received checkout request for user:", userId, "price:", priceId);
 
-    // Create or retrieve customer
-    let { data: subscriptions, error: subscriptionError } = await supabase
+    // Get user's email from auth.users using admin API
+    const { data: { user }, error: userError } = await supabase.auth.admin.getUserById(userId);
+
+    if (userError || !user?.email) {
+      console.error("Error fetching user:", userError);
+      throw new Error("Could not fetch user data");
+    }
+
+    console.log("Found user email:", user.email);
+
+    // Create or retrieve Stripe customer
+    let customerId: string;
+
+    // First check if user already has a customer ID in subscriptions table
+    const { data: subscription } = await supabase
       .from("subscriptions")
       .select("stripe_customer_id")
       .eq("user_id", userId)
       .maybeSingle();
 
-    if (subscriptionError) {
-      console.error("Error fetching subscription:", subscriptionError);
-      throw new Error("Error fetching subscription data");
-    }
-
-    let customerId = subscriptions?.stripe_customer_id;
-
-    if (!customerId) {
-      const { data: userProfile, error: profileError } = await supabase
-        .from("profiles")
-        .select("email")
-        .eq("id", userId)
-        .single();
-
-      if (profileError) {
-        console.error("Error fetching user profile:", profileError);
-        throw new Error("Error fetching user profile");
-      }
-
-      if (!userProfile?.email) {
-        console.error("No email found for user:", userId);
-        throw new Error("User email not found");
-      }
-
+    if (subscription?.stripe_customer_id) {
+      console.log("Found existing Stripe customer:", subscription.stripe_customer_id);
+      customerId = subscription.stripe_customer_id;
+    } else {
+      // Create new Stripe customer
+      console.log("Creating new Stripe customer for email:", user.email);
       const customer = await stripe.customers.create({
-        email: userProfile.email,
+        email: user.email,
         metadata: {
           user_id: userId,
         },
@@ -85,9 +80,8 @@ const handler = async (req: Request): Promise<Response> => {
       console.log("Created new Stripe customer:", customerId);
     }
 
-    console.log("Using customer ID:", customerId);
-    console.log("Creating checkout session with price ID:", priceId);
-
+    // Create checkout session
+    console.log("Creating checkout session with customerId:", customerId);
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       line_items: [
@@ -97,7 +91,7 @@ const handler = async (req: Request): Promise<Response> => {
         },
       ],
       mode: "subscription",
-      allow_promotion_codes: true, // Enable promotion code field
+      allow_promotion_codes: true,
       success_url: `${req.headers.get("origin")}/dashboard?success=true`,
       cancel_url: `${req.headers.get("origin")}/pricing?canceled=true`,
       subscription_data: {

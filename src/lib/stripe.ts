@@ -1,5 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export async function createCheckoutSession(priceId: string) {
   try {
@@ -16,7 +17,11 @@ export async function createCheckoutSession(priceId: string) {
       },
     });
 
-    if (error) throw error;
+    if (error) {
+      console.error('Checkout error:', error);
+      toast.error("Failed to start checkout process. Please try again.");
+      throw error;
+    }
     if (!data?.url) throw new Error('No checkout URL returned');
 
     window.location.href = data.url;

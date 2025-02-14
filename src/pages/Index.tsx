@@ -3,11 +3,28 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { EmotionLogger } from "@/components/journal/EmotionLogger";
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate } from "react-router-dom";
+import { useSubscription } from "@/hooks/useSubscription";
 
 const Index = () => {
   const { user } = useAuth();
+  const { data: hasActiveSubscription, isLoading } = useSubscription();
 
+  // If not logged in, redirect to pricing
   if (!user) {
+    return <Navigate to="/pricing" replace />;
+  }
+
+  // If subscription check is loading, show loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#1A1F2C] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  // If no subscription, redirect to pricing
+  if (hasActiveSubscription === false) {
     return <Navigate to="/pricing" replace />;
   }
 

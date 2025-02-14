@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -7,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useSubscription } from "@/hooks/useSubscription";
 
 const Login = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -20,46 +20,17 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
+  const { data: hasSubscription, isLoading: isSubscriptionLoading } = useSubscription();
 
-  // Get the return URL from the query parameters
-  const searchParams = new URLSearchParams(location.search);
-  const returnTo = searchParams.get('returnTo') || '/dashboard';
-
-  // Only redirect if user is logged in and NOT in reset password mode
   useEffect(() => {
-    if (user && !isResetPassword) {
-      // Redirect to the return URL if authenticated
-      navigate(returnTo);
-    }
-  }, [user, navigate, isResetPassword, returnTo]);
-
-  // Check for recovery token in URL
-  useEffect(() => {
-    const checkForRecoveryToken = async () => {
-      try {
-        const fragments = new URLSearchParams(window.location.hash.substring(1));
-        const accessToken = fragments.get('access_token');
-        const type = fragments.get('type');
-        
-        if (accessToken && type === 'recovery') {
-          setIsResetPassword(true);
-          toast({
-            title: "Reset Password",
-            description: "Please enter your new password below.",
-          });
-        }
-      } catch (error) {
-        console.error('Error checking recovery token:', error);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Unable to process password reset. Please try again.",
-        });
+    if (user && !isResetPassword && !isSubscriptionLoading) {
+      if (hasSubscription === false) {
+        navigate('/pricing', { replace: true });
+      } else if (hasSubscription === true) {
+        navigate('/dashboard', { replace: true });
       }
-    };
-
-    checkForRecoveryToken();
-  }, [toast]);
+    }
+  }, [user, hasSubscription, isSubscriptionLoading, isResetPassword, navigate]);
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,15 +56,13 @@ const Login = () => {
         description: "Please sign in with your new password.",
       });
       
-      // Clear passwords
+      // Clear passwords and reset state
       setPassword("");
       setConfirmPassword("");
       setIsResetPassword(false);
       
-      // Clear the URL
+      // Clear the URL and sign out
       window.history.replaceState({}, document.title, window.location.pathname);
-      
-      // Force logout to ensure security
       await supabase.auth.signOut();
       
     } catch (error) {
@@ -135,7 +104,6 @@ const Login = () => {
         });
       } else {
         await signIn(email, password);
-        navigate(returnTo);
       }
     } catch (error) {
       console.error('Auth error:', error);

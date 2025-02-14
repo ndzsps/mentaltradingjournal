@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -67,7 +66,7 @@ const Landing = () => {
               </Button>
               <Button
                 className="flex items-center gap-2 bg-primary/20 hover:bg-primary/30 text-primary-light border border-primary/20 backdrop-blur-sm"
-                onClick={() => navigate("/login")}
+                onClick={() => navigate("/pricing")}
               >
                 <span>Get Started</span>
                 <ArrowRightCircle className="h-4 w-4" />
@@ -95,7 +94,7 @@ const Landing = () => {
                 <Button
                   size="lg"
                   className="text-lg px-8 py-6 bg-primary hover:bg-primary/90 backdrop-blur-lg shadow-lg shadow-primary/20"
-                  onClick={() => navigate("/login")}
+                  onClick={() => navigate("/pricing")}
                 >
                   Sign up with email
                 </Button>
@@ -103,7 +102,7 @@ const Landing = () => {
                   variant="outline"
                   size="lg"
                   className="text-lg px-8 py-6 border-gray-700 hover:bg-gray-800/50 backdrop-blur-lg"
-                  onClick={() => navigate("/login")}
+                  onClick={() => navigate("/pricing")}
                 >
                   Try Demo
                 </Button>
@@ -188,7 +187,7 @@ const Landing = () => {
                 <Button
                   size="lg"
                   className="text-lg px-8 py-6 bg-white/10 hover:bg-white/20 backdrop-blur-lg border border-white/10 transition-all duration-300"
-                  onClick={() => navigate("/login")}
+                  onClick={() => navigate("/pricing")}
                 >
                   Focus on what matters →
                 </Button>
@@ -204,4 +203,3 @@ const Landing = () => {
 };
 
 export default Landing;
-

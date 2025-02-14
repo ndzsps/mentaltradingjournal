@@ -15,7 +15,7 @@ export const useSubscription = () => {
       }
 
       try {
-        console.log('Checking subscription status with token...');
+        console.log('Checking subscription status...');
         const { data, error } = await supabase.functions.invoke(
           'check-subscription',
           {

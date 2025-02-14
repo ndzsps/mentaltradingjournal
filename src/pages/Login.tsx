@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useSubscription } from "@/hooks/useSubscription";
 
 const Login = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -17,6 +18,7 @@ const Login = () => {
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [isResetPassword, setIsResetPassword] = useState(false);
   const { signIn, signUp, user } = useAuth();
+  const { data: hasActiveSubscription } = useSubscription();
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
@@ -28,10 +30,15 @@ const Login = () => {
   // Only redirect if user is logged in and NOT in reset password mode
   useEffect(() => {
     if (user && !isResetPassword) {
-      // Redirect to the return URL if authenticated
-      navigate(returnTo);
+      // If user has no subscription, redirect to pricing
+      if (hasActiveSubscription === false) {
+        navigate('/pricing');
+      } else {
+        // If user has subscription, redirect to the return URL
+        navigate(returnTo);
+      }
     }
-  }, [user, navigate, isResetPassword, returnTo]);
+  }, [user, navigate, isResetPassword, returnTo, hasActiveSubscription]);
 
   // Check for recovery token in URL
   useEffect(() => {
@@ -135,7 +142,6 @@ const Login = () => {
         });
       } else {
         await signIn(email, password);
-        navigate(returnTo);
       }
     } catch (error) {
       console.error('Auth error:', error);

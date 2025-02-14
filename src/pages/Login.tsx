@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -18,7 +17,7 @@ const Login = () => {
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [isResetPassword, setIsResetPassword] = useState(false);
   const { signIn, signUp, user } = useAuth();
-  const { data: hasActiveSubscription } = useSubscription();
+  const { data: hasActiveSubscription, isLoading: isSubscriptionLoading } = useSubscription();
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
@@ -27,18 +26,19 @@ const Login = () => {
   const searchParams = new URLSearchParams(location.search);
   const returnTo = searchParams.get('returnTo') || '/dashboard';
 
-  // Only redirect if user is logged in and NOT in reset password mode
+  // Only redirect if user is logged in, NOT in reset password mode, and subscription check is complete
   useEffect(() => {
-    if (user && !isResetPassword) {
+    if (user && !isResetPassword && !isSubscriptionLoading) {
+      console.log('Login redirect - User:', !!user, 'Subscription:', hasActiveSubscription);
       // If user has no subscription, redirect to pricing
       if (hasActiveSubscription === false) {
-        navigate('/pricing');
-      } else {
-        // If user has subscription, redirect to the return URL
-        navigate(returnTo);
+        navigate('/pricing', { replace: true });
+      } else if (hasActiveSubscription === true) {
+        // Only redirect to returnTo if user has an active subscription
+        navigate(returnTo, { replace: true });
       }
     }
-  }, [user, navigate, isResetPassword, returnTo, hasActiveSubscription]);
+  }, [user, navigate, isResetPassword, returnTo, hasActiveSubscription, isSubscriptionLoading]);
 
   // Check for recovery token in URL
   useEffect(() => {

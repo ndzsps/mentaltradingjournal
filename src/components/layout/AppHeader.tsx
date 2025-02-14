@@ -46,7 +46,6 @@ export function AppHeader() {
 
   const displayName = user?.user_metadata?.username || user?.email?.split('@')[0] || 'User';
   const userEmail = user?.email;
-  const isPricingPage = location.pathname === '/pricing';
 
   return (
     <header className="border-b border-border/40 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -127,11 +126,9 @@ export function AppHeader() {
               <Button variant="ghost" asChild>
                 <Link to="/login">Sign In</Link>
               </Button>
-              {!isPricingPage && (
-                <Button asChild>
-                  <Link to="/pricing">Get Started</Link>
-                </Button>
-              )}
+              <Button asChild>
+                <Link to="/pricing">Get Started</Link>
+              </Button>
             </div>
           )}
         </nav>
@@ -203,11 +200,9 @@ export function AppHeader() {
                   <Button variant="outline" className="w-full" asChild>
                     <Link to="/login">Sign In</Link>
                   </Button>
-                  {!isPricingPage && (
-                    <Button className="w-full" asChild>
-                      <Link to="/pricing">Get Started</Link>
-                    </Button>
-                  )}
+                  <Button className="w-full" asChild>
+                    <Link to="/pricing">Get Started</Link>
+                  </Button>
                 </div>
               )}
             </nav>

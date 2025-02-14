@@ -1,16 +1,8 @@
 
 import { AppLayout } from "@/components/layout/AppLayout";
 import { EmotionLogger } from "@/components/journal/EmotionLogger";
-import { useAuth } from "@/contexts/AuthContext";
-import { Navigate } from "react-router-dom";
 
 const Index = () => {
-  const { user } = useAuth();
-
-  if (!user) {
-    return <Navigate to="/pricing" replace />;
-  }
-
   return (
     <div className="min-h-screen bg-[#1A1F2C]">
       <div className="fixed inset-0">

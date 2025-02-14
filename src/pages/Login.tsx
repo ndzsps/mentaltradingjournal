@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useSubscription } from "@/hooks/useSubscription";
 
 const Login = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -21,23 +20,23 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  const { data: hasSubscription, isLoading: isSubscriptionLoading } = useSubscription();
 
+  // Get the return URL from the query parameters
+  const searchParams = new URLSearchParams(location.search);
+  const returnTo = searchParams.get('returnTo') || '/dashboard';
+
+  // Only redirect if user is logged in and NOT in reset password mode
   useEffect(() => {
-    if (user && !isResetPassword && !isSubscriptionLoading) {
-      if (hasSubscription === false) {
-        navigate('/pricing', { replace: true });
-      } else if (hasSubscription === true) {
-        navigate('/dashboard', { replace: true });
-      }
+    if (user && !isResetPassword) {
+      // Redirect to the return URL if authenticated
+      navigate(returnTo);
     }
-  }, [user, hasSubscription, isSubscriptionLoading, isResetPassword, navigate]);
+  }, [user, navigate, isResetPassword, returnTo]);
 
-  // Check for verification tokens or recovery tokens in URL
+  // Check for recovery token in URL
   useEffect(() => {
-    const checkForTokens = async () => {
+    const checkForRecoveryToken = async () => {
       try {
-        // Check hash fragment first (for password recovery)
         const fragments = new URLSearchParams(window.location.hash.substring(1));
         const accessToken = fragments.get('access_token');
         const type = fragments.get('type');
@@ -48,30 +47,18 @@ const Login = () => {
             title: "Reset Password",
             description: "Please enter your new password below.",
           });
-          return;
-        }
-
-        // Check query parameters for email verification
-        const searchParams = new URLSearchParams(window.location.search);
-        if (searchParams.has('access_token')) {
-          toast({
-            title: "Email verified",
-            description: "Your email has been verified. You can now sign in.",
-          });
-          // Clean up the URL
-          window.history.replaceState({}, document.title, window.location.pathname);
         }
       } catch (error) {
-        console.error('Error checking tokens:', error);
+        console.error('Error checking recovery token:', error);
         toast({
           variant: "destructive",
           title: "Error",
-          description: "Unable to process verification. Please try again.",
+          description: "Unable to process password reset. Please try again.",
         });
       }
     };
 
-    checkForTokens();
+    checkForRecoveryToken();
   }, [toast]);
 
   const handleResetPassword = async (e: React.FormEvent) => {
@@ -98,13 +85,15 @@ const Login = () => {
         description: "Please sign in with your new password.",
       });
       
-      // Clear passwords and reset state
+      // Clear passwords
       setPassword("");
       setConfirmPassword("");
       setIsResetPassword(false);
       
-      // Clear the URL and sign out
+      // Clear the URL
       window.history.replaceState({}, document.title, window.location.pathname);
+      
+      // Force logout to ensure security
       await supabase.auth.signOut();
       
     } catch (error) {
@@ -146,6 +135,7 @@ const Login = () => {
         });
       } else {
         await signIn(email, password);
+        navigate(returnTo);
       }
     } catch (error) {
       console.error('Auth error:', error);
